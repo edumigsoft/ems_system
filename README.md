@@ -1,6 +1,28 @@
-# EMS System (EduMig System)
+# EMS System (EduMigSoft System)
 
-Sistema de Gestão de features para o EduMig.
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/edumigsoft/ems_system/releases)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
+[![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.0.0-02569B.svg?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-%3E%3D3.0.0-0175C2.svg?logo=dart&logoColor=white)](https://dart.dev)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+Sistema de Gestão de features para o EduMigSoft.
+
+## 📊 Status do Projeto
+
+| Módulo | Status | Versão | Descrição |
+|--------|--------|--------|-----------|
+| Core Shared | 🟡 Em desenvolvimento | 0.1.0 | Funcionalidades compartilhadas |
+| Core Server | 🟡 Em desenvolvimento | 0.1.0 | Núcleo do servidor |
+| Core Client | 🟡 Em desenvolvimento | 0.1.0 | Núcleo do cliente |
+| UI Components | 🟡 Em desenvolvimento | 0.1.0 | Componentes de interface |
+| Design System | 🟡 Em desenvolvimento | 0.1.0 | Sistema de design |
+| App Flutter | 🔴 Planejado | 0.0.0 | Aplicativo mobile |
+| Server Dart/Shelf | 🔴 Planejado | 0.0.0 | Backend API |
+
+**Legenda:** 🟢 Ativo | 🟡 Em desenvolvimento | 🔴 Planejado
+
+## ✨ Features
 
 Features da ideia inicial:
 - App em Flutter

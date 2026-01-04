@@ -24,5 +24,5 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - Configuração de servers (server Dart/Shelf)
 - Documentação inicial (README.md, CHANGELOG.md, LICENSE.md, CONTRIBUTING.md)
 
-[Unreleased]: https://github.com/seu-usuario/ems_system/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/seu-usuario/ems_system/releases/tag/v0.1.0
+[Unreleased]: https://github.com/edumigsoft/ems_system/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/edumigsoft/ems_system/releases/tag/v0.1.0

@@ -127,7 +127,7 @@ Tipos de commit:
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/ems_system.git
+git clone https://github.com/edumigsoft/ems_system.git
 cd ems_system
 
 # Instale dependências
