@@ -11,4 +11,12 @@ class AppColorPalette {
   // Variações
   static const primaryLight = ColorValue(0xFF9A67EA);
   static const primaryDark = ColorValue(0xFF3700B3);
+
+  // Card Light
+  static ColorValue? cardBackgroundLight;
+  static ColorValue? cardBorderLight;
+
+  // Card Dark
+  static ColorValue? cardBackgroundDark;
+  static ColorValue? cardBorderDark;
 }
