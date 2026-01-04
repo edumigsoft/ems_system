@@ -1,13 +1,13 @@
 {
   "roots": [
-    "design_system_shared"
+    "localizations_server"
   ],
   "packages": [
     {
-      "name": "design_system_shared",
+      "name": "localizations_server",
       "version": "0.1.0",
       "dependencies": [
-        "meta"
+        "localizations_shared"
       ],
       "devDependencies": [
         "lints",
@@ -51,9 +51,11 @@
       "dependencies": []
     },
     {
-      "name": "meta",
-      "version": "1.17.0",
-      "dependencies": []
+      "name": "localizations_shared",
+      "version": "0.1.0",
+      "dependencies": [
+        "meta"
+      ]
     },
     {
       "name": "yaml",
@@ -302,6 +304,11 @@
         "watcher",
         "yaml"
       ]
+    },
+    {
+      "name": "meta",
+      "version": "1.17.0",
+      "dependencies": []
     },
     {
       "name": "string_scanner",

@@ -1,5 +1,5 @@
-name: design_system_ui
-description: UI Package for Design System.
+name: localizations_ui
+description: UI Package for Localizations Configuration.
 version: 0.1.0
 publish_to: none
 
@@ -10,13 +10,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   dio: ^5.9.0
   logging: ^1.3.0
   get_it: ^9.2.0
-  design_system_shared:
-    path: ../design_system_shared
+  localizations_shared:
+    path: ../localizations_shared
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+
+flutter:
+  generate: true

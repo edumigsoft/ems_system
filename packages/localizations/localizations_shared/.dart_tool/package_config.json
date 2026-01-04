@@ -290,7 +290,7 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "design_system_shared",
+      "name": "localizations_shared",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.10"

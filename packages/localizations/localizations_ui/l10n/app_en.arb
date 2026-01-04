@@ -1,0 +1,78 @@
+{
+    "@@locale": "en",
+    "appName": "My Application",
+    "@appName": {
+        "description": "The application name"
+    },
+    "welcomeMessage": "Welcome!",
+    "@welcomeMessage": {
+        "description": "Welcome message shown on home screen"
+    },
+    "errorGeneric": "An error occurred. Please try again.",
+    "@errorGeneric": {
+        "description": "Generic error message"
+    },
+    "loginError": "Login failed: {reason}",
+    "@loginError": {
+        "description": "Error message for login failures",
+        "placeholders": {
+            "reason": {
+                "type": "String",
+                "example": "Invalid credentials"
+            }
+        }
+    },
+    "serverErrorLog": "SERVER ERROR: {error}",
+    "@serverErrorLog": {
+        "description": "Server error log format",
+        "placeholders": {
+            "error": {
+                "type": "String"
+            }
+        }
+    },
+    "emailSubjectWelcome": "Welcome to the system, {userName}!",
+    "@emailSubjectWelcome": {
+        "description": "Welcome email subject",
+        "placeholders": {
+            "userName": {
+                "type": "String",
+                "example": "John"
+            }
+        }
+    },
+    "itemCount": "{count, plural, =0{No items} =1{1 item} other{{count} items}}",
+    "@itemCount": {
+        "description": "Display count of items with pluralization",
+        "placeholders": {
+            "count": {
+                "type": "int",
+                "format": "compact"
+            }
+        }
+    },
+    "lastUpdated": "Last updated: {date}",
+    "@lastUpdated": {
+        "description": "Shows the last update timestamp",
+        "placeholders": {
+            "date": {
+                "type": "DateTime",
+                "format": "yMd"
+            }
+        }
+    },
+    "buttonSave": "Save",
+    "@buttonSave": {},
+    "buttonCancel": "Cancel",
+    "@buttonCancel": {},
+    "buttonConfirm": "Confirm",
+    "@buttonConfirm": {},
+    "buttonDelete": "Delete",
+    "@buttonDelete": {},
+    "validationEmailInvalid": "Please enter a valid email address",
+    "@validationEmailInvalid": {},
+    "validationPasswordTooShort": "Password must be at least 8 characters",
+    "@validationPasswordTooShort": {},
+    "validationRequired": "This field is required",
+    "@validationRequired": {}
+}

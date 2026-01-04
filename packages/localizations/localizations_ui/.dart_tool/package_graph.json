@@ -1,16 +1,18 @@
 {
   "roots": [
-    "design_system_ui"
+    "localizations_ui"
   ],
   "packages": [
     {
-      "name": "design_system_ui",
+      "name": "localizations_ui",
       "version": "0.1.0",
       "dependencies": [
-        "design_system_shared",
         "dio",
         "flutter",
+        "flutter_localizations",
         "get_it",
+        "intl",
+        "localizations_shared",
         "logging"
       ],
       "devDependencies": [
@@ -44,7 +46,7 @@
       ]
     },
     {
-      "name": "design_system_shared",
+      "name": "localizations_shared",
       "version": "0.1.0",
       "dependencies": [
         "meta"
@@ -74,6 +76,24 @@
         "http_parser",
         "meta",
         "mime",
+        "path"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
         "path"
       ]
     },

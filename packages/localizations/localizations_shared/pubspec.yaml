@@ -1,5 +1,5 @@
-name: design_system_shared
-description: Shared design system.
+name: localizations_shared
+description: Shared localizations.
 version: 0.1.0
 publish_to: none
 

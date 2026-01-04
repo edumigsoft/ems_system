@@ -1,10 +1,10 @@
 {
   "roots": [
-    "design_system_shared"
+    "localizations_shared"
   ],
   "packages": [
     {
-      "name": "design_system_shared",
+      "name": "localizations_shared",
       "version": "0.1.0",
       "dependencies": [
         "meta"
