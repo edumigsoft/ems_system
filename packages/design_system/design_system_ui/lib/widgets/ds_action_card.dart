@@ -1,3 +1,4 @@
+import 'package:design_system_shared/design_system_shared.dart';
 import 'package:flutter/material.dart';
 
 import 'ds_card.dart';
@@ -6,19 +7,10 @@ import 'ds_card.dart';
 ///
 /// Exibe um card com foco em uma ação primária.
 class DSActionCard extends StatelessWidget {
-  /// Ícone da ação
   final IconData icon;
-
-  /// Título da ação
   final String title;
-
-  /// Descrição da ação
   final String description;
-
-  /// Callback da ação
   final VoidCallback onTap;
-
-  /// Cor de destaque
   final Color? accentColor;
 
   const DSActionCard({
@@ -37,14 +29,14 @@ class DSActionCard extends StatelessWidget {
 
     return DSCard(
       onTap: onTap,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(DSPaddings.medium),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(DSPaddings.medium),
             decoration: BoxDecoration(
               color: effectiveAccentColor.withAlpha(25),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(DSRadius.large),
             ),
             child: Icon(
               icon,
@@ -52,7 +44,7 @@ class DSActionCard extends StatelessWidget {
               size: 32,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: DSPaddings.medium),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +55,7 @@ class DSActionCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: DSPaddings.tiny),
                 Text(
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(

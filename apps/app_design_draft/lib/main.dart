@@ -82,57 +82,80 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Design System Demo'),
-        actions: [
-          IconButton(
-            icon: Icon(
-              currentThemeMode == ThemeMode.dark
-                  ? Icons.light_mode
-                  : Icons.dark_mode,
+    return Container(
+      color: Theme.of(context).cardColor.withAlpha(240),
+      child: DSCard(
+        padding: const EdgeInsets.all(DSPaddings.tiny),
+        child: Row(
+          children: [
+            DSCard(
+              width: 260,
+              child: Center(
+                child: Text('Sidebar'),
+              ),
             ),
-            onPressed: () {
-              onThemeModeChange(
-                currentThemeMode == ThemeMode.dark
-                    ? ThemeMode.light
-                    : ThemeMode.dark,
-              );
-            },
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // Theme Selector
-          _buildThemeSelector(context),
+            Expanded(
+              child: DSCard(
+                child: Center(
+                  child: Text('Content'),
+                ),
+              ),
+            ),
+          ],
+        ),
+        // child: Scaffold(
+        //   appBar: AppBar(
+        //     title: const Text('Design System Demo'),
+        //     actions: [
+        //       IconButton(
+        //         icon: Icon(
+        //           currentThemeMode == ThemeMode.dark
+        //               ? Icons.light_mode
+        //               : Icons.dark_mode,
+        //         ),
+        //         onPressed: () {
+        //           onThemeModeChange(
+        //             currentThemeMode == ThemeMode.dark
+        //                 ? ThemeMode.light
+        //                 : ThemeMode.dark,
+        //           );
+        //         },
+        //       ),
+        //     ],
+        //   ),
+        //   body: ListView(
+        //     padding: const EdgeInsets.all(16),
+        //     children: [
+        //       // Theme Selector
+        //       _buildThemeSelector(context),
 
-          const SizedBox(height: 24),
+        //       const SizedBox(height: 24),
 
-          // Dashboard Section
-          _buildSectionTitle(context, 'Dashboard - DSInfoCard'),
-          _buildDashboard(context),
+        //       // Dashboard Section
+        //       _buildSectionTitle(context, 'Dashboard - DSInfoCard'),
+        //       _buildDashboard(context),
 
-          const SizedBox(height: 24),
+        //       const SizedBox(height: 24),
 
-          // Actions Section
-          _buildSectionTitle(context, 'Ações Rápidas - DSActionCard'),
-          _buildQuickActions(context),
+        //       // Actions Section
+        //       _buildSectionTitle(context, 'Ações Rápidas - DSActionCard'),
+        //       _buildQuickActions(context),
 
-          const SizedBox(height: 24),
+        //       const SizedBox(height: 24),
 
-          // Standard Cards Section
-          _buildSectionTitle(context, 'Cards Padrão - DSCard'),
-          _buildStandardCards(context),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          _showBottomSheet(context);
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Nova Ação'),
+        //       // Standard Cards Section
+        //       _buildSectionTitle(context, 'Cards Padrão - DSCard'),
+        //       _buildStandardCards(context),
+        //     ],
+        //   ),
+        //   floatingActionButton: FloatingActionButton.extended(
+        //     onPressed: () {
+        //       _showBottomSheet(context);
+        //     },
+        //     icon: const Icon(Icons.add),
+        //     label: const Text('Nova Ação'),
+        //   ),
+        // ),
       ),
     );
   }
@@ -147,6 +170,7 @@ class HomePage extends StatelessWidget {
     };
 
     return DSCard(
+      hasShadow: false,
       title: 'Tema Atual',
       subtitle: 'Selecione um tema personalizado',
       leading: Icon(Icons.palette, color: context.dsColors.primary),

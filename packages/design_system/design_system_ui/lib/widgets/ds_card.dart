@@ -1,3 +1,4 @@
+import 'package:design_system_shared/design_system_shared.dart';
 import 'package:flutter/material.dart';
 
 /// Card personalizado do Design System
@@ -19,50 +20,26 @@ import 'package:flutter/material.dart';
 /// )
 /// ```
 class DSCard extends StatelessWidget {
-  /// Título principal do card
   final String? title;
-
-  /// Subtítulo ou descrição
   final String? subtitle;
-
-  /// Conteúdo principal do card
   final Widget? child;
-
-  /// Widget à esquerda do título (geralmente um ícone)
   final Widget? leading;
-
-  /// Widget à direita do título
   final Widget? trailing;
-
-  /// Callback quando o card é tocado
   final VoidCallback? onTap;
-
-  /// Padding interno do card
   final EdgeInsets? padding;
-
-  /// Cor de fundo customizada
   final Color? backgroundColor;
-
-  /// Elevação (sombra) customizada
   final double? elevation;
-
-  /// Border radius customizado
   final BorderRadius? borderRadius;
-
-  /// Borda customizada
   final Border? border;
-
-  /// Lista de widgets de ação no rodapé
   final List<Widget>? actions;
-
-  /// Margem externa do card
   final EdgeInsets? margin;
-
-  /// Se deve mostrar um indicador de carregamento
   final bool isLoading;
-
-  /// Se o card está desabilitado
   final bool isDisabled;
+  final double? width;
+  final double? height;
+  final bool hasShadow;
+  final bool hasBorder;
+  final List<BoxShadow>? boxShadow;
 
   const DSCard({
     super.key,
@@ -81,6 +58,14 @@ class DSCard extends StatelessWidget {
     this.margin,
     this.isLoading = false,
     this.isDisabled = false,
+    this.width,
+    this.height,
+    this.hasShadow = true,
+    this.hasBorder = false,
+    this.boxShadow,
+
+    // this.borderRadius,
+    // this.borderColor,
   });
 
   @override
@@ -92,34 +77,73 @@ class DSCard extends StatelessWidget {
         borderRadius ??
         (cardTheme.shape as RoundedRectangleBorder?)?.borderRadius
             as BorderRadius? ??
-        BorderRadius.circular(12);
+        BorderRadius.circular(DSRadius.large);
 
-    final cardContent = Padding(
-      padding: padding ?? const EdgeInsets.all(16.0),
+    final effectivePadding = padding ?? const EdgeInsets.all(DSPaddings.medium);
+
+    List<BoxShadow> effectiveBoxShadow = [];
+    if (hasShadow) {
+      const dsBoxShadow = DSBoxShadow.small;
+      effectiveBoxShadow =
+          boxShadow ??
+          <BoxShadow>[
+            BoxShadow(
+              color: cardTheme.shadowColor!,
+              blurRadius: dsBoxShadow.blurRadius,
+              spreadRadius: dsBoxShadow.spreadRadius,
+              offset: Offset(
+                dsBoxShadow.offset.dx,
+                dsBoxShadow.offset.dy,
+              ),
+            ),
+            BoxShadow(
+              color: cardTheme.shadowColor!,
+              blurRadius: dsBoxShadow.blurRadius,
+              spreadRadius: dsBoxShadow.spreadRadius,
+              offset: Offset(
+                dsBoxShadow.offset.dx,
+                dsBoxShadow.offset.dy,
+              ),
+            ),
+          ];
+    }
+
+    // final effectiveBorderColor =
+    //     borderColor ?? dsTheme?.border ?? DSPrimitiveColors.neutralGrey300;
+
+    final container = Container(
+      width: width,
+      height: height,
+      padding: effectivePadding,
+      decoration: BoxDecoration(
+        // color: backgroundColor ?? cardTheme.color?.withAlpha(125),
+        color: Colors.transparent,
+        borderRadius: effectiveBorderRadius,
+        //   // border: hasBorder ? Border.all(color: effectiveBorderColor) : null,
+        boxShadow: effectiveBoxShadow,
+        shape: BoxShape.rectangle,
+      ),
       child: isLoading
           ? _buildLoadingState(context)
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize: MainAxisSize.max,
               children: [
-                // Header com título, leading e trailing
                 if (title != null || leading != null || trailing != null)
                   _buildHeader(context),
 
                 if ((title != null || leading != null || trailing != null) &&
                     (child != null || actions != null))
-                  const SizedBox(height: 12),
+                  const SizedBox(height: DSPaddings.extraSmall),
 
-                // Conteúdo principal
                 if (child != null)
                   Opacity(
                     opacity: isDisabled ? 0.5 : 1.0,
                     child: child!,
                   ),
 
-                // Actions
                 if (actions != null && actions!.isNotEmpty) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: DSPaddings.medium),
                   _buildActions(),
                 ],
               ],
@@ -129,25 +153,28 @@ class DSCard extends StatelessWidget {
     final card = Card(
       elevation: elevation ?? cardTheme.elevation,
       color: backgroundColor ?? cardTheme.color,
+      // color: backgroundColor ?? cardTheme.color?.withAlpha(200),
+      // color: Colors.transparent,
       margin: margin ?? cardTheme.margin,
-      shape: border != null
-          ? RoundedRectangleBorder(
-              borderRadius: effectiveBorderRadius,
-              side: border!.top,
-            )
-          : RoundedRectangleBorder(
-              borderRadius: effectiveBorderRadius,
-              side:
-                  (cardTheme.shape as RoundedRectangleBorder?)?.side ??
-                  BorderSide.none,
-            ),
-      child: cardContent,
+      // shape: border != null
+      //     ? RoundedRectangleBorder(
+      //         borderRadius: effectiveBorderRadius,
+      //         side: border!.top,
+      //       )
+      //     : RoundedRectangleBorder(
+      //         borderRadius: effectiveBorderRadius,
+      //         side:
+      //             (cardTheme.shape as RoundedRectangleBorder?)?.side ??
+      //             BorderSide.none,
+      //       ),
+      // child: child,
+      child: container,
     );
 
     if (onTap != null && !isDisabled && !isLoading) {
       return InkWell(
         onTap: onTap,
-        borderRadius: effectiveBorderRadius,
+        // borderRadius: effectiveBorderRadius,
         child: card,
       );
     }
@@ -165,7 +192,7 @@ class DSCard extends StatelessWidget {
             opacity: isDisabled ? 0.5 : 1.0,
             child: leading!,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: DSPaddings.extraSmall),
         ],
         Expanded(
           child: Column(
@@ -182,7 +209,7 @@ class DSCard extends StatelessWidget {
                   ),
                 ),
               if (subtitle != null) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: DSPaddings.tiny),
                 Text(
                   subtitle!,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -196,7 +223,7 @@ class DSCard extends StatelessWidget {
           ),
         ),
         if (trailing != null) ...[
-          const SizedBox(width: 12),
+          const SizedBox(width: DSPaddings.extraSmall),
           Opacity(
             opacity: isDisabled ? 0.5 : 1.0,
             child: trailing!,
@@ -212,7 +239,7 @@ class DSCard extends StatelessWidget {
       children: actions!
           .map(
             (action) => Padding(
-              padding: const EdgeInsets.only(left: 8.0),
+              padding: const EdgeInsets.only(left: DSPaddings.extraSmall),
               child: Opacity(
                 opacity: isDisabled ? 0.5 : 1.0,
                 child: action,
@@ -226,7 +253,7 @@ class DSCard extends StatelessWidget {
   Widget _buildLoadingState(BuildContext context) {
     return const Center(
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(DSPaddings.medium),
         child: CircularProgressIndicator(),
       ),
     );

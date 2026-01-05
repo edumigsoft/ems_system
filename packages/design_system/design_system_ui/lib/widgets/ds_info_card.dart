@@ -1,3 +1,4 @@
+import 'package:design_system_shared/design_system_shared.dart';
 import 'package:flutter/material.dart';
 
 import 'ds_card.dart';
@@ -7,31 +8,14 @@ import 'ds_card.dart';
 /// Exibe um ícone, título e valor de forma compacta.
 /// Ideal para dashboards e métricas.
 class DSInfoCard extends StatelessWidget {
-  /// Ícone principal
   final IconData icon;
-
-  /// Título/label da informação
   final String title;
-
-  /// Valor principal a ser exibido
   final String value;
-
-  /// Cor do ícone
   final Color? iconColor;
-
-  /// Cor de fundo do card
   final Color? backgroundColor;
-
-  /// Callback quando tocado
   final VoidCallback? onTap;
-
-  /// Texto opcional no rodapé
   final String? footer;
-
-  /// Ícone de tendência (opcional)
   final IconData? trendIcon;
-
-  /// Cor da tendência
   final Color? trendColor;
 
   const DSInfoCard({
@@ -55,17 +39,17 @@ class DSInfoCard extends StatelessWidget {
     return DSCard(
       backgroundColor: backgroundColor,
       onTap: onTap,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(DSPaddings.medium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(DSPaddings.extraSmall),
                 decoration: BoxDecoration(
                   color: effectiveIconColor.withAlpha(25),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(DSRadius.medium),
                 ),
                 child: Icon(
                   icon,
@@ -73,7 +57,7 @@ class DSInfoCard extends StatelessWidget {
                   size: 28,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: DSPaddings.medium),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,7 +68,7 @@ class DSInfoCard extends StatelessWidget {
                         color: theme.colorScheme.onSurface.withAlpha(192),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: DSPaddings.tiny),
                     Row(
                       children: [
                         Text(
@@ -94,7 +78,7 @@ class DSInfoCard extends StatelessWidget {
                           ),
                         ),
                         if (trendIcon != null) ...[
-                          const SizedBox(width: 8),
+                          const SizedBox(width: DSPaddings.extraSmall),
                           Icon(
                             trendIcon,
                             size: 20,
@@ -109,7 +93,7 @@ class DSInfoCard extends StatelessWidget {
             ],
           ),
           if (footer != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: DSPaddings.extraSmall),
             Text(
               footer!,
               style: theme.textTheme.bodySmall?.copyWith(

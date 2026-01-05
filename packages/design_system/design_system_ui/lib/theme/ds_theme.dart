@@ -23,7 +23,10 @@ class DSTheme {
 
       // ========== Card Theme ==========
       cardTheme: CardThemeData(
-        color: config.cardBackground?.toColor(),
+        shadowColor:
+            config.cardShadowColor?.toColor().withValues(alpha: 0.1) ??
+            colorScheme.shadow.withValues(alpha: 0.1),
+        color: config.cardBackground?.toColor() ?? colorScheme.surface,
         elevation: config.cardElevation,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(config.cardBorderRadius),
@@ -34,7 +37,10 @@ class DSTheme {
                 )
               : BorderSide.none,
         ),
-        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+        margin: EdgeInsets.symmetric(
+          vertical: config.cardPaddingVertical,
+          horizontal: config.cardPaddingHorizontal,
+        ),
       ),
 
       // ========== AppBar Theme ==========

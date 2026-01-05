@@ -56,6 +56,21 @@ class DSThemeConfig {
   /// Este valor também influencia botões, inputs e outros componentes.
   final double cardBorderRadius;
 
+  /// Cor da sombra dos Cards
+  ///
+  /// Se não especificada, a cor padrão do tema gerado será usada.
+  final ColorValue? cardShadowColor;
+
+  /// Padding vertical dos Cards
+  ///
+  /// Se não especificada, o padding vertical será 0.0.
+  final double cardPaddingVertical;
+
+  /// Padding horizontal dos Cards
+  ///
+  /// Se não especificada, o padding horizontal será 0.0.
+  final double cardPaddingHorizontal;
+
   /// Se deve usar Material Design 3
   ///
   /// Valor padrão: true
@@ -76,6 +91,9 @@ class DSThemeConfig {
     this.cardBorder,
     this.cardElevation = 2.0,
     this.cardBorderRadius = 12.0,
+    this.cardShadowColor,
+    this.cardPaddingVertical = 8.0,
+    this.cardPaddingHorizontal = 0.0,
     this.useMaterial3 = true,
     this.themeName,
     this.fontFamily,
@@ -91,6 +109,9 @@ class DSThemeConfig {
     ColorValue? cardBorder,
     double? cardElevation,
     double? cardBorderRadius,
+    ColorValue? cardShadowColor,
+    double? cardPaddingVertical,
+    double? cardPaddingHorizontal,
     bool? useMaterial3,
     String? themeName,
     String? fontFamily,
@@ -102,32 +123,15 @@ class DSThemeConfig {
       cardBorder: cardBorder ?? this.cardBorder,
       cardElevation: cardElevation ?? this.cardElevation,
       cardBorderRadius: cardBorderRadius ?? this.cardBorderRadius,
+      cardShadowColor: cardShadowColor ?? this.cardShadowColor,
+      cardPaddingVertical: cardPaddingVertical ?? this.cardPaddingVertical,
+      cardPaddingHorizontal:
+          cardPaddingHorizontal ?? this.cardPaddingHorizontal,
       useMaterial3: useMaterial3 ?? this.useMaterial3,
       themeName: themeName ?? this.themeName,
       fontFamily: fontFamily ?? this.fontFamily,
       baseSpacing: baseSpacing ?? this.baseSpacing,
     );
-  }
-
-  /// Remove a cor de fundo customizada dos cards
-  /// (volta a usar a cor padrão do tema)
-  DSThemeConfig withoutCardBackground() {
-    return copyWith(cardBackground: null);
-  }
-
-  /// Remove a borda customizada dos cards
-  DSThemeConfig withoutCardBorder() {
-    return copyWith(cardBorder: null);
-  }
-
-  /// Ajusta o border radius de todos os componentes
-  DSThemeConfig withBorderRadius(double radius) {
-    return copyWith(cardBorderRadius: radius);
-  }
-
-  /// Ajusta a elevação de todos os componentes
-  DSThemeConfig withElevation(double elevation) {
-    return copyWith(cardElevation: elevation);
   }
 
   @override
@@ -139,6 +143,9 @@ class DSThemeConfig {
         other.cardBorder == cardBorder &&
         other.cardElevation == cardElevation &&
         other.cardBorderRadius == cardBorderRadius &&
+        other.cardShadowColor == cardShadowColor &&
+        other.cardPaddingVertical == cardPaddingVertical &&
+        other.cardPaddingHorizontal == cardPaddingHorizontal &&
         other.useMaterial3 == useMaterial3 &&
         other.themeName == themeName &&
         other.fontFamily == fontFamily &&
@@ -152,6 +159,9 @@ class DSThemeConfig {
     cardBorder,
     cardElevation,
     cardBorderRadius,
+    cardShadowColor,
+    cardPaddingVertical,
+    cardPaddingHorizontal,
     useMaterial3,
     themeName,
     fontFamily,
@@ -178,6 +188,9 @@ class DSThemeConfig {
       'cardBorder': cardBorder?.value,
       'cardElevation': cardElevation,
       'cardBorderRadius': cardBorderRadius,
+      'cardShadowColor': cardShadowColor?.value,
+      'cardPaddingVertical': cardPaddingVertical,
+      'cardPaddingHorizontal': cardPaddingHorizontal,
       'useMaterial3': useMaterial3,
       'themeName': themeName,
       'fontFamily': fontFamily,
@@ -185,7 +198,7 @@ class DSThemeConfig {
     };
   }
 
-  /// Cria um AppThemeConfig a partir de um Map
+  /// Cria um DSThemeConfig a partir de um Map
   factory DSThemeConfig.fromMap(Map<String, dynamic> map) {
     return DSThemeConfig(
       seedColor: ColorValue(map['seedColor'] as int),
@@ -197,6 +210,11 @@ class DSThemeConfig {
           : null,
       cardElevation: (map['cardElevation'] as num?)?.toDouble() ?? 2.0,
       cardBorderRadius: (map['cardBorderRadius'] as num?)?.toDouble() ?? 12.0,
+      cardShadowColor: ColorValue(map['cardShadowColor'] as int),
+      cardPaddingVertical:
+          (map['cardPaddingVertical'] as num?)?.toDouble() ?? 8.0,
+      cardPaddingHorizontal:
+          (map['cardPaddingHorizontal'] as num?)?.toDouble() ?? 0.0,
       useMaterial3: map['useMaterial3'] as bool? ?? true,
       themeName: map['themeName'] as String?,
       fontFamily: map['fontFamily'] as String?,
