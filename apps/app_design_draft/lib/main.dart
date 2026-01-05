@@ -1,100 +1,4 @@
-// import 'package:design_system_shared/design_system_shared.dart';
-// import 'package:design_system_ui/theme/ds_theme.dart';
-// import 'package:flutter/material.dart';
-
-// void main() {
-//   runApp(const MyApp());
-// }
-
-// ValueNotifier<ThemeMode> _themeMode = ValueNotifier(ThemeMode.dark);
-
-// class MyApp extends StatefulWidget {
-//   const MyApp({super.key});
-
-//   @override
-//   State<MyApp> createState() => _MyAppState();
-// }
-
-// class _MyAppState extends State<MyApp> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return ValueListenableBuilder(
-//       valueListenable: _themeMode,
-//       builder: (context, value, child) {
-//         return MaterialApp(
-//           title: 'App Design Draft',
-//           theme: DSTheme.fromConfig(
-//             config: AppThemeConfig.greenTheme,
-//             brightness: Brightness.light,
-//           ),
-//           darkTheme: DSTheme.fromConfig(
-//             config: AppThemeConfig.tealTheme,
-//             brightness: Brightness.dark,
-//           ),
-//           themeMode: value,
-//           home: const MyHomePage(),
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class MyHomePage extends StatefulWidget {
-//   const MyHomePage({super.key});
-
-//   @override
-//   State<MyHomePage> createState() => _MyHomePageState();
-// }
-
-// class _MyHomePageState extends State<MyHomePage> {
-//   int _counter = 0;
-
-//   void _incrementCounter() {
-//     setState(() {
-//       _counter++;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-//         title: const Text('App Design Draft'),
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: .center,
-//           children: [
-//             const Text('You have pushed the button this many times:'),
-//             Text(
-//               '$_counter',
-//               style: Theme.of(context).textTheme.headlineMedium,
-//             ),
-//             const SizedBox(height: 56),
-//             ElevatedButton(
-//               onPressed: () {
-//                 setState(() {
-//                   _themeMode.value = _themeMode.value == ThemeMode.dark
-//                       ? ThemeMode.light
-//                       : ThemeMode.dark;
-//                 });
-//               },
-//               child: const Text('ThemeMode'),
-//             ),
-//           ],
-//         ),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: _incrementCounter,
-//         tooltip: 'Increment',
-//         child: const Icon(Icons.add),
-//       ),
-//     );
-//   }
-// }
-
-import 'package:design_system_ui/theme/ds_theme.dart';
+import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/theme/ds_theme_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:design_system_ui/design_system_ui.dart';
@@ -136,46 +40,16 @@ class _MyAppState extends State<MyApp> {
 
   ThemeData _getTheme(Brightness brightness) {
     switch (_selectedTheme) {
-      case 'blue':
-        return DSTheme.custom(
-          seedColor: const Color(0xFF1976D2),
-          brightness: brightness,
-          cardBackground: brightness == Brightness.light
-              ? const Color(0xFFE3F2FD)
-              : const Color(0xFF1E1E2E),
-          cardBorder: brightness == Brightness.light
-              ? const Color(0xFFBBDEFB)
-              : const Color(0xFF2C3E50),
-        );
-
-      case 'green':
-        return DSTheme.custom(
-          seedColor: const Color(0xFF388E3C),
-          brightness: brightness,
-          cardBackground: brightness == Brightness.light
-              ? const Color(0xFFE8F5E9)
-              : const Color(0xFF1E2E1E),
-          cardBorder: brightness == Brightness.light
-              ? const Color(0xFFC8E6C9)
-              : const Color(0xFF2C4A2C),
-        );
-
-      case 'purple':
-        return DSTheme.custom(
-          seedColor: const Color(0xFF9C27B0),
-          brightness: brightness,
-          cardBackground: brightness == Brightness.light
-              ? const Color(0xFFF3E5F5)
-              : const Color(0xFF2E1E2E),
-          cardBorder: brightness == Brightness.light
-              ? const Color(0xFFE1BEE7)
-              : const Color(0xFF4A2C4A),
-        );
-
+      case 'blueGray':
+        return DSTheme.forPreset(DSThemeEnum.blueGray, brightness);
+      case 'acqua':
+        return DSTheme.forPreset(DSThemeEnum.acqua, brightness);
+      case 'lolo':
+        return DSTheme.forPreset(DSThemeEnum.lolo, brightness);
+      case 'teal':
+        return DSTheme.forPreset(DSThemeEnum.teal, brightness);
       default:
-        return brightness == Brightness.light
-            ? DSTheme.light()
-            : DSTheme.dark();
+        return DSTheme.forPreset(DSThemeEnum.system, brightness);
     }
   }
 
@@ -266,9 +140,10 @@ class HomePage extends StatelessWidget {
   Widget _buildThemeSelector(BuildContext context) {
     final themes = {
       'default': 'Padrão',
-      'blue': 'Azul',
-      'green': 'Verde',
-      'purple': 'Roxo',
+      'blueGray': 'Azul',
+      'acqua': 'Acqua',
+      'lolo': 'Lolo',
+      'teal': 'Teal',
     };
 
     return DSCard(

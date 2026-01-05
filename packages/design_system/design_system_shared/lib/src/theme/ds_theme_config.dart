@@ -1,5 +1,6 @@
-import '../colors/color_value.dart';
-import '../colors/app_color_palette.dart';
+import '../../design_system_shared.dart';
+// import '../colors/color_value.dart';
+// import '../colors/app_color_palette.dart';
 
 /// Configuração de tema personalizado (Dart puro)
 ///
@@ -10,7 +11,7 @@ import '../colors/app_color_palette.dart';
 /// Exemplo de uso:
 /// ```dart
 /// // Tema customizado
-/// final customTheme = AppThemeConfig(
+/// final customTheme = DSThemeConfig(
 ///   seedColor: ColorValue.fromHex('#1976D2'),
 ///   cardBackground: ColorValue.fromHex('#E3F2FD'),
 ///   cardBorder: ColorValue.fromHex('#BBDEFB'),
@@ -24,7 +25,7 @@ import '../colors/app_color_palette.dart';
 ///   brightness: Brightness.light,
 /// );
 /// ```
-class AppThemeConfig {
+class DSThemeConfig {
   /// Cor seed para gerar o ColorScheme
   ///
   /// Esta é a cor primária base do tema. O Flutter gerará
@@ -69,7 +70,7 @@ class AppThemeConfig {
   /// Espaçamento base (futuro)
   final double? baseSpacing;
 
-  const AppThemeConfig({
+  const DSThemeConfig({
     required this.seedColor,
     this.cardBackground,
     this.cardBorder,
@@ -81,76 +82,10 @@ class AppThemeConfig {
     this.baseSpacing,
   });
 
-  // ========== Temas Pré-configurados ==========
-
-  /// Tema light padrão
-  static AppThemeConfig light = AppThemeConfig(
-    seedColor: AppColorPalette.primary,
-    cardBackground: AppColorPalette.cardBackgroundLight,
-    cardBorder: AppColorPalette.cardBorderLight,
-    themeName: 'Light',
-  );
-
-  /// Tema dark padrão
-  static AppThemeConfig dark = AppThemeConfig(
-    seedColor: AppColorPalette.primary,
-    cardBackground: AppColorPalette.cardBackgroundDark,
-    cardBorder: AppColorPalette.cardBorderDark,
-    themeName: 'Dark',
-  );
-
-  /// Tema azul personalizado
-  static const blueTheme = AppThemeConfig(
-    seedColor: ColorValue(0xFF1976D2), // Blue 700
-    cardBackground: ColorValue(0xFFE3F2FD), // Blue 50
-    cardBorder: ColorValue(0xFFBBDEFB), // Blue 100
-    themeName: 'Blue',
-  );
-
-  /// Tema verde personalizado
-  static const greenTheme = AppThemeConfig(
-    seedColor: ColorValue(0xFF388E3C), // Green 700
-    cardBackground: ColorValue(0xFFE8F5E9), // Green 50
-    cardBorder: ColorValue(0xFFC8E6C9), // Green 100
-    themeName: 'Green',
-  );
-
-  /// Tema roxo personalizado
-  static const purpleTheme = AppThemeConfig(
-    seedColor: ColorValue(0xFF9C27B0), // Purple 600
-    cardBackground: ColorValue(0xFFF3E5F5), // Purple 50
-    cardBorder: ColorValue(0xFFE1BEE7), // Purple 100
-    themeName: 'Purple',
-  );
-
-  /// Tema laranja personalizado
-  static const orangeTheme = AppThemeConfig(
-    seedColor: ColorValue(0xFFF57C00), // Orange 700
-    cardBackground: ColorValue(0xFFFFF3E0), // Orange 50
-    cardBorder: ColorValue(0xFFFFE0B2), // Orange 100
-    themeName: 'Orange',
-  );
-
-  /// Tema vermelho personalizado
-  static const redTheme = AppThemeConfig(
-    seedColor: ColorValue(0xFFD32F2F), // Red 700
-    cardBackground: ColorValue(0xFFFFEBEE), // Red 50
-    cardBorder: ColorValue(0xFFFFCDD2), // Red 100
-    themeName: 'Red',
-  );
-
-  /// Tema teal personalizado
-  static const tealTheme = AppThemeConfig(
-    seedColor: ColorValue(0xFF00897B), // Teal 600
-    cardBackground: ColorValue(0xFFE0F2F1), // Teal 50
-    cardBorder: ColorValue(0xFFB2DFDB), // Teal 100
-    themeName: 'Teal',
-  );
-
   // ========== Métodos Utilitários ==========
 
   /// Cria uma cópia do tema com alterações específicas
-  AppThemeConfig copyWith({
+  DSThemeConfig copyWith({
     ColorValue? seedColor,
     ColorValue? cardBackground,
     ColorValue? cardBorder,
@@ -161,7 +96,7 @@ class AppThemeConfig {
     String? fontFamily,
     double? baseSpacing,
   }) {
-    return AppThemeConfig(
+    return DSThemeConfig(
       seedColor: seedColor ?? this.seedColor,
       cardBackground: cardBackground ?? this.cardBackground,
       cardBorder: cardBorder ?? this.cardBorder,
@@ -176,29 +111,29 @@ class AppThemeConfig {
 
   /// Remove a cor de fundo customizada dos cards
   /// (volta a usar a cor padrão do tema)
-  AppThemeConfig withoutCardBackground() {
+  DSThemeConfig withoutCardBackground() {
     return copyWith(cardBackground: null);
   }
 
   /// Remove a borda customizada dos cards
-  AppThemeConfig withoutCardBorder() {
+  DSThemeConfig withoutCardBorder() {
     return copyWith(cardBorder: null);
   }
 
   /// Ajusta o border radius de todos os componentes
-  AppThemeConfig withBorderRadius(double radius) {
+  DSThemeConfig withBorderRadius(double radius) {
     return copyWith(cardBorderRadius: radius);
   }
 
   /// Ajusta a elevação de todos os componentes
-  AppThemeConfig withElevation(double elevation) {
+  DSThemeConfig withElevation(double elevation) {
     return copyWith(cardElevation: elevation);
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is AppThemeConfig &&
+    return other is DSThemeConfig &&
         other.seedColor == seedColor &&
         other.cardBackground == cardBackground &&
         other.cardBorder == cardBorder &&
@@ -225,7 +160,7 @@ class AppThemeConfig {
 
   @override
   String toString() {
-    return 'AppThemeConfig('
+    return 'DSThemeConfig('
         'name: $themeName, '
         'seedColor: ${seedColor.toHex()}, '
         'cardBackground: ${cardBackground?.toHex()}, '
@@ -251,8 +186,8 @@ class AppThemeConfig {
   }
 
   /// Cria um AppThemeConfig a partir de um Map
-  factory AppThemeConfig.fromMap(Map<String, dynamic> map) {
-    return AppThemeConfig(
+  factory DSThemeConfig.fromMap(Map<String, dynamic> map) {
+    return DSThemeConfig(
       seedColor: ColorValue(map['seedColor'] as int),
       cardBackground: map['cardBackground'] != null
           ? ColorValue(map['cardBackground'] as int)

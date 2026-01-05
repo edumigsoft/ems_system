@@ -8,7 +8,7 @@ import '../colors/color_extensions.dart';
 class DSTheme {
   /// Cria um ThemeData a partir de uma configuração personalizada
   static ThemeData fromConfig({
-    required AppThemeConfig config,
+    required DSThemeConfig config,
     required Brightness brightness,
   }) {
     final colorScheme = ColorScheme.fromSeed(
@@ -153,35 +153,17 @@ class DSTheme {
     );
   }
 
-  /// Tema light padrão
-  static ThemeData light([AppThemeConfig? config]) {
+  /// Retorna o tema conforme o preset configurado
+  static ThemeData forPreset(DSThemeEnum theme, Brightness brightness) {
     return fromConfig(
-      config: config ?? AppThemeConfig.light,
-      brightness: Brightness.light,
-    );
-  }
-
-  /// Tema dark padrão
-  static ThemeData dark([AppThemeConfig? config]) {
-    return fromConfig(
-      config: config ?? AppThemeConfig.dark,
-      brightness: Brightness.dark,
-    );
-  }
-
-  /// Tema azul personalizado
-  static ThemeData blueLight() {
-    return fromConfig(
-      config: AppThemeConfig.blueTheme,
-      brightness: Brightness.light,
-    );
-  }
-
-  /// Tema verde personalizado
-  static ThemeData greenLight() {
-    return fromConfig(
-      config: AppThemeConfig.greenTheme,
-      brightness: Brightness.light,
+      config: switch (theme) {
+        DSThemeEnum.system => DefaultPreset.config,
+        DSThemeEnum.lolo => LoloPreset.config,
+        DSThemeEnum.teal => TealPreset.config,
+        DSThemeEnum.blueGray => BlueGrayPreset.config,
+        DSThemeEnum.acqua => AcquaPreset.config,
+      },
+      brightness: brightness,
     );
   }
 
@@ -194,7 +176,7 @@ class DSTheme {
     double cardElevation = 2.0,
     double cardBorderRadius = 12.0,
   }) {
-    final config = AppThemeConfig(
+    final config = DSThemeConfig(
       seedColor: seedColor.toColorValue(),
       cardBackground: cardBackground?.toColorValue(),
       cardBorder: cardBorder?.toColorValue(),

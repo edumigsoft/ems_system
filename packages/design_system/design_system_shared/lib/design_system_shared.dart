@@ -1,3 +1,8 @@
 export 'src/colors/color_value.dart';
-export 'src/colors/app_color_palette.dart';
-export 'src/theme/app_theme_config.dart';
+export 'src/theme/ds_theme_config.dart';
+export 'src/theme/presets/default_preset.dart';
+export 'src/theme/presets/blue_gray_preset.dart';
+export 'src/theme/presets/acqua_preset.dart';
+export 'src/theme/presets/lolo_preset.dart';
+export 'src/theme/presets/teal_preset.dart';
+export 'src/enums/ds_enums.dart';
