@@ -1,0 +1,44 @@
+# IDEs e editores
+.idea/
+*.swp
+*.swo
+
+# Flutter/Dart
+**/.dart_tool/
+**/.packages
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.dart_tool/
+**/pubspec.lock
+.pub-cache/
+.pub/
+build/
+
+# Cobertura de testes
+**/coverage/
+*.lcov
+
+# Variáveis de ambiente
+*.env
+
+# Arquivos gerados
+**/*.g.dart
+**/*.freezed.dart
+**/*.mocks.dart
+**/*.reflectable.dart
+**/*.gql.dart
+**/*.gr.dart
+**/*.chopper.dart
+
+# FVM
+.fvm/
+.fvm/fvm_config.json
+
+# Arquivos de configuração local
+*.fvm
+
+# Logs e bancos de dados
+*.log
+*.sql
+*.sqlite
+*.sqlite3

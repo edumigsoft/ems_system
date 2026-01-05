@@ -82,80 +82,59 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).cardColor.withAlpha(240),
-      child: DSCard(
-        padding: const EdgeInsets.all(DSPaddings.tiny),
+    //     //   floatingActionButton: FloatingActionButton.extended(
+    //     //     onPressed: () {
+    //     //       _showBottomSheet(context);
+    //     //     },
+    //     //     icon: const Icon(Icons.add),
+    //     //     label: const Text('Nova Ação'),
+    //     //   ),
+
+    return Scaffold(
+      body: DSCard(
+        margin: EdgeInsets.zero,
+        isBorderRadius: false,
         child: Row(
           children: [
             DSCard(
               width: 260,
-              child: Center(
-                child: Text('Sidebar'),
+              child: Column(
+                children: [
+                  Text('Sidebar'),
+                ],
               ),
             ),
             Expanded(
               child: DSCard(
-                child: Center(
-                  child: Text('Content'),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildThemeSelector(context),
+
+                      const SizedBox(height: 24),
+
+                      _buildSectionTitle(context, 'Dashboard - DSInfoCard'),
+                      _buildDashboard(context),
+
+                      const SizedBox(height: 24),
+
+                      _buildSectionTitle(
+                        context,
+                        'Ações Rápidas - DSActionCard',
+                      ),
+                      _buildQuickActions(context),
+
+                      const SizedBox(height: 24),
+
+                      _buildSectionTitle(context, 'Cards Padrão - DSCard'),
+                      _buildStandardCards(context),
+                    ],
+                  ),
                 ),
               ),
             ),
           ],
         ),
-        // child: Scaffold(
-        //   appBar: AppBar(
-        //     title: const Text('Design System Demo'),
-        //     actions: [
-        //       IconButton(
-        //         icon: Icon(
-        //           currentThemeMode == ThemeMode.dark
-        //               ? Icons.light_mode
-        //               : Icons.dark_mode,
-        //         ),
-        //         onPressed: () {
-        //           onThemeModeChange(
-        //             currentThemeMode == ThemeMode.dark
-        //                 ? ThemeMode.light
-        //                 : ThemeMode.dark,
-        //           );
-        //         },
-        //       ),
-        //     ],
-        //   ),
-        //   body: ListView(
-        //     padding: const EdgeInsets.all(16),
-        //     children: [
-        //       // Theme Selector
-        //       _buildThemeSelector(context),
-
-        //       const SizedBox(height: 24),
-
-        //       // Dashboard Section
-        //       _buildSectionTitle(context, 'Dashboard - DSInfoCard'),
-        //       _buildDashboard(context),
-
-        //       const SizedBox(height: 24),
-
-        //       // Actions Section
-        //       _buildSectionTitle(context, 'Ações Rápidas - DSActionCard'),
-        //       _buildQuickActions(context),
-
-        //       const SizedBox(height: 24),
-
-        //       // Standard Cards Section
-        //       _buildSectionTitle(context, 'Cards Padrão - DSCard'),
-        //       _buildStandardCards(context),
-        //     ],
-        //   ),
-        //   floatingActionButton: FloatingActionButton.extended(
-        //     onPressed: () {
-        //       _showBottomSheet(context);
-        //     },
-        //     icon: const Icon(Icons.add),
-        //     label: const Text('Nova Ação'),
-        //   ),
-        // ),
       ),
     );
   }
@@ -174,21 +153,41 @@ class HomePage extends StatelessWidget {
       title: 'Tema Atual',
       subtitle: 'Selecione um tema personalizado',
       leading: Icon(Icons.palette, color: context.dsColors.primary),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: themes.entries.map((entry) {
-          final isSelected = currentTheme == entry.key;
-          return ChoiceChip(
-            label: Text(entry.value),
-            selected: isSelected,
-            onSelected: (selected) {
-              if (selected) {
-                onThemeChange(entry.key);
-              }
+      child: Row(
+        children: [
+          Expanded(
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: themes.entries.map((entry) {
+                final isSelected = currentTheme == entry.key;
+                return ChoiceChip(
+                  label: Text(entry.value),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) {
+                      onThemeChange(entry.key);
+                    }
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+          IconButton(
+            icon: Icon(
+              currentThemeMode == ThemeMode.dark
+                  ? Icons.light_mode
+                  : Icons.dark_mode,
+            ),
+            onPressed: () {
+              onThemeModeChange(
+                currentThemeMode == ThemeMode.dark
+                    ? ThemeMode.light
+                    : ThemeMode.dark,
+              );
             },
-          );
-        }).toList(),
+          ),
+        ],
       ),
     );
   }
@@ -341,51 +340,51 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  void _showBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Nova Ação', style: context.dsTextStyles.titleLarge),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Título',
-                hintText: 'Digite o título',
-              ),
-            ),
-            const SizedBox(height: 16),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Descrição',
-                hintText: 'Digite a descrição',
-              ),
-              maxLines: 3,
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _showSnackBar(context, 'Ação criada com sucesso!');
-                  },
-                  child: const Text('Criar'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  // void _showBottomSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     builder: (context) => Padding(
+  //       padding: const EdgeInsets.all(24),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Text('Nova Ação', style: context.dsTextStyles.titleLarge),
+  //           const SizedBox(height: 16),
+  //           const TextField(
+  //             decoration: InputDecoration(
+  //               labelText: 'Título',
+  //               hintText: 'Digite o título',
+  //             ),
+  //           ),
+  //           const SizedBox(height: 16),
+  //           const TextField(
+  //             decoration: InputDecoration(
+  //               labelText: 'Descrição',
+  //               hintText: 'Digite a descrição',
+  //             ),
+  //             maxLines: 3,
+  //           ),
+  //           const SizedBox(height: 24),
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.end,
+  //             children: [
+  //               TextButton(
+  //                 onPressed: () => Navigator.pop(context),
+  //                 child: const Text('Cancelar'),
+  //               ),
+  //               const SizedBox(width: 8),
+  //               FilledButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context);
+  //                   _showSnackBar(context, 'Ação criada com sucesso!');
+  //                 },
+  //                 child: const Text('Criar'),
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }
