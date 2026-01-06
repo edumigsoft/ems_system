@@ -42,3 +42,6 @@ build/
 *.sql
 *.sqlite
 *.sqlite3
+
+# Claude
+.claude/
