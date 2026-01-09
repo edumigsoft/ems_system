@@ -44,4 +44,4 @@ build/
 *.sqlite3
 
 # Claude
-.claude/
+.claude/settings.local.json
