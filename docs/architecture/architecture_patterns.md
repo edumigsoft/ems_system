@@ -500,4 +500,6 @@ sequenceDiagram
 - [ADR-0006: Sincronização BaseDetails ↔ DriftTableMixin](../adr/0006-base-details-sync.md)
 - [Hierarquia de Features](./features_hierarchy.md)
 - [Padrões de Entities](./entity_patterns.md)
+- [Guia de Design System](./design_system_guide.md)
 - [Guia de Criação de Features](../rules/new_feature.md)
+

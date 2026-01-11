@@ -455,5 +455,7 @@ packages/user/
 - [Padrões de Entities](../architecture/entity_patterns.md) - Regras e práticas sobre Entities e BaseDetails
 - [ADR-0006: Sincronização BaseDetails](./0006-base-details-sync.md) - Sincronização automática entre Entity e BaseDetails
 - [Guia de Criação de Features](../rules/new_feature.md) - Como criar novas features no projeto
+- [Guia de Design System](../architecture/design_system_guide.md) - Padrões visuais, tipografia, cores e componentes
 - [Regras Dart/Flutter](../rules/flutter_dart_rules.md) - Convenções e regras de código
+
 

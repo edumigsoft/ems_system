@@ -494,4 +494,6 @@ Ver exemplos completos em:
 - [Padrões Arquiteturais](../architecture/architecture_patterns.md)
 - [ADR-0005: Standard Package Structure](../adr/0005-standard-package-structure.md)
 - [ADR-0006: Sincronização BaseDetails](../adr/0006-base-details-sync.md)
+- [Guia de Design System](./design_system_guide.md)
 - [Guia de Criação de Features](./new_feature.md)
+

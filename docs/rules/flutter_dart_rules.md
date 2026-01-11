@@ -226,6 +226,11 @@ class SubjectDetailsModel {
     *   **Errado**: `Colors.green`
 *   **Component Themes**: Centralize a customização de componentes (ex: `CardTheme`, `InputDecorationTheme`) no `design_system`.
 
+> [!IMPORTANT]
+> **Guia Completo de Design System**
+> 
+> Para regras detalhadas sobre uso de tipografia, cores, spacing e componentes, consulte o [Guia de Uso do Design System](../architecture/design_system_guide.md).
+
 ### Layout
 *   **Responsividade**: Use `LayoutBuilder` ou `MediaQuery` para decisões de layout, não valores de pixel fixos.
 *   **Flexibilidade**: Use `Flexible` e `Expanded` para layouts que se adaptam ao tamanho da tela, evitando Overflow errors.
