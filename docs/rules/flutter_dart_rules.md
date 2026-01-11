@@ -73,6 +73,102 @@ lib/ui/
 *   **Pattern Matching**: Use `switch` expressions e destructuring sempre que simplificar a lógica.
 *   **Records**: Prefira Records `(double x, double y)` ao invés de criar classes DTO descartáveis para retornos múltiplos simples.
 
+### Tratamento de Erros
+
+> **PADRÃO OBRIGATÓRIO**: Use `Result<T>` para todas as operações que podem falhar.
+
+*   **Result Pattern**: Adotamos o padrão `Result<T>` (tipo soma com `Success<T>` e `Failure<T>`) para tratamento explícito de erros.
+*   **Onde Usar**:
+    *   **Repositórios**: TODOS os métodos de repository DEVEM retornar `Result<T>`
+    *   **Use Cases**: TODOS os use cases DEVEM retornar `Result<T>`
+    *   **ViewModels**: Devem consumir `Result<T>` dos use cases e reagir adequadamente
+*   **Evite `try-catch` na UI**: O tratamento de exceções deve ocorrer nas camadas inferiores (Data/Domain)
+*   **Pattern Matching**: Use `switch` ou `when()` para lidar com casos de sucesso/falha
+
+**Exemplo**:
+```dart
+// Repository
+Future<Result<FinanceDetails>> create(FinanceCreate data) async {
+  try {
+    final response = await _api.create(data);
+    return Success(response);
+  } on DioException catch (e) {
+    return Failure(handleDioError(e));
+  }
+}
+
+// ViewModel
+final result = await _createUseCase(data);
+switch (result) {
+  case Success<FinanceDetails>(:final value):
+    _items.add(value);
+    notifyListeners();
+  case Failure<FinanceDetails>(:final error):
+    _errorMessage = error.toString();
+    notifyListeners();
+}
+```
+
+> **Referência Completa**: [ADR-0001: Padrão Result para Tratamento de Erros](../adr/0001-use-result-pattern-for-error-handling.md)
+
+### Validação de Formulários
+
+> **PADRÃO OBRIGATÓRIO**: Use `Zard` para validação declarativa e `FormValidationMixin` em ViewModels.
+
+*   **Validators Zard**: Validação declarativa de DTOs no `*_core/validators/`
+*   **Onde Usar**:
+    *   **Validators**: TODOS os DTOs de entrada (Create/Update) DEVEM ter validators Zard
+    *   **FormValidationMixin**: ViewModels que lidam com formulários DEVEM usar o mixin
+    *   **Validação em camadas**: UI (feedback imediato), UseCase (segurança), Server (nunca confiar no client)
+*   **Pattern Matching**: Use `if (!validate(_validator, data))` para validar antes de processar
+*   **Mensagens consistentes**: Validators garantem mensagens padronizadas em toda a aplicação
+
+**Exemplo**:
+```dart
+// Validator (em *_core/validators/)
+class FinanceCreateValidator extends Validator<FinanceCreate> {
+  @override
+  ValidationResult validate(FinanceCreate value) {
+    final errors = <ValidationError>[];
+    
+    if (value.name.length < 3) {
+      errors.add(ValidationError(
+        field: 'name',
+        message: 'Nome deve ter no mínimo 3 caracteres',
+      ));
+    }
+    
+    return ValidationResult(errors);
+  }
+}
+
+// ViewModel (em *_ui/view_models/)
+class FinanceFormViewModel extends ChangeNotifier 
+    with FormValidationMixin {
+  
+  final CreateFinanceUseCase _createUseCase;
+  final FinanceCreateValidator _validator;
+  
+  Future<void> submit(FinanceCreate data) async {
+    // Validar usando FormValidationMixin
+    if (!validate(_validator, data)) {
+      return; // Erros já foram setados no mixin
+    }
+    
+    // Prosseguir com lógica de negócio
+    final result = await _createUseCase(data);
+    switch (result) {
+      case Success(:final value):
+        clearErrors();
+      case Failure(:final error):
+        setFieldError('form', error.toString());
+    }
+  }
+}
+```
+
+> **Referência Completa**: [ADR-0004: FormValidationMixin e Zard](../adr/0004-use-form-validation-mixin-and-zard.md)
+
 ### Serialização JSON e DTOs
 
 > **REGRA DE OURO**: Entidades de Domínio (`_core/domain/entities`) devem ser **PURAS**.

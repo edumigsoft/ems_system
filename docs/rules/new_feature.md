@@ -653,22 +653,162 @@ Gere o código passo a passo, solicitando validação a cada grande bloco:
         - Flutter packages: `include: ../../../analysis_options_flutter.yaml`
 2.  **Core Domain**: 
     - Definir Entidades em `domain/entities/`
-    - Definir Interfaces de Repositórios em `domain/repositories/`
-    - Criar Use Cases em `domain/use_cases/`
+    - Definir Interfaces de Repositórios em `domain/repositories/` (**OBRIGATÓRIO: retornar `Result<T>`**)
+    - Criar Use Cases em `domain/use_cases/` (**OBRIGATÓRIO: retornar `Result<T>`**)
     - Definir DTOs em `data/models/` (`json_serializable`, `@Schema`)
     - Criar Validators em `validators/` (Zard)
+    
+    **Exemplo de Repository Interface**:
+    ```dart
+    // packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_core/lib/src/domain/repositories/{{entity}}_repository.dart
+    import 'package:core_shared/core_shared.dart';
+    import '../entities/{{entity}}_details.dart';
+    import '../dtos/{{entity}}_create.dart';
+    import '../dtos/{{entity}}_update.dart';
+    
+    abstract class {{Entity}}Repository {
+      Future<Result<{{Entity}}Details>> create({{Entity}}Create data);
+      Future<Result<{{Entity}}Details>> getById(String id);
+      Future<Result<List<{{Entity}}Details>>> getAll();
+      Future<Result<{{Entity}}Details>> update({{Entity}}Update data);
+      Future<Result<void>> delete(String id);
+    }
+    ```
+    
+    **Exemplo de Use Case**:
+    ```dart
+    // packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_core/lib/src/domain/use_cases/get_all_{{entity}}_use_case.dart
+    import 'package:core_shared/core_shared.dart';
+    import '../entities/{{entity}}_details.dart';
+    import '../repositories/{{entity}}_repository.dart';
+    
+    class GetAll{{Entity}}UseCase {
+      final {{Entity}}Repository _repository;
+      
+      GetAll{{Entity}}UseCase(this._repository);
+      
+      Future<Result<List<{{Entity}}Details>>> call() async {
+        return await _repository.getAll();
+      }
+    }
+    ```
+    
+    > **Referência**: [ADR-0001: Padrão Result](../adr/0001-use-result-pattern-for-error-handling.md)
 3.  **Server Implementation**:
     - Implementar Tabelas em `database/` (`Drift`) usando `DatabaseProvider`
     - Implementar Handlers em `handlers/` (`Shelf`, `open_api`)
 4.  **Client Implementation**: 
-    - Implementar Repositórios em `repositories/` (`Retrofit/Dio`)
+    - Implementar Repositórios em `repositories/` (`Retrofit/Dio`) **COM Result Pattern**
     - Implementar Serviços em `services/`
+    
+    **Exemplo de Repository Implementation**:
+    ```dart
+    // packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_client/lib/src/repositories/{{entity}}_repository_impl.dart
+    import 'package:core_shared/core_shared.dart';
+    import 'package:{{feature_name}}_core/{{feature_name}}_core.dart';
+    import 'package:dio/dio.dart';
+    import '../services/{{entity}}_api_service.dart';
+    
+    class {{Entity}}RepositoryImpl implements {{Entity}}Repository {
+      final {{Entity}}ApiService _api;
+      
+      {{Entity}}RepositoryImpl(this._api);
+      
+      @override
+      Future<Result<List<{{Entity}}Details>>> getAll() async {
+        try {
+          final response = await _api.getAll();
+          final entities = response.map((model) => model.toDomain()).toList();
+          return Success(entities);
+        } on DioException catch (e) {
+          return Failure(handleDioError(e));
+        } catch (e) {
+          return Failure(Exception('Erro inesperado: $e'));
+        }
+      }
+      
+      @override
+      Future<Result<{{Entity}}Details>> create({{Entity}}Create data) async {
+        try {
+          final model = {{Entity}}CreateModel.fromDomain(data);
+          final response = await _api.create(model.toJson());
+          return Success(response.toDomain());
+        } on DioException catch (e) {
+          return Failure(handleDioError(e));
+        } catch (e) {
+          return Failure(Exception('Erro ao criar: $e'));
+        }
+      }
+    }
+    ```
 5.  **UI Foundation**: 
     - Criar `{{FEATURE_NAME}}Module.dart` e registrar rotas
     - Estruturar `ui/pages/`, `ui/view_models/`, `ui/widgets/`
 6.  **UI Screens**: 
     - Criar Telas seguindo **Responsive Layout** e **Design System**
-    - Criar ViewModels seguindo padrão MVVM
+    - Criar ViewModels seguindo padrão MVVM **COM Result Pattern**
+    
+    **Exemplo de ViewModel**:
+    ```dart
+    // packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_ui/lib/ui/view_models/{{entity}}_view_model.dart
+    import 'package:flutter/foundation.dart';
+    import 'package:{{feature_name}}_core/{{feature_name}}_core.dart';
+    
+    class {{Entity}}ViewModel extends ChangeNotifier {
+      final GetAll{{Entity}}UseCase _getAllUseCase;
+      final Create{{Entity}}UseCase _createUseCase;
+      
+      List<{{Entity}}Details> _items = [];
+      String? _errorMessage;
+      bool _isLoading = false;
+      
+      List<{{Entity}}Details> get items => _items;
+      String? get errorMessage => _errorMessage;
+      bool get isLoading => _isLoading;
+      
+      {{Entity}}ViewModel(this._getAllUseCase, this._createUseCase);
+      
+      Future<void> loadAll() async {
+        _isLoading = true;
+        _errorMessage = null;
+        notifyListeners();
+        
+        final result = await _getAllUseCase();
+        
+        // Usando pattern matching
+        switch (result) {
+          case Success<List<{{Entity}}Details>>(:final value):
+            _items = value;
+          case Failure<List<{{Entity}}Details>>(:final error):
+            _errorMessage = error.toString();
+        }
+        
+        _isLoading = false;
+        notifyListeners();
+      }
+      
+      Future<void> create({{Entity}}Create data) async {
+        _isLoading = true;
+        notifyListeners();
+        
+        final result = await _createUseCase(data);
+        
+        // Usando .when()
+        result.when(
+          success: (entity) {
+            _items.add(entity);
+            _errorMessage = null;
+          },
+          failure: (error) {
+            _errorMessage = 'Erro ao criar: ${error.toString()}';
+          },
+        );
+        
+        _isLoading = false;
+        notifyListeners();
+      }
+    }
+    ```
 
 7.  **Integração com Aplicações** (dependendo dos pacotes criados):
     

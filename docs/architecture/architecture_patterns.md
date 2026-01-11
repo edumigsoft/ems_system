@@ -180,6 +180,31 @@ class FinanceDetails implements BaseDetails {
 
 **Uso:** Transferência entre Repository ↔ UseCase/ViewModel
 
+> [!NOTE]
+> **Repositórios e Result Pattern**
+>
+> TODOS os métodos de repositório DEVEM retornar `Result<EntityDetails>` ao invés de lançar exceções.
+> O padrão Result torna o tratamento de erros explícito e obrigatório.
+>
+> **Exemplo de Interface**:
+> ```dart
+> // packages/finance/finance_core/lib/src/domain/repositories/finance_repository.dart
+> import 'package:core_shared/core_shared.dart';
+> import '../entities/finance_details.dart';
+> import '../dtos/finance_create.dart';
+> import '../dtos/finance_update.dart';
+>
+> abstract class FinanceRepository {
+>   Future<Result<FinanceDetails>> create(FinanceCreate data);
+>   Future<Result<FinanceDetails>> getById(String id);
+>   Future<Result<List<FinanceDetails>>> getAll();
+>   Future<Result<FinanceDetails>> update(FinanceUpdate data);
+>   Future<Result<void>> delete(String id);
+> }
+> ```
+>
+> **Referência**: [ADR-0001: Padrão Result](../adr/0001-use-result-pattern-for-error-handling.md)
+
 ---
 
 ### 3. Camada de DTOs (`*_core/domain/dtos/`)
@@ -384,6 +409,109 @@ class FinanceTable extends Table with DriftTableMixinPostgres {
 
 ---
 
+### 6. Camada de Validação (`*_core/validators/`)
+
+#### Validators Zard
+
+Validators são responsáveis por validar DTOs antes de serem processados pelos Use Cases ou enviados ao servidor.
+
+```dart
+// Exemplo: packages/finance/finance_core/lib/src/validators/finance_create_validator.dart
+import 'package:zard/zard.dart';
+import '../domain/dtos/finance_create.dart';
+import '../constants/finance_constants.dart';
+
+/// Validator para FinanceCreate
+class FinanceCreateValidator extends Validator<FinanceCreate> {
+  const FinanceCreateValidator();
+  
+  @override
+  ValidationResult validate(FinanceCreate value) {
+    final List<ValidationError> errors = [];
+    
+    // Validar name
+    if (value.name.isEmpty) {
+      errors.add(ValidationError(
+        field: 'name',
+        message: 'Nome é obrigatório',
+      ));
+    } else if (value.name.length < FinanceConstants.minNameLength) {
+      errors.add(ValidationError(
+        field: 'name',
+        message: 'Nome deve ter no mínimo ${FinanceConstants.minNameLength} caracteres',
+      ));
+    }
+    
+    // Validar code
+    if (value.code.isEmpty) {
+      errors.add(ValidationError(
+        field: 'code',
+        message: 'Código é obrigatório',
+      ));
+    }
+    
+    return ValidationResult(errors);
+  }
+}
+```
+
+**Características:**
+- ✅ Validação declarativa com Zard
+- ✅ Reutilizável em UI e Server
+- ✅ Testável isoladamente
+- ✅ Mensagens de erro consistentes
+- ✅ Usa constants compartilhadas
+
+**Integração com ViewModels:**
+
+```dart
+// Exemplo: packages/finance/finance_ui/lib/ui/view_models/finance_form_view_model.dart
+import 'package:flutter/foundation.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:finance_core/finance_core.dart';
+
+class FinanceFormViewModel extends ChangeNotifier 
+    with FormValidationMixin {
+  
+  final CreateFinanceUseCase _createUseCase;
+  final FinanceCreateValidator _validator;
+  
+  FinanceFormViewModel(this._createUseCase, this._validator);
+  
+  Future<void> submit(String name, String code) async {
+    final data = FinanceCreate(name: name, code: code);
+    
+    // Validar usando FormValidationMixin
+    if (!validate(_validator, data)) {
+      return; // Erros já foram setados no mixin
+    }
+    
+    // Prosseguir com criação
+    final result = await _createUseCase(data);
+    
+    switch (result) {
+      case Success(:final value):
+        clearErrors();
+      case Failure(:final error):
+        setFieldError('form', error.toString());
+    }
+  }
+}
+```
+
+> [!NOTE]
+> **Validação em Múltiplas Camadas**
+>
+> - **UI (ViewModel)**: Valida antes de submeter (feedback imediato)
+> - **UseCase**: Pode validar novamente (camada extra de segurança)
+> - **Server**: Valida na API (nunca confiar no client)
+>
+> Validators Zard podem ser reutilizados em todas essas camadas!
+
+Para detalhes completos sobre validação de formulários, consulte [ADR-0004:  FormValidationMixin e Zard](../adr/0004-use-form-validation-mixin-and-zard.md).
+
+---
+
 ## Estrutura de Diretórios
 
 ```
@@ -403,14 +531,19 @@ packages/
             │   ├── entities/
             │   │   ├── <entity>.dart              (Entity pura)
             │   │   └── <entity>_details.dart      (Entity + metadados)
-            │   └── dtos/
-            │       ├── <entity>_create.dart       (DTO criação)
-            │       └── <entity>_update.dart       (DTO atualização)
-            └── data/
-                └── models/
-                    ├── <entity>_details_model.dart  (Serialização)
-                    ├── <entity>_create_model.dart   (Serialização)
-                    └── <entity>_update_model.dart   (Serialização)
+            │   ├── dtos/
+            │   │   ├── <entity>_create.dart       (DTO criação)
+            │   │   └── <entity>_update.dart       (DTO atualização)
+            │   └── repositories/
+            │       └── <entity>_repository.dart   (Interface)
+            ├── data/
+            │   └── models/
+            │       ├── <entity>_details_model.dart  (Serialização)
+            │       ├── <entity>_create_model.dart   (Serialização)
+            │       └── <entity>_update_model.dart   (Serialização)
+            └── validators/
+                ├── <entity>_create_validator.dart  (Validators Zard)
+                └── <entity>_update_validator.dart  (Validators Zard)
 ```
 
 ---
@@ -422,12 +555,14 @@ packages/
 ```mermaid
 sequenceDiagram
     participant UI as UI/ViewModel
+    participant UC as UseCase
     participant Repo as Repository
     participant API as API Service
     participant Route as Server Route
     participant DB as Database
 
-    UI->>Repo: create(FinanceCreate)
+    UI->>UC: execute(FinanceCreate)
+    UC->>Repo: create(FinanceCreate)
     Repo->>API: POST /finances<br/>body: FinanceCreateModel.toJson()
     API->>Route: HTTP Request
     Route->>Route: FinanceCreateModel.fromJson()
@@ -437,7 +572,9 @@ sequenceDiagram
     Route->>Route: FinanceDetailsModel.fromDomain()
     Route-->>API: JSON Response
     API->>Repo: FinanceDetailsModel.fromJson()
-    Repo-->>UI: FinanceDetails
+    Repo-->>UC: Result<FinanceDetails>
+    UC-->>UI: Result<FinanceDetails>
+    Note over UI: Pattern match:<br/>Success → update UI<br/>Failure → show error
 ```
 
 ### Leitura (Server → Client)
@@ -445,12 +582,14 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant UI as UI/ViewModel
+    participant UC as UseCase
     participant Repo as Repository
     participant API as API Service
     participant Route as Server Route
     participant DB as Database
 
-    UI->>Repo: getAll()
+    UI->>UC: execute()
+    UC->>Repo: getAll()
     Repo->>API: GET /finances
     API->>Route: HTTP Request
     Route->>DB: query all
@@ -459,7 +598,9 @@ sequenceDiagram
     Route-->>API: JSON Array
     API->>Repo: map to FinanceDetailsModel
     Repo->>Repo: map .toDomain()
-    Repo-->>UI: List<FinanceDetails>
+    Repo-->>UC: Result<List<FinanceDetails>>
+    UC-->>UI: Result<List<FinanceDetails>>
+    Note over UI: Pattern match:<br/>Success → show list<br/>Failure → show error
 ```
 
 ---
@@ -496,10 +637,12 @@ sequenceDiagram
 
 ## Referências
 
-- [ADR-0005: Standard Package Structure](../adr/0005-standard-package-structure.md)
-- [ADR-0006: Sincronização BaseDetails ↔ DriftTableMixin](../adr/0006-base-details-sync.md)
-- [Hierarquia de Features](./features_hierarchy.md)
-- [Padrões de Entities](./entity_patterns.md)
-- [Guia de Design System](./design_system_guide.md)
-- [Guia de Criação de Features](../rules/new_feature.md)
+- [ADR-0001: Padrão Result](../adr/0001-use-result-pattern-for-error-handling.md) - Tratamento de erros
+- [ADR-0004: FormValidationMixin e Zard](../adr/0004-use-form-validation-mixin-and-zard.md) - Validação de formulários
+- [ADR-0005: Standard Package Structure](../adr/0005-standard-package-structure.md) - Estrutura de pacotes
+- [ADR-0006: Sincronização BaseDetails ↔ DriftTableMixin](../adr/0006-base-details-sync.md) - Sincronização de metadados
+- [Hierarquia de Features](./features_hierarchy.md) - Organização de features
+- [Padrões de Entities](./entity_patterns.md) - Padrões de entidades
+- [Guia de Design System](./design_system_guide.md) - Sistema de design
+- [Guia de Criação de Features](../rules/new_feature.md) - Como criar features
 

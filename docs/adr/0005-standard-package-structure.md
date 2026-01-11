@@ -321,7 +321,7 @@ Em um monorepo, a documentação deve seguir uma hierarquia clara:
 
 #### Nível 1: Raiz da Feature (`packages/{{feature}}/`)
 
-Arquivos **obrigatórios** na raiz de cada feature (ex: `packages/school/`):
+Arquivos **obrigatórios** na raiz de cada feature (ex: `packages/user/`):
 
 - ✅ **README.md**: Visão geral da feature completa
   - Descrição da feature e seus módulos (_core, _client, _server, _ui)
@@ -450,12 +450,14 @@ packages/user/
 - [Flutter Architecture Guide](https://docs.flutter.dev/app-architecture)
 - [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Domain-Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+- [ADR-0001: Padrão Result](./0001-use-result-pattern-for-error-handling.md) - Tratamento de erros
+- [ADR-0004: FormValidationMixin e Zard](./0004-use-form-validation-mixin-and-zard.md) - Validação de formulários
+- [ADR-0006: Sincronização BaseDetails](./0006-base-details-sync.md) - Sincronização automática entre Entity e BaseDetails
 - [Padrões Arquiteturais](../architecture/architecture_patterns.md) - Detalhes sobre Entities, Models (DTOs) e Details
 - [Hierarquia de Features](../architecture/features_hierarchy.md) - Guia detalhado sobre Features vs Sub-Features
 - [Padrões de Entities](../architecture/entity_patterns.md) - Regras e práticas sobre Entities e BaseDetails
-- [ADR-0006: Sincronização BaseDetails](./0006-base-details-sync.md) - Sincronização automática entre Entity e BaseDetails
-- [Guia de Criação de Features](../rules/new_feature.md) - Como criar novas features no projeto
 - [Guia de Design System](../architecture/design_system_guide.md) - Padrões visuais, tipografia, cores e componentes
+- [Guia de Criação de Features](../rules/new_feature.md) - Como criar novas features no projeto
 - [Regras Dart/Flutter](../rules/flutter_dart_rules.md) - Convenções e regras de código
 
 
