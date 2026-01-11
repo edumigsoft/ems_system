@@ -136,25 +136,25 @@ packages/auth/
 Estrutura hierárquica com domínio pai contendo múltiplas sub-features:
 
 ```
-packages/project/                     # Domínio pai
+packages/financial/                   # Domínio pai
 ├── README.md                         # Visão geral de TODAS as sub-features
 ├── CONTRIBUTING.md                   # ÚNICO para todo o domínio
 ├── CHANGELOG.md                      # Reúne as mudanças de todas as sub-features
-├── projects/                     # Sub-feature 1
+├── billing/                          # Sub-feature 1
 │   ├── README.md
 │   ├── CHANGELOG.md
-│   ├── projects_core/
-│   ├── projects_client/
-│   ├── projects_server/
-│   └── projects_ui/
+│   ├── billing_core/
+│   ├── billing_client/
+│   ├── billing_server/
+│   └── billing_ui/
 │
-└── projects_task/                    # Sub-feature 2
+└── payments/                         # Sub-feature 2
     ├── README.md
     ├── CHANGELOG.md
-    ├── projects_task_core/
-    ├── projects_task_client/
-    ├── projects_task_server/
-    └── projects_task_ui/
+    ├── payments_core/
+    ├── payments_client/
+    ├── payments_server/
+    └── payments_ui/
 ```
 
 **Quando usar:**
@@ -162,9 +162,18 @@ packages/project/                     # Domínio pai
 - Mais de ~10 entidades ou múltiplas áreas de negócio
 - Necessidade de versionamento independente de componentes
 
-**Exemplos:** `project` (com `projects` e `projects_task`)
+**Exemplos:** `financial` (com `billing` e `payments`)
 
-**Nomenclatura:** `{sub_feature}_{tipo}` (ex: `projects_core`, `projects_ui`)
+**Nomenclatura:** `{sub_feature}_{tipo}` (ex: `billing_core`, `billing_ui`)
+
+> [!IMPORTANT]
+> **Independência de Sub-Features**
+> 
+> Cada sub-feature é **completamente independente** e não deve compartilhar entidades:
+> - ✅ Correto: `class Invoice { final String paymentId; }` (referência por ID)
+> - ❌ Incorreto: `class Invoice { final Payment payment; }` (acoplamento entre sub-features)
+> 
+> Isso garante evolução independente e previne acoplamento entre sub-domínios.
 
 > [!WARNING]
 > **Caminhos Relativos em Sub-Features**
@@ -174,88 +183,112 @@ packages/project/                     # Domínio pai
 > # Feature simples: packages/auth/auth_core/
 > include: ../../../analysis_options_dart.yaml
 > 
-> # Sub-feature: packages/project/projects/projects_core/
+> # Sub-feature: packages/financial/billing/billing_core/
 > include: ../../../../analysis_options_dart.yaml  # ⚠️ Um nível a mais!
 > ```
 
-Para detalhes completos sobre Features vs Sub-Features, consulte [Hierarquia de Features](../analysis/features_hierarchy.md).
+### Critérios de Decisão
+
+Use este fluxo de decisão para escolher entre Feature Simples e Sub-Features:
+
+```mermaid
+graph TD
+    A[Nova Feature] --> B{Mais de 10 entidades?}
+    B -->|Não| C{Múltiplas áreas de negócio?}
+    B -->|Sim| D{Sub-domínios bem definidos?}
+    C -->|Não| E[Feature Simples]
+    C -->|Sim| D
+    D -->|Sim| F[Feature com Sub-Features]
+    D -->|Não| G{Previsão de crescimento?}
+    G -->|Não| E
+    G -->|Sim| F
+```
+
+**Sinais para migrar de Feature Simples para Sub-Features:**
+1. Feature ultrapassou ~10-15 entidades
+2. Múltiplas áreas de negócio começam a emergir
+3. Necessidade de evoluir partes independentemente
+4. Diferentes times trabalhando em aspectos diferentes do domínio
+5. Dificuldade em navegar ou entender a estrutura atual
+
+Para detalhes completos sobre Features vs Sub-Features, consulte [Hierarquia de Features](../architecture/features_hierarchy.md).
 
 
 ## Exemplos Práticos
 
-### Exemplo 1: Pacote School Core
+### Exemplo 1: Pacote User Core
 
 ```
-packages/school/
-  ├── README.md                       # Visão geral da feature school
+packages/user/
+  ├── README.md                       # Visão geral da feature user
   ├── CONTRIBUTING.md                 # Guia de contribuição (Único arquivo)
-  └── school_core/
+  └── user_core/
       ├── lib/
       │   └── src/
       │       ├── domain/
       │       │   ├── entities/
-      │       │   │   ├── school.dart                    # Entidade de domínio
-      │       │   │   └── school_details.dart
+      │       │   │   ├── user.dart                    # Entidade de domínio
+      │       │   │   └── user_details.dart
       │       │   ├── repositories/
-      │       │   │   └── school_repository.dart         # Interface/contrato
+      │       │   │   └── user_repository.dart         # Interface/contrato
       │       │   └── use_cases/
-      │       │       ├── create_school_use_case.dart
-      │       │       ├── get_schools_use_case.dart
-      │       │       ├── update_school_use_case.dart
-      │       │       └── delete_school_use_case.dart
+      │       │       ├── create_user_use_case.dart
+      │       │       ├── get_users_use_case.dart
+      │       │       ├── update_user_use_case.dart
+      │       │       └── delete_user_use_case.dart
       │       ├── data/
       │       │   ├── models/
-      │       │   │   └── school_model.dart              # DTO para serialização
+      │       │   │   └── user_model.dart              # DTO para serialização
       │       │   └── repositories/
-      │       │       └── school_repository_impl.dart    # Implementação (se necessário)
+      │       │       └── user_repository_impl.dart    # Implementação (se necessário)
       │       ├── validators/
-      │       │   └── school_details_validator.dart    # Zard schema
+      │       │   └── user_details_validator.dart    # Zard schema
       │       ├── constants/
-      │       │   └── school_constants.dart
+      │       │   └── user_constants.dart
       │       └── extensions/
-      │           └── school_extensions.dart
-      ├── school_core.dart                     # Barrel export
+      │           └── user_extensions.dart
+      ├── user_core.dart                     # Barrel export
       ├── pubspec.yaml
       ├── analysis_options.yaml
-      ├── README.md                            # Específico do school_core
+      ├── README.md                            # Específico do user_core
       └── CHANGELOG.md                         # Versionamento do core
 ```
 
-### Exemplo 2: Pacote School Client
+### Exemplo 2: Pacote User Client
 
 ```
-packages/school/school_client/
+packages/user/user_client/
   ├── lib/
   │   └── src/
   │       ├── repositories/
-  │       │   └── school_repository_client.dart    # Implementação HTTP
+  │       │   └── user_repository_client.dart    # Implementação HTTP
   │       └── services/
-  │           └── school_api_service.dart          # Retrofit service
-  ├── school_client.dart
+  │           └── user_api_service.dart          # Retrofit service
+  ├── user_client.dart
   ├── pubspec.yaml
   ├── analysis_options.yaml
   ├── README.md                                # Específico do client
   └── CHANGELOG.md                             # Versionamento do client
 ```
 
-> **Nota**: `CONTRIBUTING.md` NÃO está aqui, está em `packages/school/CONTRIBUTING.md`
+> **Nota**: `CONTRIBUTING.md` NÃO está aqui, está em `packages/user/CONTRIBUTING.md`
 
-### Exemplo 3: Pacote School UI
+### Exemplo 3: Pacote User UI
 
 ```
-packages/school/school_ui/
+packages/user/user_ui/
   ├── lib/
   │   ├── ui/
   │   │   ├── pages/
-  │   │   │   ├── school_page.dart
-  │   │   │   └── school_details_page.dart
+  │   │   │   ├── user_page.dart
+  │   │   │   └── user_details_page.dart
   │   │   ├── view_models/
-  │   │   │   └── school_view_model.dart
+  │   │   │   └── user_view_model.dart
   │   │   └── widgets/
-  │   │       ├── school_card.dart
-  │   │       └── school_list.dart
-  │   ├── school_module.dart                   # AppModule
-  │   └── school_ui.dart
+  │   │       ├── user_card.dart
+  │   │       └── user_list.dart
+  │   ├── user_module.dart                   # AppModule
+  │   └── user_ui.dart
   ├── pubspec.yaml
   ├── analysis_options.yaml
   ├── README.md                                # Específico do UI
@@ -310,7 +343,7 @@ Arquivos **obrigatórios** na raiz de cada feature (ex: `packages/school/`):
 
 #### Nível 2: Pacotes Individuais (`packages/{{feature}}/{{feature}}_{{type}}/`)
 
-Arquivos **obrigatórios** em cada subpacote (ex: `packages/school/school_core/`):
+Arquivos **obrigatórios** em cada subpacote (ex: `packages/user/user_core/`):
 
 - ✅ **README.md**: Documentação específica do pacote
   - Objetivo e responsabilidade do pacote
@@ -346,28 +379,28 @@ Arquivos **obrigatórios** em cada subpacote (ex: `packages/school/school_core/`
 ### Exemplo de Estrutura Completa
 
 ```
-packages/school/
-  ├── README.md                    # Visão geral da feature school
+packages/user/
+  ├── README.md                    # Visão geral da feature user
   ├── CONTRIBUTING.md              # Como contribuir (NÃO duplicar)
-  ├── school_core/
+  ├── user_core/
   │   ├── README.md                # Específico do core
   │   ├── CHANGELOG.md             # Versões do core
   │   ├── pubspec.yaml
   │   ├── analysis_options.yaml
   │   └── lib/...
-  ├── school_client/
+  ├── user_client/
   │   ├── README.md                # Específico do client
   │   ├── CHANGELOG.md             # Versões do client
   │   ├── pubspec.yaml
   │   ├── analysis_options.yaml
   │   └── lib/...
-  ├── school_server/
+  ├── user_server/
   │   ├── README.md
   │   ├── CHANGELOG.md
   │   ├── pubspec.yaml
   │   ├── analysis_options.yaml
   │   └── lib/...
-  └── school_ui/
+  └── user_ui/
       ├── README.md
       ├── CHANGELOG.md
       ├── pubspec.yaml
@@ -394,12 +427,16 @@ packages/school/
 - ✅ Facilita onboarding de novos desenvolvedores
 - ✅ Estrutura escalável para crescimento futuro
 - ✅ Separação clara facilita code review
+- ✅ Sub-features permitem evolução independente de sub-domínios
+- ✅ Flexibilidade para escolher entre Feature Simples e Sub-Features conforme necessidade
 
 ### Negativas
 
 - ⚠️ Mais diretórios podem intimidar iniciantes
 - ⚠️ Pacotes pequenos podem parecer "over-engineered"
 - ⚠️ Necessidade de educar time sobre quando usar cada variação
+- ⚠️ Sub-features exigem atenção especial aos caminhos relativos (um nível a mais)
+- ⚠️ Risco de acoplamento entre sub-features se regras de independência não forem seguidas
 
 ### Mitigação
 
@@ -413,10 +450,10 @@ packages/school/
 - [Flutter Architecture Guide](https://docs.flutter.dev/app-architecture)
 - [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Domain-Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html)
-- [Padrões Arquiteturais](../analysis/architecture_patterns.md) - Detalhes sobre Entities/Details/DTOs
-- [Hierarquia de Features](../analysis/features_hierarchy.md) - Features vs Sub-Features
-- [Padrões de Entities](../rules/entity_patterns.md) - Regras práticas
-- [ADR-0006: Sincronização BaseDetails](./0006-base-details-sync.md)
-- `docs/rules/new_feature.md` - Guia de criação de features
-- `docs/rules/flutter_dart_rules.md` - Regras Dart/Flutter
+- [Padrões Arquiteturais](../architecture/architecture_patterns.md) - Detalhes sobre Entities, Models (DTOs) e Details
+- [Hierarquia de Features](../architecture/features_hierarchy.md) - Guia detalhado sobre Features vs Sub-Features
+- [Padrões de Entities](../architecture/entity_patterns.md) - Regras e práticas sobre Entities e BaseDetails
+- [ADR-0006: Sincronização BaseDetails](./0006-base-details-sync.md) - Sincronização automática entre Entity e BaseDetails
+- [Guia de Criação de Features](../rules/new_feature.md) - Como criar novas features no projeto
+- [Regras Dart/Flutter](../rules/flutter_dart_rules.md) - Convenções e regras de código
 

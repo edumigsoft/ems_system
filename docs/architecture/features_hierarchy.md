@@ -2,10 +2,10 @@
 
 ## Contexto
 
-O School Manager System suporta **dois padrões** de organização de features, dependendo da complexidade e escopo do domínio:
+O EMS System suporta **dois padrões** de organização de features, dependendo da complexidade e escopo do domínio:
 
-1. **Feature Simples** → 4 pacotes diretamente (ex: `school`, `user`, `auth`)
-2. **Feature com Sub-Features** → Domínio pai contendo múltiplas sub-features (ex: `academic`)
+1. **Feature Simples** → 4 pacotes diretamente (ex: `user`, `auth`)
+2. **Feature com Sub-Features** → Domínio pai contendo múltiplas sub-features (ex: `financial`)
 
 Este documento explica quando e como usar cada padrão.
 
@@ -16,13 +16,13 @@ Este documento explica quando e como usar cada padrão.
 ### Estrutura
 
 ```
-packages/school/
+packages/user/
 ├── README.md
 ├── CONTRIBUTING.md
-├── school_core/
-├── school_client/
-├── school_server/
-└── school_ui/
+├── user_core/
+├── user_client/
+├── user_server/
+└── user_ui/
 ```
 
 ### Quando Usar
@@ -34,7 +34,6 @@ packages/school/
 
 ### Exemplos
 
-- `school` - Gestão de escolas
 - `user` - Gestão de usuários
 - `auth` - Autenticação e autorização
 
@@ -51,24 +50,24 @@ packages/school/
 ### Estrutura
 
 ```
-packages/academic/                     # Domínio pai
+packages/financial/                    # Domínio pai
 ├── README.md                          # Visão geral de TODAS as sub-features
 ├── CONTRIBUTING.md                    # ÚNICO para todo o domínio
 ├── CHANGELOG.md
 │
-├── academic_structure/                # Sub-feature 1
+├── billing/                           # Sub-feature 1
 │   ├── README.md
-│   ├── academic_structure_core/
-│   ├── academic_structure_client/
-│   ├── academic_structure_server/
-│   └── academic_structure_ui/
+│   ├── billing_core/
+│   ├── billing_client/
+│   ├── billing_server/
+│   └── billing_ui/
 │
-└── academic_config/                    # Sub-feature 2
+└── payments/                          # Sub-feature 2
     ├── README.md
-    ├── academic_config_core/
-    ├── academic_config_client/
-    ├── academic_config_server/
-    └── academic_config_ui/
+    ├── payments_core/
+    ├── payments_client/
+    ├── payments_server/
+    └── payments_ui/
 ```
 
 ### Quando Usar
@@ -78,23 +77,24 @@ packages/academic/                     # Domínio pai
 - Mais de ~10 entidades ou múltiplas áreas de negócio dentro do mesmo contexto
 - Sub-domínios que podem evoluir em ritmos diferentes
 
-### Exemplos Atuais
+### Exemplos
 
-#### `academic/`
-- **Sub-feature 1:** `academic_structure/` - Estrutura acadêmica (disciplinas, áreas de conhecimento, níveis)
-- **Sub-feature 2:** `academic_config/` - Configurações acadêmicas (anos letivos, calendários)
+#### `financial/`
+- **Sub-feature 1:** `billing/` - Faturamento e cobranças
+- **Sub-feature 2:** `payments/` - Processamento de pagamentos
+- **Sub-feature 3:** `reports/` - Relatórios financeiros
 
 ### Exemplos Futuros
-
-#### `finance/`
-- `billing/` - Faturamento e cobranças
-- `payments/` - Processamento de pagamentos
-- `reports/` - Relatórios financeiros
 
 #### `enrollment/`
 - `registration/` - Registro de matrículas
 - `documents/` - Gestão de documentação
 - `validation/` - Validação de requisitos
+
+#### `hr/` (Recursos Humanos)
+- `employees/` - Gestão de funcionários
+- `payroll/` - Folha de pagamento
+- `attendance/` - Controle de ponto
 
 ---
 
@@ -107,33 +107,33 @@ packages/academic/                     # Domínio pai
 ### ✅ Correto
 
 ```
-academic/
-├── academic_structure/
-│   ├── academic_structure_core/
-│   ├── academic_structure_client/
-│   ├── academic_structure_server/
-│   └── academic_structure_ui/
-└── academic_config/
-    ├── academic_config_core/
-    ├── academic_config_client/
-    ├── academic_config_server/
-    └── academic_config_ui/
+financial/
+├── billing/
+│   ├── billing_core/
+│   ├── billing_client/
+│   ├── billing_server/
+│   └── billing_ui/
+└── payments/
+    ├── payments_core/
+    ├── payments_client/
+    ├── payments_server/
+    └── payments_ui/
 ```
 
 ### ❌ Incorreto
 
 ```
-academic/
-├── academic_core/        # ❌ Qual sub-feature?
-├── structure_core/       # ❌ Perde contexto do domínio pai
-└── config/              # ❌ Nome muito genérico
+financial/
+├── financial_core/        # ❌ Qual sub-feature?
+├── billing_core/          # ❌ Perde contexto do domínio pai
+└── payments/              # ❌ Nome muito genérico
 ```
 
 ### Justificativa
 
 - **Clareza:** Nome completo identifica tanto o domínio pai quanto a sub-feature
 - **Evita Conflitos:** Previne colisões de nomes entre diferentes domínios
-- **Facilita Busca:** Pesquisar por "academic_structure" retorna todos os pacotes relacionados
+- **Facilita Busca:** Pesquisar por "billing" retorna todos os pacotes relacionados
 - **Consistência:** Padrão uniforme em todo o monorepo
 
 ---
@@ -145,8 +145,8 @@ Sub-features têm profundidade extra na hierarquia de diretórios, o que afeta c
 ### Feature Simples
 
 ```yaml
-# packages/school/school_core/pubspec.yaml
-# Profundidade: packages/school/school_core/
+# packages/user/user_core/pubspec.yaml
+# Profundidade: packages/user/user_core/
 
 include: ../../../analysis_options_dart.yaml
 ```
@@ -155,15 +155,15 @@ include: ../../../analysis_options_dart.yaml
 ```
 [raiz]/
 └── packages/         # -3
-    └── school/       # -2
-        └── school_core/  # -1 (atual)
+    └── user/       # -2
+        └── user_core/  # -1 (atual)
 ```
 
 ### Sub-Feature
 
 ```yaml
-# packages/academic/academic_structure/academic_structure_core/pubspec.yaml
-# Profundidade: packages/academic/academic_structure/academic_structure_core/
+# packages/financial/billing/billing_core/pubspec.yaml
+# Profundidade: packages/financial/billing/billing_core/
 
 include: ../../../../analysis_options_dart.yaml  # ⚠️ Um nível a mais!
 ```
@@ -172,9 +172,9 @@ include: ../../../../analysis_options_dart.yaml  # ⚠️ Um nível a mais!
 ```
 [raiz]/
 └── packages/                  # -4
-    └── academic/              # -3
-        └── academic_structure/    # -2
-            └── academic_structure_core/  # -1 (atual)
+    └── financial/              # -3
+        └── billing/            # -2
+            └── billing_core/  # -1 (atual)
 ```
 
 > [!WARNING]
@@ -186,24 +186,24 @@ include: ../../../../analysis_options_dart.yaml  # ⚠️ Um nível a mais!
 
 ### Feature com Sub-Features
 
-#### No Nível do Domínio Pai (`packages/academic/`)
+#### No Nível do Domínio Pai (`packages/financial/`)
 
 **README.md**
-- Visão geral do domínio `academic`
+- Visão geral do domínio `financial`
 - Lista e descreve todas as sub-features
 - Diagrama de relacionamentos entre sub-features
 - Links para READMEs específicos de cada sub-feature
 
 **CONTRIBUTING.md**
 - Regras de contribuição **únicas** para todo o domínio
-- Padrões de código específicos do contexto acadêmico
+- Padrões de código específicos do contexto financeiro
 - Workflow de desenvolvimento
 
 **CHANGELOG.md**
 - Histórico de mudanças consolidado de todas as sub-features
 - Versionamento coordenado quando necessário
 
-#### No Nível da Sub-Feature (`packages/academic/academic_structure/`)
+#### No Nível da Sub-Feature (`packages/financial/billing/`)
 
 **README.md**
 - Documentação específica da sub-feature
@@ -220,22 +220,24 @@ include: ../../../../analysis_options_dart.yaml  # ⚠️ Um nível a mais!
 **Cada sub-feature é independente e segue o padrão completo de camadas:**
 
 ```
-academic/
-├── academic_structure_core/
+financial/
+├── billing_core/
 │   └── lib/src/
 │       ├── domain/entities/
-│       │   ├── discipline.dart              # Entity pura
-│       │   ├── discipline_details.dart      # Details
-│       │   ├── knowledge_area.dart
-│       │   ├── knowledge_area_details.dart
+│       │   ├── invoice.dart                   # Entity pura
+│       │   ├── invoice_details.dart           # Details
+│       │   ├── billing_plan.dart
+│       │   ├── billing_plan_details.dart
 │       │   └── dtos/...
 │       └── data/models/...
 │
-└── academic_config_core/
+└── payments_core/
     └── lib/src/
         ├── domain/entities/
-        │   ├── academic_year_config.dart         # Entity pura
-        │   ├── academic_year_config_details.dart
+        │   ├── payment.dart                    # Entity pura
+        │   ├── payment_details.dart
+        │   ├── payment_method.dart
+        │   ├── payment_method_details.dart
         │   └── dtos/...
         └── data/models/...
 ```
@@ -252,19 +254,19 @@ academic/
 
 **❌ Incorreto:**
 ```dart
-// academic_structure_core usando entity de academic_config
-import 'package:academic_config_core/academic_config_core.dart';
+// billing_core usando entity de payments
+import 'package:payments_core/payments_core.dart';
 
-class Discipline {
-  final AcademicYearConfig config;  // ❌ Acoplamento entre sub-features
+class Invoice {
+  final Payment payment;  // ❌ Acoplamento entre sub-features
 }
 ```
 
 **✅ Correto:**
 ```dart
-// academic_structure_core tem sua própria referência
-class Discipline {
-  final String academicYearConfigId;  // ✅ Apenas referência por ID
+// billing_core tem sua própria referência
+class Invoice {
+  final String paymentId;  // ✅ Apenas referência por ID
 }
 ```
 
@@ -331,42 +333,42 @@ packages/user/
 
 ---
 
-### Feature com Sub-Features: `academic`
+### Feature com Sub-Features: `financial`
 
 ```
-packages/academic/
-├── README.md                              # Overview de academic
-├── CONTRIBUTING.md                        # Regras para todo academic
+packages/financial/
+├── README.md                              # Overview de financial
+├── CONTRIBUTING.md                        # Regras para todo financial
 │
-├── academic_structure/                    # Sub-domínio: Estrutura
+├── billing/                               # Sub-domínio: Faturamento
 │   ├── README.md
-│   ├── academic_structure_core/
+│   ├── billing_core/
 │   │   └── domain/entities/
-│   │       ├── discipline.dart            # 1. Disciplinas
-│   │       ├── knowledge_area.dart        # 2. Áreas de conhecimento
-│   │       └── grade_level.dart           # 3. Níveis escolares
-│   ├── academic_structure_client/
-│   ├── academic_structure_server/
-│   └── academic_structure_ui/
+│   │       ├── invoice.dart                   # 1. Faturas
+│   │       ├── billing_plan.dart              # 2. Planos de cobrança
+│   │       └── billing_cycle.dart             # 3. Ciclos de cobrança
+│   ├── billing_client/
+│   ├── billing_server/
+│   └── billing_ui/
 │
-└── academic_config/                        # Sub-domínio: Configuração
+└── payments/                              # Sub-domínio: Pagamentos
     ├── README.md
-    ├── academic_config_core/
+    ├── payments_core/
     │   └── domain/entities/
-    │       ├── academic_year_config.dart  # 1. Configuração de ano letivo
-    │       └── calendar_config.dart       # 2. Calendário acadêmico
-    ├── academic_config_client/
-    ├── academic_config_server/
-    └── academic_config_ui/
+    │       ├── payment.dart                   # 1. Pagamentos
+    │       └── payment_method.dart            # 2. Métodos de pagamento
+    ├── payments_client/
+    ├── payments_server/
+    └── payments_ui/
 ```
 
-**Justificativa:** Duas áreas distintas (estrutura vs configuração), evolução independente, ~8 entidades.
+**Justificativa:** Duas áreas distintas (faturamento vs pagamentos), evolução independente, ~5-7 entidades.
 
 ---
 
 ## Referências
 
-- [Padrões Arquiteturais](./architecture_patterns.md)
+- [Padrões Arquiteturais](../analysis/architecture_patterns.md)
 - [ADR-0005: Standard Package Structure](../adr/0005-standard-package-structure.md)
 - [Guia de Criação de Features](../rules/new_feature.md)
 - [Padrões de Entities](../rules/entity_patterns.md)

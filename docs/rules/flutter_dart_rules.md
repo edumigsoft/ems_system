@@ -1,4 +1,4 @@
-# Flutter & Dart Rules for EdumigSoft (EMS System)
+# Flutter & Dart Rules for EduMigSoft (EMS System)
 
 Este documento consolida as regras oficiais do [Flutter AI Rules](https://raw.githubusercontent.com/flutter/flutter/refs/heads/master/docs/rules/rules.md), adaptadas para o contexto do **EMS System**.
 
@@ -109,7 +109,7 @@ class SubjectDetails implements BaseDetails {
   @override
   final String id;
   @override
-  final bool deleted;
+  final bool isDeleted;
   @override
   final bool isActive;
   @override
@@ -121,7 +121,7 @@ class SubjectDetails implements BaseDetails {
   
   SubjectDetails({
     required this.id,
-    this.deleted = false,
+    this.isDeleted = false,
     this.isActive = true,
     required this.createdAt,
     required this.updatedAt,
@@ -146,7 +146,7 @@ class SubjectDetailsModel {
     return SubjectDetailsModel(
       SubjectDetails(
         id: json['id'] as String,
-        deleted: json['deleted'] as bool? ?? false,
+        isDeleted: json['is_deleted'] as bool? ?? false,
         isActive: json['is_active'] as bool? ?? true,
         createdAt: DateTime.parse(json['created_at'] as String),
         updatedAt: DateTime.parse(json['updated_at'] as String),
@@ -158,7 +158,7 @@ class SubjectDetailsModel {
   
   Map<String, dynamic> toJson() => {
     'id': entity.id,
-    'deleted': entity.deleted,
+    'is_deleted': entity.isDeleted,
     'is_active': entity.isActive,
     'created_at': entity.createdAt.toIso8601String(),
     'updated_at': entity.updatedAt.toIso8601String(),
@@ -183,8 +183,8 @@ class SubjectDetailsModel {
 > - **Models**: Classes `*Model` para serialização JSON
 > 
 > Para detalhes completos, consulte:
-> - [Padrões Arquiteturais](../analysis/architecture_patterns.md)
-> - [Padrões de Entities](./entity_patterns.md)
+> - [Padrões Arquiteturais](../architecture/architecture_patterns.md)
+> - [Padrões de Entities](../architecture/entity_patterns.md)
 > - [ADR-0006: Sincronização BaseDetails](../adr/0006-base-details-sync.md)
 
 ### Documentation & Comments
@@ -237,7 +237,7 @@ class SubjectDetailsModel {
 > **Adaptação**: O guia original sugere `go_router`, mas para este projeto adotamos a estratégia **Nativa Modular**.
 
 *   **Native Navigation**: Use `Navigator` (v1/v2) nativo.
-*   **Named Routes**: Use rotas nomeadas (`/school/details`) definidas em contratos constantes (`AppRoutes` no `core_shared`).
+*   **Named Routes**: Use rotas nomeadas (`/finance/details`) definidas em contratos constantes (`AppRoutes` no `core_shared`).
 *   **Deep Linking**: Se necessário, suporte deep links via configuração nativa do Android/iOS mapeando para rotas nomeadas.
 
 ---
