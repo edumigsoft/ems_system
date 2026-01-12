@@ -1,11 +1,8 @@
-"Please read openspec/project.md and help me fill it out
-    with details about my project, tech stack, and conventions"
+"Please read openspec/project.md and help me fill it out with details about my project, tech stack, and conventions"
     
 
-"I want to add [YOUR FEATURE HERE]. Please create an
-    OpenSpec change proposal for this feature"
+"I want to add [YOUR FEATURE HERE]. Please create an OpenSpec change proposal for this feature"
     
     
-"Please explain the OpenSpec workflow from openspec/AGENTS.md
-    and how I should work with you on this project"
+"Please explain the OpenSpec workflow from openspec/AGENTS.md and how I should work with you on this project"
 
