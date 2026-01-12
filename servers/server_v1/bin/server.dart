@@ -14,9 +14,9 @@ import 'server.reflectable.dart';
 // -------------Somente para gerar Swagger---------------
 @api
 @ApiInfo(
-  title: 'School Manager System API',
+  title: 'EMS System API',
   version: '0.1.0',
-  description: 'API para o School Manager System',
+  description: 'API para o EMS System',
 )
 class Document {}
 // -------------Somente para gerar Swagger---------------
