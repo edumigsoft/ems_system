@@ -1,0 +1,13 @@
+# Changelog
+
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0] - 2026-01-12
+
+### Added
+- Criação inicial do pacote.
+- Adição de anotações básicas (`ApiInfo`, `Route`, `Get`, `Post`, etc).
+- Adição de estrutura de geradores.
