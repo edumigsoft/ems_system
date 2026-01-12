@@ -820,12 +820,12 @@ Gere o código passo a passo, solicitando validação a cada grande bloco:
     - Executar `flutter pub get` em `apps/app_v1`
     - Validar `dart analyze` (0 errors) em `{{FEATURE_NAME}}_ui`
     
-    **SMS Server V1 (Backend)** - Somente se tiver `_server`:
-    - Adicionar `{{FEATURE_NAME}}_core` e `{{FEATURE_NAME}}_server` em `servers/sms_server_v1/pubspec.yaml`
+    **EMS Server V1 (Backend)** - Somente se tiver `_server`:
+    - Adicionar `{{FEATURE_NAME}}_core` e `{{FEATURE_NAME}}_server` em `servers/server_v1/pubspec.yaml`
     - Criar `Init{{FeatureName}}ModuleToServer` no barrel export `{{FEATURE_NAME}}_server.dart`
-    - Registrar em `servers/sms_server_v1/lib/config/injector.dart`
+    - Registrar em `servers/server_v1/lib/config/injector.dart`
     - Criar tabela no PostgreSQL com script SQL (incluir campos DriftTableMixinPostgres)
-    - Executar `dart pub get` em `servers/sms_server_v1`
+    - Executar `dart pub get` em `servers/server_v1`
     - Validar `dart analyze` (0 errors) em `{{FEATURE_NAME}}_server`
 
 ## 4. Definição de Concluído (DoD) - RÍGIDO
@@ -849,7 +849,7 @@ Para considerar a tarefa finalizada, você deve passar nas seguintes verificaç�
     - `_server` usa `DatabaseProvider`.
 5.  **Integração**:
     - Se a feature tiver `_client` E `_ui`: verificar que está registrada em `apps/app_v1` e aparece no menu.
-    - Se a feature tiver `_server`: verificar que está registrada em `apps/sms_server_v1` e rotas respondem corretamente.
+    - Se a feature tiver `_server`: verificar que está registrada em `servers/server_v1` e rotas respondem corretamente.
 
 ## 5. Erros Comuns e Como Evitá-los ⚠️
 

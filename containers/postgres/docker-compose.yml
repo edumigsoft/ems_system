@@ -1,0 +1,16 @@
+services:
+  docker_postgres_db:
+    build: .
+    container_name: docker_postgres_db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: A.N-shgS.f2D~n5j
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: >
+      -c shared_preload_libraries=pg_cron
+volumes:
+  postgres_data:
+  
