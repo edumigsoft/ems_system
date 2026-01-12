@@ -42,14 +42,14 @@ packages:
     source: hosted
     version: "1.19.1"
   core_shared:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../packages/core/core_shared"
       relative: true
     source: path
     version: "0.1.0"
   core_ui:
-    dependency: transitive
+    dependency: "direct main"
     description:
       path: "../../packages/core/core_ui"
       relative: true

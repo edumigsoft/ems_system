@@ -58,7 +58,7 @@ import 'package:flutter/material.dart';
 ///   }
 /// }
 /// ```
-abstract class BaseViewModel<T> extends ChangeNotifier with Loggable {
+abstract class BaseCRUDViewModel<T> extends ChangeNotifier with Loggable {
   /// ID da entidade que está sendo editada, ou null se não estiver em modo de edição.
   String? editing;
 
