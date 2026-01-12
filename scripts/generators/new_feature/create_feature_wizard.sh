@@ -216,13 +216,45 @@ $ENTITY_NAME" | "$GENERATORS_DIR/16_generate_ui_widgets.sh"
 fi
 
 # ============================================================================
-# 7. Build Runner (se necessário)
+# 7. Pub Get (instalar dependências)
+# ============================================================================
+
+progress "Instalando dependências dos pacotes..."
+
+ROOT=$(get_project_root)
+
+# Shared sempre existe
+info "pub get em ${FEATURE_NAME}_shared..."
+cd "$ROOT/packages/$FEATURE_NAME/${FEATURE_NAME}_shared"
+dart pub get || warn "Erro no pub get shared"
+
+if [[ "$PACKAGES" == *"server"* ]]; then
+  info "pub get em ${FEATURE_NAME}_server..."
+  cd "$ROOT/packages/$FEATURE_NAME/${FEATURE_NAME}_server"
+  dart pub get || warn "Erro no pub get server"
+fi
+
+if [[ "$PACKAGES" == *"client"* ]]; then
+  info "pub get em ${FEATURE_NAME}_client..."
+  cd "$ROOT/packages/$FEATURE_NAME/${FEATURE_NAME}_client"
+  dart pub get || warn "Erro no pub get client"
+fi
+
+if [[ "$PACKAGES" == *"ui"* ]]; then
+  info "pub get em ${FEATURE_NAME}_ui..."
+  cd "$ROOT/packages/$FEATURE_NAME/${FEATURE_NAME}_ui"
+  dart pub get || warn "Erro no pub get ui"
+fi
+
+cd "$ROOT"
+success "Dependências instaladas!"
+
+# ============================================================================
+# 8. Build Runner (se necessário)
 # ============================================================================
 
 if [[ "$PACKAGES" == *"server"* ]] || [[ "$PACKAGES" == *"client"* ]]; then
   progress "Executando build_runner..."
-  
-  ROOT=$(get_project_root)
   
   if [[ "$PACKAGES" == *"server"* ]]; then
     info "build_runner em ${FEATURE_NAME}_server..."
@@ -241,7 +273,7 @@ if [[ "$PACKAGES" == *"server"* ]] || [[ "$PACKAGES" == *"client"* ]]; then
 fi
 
 # ============================================================================
-# 8. Validação
+# 9. Validação
 # ============================================================================
 
 if confirm "Deseja executar validate_architecture.sh?"; then
@@ -253,7 +285,7 @@ if confirm "Deseja executar validate_architecture.sh?"; then
 fi
 
 # ============================================================================
-# 9. Finalização
+# 10. Finalização
 # ============================================================================
 
 echo ""
