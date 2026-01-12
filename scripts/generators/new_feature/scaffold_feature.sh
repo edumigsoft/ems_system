@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script para scaffold de nova feature (Suporte a Sub-features, Pubspec e CLI flags)
 # Uso interativo: ./scripts/scaffold_feature.sh
-# Uso com flags: ./scripts/scaffold_feature.sh --name book --title "Book Management" --entity Book --packages core,client,server,ui --no-prompt
+# Uso com flags: ./scripts/scaffold_feature.sh --name book --title "Book Management" --entity Book --packages shared,client,server,ui --no-prompt
 
 set -e
 
@@ -79,7 +79,7 @@ if [ "$NO_PROMPT" = false ]; then
   ask "Nome da feature (ex: library ou finance/invoice)" FEATURE_PATH
   ask "Título da feature (ex: Library Management)" FEATURE_TITLE
   ask "Entidade principal (ex: Book)" ENTITY_NAME
-  ask "Pacotes a criar (core,client,server,ui)" PACKAGES "core,client,server,ui"
+  ask "Pacotes a criar (shared,client,server,ui)" PACKAGES "shared,client,server,ui"
   ask "Descrição breve" DESCRIPTION
 fi
 
@@ -106,7 +106,7 @@ for ((i=0; i<$DEPTH; i++)); do
 done
 
 # REL_PATH para o nível do PACOTE (lib, pubspec, etc)
-REL_PATH_PKG="../$REL_PATH_FEATURE"
+REL_PATH_PKG="../../../$REL_PATH_FEATURE"
 
 # Função para substituir placeholders
 replace_placeholders() {
@@ -135,9 +135,9 @@ mkdir -p "$FEATURE_DIR"
 # Garantir arquivos no nível pai se for uma sub-feature ou feature nova
 if [ ! -f "$TOP_FEATURE_DIR/CONTRIBUTING.md" ]; then
   echo -e "${GREEN}Criando estrutura base em $TOP_FEATURE_DIR...${NC}"
-  cp docs/templates/feature/README.md "$TOP_FEATURE_DIR/"
-  cp docs/templates/feature/CONTRIBUTING.md "$TOP_FEATURE_DIR/"
-  cp docs/templates/feature/CHANGELOG.md "$TOP_FEATURE_DIR/"
+  cp generators/templates/feature/README.md "$TOP_FEATURE_DIR/"
+  cp generators/templates/feature/CONTRIBUTING.md "$TOP_FEATURE_DIR/"
+  cp generators/templates/feature/CHANGELOG.md "$TOP_FEATURE_DIR/"
   replace_placeholders "$TOP_FEATURE_DIR/README.md" "$REL_PATH_FEATURE"
   replace_placeholders "$TOP_FEATURE_DIR/CONTRIBUTING.md" "$REL_PATH_FEATURE"
   replace_placeholders "$TOP_FEATURE_DIR/CHANGELOG.md" "$REL_PATH_FEATURE"
@@ -145,7 +145,7 @@ fi
 
 # Se for uma sub-feature, criar o README dela também
 if [ "$FEATURE_PATH" != "$TOP_FEATURE_PATH" ]; then
-  cp docs/templates/feature/README.md "$FEATURE_DIR/"
+  cp generators/templates/feature/README.md "$FEATURE_DIR/"
   replace_placeholders "$FEATURE_DIR/README.md" "$REL_PATH_FEATURE"
 fi
 
@@ -159,17 +159,17 @@ for pkg in "${PKG_ARRAY[@]}"; do
   mkdir -p "$PKG_DIR/test"
   
   # Copiar templates base
-  cp "docs/templates/$pkg/README.md" "$PKG_DIR/"
-  cp "docs/templates/$pkg/CHANGELOG.md" "$PKG_DIR/"
+  cp "generators/templates/$pkg/README.md" "$PKG_DIR/"
+  cp "generators/templates/$pkg/CHANGELOG.md" "$PKG_DIR/"
   
   # Gerar Pubspec
-  if [ -f "docs/templates/$pkg/pubspec.yaml.template" ]; then
-    cp "docs/templates/$pkg/pubspec.yaml.template" "$PKG_DIR/pubspec.yaml"
+  if [ -f "generators/templates/$pkg/pubspec.yaml.template" ]; then
+    cp "generators/templates/$pkg/pubspec.yaml.template" "$PKG_DIR/pubspec.yaml"
     replace_placeholders "$PKG_DIR/pubspec.yaml" "$REL_PATH_PKG"
   fi
   
   # Gerar Analysis Options
-  cp "docs/templates/$pkg/analysis_options.yaml.template" "$PKG_DIR/analysis_options.yaml"
+  cp "generators/templates/$pkg/analysis_options.yaml.template" "$PKG_DIR/analysis_options.yaml"
   replace_placeholders "$PKG_DIR/analysis_options.yaml" "$REL_PATH_PKG"
   
   # Substituir placeholders nos arquivos restantes

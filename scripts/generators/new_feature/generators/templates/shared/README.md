@@ -1,6 +1,6 @@
-# {{FEATURE_NAME}}_core
+# {{FEATURE_NAME}}_shared
 
-Pacote core da feature **{{FEATURE_TITLE}}**. Contém a lógica de domínio e negócio.
+Pacote shared da feature **{{FEATURE_TITLE}}**. Contém a lógica de domínio e negócio.
 
 ## 📦 Responsabilidade
 
@@ -32,7 +32,7 @@ lib/src/
 ### Use Case
 
 ```dart
-import 'package:{{FEATURE_NAME}}_core/{{FEATURE_NAME}}_core.dart';
+import 'package:{{FEATURE_NAME}}_shared/{{FEATURE_NAME}}_shared.dart';
 
 // Injetar Use Case
 final useCase = Create{{ENTITY_NAME}}UseCase(repository);
@@ -49,7 +49,7 @@ result.when(
 ### Validators
 
 ```dart
-import 'package:{{FEATURE_NAME}}_core/{{FEATURE_NAME}}_core.dart';
+import 'package:{{FEATURE_NAME}}_shared/{{FEATURE_NAME}}_shared.dart';
 
 // Validar com Zard
 final validation = {{ENTITY_NAME_LOWER}}Schema.safeParse(data);

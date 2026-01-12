@@ -39,7 +39,7 @@ progress "Gerando ${ENTITY_NAME}ViewModel..."
 
 # ViewModel  
 cat > "$VM_DIR/${ENTITY_SNAKE}_view_model.dart" <<EOF
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
 import 'package:core_shared/core_shared.dart' hide Loggable;
 import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';

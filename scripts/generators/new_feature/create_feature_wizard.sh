@@ -63,20 +63,20 @@ validate_fields "$FIELDS" || exit 1
 validate_entity_no_id "$FIELDS" || exit 1
 
 info "Quais pacotes deseja criar?"
-info "  1. core (obrigatório)"
-info "  2. core + client"
-info "  3. core + server"  
-info "  4. core + client + server"
-info "  5. core + client + server + ui (completo)"
+info "  1. shared (obrigatório)"
+info "  2. shared + client"
+info "  3. shared + server"  
+info "  4. shared + client + server"
+info "  5. shared + client + server + ui (completo)"
 ask "Opção (1-5)" PACKAGES_OPTION "5"
 
 # Mapeia opção para pacotes
 case "$PACKAGES_OPTION" in
-  1) PACKAGES="core" ;;
-  2) PACKAGES="core,client" ;;
-  3) PACKAGES="core,server" ;;
-  4) PACKAGES="core,client,server" ;;
-  5) PACKAGES="core,client,server,ui" ;;
+  1) PACKAGES="shared" ;;
+  2) PACKAGES="shared,client" ;;
+  3) PACKAGES="shared,server" ;;
+  4) PACKAGES="shared,client,server" ;;
+  5) PACKAGES="shared,client,server,ui" ;;
   *) error "Opção inválida"; exit 1 ;;
 esac
 
@@ -98,10 +98,10 @@ success "Estrutura base criada!"
 info "✓ Pubspec.yaml gerado a partir de templates com versões fixas"
 
 # ============================================================================
-# 3. Geradores Core (sempre executados)
+# 3. Geradores Shared (sempre executados)
 # ============================================================================
 
-progress "Gerando código core..."
+progress "Gerando código shared..."
 
 # Entity
 echo "$FEATURE_NAME
@@ -143,15 +143,15 @@ echo "$FEATURE_NAME
 $ENTITY_NAME
 $ENTITY_PLURAL" | "$GENERATORS_DIR/12_generate_use_cases.sh"
 
-# Repository Interface (sempre no core)
+# Repository Interface (sempre no shared)
 echo "$FEATURE_NAME
 $ENTITY_NAME" | "$GENERATORS_DIR/09_generate_repositories.sh" --interface-only
 
-# Validators (Zard - Core)
+# Validators (Zard - Shared)
 echo "$FEATURE_NAME
 $ENTITY_NAME" | "$GENERATORS_DIR/13_generate_validators.sh"
 
-success "Core gerado!"
+success "Shared gerado!"
 
 # ============================================================================
 # 4. Geradores Server (se solicitado)

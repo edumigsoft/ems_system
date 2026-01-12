@@ -29,10 +29,29 @@ O sistema é projetado para suportar tanto aplicações Flutter (mobile/web) qua
 - Scripts shell para automação (`./scripts/`)
 
 ### Dependências Principais
+
+#### Core/Shared (Pure Dart)
 - `meta: ^1.17.0` - Annotations para código Dart
+- `zard: ^0.0.25` - Validação de dados (formulários e entidades)
+- `get_it: ^9.2.0` - Service Locator / Dependency Injection
+- `logging: ^1.3.0` - Sistema de logging
+- `path: ^1.9.1` - Manipulação de paths
+
+#### Server (Backend)
+- `shelf: ^1.4.2` / `shelf_router: ^1.1.4` - Framework HTTP
+- `drift: ^2.30.0` / `drift_postgres: ^1.3.1` - ORM para banco de dados
+- `postgres: ^3.5.9` - Driver PostgreSQL
+- `dart_jsonwebtoken: ^3.3.1` - JWT para autenticação
+- `bcrypt: ^1.2.0` / `pointycastle: 4.0.0` - Criptografia
+
+#### UI (Flutter)
 - `cupertino_icons` - Ícones iOS
-- `flutter_lints: ^6.0.0` - Linting para Flutter
-- `package:lints` - Linting para Dart puro
+- `path_provider: ^2.1.5` - Acesso a diretórios do sistema
+
+#### Dev Dependencies
+- `flutter_lints: ^6.0.0` / `lints: ^6.0.0` - Linting
+- `test: ^1.29.0` / `flutter_test` - Testes
+- `build_runner: 2.10.4` - Code generation
 
 ## Project Conventions
 
@@ -106,6 +125,17 @@ Ver `packages/design_system/` para implementação madura do padrão:
   - Mocks quando apropriado
 - **Execução**: `dart test` ou `flutter test`
 - **Restrição**: Não usar testes automatizados em projetos pequenos/simples (conforme princípios de clean code)
+
+### Architectural Decision Records (ADRs)
+
+Decisões arquiteturais documentadas em `docs/adr/`:
+
+1. **ADR-0001**: Result Pattern para tratamento de erros
+2. **ADR-0002**: Dio Error Handler Mixin para HTTP client
+3. **ADR-0003**: Base Repository Pattern para acesso a dados
+4. **ADR-0004**: Form Validation Mixin com Zard
+5. **ADR-0005**: Standard Package Structure (4 variantes)
+6. **ADR-0006**: Base Details Sync para sincronização de dados
 
 ### Git Workflow
 
@@ -206,25 +236,45 @@ O sistema trata temas, localizações e outras configurações como **dados tran
 - **Dart Pub**: Gerenciamento de pacotes
 - **Flutter SDK**: Framework de UI
 - **Material Design Icons**: `cupertino_icons` para ícones
+- **PostgreSQL**: Banco de dados relacional (via Drift ORM)
+- **JWT**: Autenticação via tokens
+- **API Generation**: OpenAPI/Swagger (pacote `open_api`)
+- **i18n**: Flutter localizations (pacote `localizations`)
 
 ### Planejadas
 
-- **Database**: PostgreSQL ou similar (para backend)
-- **API Generation**: OpenAPI/Swagger (pacote `open_api`)
-- **i18n**: Flutter localizations (pacote `localizations`)
 - **CI/CD**: GitHub Actions ou similar
-- **Container**: Docker (configurações em `containers/`)
-- **Auth**: Autenticação e autorização
-- **Core**: Códigos compartilhados
-- **Images**: Imagens do sistema
+- **Container**: Docker (diretório `containers/` preparado)
 
 ### Scripts de Automação
 
 Disponíveis em `./scripts/`:
+
+#### Manutenção
 - `pub_get_all.sh` - Instala dependências em todos os pacotes
 - `clean_all.sh` - Remove build artifacts
 - `build_runner_all.sh` - Executa build_runner em todos os pacotes
 - `dart_fix_all.sh` - Aplica dart fix em todos os pacotes
-- Planejado scripts para:
-    - new feature;
-    - etc;
+
+#### Validação
+- `check_documentation.sh` - Verifica documentação de classes/métodos públicos
+- `validate_architecture.sh` - Valida estrutura de pacotes conforme ADR-0005
+
+#### Geração de Código
+- `generators/` - Scripts para geração de novas features:
+  - Estrutura completa de pacotes (4 variantes)
+  - Models, repositories, use cases
+  - View models, telas e widgets
+  - Validadores com Zard
+
+## Packages Structure
+
+### Pacotes Implementados
+
+| Pacote | Status | Descrição |
+|--------|--------|--------|
+| `core` | ✅ Ativo | Infraestrutura compartilhada (shared, ui, client, server) |
+| `design_system` | ✅ Ativo | Sistema de design com tokens e componentes |
+| `localizations` | ✅ Ativo | Internacionalização |
+| `open_api` | ✅ Ativo | Geração de API OpenAPI/Swagger |
+| `images` | 🔄 Estruturado | Assets de imagens |

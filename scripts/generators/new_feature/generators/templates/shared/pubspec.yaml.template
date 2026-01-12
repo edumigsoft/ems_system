@@ -1,5 +1,5 @@
-name: {{FEATURE_NAME}}_core
-description: Core entities and logic for {{FEATURE_TITLE}}.
+name: {{FEATURE_NAME}}_shared
+description: Shared entities and logic for {{FEATURE_TITLE}}.
 version: 0.1.0
 publish_to: none
 
