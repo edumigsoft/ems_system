@@ -1,0 +1,13 @@
+# Configurações de análise estática para pacote Dart (core)
+# Este arquivo DEVE incluir as regras centralizadas da raiz do monorepo
+
+include: {{REL_PATH}}analysis_options_dart.yaml
+
+# Customizações específicas deste pacote (se necessário)
+# Descomente e adicione regras extras apenas se realmente precisar
+
+# linter:
+#   rules:
+#     # Adicionar regras extras aqui
+#     # Exemplo:
+#     # my_custom_rule: true
