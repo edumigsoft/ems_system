@@ -58,9 +58,9 @@ validate_field() {
     return 1
   fi
   
-  # Formato esperado: nome:tipo
-  if ! [[ "$field" =~ ^[a-z][a-zA-Z0-9]*:[A-Z][a-zA-Z0-9\<\>,]*$ ]]; then
-    error "Campo inválido. Formato esperado: nome:Tipo (ex: title:String, items:List<String>)"
+  # Formato esperado: nome:tipo (tipo pode começar com minúscula para primitivos: int, double, bool, num)
+  if ! [[ "$field" =~ ^[a-z][a-zA-Z0-9]*:[a-zA-Z][a-zA-Z0-9\<\>,]*$ ]]; then
+    error "Campo inválido. Formato esperado: nome:Tipo (ex: title:String, count:int, items:List<String>)"
     return 1
   fi
   
@@ -113,7 +113,7 @@ validate_fields() {
 # Valida se o pacote existe
 validate_package_exists() {
   local feature="$1"
-  local package_type="$2"  # core, client, server, ui
+  local package_type="$2"  # shared, client, server, ui
   
   local root=$(get_project_root)
   local package_path="$root/packages/$feature/${feature}_${package_type}"

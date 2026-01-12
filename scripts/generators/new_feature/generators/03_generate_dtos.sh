@@ -43,12 +43,12 @@ validate_create_no_timestamps "$FIELDS" || exit 1
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ENTITY_SNAKE=$(to_snake_case "$ENTITY_NAME")
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-DTO_DIR="$CORE_PATH/lib/src/domain/dtos"
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+DTO_DIR="$SHARED_PATH/lib/src/domain/dtos"
 CREATE_FILE="$DTO_DIR/${ENTITY_SNAKE}_create.dart"
 UPDATE_FILE="$DTO_DIR/${ENTITY_SNAKE}_update.dart"
 
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 ensure_dir "$DTO_DIR"
 
 # ============================================================================

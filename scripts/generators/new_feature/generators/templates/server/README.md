@@ -27,7 +27,7 @@ final app = shelf_router.Router()
 
 ## 📚 Dependências
 
-- `{{FEATURE_NAME}}_core` - Interfaces e modelos
+- `{{FEATURE_NAME}}_shared` - Interfaces e modelos
 - `drift` - Type-safe database layer
 - `shelf` - HTTP server framework
 - `shelf_router` - Routing

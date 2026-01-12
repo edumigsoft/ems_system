@@ -12,7 +12,7 @@
 # - Mensagens de erro compartilhadas
 # - Limites e constraints
 #
-# Localização: packages/{feature}/{feature}_core/lib/src/constants/
+# Localização: packages/{feature}/{feature}_shared/lib/src/constants/
 #
 # ============================================================================
 
@@ -38,11 +38,11 @@ validate_name "$ENTITY_PLURAL" || exit 1
 # Preparação
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-CONSTANTS_DIR="$CORE_PATH/lib/src/constants"
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+CONSTANTS_DIR="$SHARED_PATH/lib/src/constants"
 CONSTANTS_FILE="$CONSTANTS_DIR/${FEATURE_SNAKE}_constants.dart"
 
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 ensure_dir "$CONSTANTS_DIR"
 
 progress "Gerando ${FEATURE_NAME} constants..."
@@ -100,7 +100,7 @@ echo ""
 warn "Lembre-se de:"
 info "  1. Adicionar RegExp de validação específicas"
 info "  2. Adicionar mensagens de erro compartilhadas"
-info "  3. Importar as constants em Routes: import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';"
+info "  3. Importar as constants em Routes: import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart';"
 info "  4. Usar as constants nos DTOs e Zard Validators"
 
 # Atualiza barrel files automaticamente

@@ -1,0 +1,8 @@
+./create_feature_wizard.sh <<EOF
+> book
+> Book Management
+> Book
+> books
+> title:String,isbn:String
+> 5
+> EOF

@@ -35,9 +35,9 @@ progress "Gerando ${FEATURE_NAME^}Module..."
 
 cat > "$MODULE_FILE" <<EOF
 import 'package:flutter/material.dart';
-import 'package:core_ui/core_ui.dart' show AppModule, Loggable, AppNavigationItem;
-import 'package:core_shared/core_shared.dart' show DependencyInjector;
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';
+import 'package:core_ui/core_ui.dart' show AppModule, AppNavigationItem;
+import 'package:core_shared/core_shared.dart' show Loggable, DependencyInjector;
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart';
 import 'package:${FEATURE_SNAKE}_client/${FEATURE_SNAKE}_client.dart';
 import 'ui/view_models/${ENTITY_SNAKE}_view_model.dart';
 import 'ui/pages/${ENTITY_SNAKE}_list_page.dart';

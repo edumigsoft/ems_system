@@ -27,11 +27,11 @@ O wizard perguntará:
 4. Nome plural (ex: `books`)
 5. Campos (ex: `title:String,isbn:String,year:int`)
 6. Pacotes a criar (1-5):
-   - 1: core
-   - 2: core + client
-   - 3: core + server
-   - 4: core + client + server
-   - 5: core + client + server + ui (completo)
+   - 1: shared
+   - 2: shared + client
+   - 3: shared + server
+   - 4: shared + client + server
+   - 5: shared + client + server + ui (completo)
 
 **Resultado**: Feature completa em 2-3 minutos! ⚡
 
@@ -40,7 +40,7 @@ O wizard perguntará:
 ```bash
 cd scripts/generators
 
-# Core (sempre necessário)
+# Shared (sempre necessário)
 ./01_generate_entities.sh      # Entity
 ./02_generate_details.sh        # Details
 ./03_generate_dtos.sh           # DTOs
@@ -76,7 +76,7 @@ Cada script solicita inputs interativamente.
 - **README.md** (este arquivo)
 - **SUMMARY.md** - Resumo da implementação
 
-### Geradores Core (6/6 - 100%)
+### Geradores Shared (6/6 - 100%)
 1. **01_generate_entities.sh** - Entity SEM id
 2. **02_generate_details.sh** - *Details implementando BaseDetails
 3. **03_generate_dtos.sh** - DTOs Create e Update
@@ -138,7 +138,7 @@ Todos os geradores validam e garantem:
 ### Routes
 - ✅ Extends `Routes` do core_server
 - ✅ Usa `Loggable` mixin
-- ✅ Usa constants do _core
+- ✅ Usa constants do _shared
 - ✅ Anotações OpenAPI
 
 ### Validators
@@ -170,18 +170,18 @@ Informe os campos da entidade (formato: nome:Tipo,nome2:Tipo2)
 Exemplo: title:String,isbn:String,publishYear:int
 Campos: title:String,isbn:String,publishYear:int
 Quais pacotes deseja criar?
-  1. core (obrigatório)
-  2. core + client
-  3. core + server  
-  4. core + client + server
-  5. core + client + server + ui (completo)
+  1. shared (obrigatório)
+  2. shared + client
+  3. shared + server  
+  4. shared + client + server
+  5. shared + client + server + ui (completo)
 Opção (1-5) [5]: 5
 
 🚀 Criando estrutura base com scaffold_feature.sh...
 ✅ Estrutura base criada!
 
-🚀 Gerando código core...
-✅ Core gerado!
+🚀 Gerando código shared...
+✅ Shared gerado!
 
 🚀 Gerando código server...
 ✅ Server gerado!
@@ -213,7 +213,7 @@ Localização: packages/library/
 
 ```
 packages/library/
-├── library_core/
+├── library_shared/
 │   ├── lib/src/
 │   │   ├── domain/
 │   │   │   ├── entities/

@@ -10,9 +10,9 @@ dependencies:
   meta: ^1.11.0
   zard: ^0.0.23
   core_shared:
-    path: {{REL_PATH}}packages/core/core_shared
-  open_api:
-    path: {{REL_PATH}}packages/open_api
+    path: {{REL_PATH}}core/core_shared
+  # open_api:
+  #   path: {{REL_PATH}}packages/open_api
 
 dev_dependencies:
   lints: ^6.0.0

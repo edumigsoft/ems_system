@@ -22,7 +22,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 REPORT_DIR="$COVERAGE_DIR/$TIMESTAMP"
 
 # Metas de cobertura (conforme flutter_dart_rules.md)
-CORE_TARGET=90      # Core (Domain/UseCases)
+SHARED_TARGET=90      # Shared (Domain/UseCases)
 DATA_TARGET=80      # Client/Server (Data)
 UI_TARGET=50        # UI (Widgets)
 
@@ -70,17 +70,17 @@ report_success() {
 # FUNÇÕES DE VALIDAÇÃO
 # ============================================================
 
-# Função para validar estrutura de pacotes core (ADR-0005)
-validate_core_structure() {
+# Função para validar estrutura de pacotes shared (ADR-0005)
+validate_shared_structure() {
     local package_path="$1"
     local package_name=$(basename "$package_path")
     
-    if [[ "$package_name" =~ _core$ ]]; then
+    if [[ "$package_name" =~ _shared$ ]]; then
         if [ ! -d "$package_path/lib/src/domain" ]; then
-            report_warning "Pacote core '$package_name' não possui estrutura domain/ obrigatória (ADR-0005)"
+            report_warning "Pacote shared '$package_name' não possui estrutura domain/ obrigatória (ADR-0005)"
         fi
         if [ ! -d "$package_path/lib/src/data" ]; then
-            report_warning "Pacote core '$package_name' não possui estrutura data/ obrigatória (ADR-0005)"
+            report_warning "Pacote shared '$package_name' não possui estrutura data/ obrigatória (ADR-0005)"
         fi
     fi
 }
@@ -124,7 +124,7 @@ run_tests_for_package() {
     ((TOTAL_PACKAGES++))
     
     # Validar estrutura (ADR-0005)
-    validate_core_structure "$package_path"
+    validate_shared_structure "$package_path"
     
     # Verificar se tem pasta test
     if [ ! -d "$package_path/test" ]; then
@@ -183,8 +183,8 @@ run_tests_for_package() {
         
         # Determinar meta baseado no tipo de pacote
         local target=$DATA_TARGET
-        if [[ "$package_name" =~ _core$ ]]; then
-            target=$CORE_TARGET
+        if [[ "$package_name" =~ _shared$ ]]; then
+            target=$SHARED_TARGET
         elif [[ "$package_name" =~ _ui$ ]]; then
             target=$UI_TARGET
         fi
@@ -278,9 +278,9 @@ generate_text_report() {
                 # Determinar meta
                 local target=$DATA_TARGET
                 local type="Client/Server"
-                if [[ "$package_name" =~ _core$ ]]; then
-                    target=$CORE_TARGET
-                    type="Core"
+                if [[ "$package_name" =~ _shared$ ]]; then
+                    target=$SHARED_TARGET
+                    type="Shared"
                 elif [[ "$package_name" =~ _ui$ ]]; then
                     target=$UI_TARGET
                     type="UI"
@@ -301,7 +301,7 @@ generate_text_report() {
         echo "  METAS DE COBERTURA (flutter_dart_rules.md)"
         echo "═══════════════════════════════════════════════════════════════"
         echo ""
-        echo "Core (Domain/UseCases):        ${CORE_TARGET}%"
+        echo "Shared (Domain/UseCases):        ${SHARED_TARGET}%"
         echo "Client/Server (Data):          ${DATA_TARGET}%"
         echo "UI (Widgets):                  ${UI_TARGET}%"
         echo ""
@@ -331,19 +331,19 @@ discover_packages() {
     local packages=()
     
     # Buscar pacotes em dois níveis para suportar sub-features (ADR-0005)
-    # Nível 1: packages/feature/feature_core
-    # Nível 2: packages/feature/sub-feature/sub-feature_core
+    # Nível 1: packages/feature/feature_shared
+    # Nível 2: packages/feature/sub-feature/sub-feature_shared
     
     # Buscar pacotes diretos
     for dir in "$base_dir"/*/*; do
-        if [ -d "$dir" ] && [[ $(basename "$dir") =~ _(core|client|server|ui)$ ]]; then
+        if [ -d "$dir" ] && [[ $(basename "$dir") =~ _(shared|client|server|ui)$ ]]; then
             packages+=("$dir")
         fi
     done
     
     # Buscar pacotes em sub-features
     for dir in "$base_dir"/*/*/*; do
-        if [ -d "$dir" ] && [[ $(basename "$dir") =~ _(core|client|server|ui)$ ]]; then
+        if [ -d "$dir" ] && [[ $(basename "$dir") =~ _(shared|client|server|ui)$ ]]; then
             packages+=("$dir")
         fi
     done

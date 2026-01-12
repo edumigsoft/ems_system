@@ -38,7 +38,7 @@ progress "Gerando ${ENTITY_NAME}Service..."
 cat > "$SERVICE_FILE" <<EOF
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart';
 
 part '${ENTITY_SNAKE}_service.g.dart';
 

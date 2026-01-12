@@ -41,8 +41,8 @@ progress "Gerando ${ENTITY_NAME}ViewModel..."
 cat > "$VM_DIR/${ENTITY_SNAKE}_view_model.dart" <<EOF
 import 'package:flutter/material.dart';
 import 'package:core_ui/core_ui.dart';
-import 'package:core_shared/core_shared.dart' hide Loggable;
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';
+import 'package:core_shared/core_shared.dart';
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart';
 // import '../validators/${ENTITY_SNAKE}_validators.dart';
 
 /// ViewModel para gerenciar estado de $ENTITY_NAME.

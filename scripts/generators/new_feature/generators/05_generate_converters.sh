@@ -39,11 +39,11 @@ ask "Tipo de Model (details/create)" MODEL_TYPE
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ENTITY_SNAKE=$(to_snake_case "$ENTITY_NAME")
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-CONVERTER_DIR="$CORE_PATH/lib/src/data/converters"
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+CONVERTER_DIR="$SHARED_PATH/lib/src/data/converters"
 CONVERTER_FILE="$CONVERTER_DIR/${ENTITY_SNAKE}_${MODEL_TYPE}_converter.dart"
 
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 ensure_dir "$CONVERTER_DIR"
 
 progress "Gerando ${ENTITY_NAME}${MODEL_TYPE^}Converter..."

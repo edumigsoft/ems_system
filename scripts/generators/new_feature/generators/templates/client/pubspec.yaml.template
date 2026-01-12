@@ -7,14 +7,14 @@ environment:
   sdk: ^3.10.4
 
 dependencies:
-  {{FEATURE_NAME}}_core:
-    path: ../{{FEATURE_NAME}}_core
-  core_client:
-    path: {{REL_PATH}}packages/core/core_client
-  core_shared:
-    path: {{REL_PATH}}packages/core/core_shared
   dio: ^5.0.0
   retrofit: 4.9.1
+  core_client:
+    path: {{REL_PATH}}core/core_client
+  core_shared:
+    path: {{REL_PATH}}core/core_shared
+  {{FEATURE_NAME}}_shared:
+    path: ../{{FEATURE_NAME}}_shared
 
 dev_dependencies:
   lints: ^6.0.0

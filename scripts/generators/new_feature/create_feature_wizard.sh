@@ -198,9 +198,7 @@ fi
 
 if [[ "$PACKAGES" == *"ui"* ]]; then
   progress "Gerando código UI..."
-  
-
-  
+    
   # ViewModel
   echo "$FEATURE_NAME
 $ENTITY_NAME

@@ -37,7 +37,7 @@ Pacotes a criar (1-5): 5
 ```
 packages/finance/
 ├── billing/
-│   ├── billing_core/
+│   ├── billing_shared/
 │   │   ├── lib/src/
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
@@ -71,8 +71,8 @@ O `scaffold_feature.sh` converteu:
 ```yaml
 name: {{FEATURE_NAME}}_client
 dependencies:
-  {{FEATURE_NAME}}_core:
-    path: ../{{FEATURE_NAME}}_core
+  {{FEATURE_NAME}}_shared:
+    path: ../{{FEATURE_NAME}}_shared
   core_client:
     path: {{REL_PATH}}packages/core/core_client
   retrofit: 4.9.1  ← Versão fixa
@@ -82,8 +82,8 @@ dependencies:
 ```yaml
 name: billing_client
 dependencies:
-  billing_core:
-    path: ../billing_core
+  billing_shared:
+    path: ../billing_shared
   core_client:
     path: ../../../core/core_client  ← Path relativo calculado
   retrofit: 4.9.1  ← Mantido
@@ -103,13 +103,13 @@ dependencies:
 ### Feature Simples
 ```bash
 Nome: library
-Path: packages/library/library_core/
+Path: packages/library/library_shared/
 ```
 
 ### Sub-Feature
 ```bash
 Nome: finance/billing  
-Path: packages/finance/billing/billing_core/
+Path: packages/finance/billing/billing_shared/
 ```
 
 Ambos funcionam perfeitamente com o wizard! 🎉

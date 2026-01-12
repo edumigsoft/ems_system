@@ -34,7 +34,7 @@ progress "Gerando ${ENUM_NAME}Converter..."
 
 cat > "$CONVERTER_FILE" <<EOF
 import 'package:drift/drift.dart';
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart' show $ENUM_NAME;
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart' show $ENUM_NAME;
 
 /// TypeConverter para $ENUM_NAME.
 ///

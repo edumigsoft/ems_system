@@ -26,7 +26,7 @@ git checkout -b feature/{{FEATURE_NAME}}/descricao-da-mudanca
 Siga a estrutura de pacotes:
 
 ```
-{{FEATURE_NAME}}_core/      # Domain, Use Cases, Validators
+{{FEATURE_NAME}}_shared/      # Domain, Use Cases, Validators
 {{FEATURE_NAME}}_client/    # HTTP Client
 {{FEATURE_NAME}}_server/    # Database, Handlers
 {{FEATURE_NAME}}_ui/         # Pages, ViewModels, Widgets
@@ -36,7 +36,7 @@ Siga a estrutura de pacotes:
 
 ```bash
 # Por pacote
-cd {{FEATURE_NAME}}_core && flutter test
+cd {{FEATURE_NAME}}_shared && flutter test
 cd {{FEATURE_NAME}}_ui && flutter test
 ```
 
@@ -50,7 +50,7 @@ cd {{REL_PATH}}.. && ./pub_get_all.sh
 ./dart_fix_all.sh
 
 # Análise estática
-cd packages/{{FEATURE_NAME}}/{{FEATURE_NAME}_core && dart analyze
+cd packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_shared && dart analyze
 
 # Formatar código
 dart format .
@@ -61,7 +61,7 @@ dart format .
 Use **Conventional Commits**:
 
 ```bash
-git commit -m "feat({{FEATURE_NAME}}_core): adiciona validação de email"
+git commit -m "feat({{FEATURE_NAME}}_shared): adiciona validação de email"
 git commit -m "fix({{FEATURE_NAME}}_ui): corrige overflow na tela de listagem"
 ```
 
@@ -76,7 +76,7 @@ git commit -m "fix({{FEATURE_NAME}}_ui): corrige overflow na tela de listagem"
 
 ## 🎯 Padrões de Código
 
-### Domain Layer (`{{FEATURE_NAME}}_core`)
+### Domain Layer (`{{FEATURE_NAME}}_shared`)
 
 ✅ **Use Cases** isolados:
 
@@ -123,7 +123,7 @@ Text('Title', style: TextStyle(fontSize: 18))
 
 | Pacote | Cobertura Mínima | dart analyze |
 |--------|------------------|--------------|
-| _core | 90% | 0 warnings |
+| _shared | 90% | 0 warnings |
 | _client | 80% | 0 warnings |
 | _server | 80% | 0 warnings |
 | _ui | 50% | 0 warnings |

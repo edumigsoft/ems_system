@@ -43,10 +43,10 @@ validate_fields "$FIELDS" || exit 1
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ENTITY_SNAKE=$(to_snake_case "$ENTITY_NAME")
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-DETAILS_FILE="$CORE_PATH/lib/src/domain/entities/${ENTITY_SNAKE}_details.dart"
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+DETAILS_FILE="$SHARED_PATH/lib/src/domain/entities/${ENTITY_SNAKE}_details.dart"
 
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 validate_file_not_exists "$DETAILS_FILE" || exit 1
 
 progress "Gerando ${ENTITY_NAME}Details..."

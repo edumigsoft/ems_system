@@ -37,18 +37,18 @@ validate_class_name "$ENTITY_NAME" || exit 1
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ENTITY_SNAKE=$(to_snake_case "$ENTITY_NAME")
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
 CLIENT_PATH=$(get_client_package_path "$FEATURE_SNAKE")
 SERVER_PATH=$(get_server_package_path "$FEATURE_SNAKE")
 
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 
 # ============================================================================
-# 1. Generation Interface (Core)
+# 1. Generation Interface (Shared)
 # ============================================================================
 if [ "$IMPLEMENTATION_ONLY" != "true" ]; then
-  # Interface no _core
-  REPO_INTERFACE="$CORE_PATH/lib/src/domain/repositories/${ENTITY_SNAKE}_repository.dart"
+  # Interface no _shared
+  REPO_INTERFACE="$SHARED_PATH/lib/src/domain/repositories/${ENTITY_SNAKE}_repository.dart"
   ensure_dir "$(dirname "$REPO_INTERFACE")"
 
   progress "Gerando ${ENTITY_NAME}Repository interface..."
@@ -86,7 +86,7 @@ if [ "$INTERFACE_ONLY" != "true" ]; then
     cat > "$CLIENT_REPO" <<EOF
 import 'package:core_shared/core_shared.dart';
 import 'package:core_client/core_client.dart';
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart';
 import '../services/${ENTITY_SNAKE}_service.dart';
 
 /// Implementação client do ${ENTITY_NAME}Repository.

@@ -25,7 +25,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/lang/pt-BR/).
 
 ## Links para CHANGELOGs dos Pacotes
 
-- [{{FEATURE_NAME}}_core/CHANGELOG.md](./{{FEATURE_NAME}}_core/CHANGELOG.md)
+- [{{FEATURE_NAME}}_shared/CHANGELOG.md](./{{FEATURE_NAME}}_shared/CHANGELOG.md)
 - [{{FEATURE_NAME}}_client/CHANGELOG.md](./{{FEATURE_NAME}}_client/CHANGELOG.md)
 - [{{FEATURE_NAME}}_server/CHANGELOG.md](./{{FEATURE_NAME}}_server/CHANGELOG.md)
 - [{{FEATURE_NAME}}_ui/CHANGELOG.md](./{{FEATURE_NAME}}_ui/CHANGELOG.md)

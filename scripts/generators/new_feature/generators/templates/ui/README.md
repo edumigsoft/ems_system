@@ -25,7 +25,7 @@ context.goNamed('{{feature_name_plural}}');
 ## 📚 Dependências
 
 - `{{FEATURE_NAME}}_client` (dev)
-- `{{FEATURE_NAME}}_core`
+- `{{FEATURE_NAME}}_shared`
 - `design_system`
 - `core_ui`
 

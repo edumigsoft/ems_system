@@ -35,7 +35,7 @@ progress "Gerando ${ENTITY_NAME}Card widget..."
 # Card Widget
 cat > "$WIDGETS_DIR/${ENTITY_SNAKE}_card.dart" <<EOF
 import 'package:flutter/material.dart';
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart';
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart';
 
 /// Card para exibir $ENTITY_NAME.
 class ${ENTITY_NAME}Card extends StatelessWidget {

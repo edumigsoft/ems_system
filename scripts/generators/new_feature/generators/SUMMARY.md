@@ -40,7 +40,7 @@ Nome da feature: finance/finance_structure
 - Paths relativos calculados automaticamente para sub-features
 
 
-### Geradores Core (6/6 - 100%)
+### Geradores Shared (6/6 - 100%)
 - ✅ `01_generate_entities.sh` - Entity SEM id
 - ✅ `02_generate_details.sh` - Details implementa BaseDetails
 - ✅ `03_generate_dtos.sh` - Create/Update DTOs
@@ -75,8 +75,8 @@ Todos os geradores garantem:
 2. ✅ **Details implementa BaseDetails** (não estende)
 3. ✅ **Campo data/entity** em Details/Models/DTOs
 4. ✅ **JSON manual** (sem @JsonSerializable)
-5. ✅ **TypeConverters no _server** (não no _core)
-6. ✅ **Routes com constants do _core**
+5. ✅ **TypeConverters no _server** (não no _shared)
+6. ✅ **Routes com constants do _shared**
 7. ✅ **Validações compartilhadas** (DTO ↔ Zard)
 8. ✅ **MVVM + ChangeNotifier**
 
@@ -114,7 +114,7 @@ Ver `README.md` para detalhes completos.
 - **Consistência**: 100% padronizado
 
 ### Cobertura
-- **Core**: 100% (6/6 geradores)
+- **Shared**: 100% (6/6 geradores)
 - **Server**: 100% (5/5 geradores)
 - **UI**: 100% (5/5 geradores)
 - **Total**: 100% (16/16 geradores)
@@ -169,7 +169,7 @@ Ver `README.md` para detalhes completos.
 Para uma feature `library` completa:
 
 ```
-Core (sempre):
+Shared (sempre):
 - book.dart                    (01)
 - book_details.dart            (02)
 - book_create.dart             (03)

@@ -161,11 +161,11 @@ replace_in_file() {
 # Funções de Feature/Package
 # ============================================================================
 
-# Obtém o caminho do pacote core
-get_core_package_path() {
+# Obtém o caminho do pacote shared
+get_shared_package_path() {
   local feature="$1"
   local root=$(get_project_root)
-  echo "$root/packages/$feature/${feature}_core"
+  echo "$root/packages/$feature/${feature}_shared"
 }
 
 # Obtém o caminho do pacote client
@@ -254,7 +254,7 @@ run_command() {
 load_template() {
   local template_name="$1"
   local root=$(get_project_root)
-  local template_path="$root/docs/templates/core/${template_name}"
+  local template_path="$root/generators/templates/shared/${template_name}"
   
   if file_exists "$template_path"; then
     cat "$template_path"
@@ -268,19 +268,19 @@ load_template() {
 # Funções de Barrel Files
 # ============================================================================
 
-# Atualiza barrel files de um pacote core
+# Atualiza barrel files de um pacote shared
 # Uso: update_barrel_files "feature_name"
 update_barrel_files() {
   local feature="$1"
-  local core_path=$(get_core_package_path "$feature")
+  local shared_path=$(get_shared_package_path "$feature")
   
-  if ! dir_exists "$core_path"; then
-    warn "Pacote core não encontrado: $core_path"
+  if ! dir_exists "$shared_path"; then
+    warn "Pacote shared não encontrado: $shared_path"
     return 1
   fi
   
-  local barrel_internal="$core_path/lib/src/${feature}_core.dart"
-  local barrel_external="$core_path/lib/${feature}_core.dart"
+  local barrel_internal="$shared_path/lib/src/${feature}_shared.dart"
+  local barrel_external="$shared_path/lib/${feature}_shared.dart"
   
   # Cria barrel file interno
   {
@@ -289,87 +289,87 @@ update_barrel_files() {
     echo ""
     
     # Entities
-    if dir_exists "$core_path/lib/src/domain/entities"; then
+    if dir_exists "$shared_path/lib/src/domain/entities"; then
       echo "// Entities"
-      find "$core_path/lib/src/domain/entities" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/domain/entities" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # Repositories
-    if dir_exists "$core_path/lib/src/domain/repositories"; then
+    if dir_exists "$shared_path/lib/src/domain/repositories"; then
       echo "// Repositories"
-      find "$core_path/lib/src/domain/repositories" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/domain/repositories" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # Use Cases
-    if dir_exists "$core_path/lib/src/domain/use_cases"; then
+    if dir_exists "$shared_path/lib/src/domain/use_cases"; then
       echo "// Use Cases"
-      find "$core_path/lib/src/domain/use_cases" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/domain/use_cases" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # DTOs
-    if dir_exists "$core_path/lib/src/domain/dtos"; then
+    if dir_exists "$shared_path/lib/src/domain/dtos"; then
       echo "// DTOs"
-      find "$core_path/lib/src/domain/dtos" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/domain/dtos" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # Models
-    if dir_exists "$core_path/lib/src/data/models"; then
+    if dir_exists "$shared_path/lib/src/data/models"; then
       echo "// Models"
-      find "$core_path/lib/src/data/models" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/data/models" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # Converters
-    if dir_exists "$core_path/lib/src/data/converters"; then
+    if dir_exists "$shared_path/lib/src/data/converters"; then
       echo "// Converters"
-      find "$core_path/lib/src/data/converters" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/data/converters" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # Validators
-    if dir_exists "$core_path/lib/src/validators"; then
+    if dir_exists "$shared_path/lib/src/validators"; then
       echo "// Validators"
-      find "$core_path/lib/src/validators" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/validators" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
       echo ""
     fi
     
     # Constants
-    if dir_exists "$core_path/lib/src/constants"; then
+    if dir_exists "$shared_path/lib/src/constants"; then
       echo "// Constants"
-      find "$core_path/lib/src/constants" -name "*.dart" -type f | sort | while read -r file; do
-        local relative_path=$(realpath --relative-to="$core_path/lib/src" "$file")
+      find "$shared_path/lib/src/constants" -name "*.dart" -type f | sort | while read -r file; do
+        local relative_path=$(realpath --relative-to="$shared_path/lib/src" "$file")
         echo "export '$relative_path';"
       done
     fi
   } > "$barrel_internal"
   
   # Cria barrel file externo
-  echo "export 'src/${feature}_core.dart';" > "$barrel_external"
+  echo "export 'src/${feature}_shared.dart';" > "$barrel_external"
   
   info "Barrel files atualizados para $feature"
   return 0
@@ -531,7 +531,7 @@ update_server_barrel_files() {
 # Valida se o pacote existe
 validate_package_exists() {
   local feature="$1"
-  local package_type="${2:-core}"
+  local package_type="${2:-shared}"
   local root=$(get_project_root)
   local package_path="$root/packages/$feature/${feature}_${package_type}"
   
@@ -547,22 +547,22 @@ validate_package_exists() {
 # Uso: run_pub_get "feature_name"
 run_pub_get() {
   local feature="$1"
-  local core_path=$(get_core_package_path "$feature")
+  local shared_path=$(get_shared_package_path "$feature")
   
   if [[ "$SKIP_INTERNAL_PUB_GET" == "true" ]]; then
     # info "Pulando pub get (SKIP_INTERNAL_PUB_GET=true)"
     return 0
   fi
   
-  if ! dir_exists "$core_path"; then
-    warn "Pacote core não encontrado: $core_path"
+  if ! dir_exists "$shared_path"; then
+    warn "Pacote shared não encontrado: $shared_path"
     return 1
   fi
   
   progress "Executando dart pub get..."
   
   # Removido > /dev/null para permitir debug se travar
-  if (cd "$core_path" && dart pub get); then
+  if (cd "$shared_path" && dart pub get); then
     success "Dependências atualizadas!"
     return 0
   else

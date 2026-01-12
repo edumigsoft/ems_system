@@ -1,23 +1,23 @@
 name: {{FEATURE_NAME}}_server
 description: Server implementation for {{FEATURE_TITLE}}.
-version: 0.2.0
+version: 0.1.0
 publish_to: none
 
 environment:
-  sdk: ^3.10.1
+  sdk: ^3.10.4
 
 dependencies:
-  {{FEATURE_NAME}}_core:
-    path: ../{{FEATURE_NAME}}_core
-  core_shared:
-    path: {{REL_PATH}}packages/core/core_shared
-  core_server:
-    path: {{REL_PATH}}packages/core/core_server
-  open_api:
-    path: {{REL_PATH}}packages/open_api
   shelf: ^1.4.2
   shelf_router: ^1.1.4
   drift: ^2.30.0
+  core_shared:
+    path: {{REL_PATH}}core/core_shared
+  core_server:
+    path: {{REL_PATH}}core/core_server
+  open_api_shared:
+    path: {{REL_PATH}}open_api/open_api_shared
+  {{FEATURE_NAME}}_shared:
+    path: ../{{FEATURE_NAME}}_shared
 
 dev_dependencies:
   lints: ^6.0.0

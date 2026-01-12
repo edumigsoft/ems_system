@@ -8,7 +8,7 @@ Esta feature é composta por até 4 pacotes seguindo o padrão "Great Schism":
 
 | Pacote | Responsabilidade | Localização |
 |--------|------------------|-------------|
-| **{{FEATURE_NAME}}_core** | Entidades, DTOs, Use Cases, Validators | [{{FEATURE_NAME}}_core](./{{FEATURE_NAME}}_core/README.md) |
+| **{{FEATURE_NAME}}_shared** | Entidades, DTOs, Use Cases, Validators | [{{FEATURE_NAME}}_shared](./{{FEATURE_NAME}}_shared/README.md) |
 | **{{FEATURE_NAME}}_client** | Implementação HTTP (Dio/Retrofit) | [{{FEATURE_NAME}}_client](./{{FEATURE_NAME}}_client/README.md) |
 | **{{FEATURE_NAME}}_server** | Database (Drift), Handlers (Shelf) | [{{FEATURE_NAME}}_server](./{{FEATURE_NAME}}_server/README.md) |
 | **{{FEATURE_NAME}}_ui** | Pages, ViewModels, Widgets | [{{FEATURE_NAME}}_ui](./{{FEATURE_NAME}}_ui/README.md) |
@@ -19,7 +19,7 @@ Esta feature é composta por até 4 pacotes seguindo o padrão "Great Schism":
 
 ```
 packages/{{FEATURE_NAME}}/
-├── {{FEATURE_NAME}}_core/     # Domain & Business Logic
+├── {{FEATURE_NAME}}_shared/     # Domain & Business Logic
 ├── {{FEATURE_NAME}}_client/   # HTTP Client
 ├── {{FEATURE_NAME}}_server/   # Backend
 └── {{FEATURE_NAME}}_ui/        # Flutter UI
@@ -28,7 +28,7 @@ packages/{{FEATURE_NAME}}/
 ### Fluxo de Dependências
 
 ```
-{{FEATURE_NAME}}_ui → {{FEATURE_NAME}}_client → {{FEATURE_NAME}}_core
+{{FEATURE_NAME}}_ui → {{FEATURE_NAME}}_client → {{FEATURE_NAME}}_shared
                                                       ↑
 {{FEATURE_NAME}}_server ──────────────────────────────┘
 ```
@@ -63,8 +63,8 @@ app.mount('/{{FEATURE_NAME}}', {{FEATURE_TITLE}}Routes(database));
 ```bash
 cd packages/{{FEATURE_NAME}}
 
-# Testar core
-cd {{FEATURE_NAME}}_core && flutter test
+# Testar shared
+cd {{FEATURE_NAME}}_shared && flutter test
 
 # Testar client  
 cd {{FEATURE_NAME}}_client && flutter test
@@ -81,8 +81,8 @@ cd {{FEATURE_NAME}}_ui && flutter test
 Execute para gerar relatório de cobertura:
 
 ```bash
-# Core (meta: 90%)
-cd {{FEATURE_NAME}}_core && flutter test --coverage
+# Shared (meta: 90%)
+cd {{FEATURE_NAME}}_shared && flutter test --coverage
 
 # Client (meta: 80%)
 cd {{FEATURE_NAME}}_client && flutter test --coverage

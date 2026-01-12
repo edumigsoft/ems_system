@@ -76,11 +76,11 @@ ENTITY_PASCAL="$ENTITY_NAME"
 
 # Paths
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-ENTITY_FILE="$CORE_PATH/lib/src/domain/entities/${ENTITY_SNAKE}.dart"
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+ENTITY_FILE="$SHARED_PATH/lib/src/domain/entities/${ENTITY_SNAKE}.dart"
 
-# Verifica se pacote core existe
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+# Verifica se pacote shared existe
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 
 # Verifica se arquivo já existe
 validate_file_not_exists "$ENTITY_FILE" || exit 1

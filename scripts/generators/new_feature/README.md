@@ -52,9 +52,9 @@ Validando feature: user
 
 ✅ user: README.md presente
 ✅ user: CONTRIBUTING.md presente
-✅ user_core: Estrutura Domain/Data presente
-✅ user_core: Todas as entidades são puras (sem JSON)
-✅ user_core: Todas as classes *Details implementam BaseDetails
+✅ user_shared: Estrutura Domain/Data presente
+✅ user_shared: Todas as entidades são puras (sem JSON)
+✅ user_shared: Todas as classes *Details implementam BaseDetails
 
 ════════════════════════════════════════════════════════════
            RELATÓRIO FINAL DE VALIDAÇÃO
@@ -129,12 +129,12 @@ Script de validação de documentação que verifica a presença e qualidade de 
 ╚════════════════════════════════════════════════════════════╝
 
 ════════════════════════════════════════════════════════════
-Analisando pacote: school_core
+Analisando pacote: user_shared
 ════════════════════════════════════════════════════════════
 
-Analisando: packages/school/school_core/lib/src/domain/entities/school.dart
-⚠️  school.dart:5 - Classe 'School' sem docstring
-⚠️  school.dart:15 - Método público 'isValid' sem docstring
+Analisando: packages/user/user_shared/lib/src/domain/entities/user.dart
+⚠️  user.dart:5 - Classe 'User' sem docstring
+⚠️  user.dart:15 - Método público 'isValid' sem docstring
   Classes: 0/1 (0%)
   Métodos: 0/1 (0%)
 
@@ -169,9 +169,9 @@ Adicione docstrings nas classes/métodos marcados acima.
 ///
 /// Exemplo:
 /// ```dart
-/// final school = School(name: 'ABC', address: '123');
+/// final user = User(name: 'John Doe', email: 'john@example.com');
 /// ```
-class School {
+class User {
   // ...
 }
 ```
@@ -206,7 +206,7 @@ Script de geração de relatório consolidado de cobertura de testes para todos 
 - ✅ Mescla coberturas em arquivo único
 
 **Metas de Cobertura:**
-- **Core** (Domain/UseCases): **90%**
+- **Shared** (Domain/UseCases): **90%**
 - **Client/Server** (Data): **80%**
 - **UI** (Widgets): **50%**
 
@@ -240,11 +240,11 @@ coverage_reports/
 **Exemplo de Output:**
 ```
 ╔════════════════════════════════════════════════════════════╗
-║     Relatório de Cobertura - School Manager System        ║
+║           Relatório de Cobertura - EMS System              ║
 ╚════════════════════════════════════════════════════════════╝
 
 ════════════════════════════════════════════════════════════
-Testando: school_core
+Testando: user_shared
 ════════════════════════════════════════════════════════════
 
 Encontrados 15 arquivo(s) de teste
@@ -252,16 +252,16 @@ Executando testes...
 ✅ Testes executados com sucesso
 Cobertura: 85%
 ⚠️  Abaixo da meta (90%)
-✅ HTML gerado em: coverage_reports/.../school_core_html/index.html
+✅ HTML gerado em: coverage_reports/.../user_shared_html/index.html
 
 ═══════════════════════════════════════════════════════════════
   COBERTURA POR PACOTE
 ═══════════════════════════════════════════════════════════════
 
-school_core                               85%  [Meta: 90%] ⚠️  Core
-user_core                                 92%  [Meta: 90%] ✅ Core
-auth_core                                 45%  [Meta: 90%] ⚠️  Core
-school_client                             82%  [Meta: 80%] ✅ Client/Server
+user_shared                               85%  [Meta: 90%] ⚠️ Shared
+auth_shared                               92%  [Meta: 90%] ✅ Shared
+auth_shared                               45%  [Meta: 90%] ⚠️ Shared
+auth_client                               82%  [Meta: 80%] ✅ Client/Server
 dashboard_ui                              65%  [Meta: 50%] ✅ UI
 
 ════════════════════════════════════════════════════════════

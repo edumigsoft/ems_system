@@ -27,7 +27,7 @@ final result = await useCase.execute();
 
 ## 📚 Dependências
 
-- `{{FEATURE_NAME}}_core` - Interfaces e modelos
+- `{{FEATURE_NAME}}_shared` - Interfaces e modelos
 - `dio` - HTTP client
 - `retrofit` - Type-safe HTTP client
 

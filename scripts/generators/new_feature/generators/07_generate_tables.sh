@@ -68,7 +68,7 @@ done
 cat > "$TABLE_FILE" <<EOF
 import 'package:drift/drift.dart';
 import 'package:core_server/core_server.dart' show DriftTableMixinPostgres;
-import 'package:${FEATURE_SNAKE}_core/${FEATURE_SNAKE}_core.dart' show ${ENTITY_NAME}Details;
+import 'package:${FEATURE_SNAKE}_shared/${FEATURE_SNAKE}_shared.dart' show ${ENTITY_NAME}Details;
 
 /// Tabela Drift para $ENTITY_NAME.
 @UseRowClass(${ENTITY_NAME}Details)

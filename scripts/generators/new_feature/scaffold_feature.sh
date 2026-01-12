@@ -100,13 +100,13 @@ TOP_FEATURE_PATH=$(echo "$FEATURE_PATH" | cut -d'/' -f1)
 DEPTH=$(echo "$FEATURE_PATH" | tr -cd '/' | wc -c)
 
 # REL_PATH para o nível da FEATURE (README.md, CONTRIBUTING.md)
-REL_PATH_FEATURE="../../"
+REL_PATH_FEATURE="../"
 for ((i=0; i<$DEPTH; i++)); do
-  REL_PATH_FEATURE="../$REL_PATH_FEATURE"
+  REL_PATH_FEATURE="$REL_PATH_FEATURE"
 done
 
 # REL_PATH para o nível do PACOTE (lib, pubspec, etc)
-REL_PATH_PKG="../../../$REL_PATH_FEATURE"
+REL_PATH_PKG="../$REL_PATH_FEATURE"
 
 # Função para substituir placeholders
 replace_placeholders() {
@@ -127,8 +127,8 @@ if [ "$NO_PROMPT" = false ]; then
 fi
 
 # Criar diretórios
-FEATURE_DIR="packages/$FEATURE_PATH"
-TOP_FEATURE_DIR="packages/$TOP_FEATURE_PATH"
+FEATURE_DIR="../../../packages/$FEATURE_PATH"
+TOP_FEATURE_DIR="../../../packages/$TOP_FEATURE_PATH"
 
 mkdir -p "$FEATURE_DIR"
 
@@ -170,7 +170,7 @@ for pkg in "${PKG_ARRAY[@]}"; do
   
   # Gerar Analysis Options
   cp "generators/templates/$pkg/analysis_options.yaml.template" "$PKG_DIR/analysis_options.yaml"
-  replace_placeholders "$PKG_DIR/analysis_options.yaml" "$REL_PATH_PKG"
+  replace_placeholders "$PKG_DIR/analysis_options.yaml" "../$REL_PATH_PKG"
   
   # Substituir placeholders nos arquivos restantes
   replace_placeholders "$PKG_DIR/README.md" "$REL_PATH_PKG"

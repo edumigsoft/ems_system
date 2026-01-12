@@ -19,23 +19,23 @@ echo ""
 ask "Nome da feature (snake_case)" FEATURE_NAME
 validate_name "$FEATURE_NAME" || exit 1
 
-ask "Tipo de pacote (core/client)" PACKAGE_TYPE
-if [[ "$PACKAGE_TYPE" != "core" && "$PACKAGE_TYPE" != "client" ]]; then
-  error "Tipo de pacote inválido. Use 'core' ou 'client'."
+ask "Tipo de pacote (shared/client)" PACKAGE_TYPE
+if [[ "$PACKAGE_TYPE" != "shared" && "$PACKAGE_TYPE" != "client" ]]; then
+  error "Tipo de pacote inválido. Use 'shared' ou 'client'."
   exit 1
 fi
 
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ROOT=$(get_project_root)
 
-if [ "$PACKAGE_TYPE" = "core" ]; then
-  PACKAGE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-  validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+if [ "$PACKAGE_TYPE" = "shared" ]; then
+  PACKAGE_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+  validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
   
-  BARREL_INTERNAL="$PACKAGE_PATH/lib/src/${FEATURE_SNAKE}_core.dart"
-  BARREL_EXTERNAL="$PACKAGE_PATH/lib/${FEATURE_SNAKE}_core.dart"
+  BARREL_INTERNAL="$PACKAGE_PATH/lib/src/${FEATURE_SNAKE}_shared.dart"
+  BARREL_EXTERNAL="$PACKAGE_PATH/lib/${FEATURE_SNAKE}_shared.dart"
   
-  progress "Gerando barrel files para ${FEATURE_SNAKE}_core..."
+  progress "Gerando barrel files para ${FEATURE_SNAKE}_shared..."
   
   # Gera barrel file interno (src/)
   cat > "$BARREL_INTERNAL" <<'EOF_SCRIPT'
@@ -132,7 +132,7 @@ EOF_SCRIPT
   
   # Gera barrel file externo (lib/)
   cat > "$BARREL_EXTERNAL" <<EOF
-export 'src/${FEATURE_SNAKE}_core.dart';
+export 'src/${FEATURE_SNAKE}_shared.dart';
 EOF
 
 else # client
@@ -182,3 +182,6 @@ success "Barrel files gerados!"
 info "Arquivos criados:"
 info "  - $BARREL_INTERNAL"
 info "  - $BARREL_EXTERNAL"
+
+# Executa pub get
+run_pub_get "$FEATURE_SNAKE"

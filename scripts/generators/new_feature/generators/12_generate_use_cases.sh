@@ -27,10 +27,10 @@ validate_name "$ENTITY_PLURAL" || exit 1
 FEATURE_SNAKE=$(to_snake_case "$FEATURE_NAME")
 ENTITY_SNAKE=$(to_snake_case "$ENTITY_NAME")
 ROOT=$(get_project_root)
-CORE_PATH=$(get_core_package_path "$FEATURE_SNAKE")
-UC_DIR="$CORE_PATH/lib/src/domain/use_cases"
+SHARED_PATH=$(get_shared_package_path "$FEATURE_SNAKE")
+UC_DIR="$SHARED_PATH/lib/src/domain/use_cases"
 
-validate_package_exists "$FEATURE_SNAKE" "core" || exit 1
+validate_package_exists "$FEATURE_SNAKE" "shared" || exit 1
 ensure_dir "$UC_DIR"
 
 progress "Gerando Use Cases CRUD para $ENTITY_NAME..."
@@ -38,7 +38,7 @@ progress "Gerando Use Cases CRUD para $ENTITY_NAME..."
 # Get All
 cat > "$UC_DIR/${ENTITY_SNAKE}_get_all_use_case.dart" <<EOF
 import 'package:core_shared/core_shared.dart';
-import '../../../${FEATURE_SNAKE}_core.dart';
+import '../../../${FEATURE_SNAKE}_shared.dart';
 
 /// Use case para obter lista de ${ENTITY_NAME}s.
 class ${ENTITY_NAME}GetAllUseCase {
@@ -58,7 +58,7 @@ EOF
 # Get By ID
 cat > "$UC_DIR/${ENTITY_SNAKE}_get_by_id_use_case.dart" <<EOF
 import 'package:core_shared/core_shared.dart';
-import '../../../${FEATURE_SNAKE}_core.dart';
+import '../../../${FEATURE_SNAKE}_shared.dart';
 
 /// Use case para obter $ENTITY_NAME por ID.
 class ${ENTITY_NAME}GetByIdUseCase {
@@ -75,7 +75,7 @@ EOF
 # Create
 cat > "$UC_DIR/${ENTITY_SNAKE}_create_use_case.dart" <<EOF
 import 'package:core_shared/core_shared.dart';
-import '../../../${FEATURE_SNAKE}_core.dart';
+import '../../../${FEATURE_SNAKE}_shared.dart';
 
 /// Use case para criar $ENTITY_NAME.
 class ${ENTITY_NAME}CreateUseCase {
@@ -92,7 +92,7 @@ EOF
 # Update
 cat > "$UC_DIR/${ENTITY_SNAKE}_update_use_case.dart" <<EOF
 import 'package:core_shared/core_shared.dart';
-import '../../../${FEATURE_SNAKE}_core.dart';
+import '../../../${FEATURE_SNAKE}_shared.dart';
 
 /// Use case para atualizar $ENTITY_NAME.
 class ${ENTITY_NAME}UpdateUseCase {
@@ -109,7 +109,7 @@ EOF
 # Delete
 cat > "$UC_DIR/${ENTITY_SNAKE}_delete_use_case.dart" <<EOF
 import 'package:core_shared/core_shared.dart';
-import '../../../${FEATURE_SNAKE}_core.dart';
+import '../../../${FEATURE_SNAKE}_shared.dart';
 
 /// Use case para deletar $ENTITY_NAME.
 class ${ENTITY_NAME}DeleteUseCase {
