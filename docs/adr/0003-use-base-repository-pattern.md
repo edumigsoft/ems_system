@@ -58,11 +58,11 @@ Os repositórios devem estender essa classe e usar métodos como `executeRequest
 > [!NOTE]
 > **Exemplo de Referência**
 >
-> Este é um exemplo de como o `BaseRepositoryLocal` será implementado no `core_shared`.
+> Este é um exemplo de como o `BaseRepositoryLocal` será implementado no `core_client`.
 > A implementação real ainda será criada seguindo esta especificação.
 
 ```dart
-// packages/core/core_shared/lib/src/repositories/base_repository_local.dart
+// packages/core/core_client/lib/src/repositories/base_repository_local.dart
 
 import 'package:dio/dio.dart';
 import '../result/result.dart';
@@ -237,6 +237,7 @@ abstract class BaseRepositoryLocal<TEntity, TCreate> with DioErrorHandler {
 // packages/finance/finance_client/lib/src/repositories/finance_repository_local.dart
 
 import 'package:dio/dio.dart';
+import 'package:core_client/core_client.dart';
 import 'package:core_shared/core_shared.dart';
 import 'package:finance_core/finance_core.dart';
 
@@ -521,7 +522,7 @@ abstract class BaseRepositoryLocal<TEntity, TCreate> with DioErrorHandler {
 O `BaseRepositoryLocal` deve ser implementado em:
 
 ```
-packages/core/core_shared/lib/src/repositories/base_repository_local.dart
+packages/core/core_client/lib/src/repositories/base_repository_local.dart
 ```
 
 Conforme a estrutura de pacotes definida no **ADR-0005**.

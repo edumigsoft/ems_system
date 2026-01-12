@@ -94,7 +94,7 @@ lib/src/
 > - Consistência em todo o monorepo
 > - Suporte explícito a Clean Architecture
 
-**Exemplos**: `auth_core`, `aura_core`, `user_core`, `project_core`
+**Exemplos**: `auth_shared`, `aura_shared`, `user_shared`, `project_shared`
 
 ## Princípios Arquiteturais
 
@@ -118,7 +118,7 @@ packages/auth/
 ├── README.md
 ├── CONTRIBUTING.md
 ├── CHANGELOG.md
-├── auth_core/
+├── auth_shared/
 ├── auth_client/
 ├── auth_server/
 └── auth_ui/
@@ -143,7 +143,7 @@ packages/financial/                   # Domínio pai
 ├── billing/                          # Sub-feature 1
 │   ├── README.md
 │   ├── CHANGELOG.md
-│   ├── billing_core/
+│   ├── billing_shared/
 │   ├── billing_client/
 │   ├── billing_server/
 │   └── billing_ui/
@@ -151,7 +151,7 @@ packages/financial/                   # Domínio pai
 └── payments/                         # Sub-feature 2
     ├── README.md
     ├── CHANGELOG.md
-    ├── payments_core/
+    ├── payments_shared/
     ├── payments_client/
     ├── payments_server/
     └── payments_ui/
@@ -164,7 +164,7 @@ packages/financial/                   # Domínio pai
 
 **Exemplos:** `financial` (com `billing` e `payments`)
 
-**Nomenclatura:** `{sub_feature}_{tipo}` (ex: `billing_core`, `billing_ui`)
+**Nomenclatura:** `{sub_feature}_{tipo}` (ex: `billing_shared`, `billing_ui`)
 
 > [!IMPORTANT]
 > **Independência de Sub-Features**
@@ -180,10 +180,10 @@ packages/financial/                   # Domínio pai
 > 
 > Sub-features têm profundidade extra, então os caminhos relativos mudam:
 > ```yaml
-> # Feature simples: packages/auth/auth_core/
+> # Feature simples: packages/auth/auth_shared/
 > include: ../../../analysis_options_dart.yaml
 > 
-> # Sub-feature: packages/financial/billing/billing_core/
+> # Sub-feature: packages/financial/billing/billing_shared/
 > include: ../../../../analysis_options_dart.yaml  # ⚠️ Um nível a mais!
 > ```
 
@@ -222,7 +222,7 @@ Para detalhes completos sobre Features vs Sub-Features, consulte [Hierarquia de 
 packages/user/
   ├── README.md                       # Visão geral da feature user
   ├── CONTRIBUTING.md                 # Guia de contribuição (Único arquivo)
-  └── user_core/
+  └── user_shared/
       ├── lib/
       │   └── src/
       │       ├── domain/
@@ -247,10 +247,10 @@ packages/user/
       │       │   └── user_constants.dart
       │       └── extensions/
       │           └── user_extensions.dart
-      ├── user_core.dart                     # Barrel export
+      ├── user_shared.dart                     # Barrel export
       ├── pubspec.yaml
       ├── analysis_options.yaml
-      ├── README.md                            # Específico do user_core
+      ├── README.md                            # Específico do user_shared
       └── CHANGELOG.md                         # Versionamento do core
 ```
 
@@ -324,7 +324,7 @@ Em um monorepo, a documentação deve seguir uma hierarquia clara:
 Arquivos **obrigatórios** na raiz de cada feature (ex: `packages/user/`):
 
 - ✅ **README.md**: Visão geral da feature completa
-  - Descrição da feature e seus módulos (_core, _client, _server, _ui)
+  - Descrição da feature e seus módulos (_shared, _client, _server, _ui)
   - Arquitetura geral da feature
   - Links para README de cada subpacote
   - Como executar testes da feature completa
@@ -343,7 +343,7 @@ Arquivos **obrigatórios** na raiz de cada feature (ex: `packages/user/`):
 
 #### Nível 2: Pacotes Individuais (`packages/{{feature}}/{{feature}}_{{type}}/`)
 
-Arquivos **obrigatórios** em cada subpacote (ex: `packages/user/user_core/`):
+Arquivos **obrigatórios** em cada subpacote (ex: `packages/user/user_shared/`):
 
 - ✅ **README.md**: Documentação específica do pacote
   - Objetivo e responsabilidade do pacote
@@ -364,7 +364,7 @@ Arquivos **obrigatórios** em cada subpacote (ex: `packages/user/user_core/`):
   - Configurações específicas do pacote
 
 - ✅ **analysis_options.yaml**: Configurações de linting ⚠️ **REGRA OBRIGATÓRIA**
-  - **Pacotes Dart** (_core, _server, _client): **DEVEM** importar `analysis_options_dart.yaml` da raiz:
+  - **Pacotes Dart** (_shared, _server, _client): **DEVEM** importar `analysis_options_dart.yaml` da raiz:
     ```yaml
     include: ../../../analysis_options_dart.yaml
     ```
@@ -382,9 +382,9 @@ Arquivos **obrigatórios** em cada subpacote (ex: `packages/user/user_core/`):
 packages/user/
   ├── README.md                    # Visão geral da feature user
   ├── CONTRIBUTING.md              # Como contribuir (NÃO duplicar)
-  ├── user_core/
-  │   ├── README.md                # Específico do core
-  │   ├── CHANGELOG.md             # Versões do core
+  ├── user_shared/
+  │   ├── README.md                # Específico do shared
+  │   ├── CHANGELOG.md             # Versões do shared
   │   ├── pubspec.yaml
   │   ├── analysis_options.yaml
   │   └── lib/...

@@ -7,10 +7,12 @@
       "name": "design_system_ui",
       "version": "0.1.0",
       "dependencies": [
+        "core_ui",
         "design_system_shared",
         "dio",
         "flutter",
         "get_it",
+        "localizations_ui",
         "logging"
       ],
       "devDependencies": [
@@ -44,10 +46,36 @@
       ]
     },
     {
+      "name": "localizations_ui",
+      "version": "0.1.0",
+      "dependencies": [
+        "dio",
+        "flutter",
+        "flutter_localizations",
+        "get_it",
+        "intl",
+        "localizations_shared",
+        "logging"
+      ]
+    },
+    {
       "name": "design_system_shared",
       "version": "0.1.0",
       "dependencies": [
         "meta"
+      ]
+    },
+    {
+      "name": "core_ui",
+      "version": "0.1.0",
+      "dependencies": [
+        "core_shared",
+        "design_system_shared",
+        "design_system_ui",
+        "flutter",
+        "logging",
+        "path_provider",
+        "zard"
       ]
     },
     {
@@ -179,6 +207,61 @@
       ]
     },
     {
+      "name": "localizations_shared",
+      "version": "0.1.0",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
+        "path"
+      ]
+    },
+    {
+      "name": "intl",
+      "version": "0.20.2",
+      "dependencies": [
+        "clock",
+        "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "core_shared",
+      "version": "0.1.0",
+      "dependencies": [
+        "get_it",
+        "logging",
+        "meta",
+        "path",
+        "zard"
+      ]
+    },
+    {
+      "name": "zard",
+      "version": "0.0.25",
+      "dependencies": [
+        "string_normalizer"
+      ]
+    },
+    {
+      "name": "path_provider",
+      "version": "2.1.5",
+      "dependencies": [
+        "flutter",
+        "path_provider_android",
+        "path_provider_foundation",
+        "path_provider_linux",
+        "path_provider_platform_interface",
+        "path_provider_windows"
+      ]
+    },
+    {
       "name": "async",
       "version": "2.13.0",
       "dependencies": [
@@ -278,6 +361,59 @@
       ]
     },
     {
+      "name": "string_normalizer",
+      "version": "0.4.0",
+      "dependencies": [
+        "characters"
+      ]
+    },
+    {
+      "name": "path_provider_windows",
+      "version": "2.3.0",
+      "dependencies": [
+        "ffi",
+        "flutter",
+        "path",
+        "path_provider_platform_interface"
+      ]
+    },
+    {
+      "name": "path_provider_platform_interface",
+      "version": "2.1.2",
+      "dependencies": [
+        "flutter",
+        "platform",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "path_provider_linux",
+      "version": "2.2.1",
+      "dependencies": [
+        "ffi",
+        "flutter",
+        "path",
+        "path_provider_platform_interface",
+        "xdg_directories"
+      ]
+    },
+    {
+      "name": "path_provider_foundation",
+      "version": "2.5.1",
+      "dependencies": [
+        "flutter",
+        "path_provider_platform_interface"
+      ]
+    },
+    {
+      "name": "path_provider_android",
+      "version": "2.2.22",
+      "dependencies": [
+        "flutter",
+        "path_provider_platform_interface"
+      ]
+    },
+    {
       "name": "web",
       "version": "1.1.1",
       "dependencies": []
@@ -293,6 +429,31 @@
       "name": "vm_service",
       "version": "15.0.2",
       "dependencies": []
+    },
+    {
+      "name": "ffi",
+      "version": "2.1.5",
+      "dependencies": []
+    },
+    {
+      "name": "plugin_platform_interface",
+      "version": "2.1.8",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
+      "name": "platform",
+      "version": "3.1.6",
+      "dependencies": []
+    },
+    {
+      "name": "xdg_directories",
+      "version": "1.1.0",
+      "dependencies": [
+        "meta",
+        "path"
+      ]
     }
   ],
   "configVersion": 1

@@ -1,5 +1,6 @@
 import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/theme/ds_theme_extension.dart';
+import 'package:design_system_ui/widgets/ds_side_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:design_system_ui/design_system_ui.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode _themeMode = ThemeMode.dark;
   String _selectedTheme = 'default';
 
   @override
@@ -96,13 +97,18 @@ class HomePage extends StatelessWidget {
         isBorderRadius: false,
         child: Row(
           children: [
-            DSCard(
-              width: 260,
-              child: Column(
-                children: [
-                  Text('Sidebar'),
-                ],
-              ),
+            // DSCard(
+            //   width: 260,
+            //   child: Column(
+            //     children: [
+            //       Text('Sidebar'),
+            //     ],
+            //   ),
+            // ),
+            DSSideNavigation(
+              selectedRoute: '',
+              onDestinationSelected: (String value) {},
+              items: [],
             ),
             Expanded(
               child: DSCard(

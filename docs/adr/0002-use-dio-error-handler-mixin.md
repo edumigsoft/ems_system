@@ -46,11 +46,11 @@ Este mixin fornece o método `handleDioError` que:
 > [!NOTE]
 > **Exemplo de Referência**
 >
-> Este é um exemplo de como o `DioErrorHandler` será implementado no `core_shared`.
+> Este é um exemplo de como o `DioErrorHandler` será implementado no `core_client`.
 > A implementação real ainda será criada seguindo esta especificação.
 
 ```dart
-// packages/core/core_shared/lib/src/mixins/dio_error_handler.dart
+// packages/core/core_client/lib/src/mixins/dio_error_handler.dart
 
 import 'package:dio/dio.dart';
 import '../result/result.dart';
@@ -227,7 +227,8 @@ class DataException implements Exception {
 // packages/finance/finance_client/lib/src/repositories/finance_repository_local.dart
 
 import 'package:dio/dio.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:core_client/core_client.dart'; // Importa DioErrorHandler
+import 'package:core_shared/core_shared.dart'; // Importa Exceptions/Result
 import 'package:finance_core/finance_core.dart';
 
 class FinanceRepositoryLocal 
@@ -308,7 +309,8 @@ class FinanceRepositoryLocal
 // packages/finance/finance_client/lib/src/repositories/finance_repository_local.dart
 
 import 'package:dio/dio.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:core_client/core_client.dart'; // Importa DioErrorHandler
+import 'package:core_shared/core_shared.dart'; // Importa Exceptions/Result
 import 'package:finance_core/finance_core.dart';
 
 class FinanceRepositoryLocal 
@@ -360,7 +362,7 @@ class FinanceRepositoryLocal
 // packages/finance/finance_ui/lib/ui/view_models/finance_view_model.dart
 
 import 'package:flutter/foundation.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:core_client/core_client.dart';
 import 'package:finance_core/finance_core.dart';
 
 class FinanceViewModel extends ChangeNotifier {
