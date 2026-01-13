@@ -222,6 +222,13 @@ IP_BLOCK_MINUTES=15
 8. **Fase 8**: Integrar em app cliente
 9. **Rollback**: Comentar registro no injector, rotas são independentes
 
+> [!TIP]
+> **Scripts de Geração Disponíveis:**
+> - `create_feature_wizard.sh` / `scaffold_feature.sh` - Para criar feature completa (4 pacotes)
+> - `generators/01_generate_entities.sh` ... `16_generate_ui_widgets.sh` - Para criar componentes individuais
+> 
+> Use os scripts individuais quando precisar adicionar entities extras a uma feature existente ou regenerar um componente específico. Consulte `generators/README.md` para detalhes.
+
 ## Open Questions
 
 - [x] ~~Qual email service usar para reset de senha?~~ → Configurável via env, em `core_server`

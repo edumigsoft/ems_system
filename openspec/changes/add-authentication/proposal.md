@@ -582,9 +582,57 @@ core_server/lib/src/
 
 ## Geração de Código
 
-Utilizar scripts existentes para scaffold inicial:
-- `scripts/generators/new_feature/create_feature_wizard.sh` para geração dos pacotes `user` e `auth`
-- `scripts/generators/new_feature/scaffold_feature.sh` para estrutura base
+Utilizar os scripts existentes para scaffold e geração de componentes:
+
+### Scripts de Feature Completa
+
+Para geração de uma feature completa (com todos os 4 pacotes: shared, server, client, ui):
+
+| Script | Descrição |
+|--------|-----------|
+| `create_feature_wizard.sh` | Wizard interativo que guia a criação de uma feature completa |
+| `scaffold_feature.sh` | Gera a estrutura base da feature com todos os pacotes |
+
+**Uso para criar as features `user` e `auth`:**
+```bash
+cd scripts/generators/new_feature
+./create_feature_wizard.sh  # Seguir o wizard para cada feature
+```
+
+### Scripts de Componentes Individuais
+
+Na pasta `generators/` existem scripts individuais para criação de componentes específicos. Úteis quando:
+- Precisa adicionar mais de uma entity a uma feature existente
+- Quer criar apenas um tipo de componente
+- Necessita regenerar um componente específico
+
+| Script | Componente | Camada |
+|--------|------------|--------|
+| `01_generate_entities.sh` | Entities de domínio | shared |
+| `02_generate_details.sh` | Details (entity + metadados) | shared |
+| `03_generate_dtos.sh` | DTOs (create/update) | shared |
+| `04_generate_models.sh` | Models (serialização) | shared |
+| `05_generate_converters.sh` | Converters (domain ↔ model) | shared |
+| `06_generate_constants.sh` | Constantes de feature | shared |
+| `07_generate_tables.sh` | Tabelas (Drift) | server |
+| `08_generate_type_converters.sh` | Type converters (Drift) | server |
+| `09_generate_repositories.sh` | Repositories | server |
+| `10_generate_services.sh` | Services | server |
+| `11_generate_routes.sh` | Routes (Shelf) | server |
+| `12_generate_use_cases.sh` | Use cases | client |
+| `13_generate_validators.sh` | Validators | shared |
+| `14_generate_ui_module.sh` | Módulo UI | ui |
+| `15_generate_ui_components.sh` | Componentes UI | ui |
+| `16_generate_ui_widgets.sh` | Widgets reutilizáveis | ui |
+
+**Exemplo - Adicionar nova entity a feature existente:**
+```bash
+cd scripts/generators/new_feature/generators
+./01_generate_entities.sh auth "SessionToken:token:String,expiresAt:DateTime"
+```
+
+> [!TIP]
+> Consulte `generators/README.md` e `generators/SUMMARY.md` para documentação completa dos scripts e exemplos de uso avançado.
 
 ---
 

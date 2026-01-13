@@ -9,6 +9,8 @@
 - [ ] 2.1 Usar `create_feature_wizard.sh` para criar estrutura `packages/user/` com 4 variantes
 - [ ] 2.2 Configurar exports e dependências entre variantes
 
+> **Nota:** Scripts individuais em `generators/` (ex: `01_generate_entities.sh`) podem ser usados para adicionar componentes extras posteriormente.
+
 ## 3. User Shared - Models
 - [ ] 3.1 Criar `UserDetails` implementando `BaseDetails`
 - [ ] 3.2 Criar `UserCreate` DTO
@@ -27,6 +29,8 @@
 - [ ] 5.1 Usar `create_feature_wizard.sh` para criar estrutura `packages/auth/` com 4 variantes
 - [ ] 5.2 Adicionar dependência `flutter_secure_storage` em `auth_client`
 - [ ] 5.3 Configurar exports e dependências entre variantes
+
+> **Nota:** Para entities adicionais (ex: `SessionToken`), use scripts individuais como `generators/01_generate_entities.sh`.
 
 ## 6. Auth Shared - Models
 - [ ] 6.1 Criar `AuthRequest` (email, password)
