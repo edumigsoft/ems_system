@@ -548,6 +548,36 @@ packages/auth/
 - `auth_server` → depende de `user_server` (FK para tabela `users`)
 - Outros pacotes (ex: `project_server`) → usam middlewares do `auth_server`
 
+> [!IMPORTANT]
+> **Garantia de Não-Circularidade:** O pacote `user_server` NÃO DEVE importar `auth_server`. A direção de dependência é unidirecional: `auth_server → user_server`. O `user_server` expõe apenas a tabela `users` e repositório CRUD básico. Funcionalidades de autenticação (validação de senha, tokens) ficam exclusivamente em `auth_server`.
+
+---
+
+### 7. Email Service (Recomendação)
+
+O email service é utilizado por `auth` (reset de senha) e `user` (verificação de email).
+
+**Recomendação:** Implementar como **utilitário em `core_server`** ao invés de capability separada.
+
+| Opção | Prós | Contras |
+|-------|------|--------|
+| **`core_server/email/`** ✅ | Reutilizável, simples, sem overhead | Menos isolamento |
+| `packages/email/` | Isolamento total | Overhead para algo simples |
+
+**Justificativa:**
+- Email é infraestrutura transversal, não domínio de negócio
+- Não requer UI própria nem client separado
+- Configuração via env vars já existe no padrão do projeto
+
+**Estrutura proposta:**
+```
+core_server/lib/src/
+├── email/
+│   ├── email_service.dart       # Interface + implementação
+│   ├── email_template.dart      # Templates (verificação, reset)
+│   └── email_config.dart        # Leitura de env vars
+```
+
 ---
 
 ## Geração de Código
@@ -590,13 +620,15 @@ Utilizar scripts existentes para scaffold inicial:
 - **Affected specs**: novas capabilities `user` e `auth`
 - **Affected code**:
   - `packages/core/core_shared/` (adiciona `domain/entity/user.dart` e `domain/enums/user_role.dart`)
-  - `packages/user/` (novo)
-  - `packages/auth/` (novo)
-  - `packages/core/core_server/` (utiliza SecurityService e CryptService existentes)
+  - `packages/core/core_server/` (adiciona `email/` com EmailService)
+  - `packages/user/` (novo - 4 variantes)
+  - `packages/auth/` (novo - 4 variantes)
   - `servers/server_v1/` (registra os módulos e middlewares via Injector)
 - **Dependências existentes aproveitadas**: `dart_jsonwebtoken`, `bcrypt`, `zard`, `flutter_secure_storage`, `drift`
 - **Padrão de ORM**: `@UseRowClass` para integração direta com entities de domínio
 - **Modelo de autorização**: RBAC genérico com `ResourcePermission` reutilizável por qualquer módulo
+- **Email**: Utilitário transversal em `core_server`, não capability separada
+
 
 
 

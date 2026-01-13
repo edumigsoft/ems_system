@@ -159,3 +159,96 @@ O sistema SHALL suportar configuração de autenticação via variáveis de ambi
 #### Scenario: Valores padrão
 - **WHEN** variáveis de ambiente não são definidas
 - **THEN** o sistema usa valores padrão seguros (15 min access, 7 dias refresh, 5/10 tentativas, 30/15 min lockout)
+
+---
+
+### Requirement: JWT Authentication Middleware
+
+O sistema SHALL fornecer middleware reutilizável para validar tokens JWT e popular o contexto de autenticação.
+
+#### Scenario: Request com token válido
+- **WHEN** uma requisição possui header `Authorization: Bearer <token>` com token JWT válido
+- **THEN** o middleware extrai as claims e popula `AuthContext` no request
+- **AND** a requisição prossegue para o handler
+
+#### Scenario: Request sem token
+- **WHEN** uma requisição protegida não possui header Authorization
+- **THEN** o middleware retorna erro 401 Unauthorized
+
+#### Scenario: Request com token expirado
+- **WHEN** uma requisição possui token JWT expirado
+- **THEN** o middleware retorna erro 401 Unauthorized
+- **AND** a mensagem indica que o token expirou
+
+---
+
+### Requirement: Role-Based Access Control
+
+O sistema SHALL suportar controle de acesso baseado em roles globais do usuário.
+
+#### Scenario: Verificação de role única
+- **WHEN** um endpoint requer role específica (ex: `admin`)
+- **AND** o usuário autenticado possui a role exigida
+- **THEN** a requisição prossegue normalmente
+
+#### Scenario: Verificação de role única - acesso negado
+- **WHEN** um endpoint requer role `admin`
+- **AND** o usuário autenticado possui role `user`
+- **THEN** o sistema retorna erro 403 Forbidden
+
+#### Scenario: Verificação de múltiplas roles
+- **WHEN** um endpoint aceita qualquer role de um conjunto (ex: `admin` OU `moderator`)
+- **AND** o usuário possui uma das roles aceitas
+- **THEN** a requisição prossegue normalmente
+
+---
+
+### Requirement: Generic Resource Permission System
+
+O sistema SHALL fornecer um modelo genérico de permissões por recurso, reutilizável por qualquer módulo (projects, documents, teams, etc.).
+
+#### Scenario: Hierarquia de permissões
+- **WHEN** um usuário possui permissão `manage` em um recurso
+- **THEN** as permissões `read`, `write` e `delete` estão implicitamente concedidas
+- **AND** a hierarquia é: `read < write < delete < manage`
+
+#### Scenario: Verificar permissão em recurso
+- **WHEN** o sistema verifica se usuário tem permissão `write` em `project/abc123`
+- **AND** o usuário possui permissão `manage` para este recurso
+- **THEN** a verificação retorna sucesso (manage inclui write)
+
+#### Scenario: Conceder permissão a usuário
+- **WHEN** um usuário com permissão `manage` concede `read` a outro usuário
+- **THEN** o sistema cria registro em `resource_members`
+- **AND** o novo usuário pode acessar o recurso
+
+#### Scenario: Revogar permissão
+- **WHEN** um usuário com permissão `manage` revoga acesso de outro usuário
+- **THEN** o registro é removido de `resource_members`
+- **AND** o usuário revogado não pode mais acessar o recurso
+
+#### Scenario: Listar permissões de um recurso
+- **WHEN** o sistema lista membros de `project/abc123`
+- **THEN** retorna todos os usuários com suas respectivas permissões
+
+---
+
+### Requirement: Authentication Data Persistence
+
+O sistema SHALL manter tabelas de suporte para autenticação e autorização.
+
+#### Scenario: Tabela user_credentials
+- **WHEN** um usuário é registrado
+- **THEN** suas credenciais são armazenadas em tabela separada de `users`
+- **AND** contém: `userId` (FK), `passwordHash`, `lastLoginAt`
+
+#### Scenario: Tabela refresh_tokens
+- **WHEN** um refresh token é emitido
+- **THEN** é registrado com: `userId` (FK), `token`, `expiresAt`, `revokedAt`
+- **AND** permite invalidação e auditoria
+
+#### Scenario: Tabela resource_members
+- **WHEN** permissão é concedida a um usuário em um recurso
+- **THEN** é registrado com: `userId` (FK), `resourceType`, `resourceId`, `permission`
+- **AND** suporta qualquer tipo de recurso (project, document, team, etc.)
+
