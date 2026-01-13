@@ -21,3 +21,7 @@ export 'src/database/database_provider.dart';
 export 'src/database/drift/drift_table_mixin.dart';
 export 'src/database/drift/boolean_converter.dart';
 export 'src/database/drift/date_time_converter_non_null.dart';
+
+// Email
+export 'src/email/email_service.dart';
+export 'src/email/implementation/http_email_service.dart';

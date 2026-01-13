@@ -1,0 +1,18 @@
+name: auth_shared
+description: Shared models and contracts for Authentication.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  meta: ^1.11.0
+  core_shared:
+    path: ../../core/core_shared
+  user_shared:
+    path: ../../user/user_shared
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.24.0

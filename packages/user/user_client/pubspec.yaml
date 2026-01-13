@@ -1,0 +1,24 @@
+name: user_client
+description: Client implementation for User Management.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  dio: ^5.0.0
+  retrofit: 4.9.1
+  core_client:
+    path: ../../core/core_client
+  core_shared:
+    path: ../../core/core_shared
+  user_shared:
+    path: ../user_shared
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.24.0
+  build_runner: 2.10.4
+  retrofit_generator: 10.2.0
+  analyzer: 8.4.1

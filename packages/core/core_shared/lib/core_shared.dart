@@ -8,3 +8,7 @@ export 'src/converters/model_converter.dart';
 export 'src/commons/base_details.dart';
 export 'src/service/log_service.dart';
 export 'src/validators/validators.dart';
+
+// Domain
+export 'src/domain/enums/user_role.dart';
+export 'src/domain/entity/user.dart';
