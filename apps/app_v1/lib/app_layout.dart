@@ -91,7 +91,9 @@ class _AppLayoutState extends State<AppLayout> {
   void initState() {
     super.initState();
 
-    _initializeApp();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeApp();
+    });
   }
 
   Future<void> _initializeApp() async {

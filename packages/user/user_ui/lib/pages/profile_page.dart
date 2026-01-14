@@ -5,7 +5,7 @@ import '../view_models/profile_view_model.dart';
 /// Página de Perfil do Usuário.
 ///
 /// Recebe ViewModel via construtor (DI).
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   final ProfileViewModel viewModel;
 
   /// Callback para logout.
@@ -14,9 +14,23 @@ class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key, required this.viewModel, this.onLogout});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  void initState() {
+    super.initState();
+    // Inicia carregamento do perfil ao abrir a página
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.viewModel.loadProfile();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
+      listenable: widget.viewModel,
       builder: (context, _) {
         final theme = Theme.of(context);
 
@@ -26,7 +40,7 @@ class ProfilePage extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit),
-                onPressed: viewModel.profile != null
+                onPressed: widget.viewModel.profile != null
                     ? () => _showEditDialog(context)
                     : null,
               ),
@@ -39,7 +53,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context) {
-    final profile = viewModel.profile;
+    final profile = widget.viewModel.profile;
     if (profile == null) return;
 
     final nameController = TextEditingController(text: profile.name);
@@ -87,7 +101,7 @@ class ProfilePage extends StatelessWidget {
                     : null,
               );
               Navigator.pop(context);
-              final success = await viewModel.updateProfile(update);
+              final success = await widget.viewModel.updateProfile(update);
               if (success && context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -105,11 +119,11 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, ThemeData theme) {
-    if (viewModel.isLoading && viewModel.profile == null) {
+    if (widget.viewModel.isLoading && widget.viewModel.profile == null) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (viewModel.error != null && viewModel.profile == null) {
+    if (widget.viewModel.error != null && widget.viewModel.profile == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -117,9 +131,23 @@ class ProfilePage extends StatelessWidget {
             Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text('Erro ao carregar perfil', style: theme.textTheme.titleMedium),
+            if (widget.viewModel.error != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: Text(
+                  widget.viewModel.error!,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.error,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             const SizedBox(height: 8),
             ElevatedButton(
-              onPressed: viewModel.loadProfile,
+              onPressed: widget.viewModel.loadProfile,
               child: const Text('Tentar novamente'),
             ),
           ],
@@ -127,13 +155,13 @@ class ProfilePage extends StatelessWidget {
       );
     }
 
-    final profile = viewModel.profile;
+    final profile = widget.viewModel.profile;
     if (profile == null) {
       return const Center(child: Text('Perfil não encontrado'));
     }
 
     return RefreshIndicator(
-      onRefresh: viewModel.loadProfile,
+      onRefresh: widget.viewModel.loadProfile,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(24),
@@ -201,7 +229,7 @@ class ProfilePage extends StatelessWidget {
 
             // Botão Logout
             OutlinedButton.icon(
-              onPressed: onLogout,
+              onPressed: widget.onLogout,
               icon: const Icon(Icons.logout),
               label: const Text('Sair'),
               style: OutlinedButton.styleFrom(

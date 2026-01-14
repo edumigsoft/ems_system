@@ -1,17 +1,17 @@
 import 'dart:ui';
 
-// import 'package:core_shared/core_shared.dart' show Success, Failure;
 import 'package:dio/dio.dart';
+import 'package:auth_client/auth_client.dart' show TokenStorage;
 
 class BackendAuthInterceptor extends Interceptor {
   final Dio dio;
-  // final AuthRepository authRepository;
+  final TokenStorage tokenStorage;
   final String backendBaseApi;
   final VoidCallback onUnauthorized; // Callback para quando refresh falha
 
   BackendAuthInterceptor({
     required this.dio,
-    // required this.authRepository,
+    required this.tokenStorage,
     required this.backendBaseApi,
     required this.onUnauthorized,
   });
@@ -21,14 +21,15 @@ class BackendAuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // final result = await authRepository.getSession();
-    // if (result case Success(value: final authEntity)) {
-    //   final token = authEntity.refreshToken;
+    // Adiciona access token no header Authorization
+    final accessToken = await tokenStorage.getAccessToken();
 
-    //   if (token != null) {
-    //     options.headers['Authorization'] = 'Bearer $token';
-    // }
-    // }
+    if (accessToken != null) {
+      options.headers['Authorization'] = 'Bearer $accessToken';
+      print('🔑 Token adicionado: ${accessToken.substring(0, 20)}...');
+    } else {
+      print('⚠️ Nenhum token disponível');
+    }
 
     handler.next(options);
   }

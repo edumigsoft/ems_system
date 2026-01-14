@@ -19,13 +19,6 @@ class DesktopPage extends StatefulWidget {
 }
 
 class _DesktopPageState extends State<DesktopPage> {
-  @override
-  void initState() {
-    widget.viewModel.init();
-
-    super.initState();
-  }
-
   /// Handler para logout com confirmação.
   Future<void> _handleLogout(BuildContext context) async {
     final confirmed = await showDialog<bool>(

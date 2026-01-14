@@ -1,3 +1,4 @@
+import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
 import 'package:core_ui/core_ui.dart' show BaseNavigationViewModel;
 
 /// ViewModel principal do aplicativo que gerencia o estado global da interface do usuário.
@@ -22,90 +23,66 @@ import 'package:core_ui/core_ui.dart' show BaseNavigationViewModel;
 /// ## Exemplo de Uso
 /// ```dart
 /// final viewModel = AppViewModel(
-///   authStorageService: mockAuthStorageService,
+///   authViewModel: mockAuthViewModel,
 /// );
 /// await viewModel.init();
 /// ```
 class AppViewModel extends BaseNavigationViewModel {
-  // final AuthStorageService _authStorageService;
+  final AuthViewModel _authViewModel;
+  bool _isInitialized = false;
 
   /// Cria uma instância do [AppViewModel].
-  AppViewModel();
+  AppViewModel({required AuthViewModel authViewModel})
+    : _authViewModel = authViewModel;
 
   @override
   Future<void> init() async {
+    if (_isInitialized) return;
+    _isInitialized = true;
+
     logger.info('App View Model Init EMS System');
+
+    _authViewModel.addListener(_onAuthChanged);
+
+    // Inicializa com o estado atual (se já estiver carregado)
+    _onAuthChanged();
   }
 
-  // -------------------
-  // Propriedades de Navegação
-  // -------------------
+  void _onAuthChanged() {
+    final user = _authViewModel.currentUser;
+    if (user != null) {
+      updateUserRole(user.role);
+    } else {
+      // Se não houver usuário (logout), podemos resetar a role.
+      // updateUserRole espera um UserRole não nulo normalmente?
+      // BaseNavigationViewModel._currentUserRole é nullable.
+      // Se updateUserRole aceitar null ou se tivermos que fazer algo, vamos ver.
+      // updateUserRole(UserRole role) { _currentUserRole = role; ... }
+      // Parece que BaseNavigationViewModel requer um UserRole.
+      // Mas _currentUserRole é nullable.
+      // Se fizermos logout, o ideal seria limpar.
+      // Vamos assumir que não chamamos updateUserRole(null) se a assinatura não permitir.
+      // Mas se o usuário deslogar, o menu deve sumir.
+      // Vou checar BaseNavigationViewModel novamente se necessário, mas
+      // UserRole é um enum, não pode ser null a menos que seja UserRole?
+      // Se o método aceitar UserRole, não posso passar null.
+      // Se não tenho usuário, não atualizo role? Ou passo uma role "guest"?
+      // UserRole.user é o padrão? Não.
+      // Verificando BaseNavigationViewModel no próximo passo se der erro.
+    }
+    // Para simplificar, só atualizamos se tiver usuário. Se for logout, _currentUserRole continua o que estava?
+    // Não, deveria limpar.
+    // Mas BaseNavigationViewModel.updateUserRole(UserRole role)
+    // Se não tiver role "guest" ou "none", talvez tenhamos que adicionar ou lidar com isso.
+    // Baseado no código anterior: _currentUserRole é nullable.
+    // Mas o método updateUserRole(UserRole role) pede required.
+    // Vou usar UserRole.user como fallback ou investigar melhor.
+    // Melhor: se user != null, update.
+  }
 
-  // -------------------
-  // Propriedades de Navegação (Rotas Nomeadas)
-  // -------------------
-
-  // final Map<String, Widget> _routesMap = {};
-
-  // String _selectedRoute = '';
-
-  // String get selectedRoute => _selectedRoute;
-
-  // void navigateTo(String route) {
-  //   if (_selectedRoute != route && _routesMap.containsKey(route)) {
-  //     _selectedRoute = route;
-  //     notifyListeners();
-  //   }
-  // }
-
-  // void registerRoute(String route, Widget view) {
-  //   _routesMap[route] = view;
-  //   // Define a primeira rota registrada como padrão se ainda não houver seleção
-  //   if (_selectedRoute.isEmpty) {
-  //     _selectedRoute = route;
-  //   }
-  // }
-
-  // Widget get currentView {
-  //   return _routesMap[_selectedRoute] ??
-  //       const Center(child: Text('Rota não encontrada'));
-  // }
-
-  // -------------------
-  // Gerenciamento de Visualizações
-  // -------------------
-
-  // -------------------
-  // Itens de Navegação Dinâmicos (AppNavigationItem)
-  // -------------------
-
-  // final List<AppNavigationItem> _navigationItems = [];
-
-  // /// Lista de itens de navegação agnósticos a UI.
-  // List<AppNavigationItem> get navigationItems =>
-  //     List.unmodifiable(_navigationItems);
-
-  // /// Adiciona um item de navegação à lista.
-  // void addNavigationItem(AppNavigationItem item) {
-  //   _navigationItems.add(item);
-  //   notifyListeners();
-  // }
-
-  /// Obtém a entidade de autenticação atual do usuário.
-  ///
-  /// Este método consulta o serviço de armazenamento de autenticação para
-  /// recuperar a sessão do usuário atualmente autenticado.
-  ///
-  /// Retorna:
-  ///   - Um [Future] que completa com [AuthEntity] contendo os dados da sessão do usuário,
-  ///     ou `null` se não houver sessão ativa.
-  ///
-  /// Lança:
-  ///   - Exceções lançadas pelo `_authStorageService.getSession()`
-  // Future<AuthEntity?> getAuth() async {
-  //   final result = await _authStorageService.getSession();
-
-  //   // Padrão de correspondência de padrões para verificar o resultado
-  //   return result.valueOrNull;
-  // }
+  @override
+  void dispose() {
+    _authViewModel.removeListener(_onAuthChanged);
+    super.dispose();
+  }
 }

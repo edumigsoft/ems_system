@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:core_server/core_server.dart';
 import 'package:core_shared/core_shared.dart';
 import 'package:auth_server/auth_server.dart';
+import 'package:auth_shared/auth_shared.dart';
+import 'package:user_shared/user_shared.dart';
 
 import '../../user_server.dart';
 
@@ -35,8 +38,15 @@ class UserRoutes extends Routes {
     final router = Router();
 
     // Perfil do usuário autenticado (qualquer usuário autenticado)
-    router.get('/me', _getMe);
-    router.put('/me', _updateMe);
+    // Aplica middleware de autenticação JWT
+    router.get(
+      '/me',
+      Pipeline().addMiddleware(authMiddleware.verifyJwt).addHandler(_getMe),
+    );
+    router.put(
+      '/me',
+      Pipeline().addMiddleware(authMiddleware.verifyJwt).addHandler(_updateMe),
+    );
 
     // Administração de usuários (apenas admin)
     final adminMiddleware = authMiddleware.requireRole(UserRole.admin);
@@ -72,11 +82,32 @@ class UserRoutes extends Routes {
 
   /// GET /users/me - Retorna o perfil do usuário autenticado.
   Future<Response> _getMe(Request request) async {
-    // Implementar - extrair userId do AuthContext
-    return Response.ok(
-      '{"message": "Not implemented yet"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    final authContext = request.context['authContext'] as AuthContext?;
+
+    if (authContext == null) {
+      return Response.forbidden(
+        jsonEncode({'error': 'Not authenticated'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final result = await userRepository.findById(authContext.userId);
+
+    if (result case Success(value: final user)) {
+      final model = UserDetailsModel.fromDomain(user);
+      return Response.ok(
+        jsonEncode(model.toJson()),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } else {
+      // Retorna 401 para forçar o logout no cliente (via interceptor)
+      // pois o token pertence a um usuário que não existe mais na base.
+      return Response(
+        401,
+        body: jsonEncode({'error': 'User not found'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
   }
 
   /// PUT /users/me - Atualiza o perfil do usuário autenticado.

@@ -47,6 +47,8 @@ class InitUserModuleToServer implements InitServerModule {
     );
 
     // 4. Mount Routes
-    addRoutes(di, di.get<UserRoutes>(), security: security);
+    // Nota: security=false porque UserRoutes gerencia sua própria autenticação
+    // internamente via AuthMiddleware, não dependendo do authRequired global
+    addRoutes(di, di.get<UserRoutes>(), security: false);
   }
 }

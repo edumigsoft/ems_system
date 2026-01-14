@@ -14,8 +14,10 @@ class AuthMiddleware {
     return (Handler innerHandler) {
       return (Request request) async {
         final authorization = request.headers['authorization'];
+        print('🔐 Authorization header: ${authorization?.substring(0, 30) ?? 'null'}...');
 
         if (authorization == null || !authorization.startsWith('Bearer ')) {
+          print('❌ Header ausente ou malformado');
           return Response(
             401,
             body: '{"error": "Missing or invalid authorization header"}',
@@ -24,6 +26,7 @@ class AuthMiddleware {
         }
 
         final token = authorization.substring(7);
+        print('🎫 Token extraído: ${token.substring(0, 20)}...');
 
         try {
           // Valida token usando SecurityService
@@ -33,6 +36,7 @@ class AuthMiddleware {
           );
 
           if (result case Failure(error: final error)) {
+            print('❌ Token inválido: $error');
             return Response(
               401,
               body: '{"error": "Invalid token: ${error.toString()}"}',
@@ -40,11 +44,14 @@ class AuthMiddleware {
             );
           }
 
-          // O payload vem como Map<String, dynamic> do SecurityService
-          final payloadMap = (result as Success).value as Map<String, dynamic>;
+          // Extrai o payload do JWT
+          final jwt = (result as Success).value;
+          final payloadMap = jwt.payload as Map<String, dynamic>;
           final payload = TokenPayload.fromJson(payloadMap);
+          print('✅ Token válido - userId: ${payload.sub}');
 
           if (payload.isExpired) {
+            print('❌ Token expirado');
             return Response(
               401,
               body: '{"error": "Token expired"}',
@@ -64,9 +71,10 @@ class AuthMiddleware {
 
           return innerHandler(updatedRequest);
         } catch (e) {
+          print('❌ Erro na validação: $e');
           return Response(
             401,
-            body: '{"error": "Token validation failed"}',
+            body: '{"error": "Token validation failed: $e"}',
             headers: {'Content-Type': 'application/json'},
           );
         }

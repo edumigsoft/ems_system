@@ -1,4 +1,5 @@
-import 'package:auth_ui/auth_ui.dart' show AuthModule;
+import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
+import 'package:auth_client/auth_client.dart' show TokenStorage;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
@@ -17,13 +18,10 @@ class Injector with Loggable {
   Future<void> injector() async {
     logger.info('injector');
 
-    // Registra os singletons e serviços essenciais da aplicação.
+    // 1. Registra serviços core (Dio, Storage, etc) - SEM AppViewModel ainda
     _registerCoreServices(_diMain);
 
-    final appViewModel = _diMain.get<AppViewModel>();
-
-    // A lista de módulos agora é criada aqui para garantir que as dependências
-    // principais já existam.
+    // 2. Registra módulos (que registram AuthViewModel, etc)
     final List<AppModule> appModules = [
       // DashboardModule(di: _diMain),
       // AuraModule(di: _diMain),
@@ -40,7 +38,24 @@ class Injector with Loggable {
       module.registerDependencies(_diMain);
     }
 
-    // Cria e registra o serviço de navegação.
+    // 3. Registra AppViewModel (agora que AuthViewModel já está registrado)
+    _diMain.registerLazySingleton<AppViewModel>(
+      () => AppViewModel(
+        authViewModel: _diMain.get<AuthViewModel>(),
+      ),
+    );
+
+    // 4. Registra AppLayout (depende de AppViewModel)
+    _diMain.registerLazySingleton<AppLayout>(
+      () => AppLayout(
+        di: _diMain,
+        viewModel: _diMain.get<AppViewModel>(),
+      ),
+    );
+
+    final appViewModel = _diMain.get<AppViewModel>();
+
+    // 5. Registra NavigationService
     _diMain.registerLazySingleton<NavigationService>(
       () =>
           NavigationService(appViewModel: appViewModel, appModules: appModules),
@@ -64,34 +79,14 @@ class Injector with Loggable {
         ),
       ),
     );
-    // di.registerLazySingleton<FlutterSecureStorage>(
-    //   () => const FlutterSecureStorage(),
-    // );
-    // di.registerLazySingleton<AuthStorageService>(
-    //   () => AuthStorageServiceLocal(
-    //     flutterSecureStorage: di.get<FlutterSecureStorage>(),
-    //   ),
-    // );
-    // di.registerLazySingleton<SystemRepository>(() => SystemRepositoryLocal());
-    di.registerLazySingleton<AppViewModel>(
-      () => AppViewModel(
-        // authStorageService: di.get<AuthStorageService>(),
-      ),
-    );
-    di.registerLazySingleton<AppLayout>(
-      () => AppLayout(
-        di: di,
-        viewModel: di.get<AppViewModel>(),
-        // systemViewModel: di.get<SystemViewModel>(),
-      ),
-    );
+    // Outros serviços core básicos...
   }
 
   void _setupDioInterceptors(DependencyInjector di) {
     di.registerLazySingleton<BackendAuthInterceptor>(
       () => BackendAuthInterceptor(
         dio: di.get<Dio>(),
-        // authRepository: di.get<AuthRepository>(),
+        tokenStorage: di.get<TokenStorage>(),
         backendBaseApi: Env.backendBaseUrl,
         onUnauthorized: () {},
       ),
