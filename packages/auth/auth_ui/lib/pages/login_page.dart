@@ -16,12 +16,16 @@ class LoginPage extends StatefulWidget {
   /// Callback quando login é bem-sucedido.
   final VoidCallback? onLoginSuccess;
 
+  /// Mensagem de boas-vindas opcional (ex: após registro).
+  final String? welcomeMessage;
+
   const LoginPage({
     super.key,
     required this.viewModel,
     this.onRegisterTap,
     this.onForgotPasswordTap,
     this.onLoginSuccess,
+    this.welcomeMessage,
   });
 
   @override
@@ -33,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _showWelcomeBanner = true;
 
   @override
   void initState() {
@@ -106,6 +111,75 @@ class _LoginPageState extends State<LoginPage> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
+
+                        // Banner de boas-vindas (pós-registro)
+                        if (widget.welcomeMessage != null && _showWelcomeBanner)
+                          Container(
+                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.only(bottom: 24),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.green.shade600,
+                                  Colors.green.shade500,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.green.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.white,
+                                  size: 32,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        widget.welcomeMessage!,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      const Text(
+                                        'Faça login com suas credenciais para continuar',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _showWelcomeBanner = false;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
 
                         // Campo Email
                         TextFormField(

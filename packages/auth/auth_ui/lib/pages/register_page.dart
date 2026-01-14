@@ -55,12 +55,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Conta criada! Verifique seu email.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      // Navega para tela de login que mostrará banner de sucesso
       widget.onRegisterSuccess?.call();
     }
   }

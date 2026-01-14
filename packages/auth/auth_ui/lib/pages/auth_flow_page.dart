@@ -86,6 +86,7 @@ class AuthFlowPage extends StatefulWidget {
 class _AuthFlowPageState extends State<AuthFlowPage> {
   late AuthFlowState _currentState;
   String? _resetToken;
+  String? _loginWelcomeMessage;
 
   @override
   void initState() {
@@ -101,11 +102,20 @@ class _AuthFlowPageState extends State<AuthFlowPage> {
   }
 
   /// Navega para um novo estado do fluxo de autenticação.
-  void _navigateTo(AuthFlowState newState, {String? resetToken}) {
+  void _navigateTo(
+    AuthFlowState newState, {
+    String? resetToken,
+    String? loginMessage,
+  }) {
     setState(() {
       _currentState = newState;
       if (resetToken != null) {
         _resetToken = resetToken;
+      }
+      if (newState == AuthFlowState.login) {
+        _loginWelcomeMessage = loginMessage;
+      } else {
+        _loginWelcomeMessage = null;
       }
     });
   }
@@ -146,6 +156,7 @@ class _AuthFlowPageState extends State<AuthFlowPage> {
           viewModel: widget.authViewModel,
           onRegisterTap: () => _navigateTo(AuthFlowState.register),
           onForgotPasswordTap: () => _navigateTo(AuthFlowState.forgotPassword),
+          welcomeMessage: _loginWelcomeMessage,
           // onLoginSuccess não precisa callback - AuthGuard detecta automaticamente
         );
 
@@ -155,8 +166,11 @@ class _AuthFlowPageState extends State<AuthFlowPage> {
           viewModel: widget.authViewModel,
           onLoginTap: () => _navigateTo(AuthFlowState.login),
           onRegisterSuccess: () {
-            // Volta para login após registro bem-sucedido
-            _navigateTo(AuthFlowState.login);
+            // Volta para login após registro bem-sucedido com mensagem
+            _navigateTo(
+              AuthFlowState.login,
+              loginMessage: 'Conta criada com sucesso!',
+            );
           },
         );
 
