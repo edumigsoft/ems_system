@@ -1,6 +1,7 @@
 import 'package:auth_shared/auth_shared.dart';
 import 'package:core_shared/core_shared.dart';
 
+import '../database/auth_database.dart';
 import '../repository/resource_permission_repository.dart';
 
 /// Serviço de gestão de permissões de recursos.
@@ -66,5 +67,16 @@ class ResourcePermissionService {
     } catch (e) {
       return Failure(Exception('Erro ao revogar permissão: $e'));
     }
+  }
+
+  /// Lista todos os membros de um recurso.
+  Future<List<ResourceMember>> listMembers({
+    required String resourceType,
+    required String resourceId,
+  }) {
+    return _repo.listMembers(
+      resourceType: resourceType,
+      resourceId: resourceId,
+    );
   }
 }

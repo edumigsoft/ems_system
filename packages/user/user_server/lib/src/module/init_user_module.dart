@@ -1,5 +1,6 @@
 import 'package:core_server/core_server.dart';
 import 'package:core_shared/core_shared.dart';
+import 'package:auth_server/auth_server.dart';
 
 import '../repository/user_repository.dart';
 import '../repository/user_repository_impl.dart';
@@ -38,8 +39,11 @@ class InitUserModuleToServer implements InitServerModule {
 
     // 3. Routes
     di.registerLazySingleton<UserRoutes>(
-      () =>
-          UserRoutes(di.get<UserRepository>(), backendBaseApi: backendBaseApi),
+      () => UserRoutes(
+        di.get<UserRepository>(),
+        di.get<AuthMiddleware>(),
+        backendBaseApi: backendBaseApi,
+      ),
     );
 
     // 4. Mount Routes

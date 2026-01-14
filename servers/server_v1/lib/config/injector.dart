@@ -1,4 +1,5 @@
-import 'package:auth_server/auth_server.dart' show InitAuthModuleToServer;
+import 'package:auth_server/auth_server.dart'
+    show InitAuthModuleToServer, AuthMiddleware;
 import 'package:core_server/core_server.dart'
     show
         AddRoutes,
@@ -70,16 +71,24 @@ Future<DependencyInjector> registryInjectors() async {
   di.registerLazySingleton<OpenApiRoutes>(
     () => OpenApiRoutes(backendBaseApi: Env.backendPathApi),
   );
-  addRoutes(di, di.get<OpenApiRoutes>(), security: false);
-
   // 4. Inicialização dos Módulos (Orquestração)
+  // IMPORTANTE: Resolvendo dependência circular Auth ↔ User:
+  // - UserRoutes precisa de AuthMiddleware
+  // - AuthService precisa de UserRepository
+  //
+  // Solução: Registrar AuthMiddleware ANTES de inicializar User module
+
+  // Pré-registro do AuthMiddleware (depende apenas de SecurityService)
+  di.registerLazySingleton<AuthMiddleware>(
+    () => AuthMiddleware(di.get<SecurityService<dynamic>>()),
+  );
 
   await InitUserModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,
-    // security: false,
   );
 
+  // Fase 2: Inicializar Auth completo (agora UserRepository está disponível)
   await InitAuthModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,

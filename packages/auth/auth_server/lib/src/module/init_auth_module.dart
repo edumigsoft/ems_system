@@ -4,7 +4,6 @@ import 'package:user_server/user_server.dart';
 import 'package:auth_server/auth_server.dart';
 
 import '../database/auth_database.dart';
-import '../middleware/resource_permission_middleware.dart';
 
 /// Inicializa o módulo de autenticação no servidor.
 ///
@@ -53,9 +52,8 @@ class InitAuthModuleToServer implements InitServerModule {
     );
 
     // 3. Middleware
-    di.registerLazySingleton<AuthMiddleware>(
-      () => AuthMiddleware(di.get<SecurityService>()),
-    );
+    // NOTA: AuthMiddleware está pré-registrado no injector global (antes do UserModule)
+    // para resolver dependência circular com UserRoutes
 
     di.registerLazySingleton<ResourcePermissionMiddleware>(
       () => ResourcePermissionMiddleware(di.get<ResourcePermissionService>()),

@@ -18,9 +18,11 @@ export 'src/service/resource_permission_service.dart';
 
 // Middleware
 export 'src/middleware/auth_middleware.dart';
+export 'src/middleware/resource_permission_middleware.dart';
 
 // Routes
 export 'src/routes/auth_routes.dart';
+export 'src/routes/resource_permission_routes.dart';
 
 // Module
 export 'src/module/init_auth_module.dart';
