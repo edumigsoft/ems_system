@@ -12,6 +12,8 @@ dependencies:
     path: ../../core/core_shared
   user_shared:
     path: ../../user/user_shared
+  open_api_shared:
+    path: ../../open_api/open_api_shared
 
 dev_dependencies:
   lints: ^6.0.0

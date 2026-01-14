@@ -1,25 +1,33 @@
 import 'package:core_shared/core_shared.dart';
+import 'package:open_api_shared/open_api_shared.dart';
 
 /// Payload do token JWT.
 ///
 /// Contém as claims do token para validação e identificação do usuário.
+@Model(name: 'TokenPayload', description: 'Payload do token JWT')
 class TokenPayload {
   /// ID do usuário.
+  @Property(description: 'ID do usuário (Subject)')
   final String sub;
 
   /// Email do usuário.
+  @Property(description: 'Email do usuário')
   final String email;
 
   /// Role global do usuário.
+  @Property(description: 'Role global do usuário')
   final UserRole role;
 
   /// Data de emissão (issued at).
+  @Property(description: 'Data de emissão (Issued At)')
   final DateTime iat;
 
   /// Data de expiração.
+  @Property(description: 'Data de expiração (Expiration Time)')
   final DateTime exp;
 
   /// Identificador único do token (para refresh token tracking).
+  @Property(description: 'ID do token (JWT ID)')
   final String? jti;
 
   const TokenPayload({

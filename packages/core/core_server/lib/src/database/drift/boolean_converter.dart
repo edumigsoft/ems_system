@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 
-class BooleanConverter implements TypeConverter<bool, int> {
+class BooleanConverter extends TypeConverter<bool, int> {
   const BooleanConverter();
 
   @override

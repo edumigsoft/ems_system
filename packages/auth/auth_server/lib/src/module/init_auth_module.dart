@@ -10,16 +10,20 @@ import '../middleware/resource_permission_middleware.dart';
 ///
 /// Registra repositories, services, middlewares e rotas.
 class InitAuthModuleToServer implements InitServerModule {
-  InitAuthModuleToServer({
+  static Future<void> init({
     required DependencyInjector di,
     required String backendBaseApi,
     bool security = true,
-  }) {
+  }) async {
     // 1. Database & Repositories
     final dbProvider = di.get<DatabaseProvider>();
 
     // Cria a instância do banco de dados modular usando o executor do provider
     final authDb = AuthDatabase(dbProvider.executor);
+
+    // Inicializa tabelas se necessário
+    await authDb.init();
+
     di.registerSingleton<AuthDatabase>(authDb);
 
     di.registerLazySingleton<AuthRepository>(() => AuthRepository(authDb));

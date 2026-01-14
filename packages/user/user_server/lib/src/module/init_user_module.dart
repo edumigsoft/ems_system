@@ -19,14 +19,18 @@ import '../routes/user_routes.dart';
 /// );
 /// ```
 class InitUserModuleToServer implements InitServerModule {
-  InitUserModuleToServer({
+  static Future<void> init({
     required DependencyInjector di,
     required String backendBaseApi,
     bool security = true,
-  }) {
+  }) async {
     // 1. Database
     final dbProvider = di.get<DatabaseProvider>();
     final userDb = UserDatabase(dbProvider.executor);
+
+    // Inicializa tabelas se necessário
+    await userDb.init();
+
     di.registerSingleton<UserDatabase>(userDb);
 
     // 2. Repository

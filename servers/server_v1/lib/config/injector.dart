@@ -1,4 +1,4 @@
-import 'package:auth_server/auth_server.dart';
+import 'package:auth_server/auth_server.dart' show InitAuthModuleToServer;
 import 'package:core_server/core_server.dart'
     show
         AddRoutes,
@@ -31,9 +31,9 @@ Future<DependencyInjector> registryInjectors() async {
 
   await databaseProvider.connect(
     host: Env.serverAddress,
-    port: 5432,
+    port: int.tryParse(Env.dbPort) ?? 5433,
     name: Env.dbDatabaseName,
-    user: Env.dbDatabaseName,
+    user: Env.dbUsername,
     password: Env.dbPassword,
     useSsl: false,
   );
@@ -74,13 +74,13 @@ Future<DependencyInjector> registryInjectors() async {
 
   // 4. Inicialização dos Módulos (Orquestração)
 
-  InitUserModuleToServer(
+  await InitUserModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,
-    security: false,
+    // security: false,
   );
 
-  InitAuthModuleToServer(
+  await InitAuthModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,
     security: false,

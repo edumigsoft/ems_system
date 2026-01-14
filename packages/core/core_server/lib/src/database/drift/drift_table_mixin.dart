@@ -19,12 +19,12 @@ mixin DriftTableMixinPostgres on Table {
       .withDefault(const CustomExpression('CURRENT_TIMESTAMP'))();
 
   @JsonKey('is_deleted')
-  @BooleanConverter()
-  late final isDeleted = boolean().withDefault(const Constant(false))();
+  IntColumn get isDeleted =>
+      integer().map(const BooleanConverter()).withDefault(const Constant(0))();
 
   @JsonKey('is_active')
-  @BooleanConverter()
-  late final isActive = boolean().withDefault(const Constant(true))();
+  IntColumn get isActive =>
+      integer().map(const BooleanConverter()).withDefault(const Constant(1))();
 
   /// Define a chave primária da tabela como o campo id.
   @override

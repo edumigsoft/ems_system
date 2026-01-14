@@ -31,8 +31,8 @@ class Users extends Table with DriftTableMixinPostgres {
 
   /// Indica se o email foi verificado.
   @JsonKey('email_verified')
-  BoolColumn get emailVerified =>
-      boolean().withDefault(const Constant(false))();
+  IntColumn get emailVerified =>
+      integer().map(const BooleanConverter()).withDefault(const Constant(0))();
 
   /// URL do avatar do usuário.
   @JsonKey('avatar_url')
