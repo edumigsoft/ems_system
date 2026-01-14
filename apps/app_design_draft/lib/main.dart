@@ -1,4 +1,4 @@
-import 'package:app_design_draft/ui/pages/app_page.dart';
+import 'package:app_design_draft/my_app.dart';
 import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class _AppState extends State<App> {
       theme: DSTheme.forPreset(DSThemeEnum.acqua, Brightness.light),
       darkTheme: DSTheme.forPreset(DSThemeEnum.acqua, Brightness.dark),
       themeMode: ThemeMode.dark,
-      home: AppPage(),
+      home: MyApp(),
     );
   }
 }

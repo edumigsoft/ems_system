@@ -1,6 +1,6 @@
 import 'package:core_shared/core_shared.dart';
-import '../dto/user_create.dart';
-import '../dto/user_update.dart';
+import '../domain/dtos/user_create.dart';
+import '../domain/dtos/user_update.dart';
 
 /// Validator para UserCreate DTO.
 ///

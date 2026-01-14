@@ -16,6 +16,22 @@
             "request": "launch",
             "type": "dart",
             "program": "servers/server_v1/bin/server.dart"
+        },
+        {
+            "name": "App V1 (debug mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "apps/app_v1/lib/main.dart"
+        },
+    ],
+    "compounds": [
+        {
+            "name": "App & Servidor",
+            "configurations": [
+                "App V1 (debug mode)",
+                "Server V1"
+            ]
         }
     ]
 }

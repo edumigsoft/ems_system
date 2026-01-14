@@ -18,6 +18,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get errorGeneric => 'Ocorreu um erro. Por favor, tente novamente.';
 
   @override
+  String get users => 'Usuários';
+
+  @override
+  String get user => 'Usuário';
+
+  @override
   String loginError(String reason) {
     return 'Falha no login: $reason';
   }

@@ -18,6 +18,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorGeneric => 'Ocurrió un error. Por favor, inténtalo de nuevo.';
 
   @override
+  String get users => 'Usuarios';
+
+  @override
+  String get user => 'Usuario';
+
+  @override
   String loginError(String reason) {
     return 'Error de inicio de sesión: $reason';
   }

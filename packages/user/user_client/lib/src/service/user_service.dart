@@ -15,7 +15,7 @@ abstract class UserService {
 
   /// Atualiza o perfil do usuário atual.
   @PATCH('/user/profile')
-  Future<UserDetailsModel> updateProfile(@Body() UserUpdate data);
+  Future<UserDetailsModel> updateProfile(@Body() UserUpdateModel data);
 
   /// Lista todos os usuários (admin only).
   @GET('/user/admin/users')

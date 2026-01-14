@@ -12,6 +12,14 @@
     "@errorGeneric": {
         "description": "Generic error message"
     },
+    "users": "Users",
+    "@users": {
+        "description": "Label for Users section"
+    },
+    "user": "User",
+    "@user": {
+        "description": "Label for a single User"
+    },
     "loginError": "Login failed: {reason}",
     "@loginError": {
         "description": "Error message for login failures",

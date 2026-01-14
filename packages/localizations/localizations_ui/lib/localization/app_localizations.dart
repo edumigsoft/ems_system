@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
-import 'package:localizations_shared/localizations_shared.dart';
 
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
@@ -63,7 +62,7 @@ import 'app_localizations_pt.dart';
 /// you wish to add from the pop-up menu in the Value field. This list should
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
-abstract class AppLocalizations extends I18nStrings {
+abstract class AppLocalizations {
   AppLocalizations(String locale)
     : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
@@ -118,6 +117,18 @@ abstract class AppLocalizations extends I18nStrings {
   /// In en, this message translates to:
   /// **'An error occurred. Please try again.'**
   String get errorGeneric;
+
+  /// Label for Users section
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get users;
+
+  /// Label for a single User
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get user;
 
   /// Error message for login failures
   ///
