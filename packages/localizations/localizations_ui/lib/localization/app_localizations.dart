@@ -520,35 +520,35 @@ abstract class AppLocalizations {
   /// **'Dashboard'**
   String get dashboard;
 
-  /// Error message for login failures
+  /// No description provided for @loginError.
   ///
   /// In en, this message translates to:
   /// **'Login failed: {reason}'**
-  String loginError(String reason);
+  String loginError(Object reason);
 
-  /// Server error log format
+  /// No description provided for @serverErrorLog.
   ///
   /// In en, this message translates to:
   /// **'SERVER ERROR: {error}'**
-  String serverErrorLog(String error);
+  String serverErrorLog(Object error);
 
-  /// Welcome email subject
+  /// No description provided for @emailSubjectWelcome.
   ///
   /// In en, this message translates to:
   /// **'Welcome to the system, {userName}!'**
-  String emailSubjectWelcome(String userName);
+  String emailSubjectWelcome(Object userName);
 
-  /// Display count of items with pluralization
+  /// No description provided for @itemCount.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =0{No items} =1{1 item} other{{count} items}}'**
-  String itemCount(int count);
+  String itemCount(num count);
 
-  /// Shows the last update timestamp
+  /// No description provided for @lastUpdated.
   ///
   /// In en, this message translates to:
   /// **'Last updated: {date}'**
-  String lastUpdated(DateTime date);
+  String lastUpdated(Object date);
 
   /// No description provided for @buttonSave.
   ///
@@ -651,6 +651,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error renewing session. Please login again.'**
   String get authSessionRenewalError;
+
+  /// My Profile
+  ///
+  /// In en, this message translates to:
+  /// **'My Profile'**
+  String get myProfile;
+
+  /// Manage Users
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Users'**
+  String get manageUsers;
 }
 
 class _AppLocalizationsDelegate

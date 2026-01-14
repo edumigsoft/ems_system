@@ -1,4 +1,5 @@
-import 'package:core_shared/core_shared.dart' show DependencyInjector, Loggable;
+import 'package:core_shared/core_shared.dart'
+    show DependencyInjector, Loggable, UserRole;
 import 'package:core_ui/core_ui.dart'
     show AppModule, AppNavigationItem, AppNavigationSection;
 import 'package:design_system_ui/design_system_ui.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
 import 'package:user_client/user_client.dart' show UserService;
 
+import 'pages/manage_users_page.dart';
 import 'pages/profile_page.dart';
+import 'pages/settings_page.dart';
 import 'view_models/profile_view_model.dart';
 
 class UserModule extends AppModule with Loggable {
@@ -21,45 +24,26 @@ class UserModule extends AppModule with Loggable {
     logger.info('registerDependencies');
 
     di.registerLazySingleton<UserService>(() => UserService(di.get()));
-    // di.registerLazySingleton<UserRepository>(
-    //   () => UserRepositoryClient(userService: di.get<UserService>()),
-    // );
-    // di.registerLazySingleton<GetAllUsersUseCase>(
-    //   () => GetAllUsersUseCase(repository: di.get<UserRepository>()),
-    // );
-    // di.registerLazySingleton<GetUserByIdUseCase>(
-    //   () => GetUserByIdUseCase(repository: di.get<UserRepository>()),
-    // );
-    // di.registerLazySingleton<CreateUserWithTempPasswordUseCase>(
-    //   () => CreateUserWithTempPasswordUseCase(
-    //     repository: di.get<UserRepository>(),
-    //   ),
-    // );
-    // di.registerLazySingleton<UpdateUserUseCase>(
-    //   () => UpdateUserUseCase(repository: di.get<UserRepository>()),
-    // );
-    // di.registerLazySingleton<DeleteUserUseCase>(
-    //   () => DeleteUserUseCase(repository: di.get<UserRepository>()),
-    // );
 
+    // ViewModels e Pages
     di.registerLazySingleton<ProfileViewModel>(
-      () => ProfileViewModel(
-        userService: di.get<UserService>(),
-        // getAllUsersUseCase: di.get<GetAllUsersUseCase>(),
-        // getUserByIdUseCase: di.get<GetUserByIdUseCase>(),
-        // createUserWithTempPasswordUseCase: di
-        //     .get<CreateUserWithTempPasswordUseCase>(),
-        // updateUserUseCase: di.get<UpdateUserUseCase>(),
-        // deleteUserUseCase: di.get<DeleteUserUseCase>(),
-      ),
+      () => ProfileViewModel(userService: di.get<UserService>()),
     );
     di.registerLazySingleton<ProfilePage>(
       () => ProfilePage(viewModel: di.get<ProfileViewModel>()),
     );
+
+    // Placeholder Pages - Registrando para facilitar navegação via DI se necessário futuramente
+    di.registerLazySingleton<SettingsPage>(() => const SettingsPage());
+    di.registerLazySingleton<ManageUsersPage>(() => const ManageUsersPage());
   }
 
   @override
-  Map<String, Widget> get routes => {routeName: di.get<ProfilePage>()};
+  Map<String, Widget> get routes => {
+    routeName: di.get<ProfilePage>(),
+    '$routeName/settings': di.get<SettingsPage>(),
+    '$routeName/manage': di.get<ManageUsersPage>(),
+  };
 
   @override
   List<AppNavigationItem> get navigationItems => [
@@ -72,20 +56,20 @@ class UserModule extends AppModule with Loggable {
       defaultExpanded: true,
       children: [
         AppNavigationItem(
-          labelBuilder: (context) => 'Meu Perfil', // TODO: Localizar
+          labelBuilder: (context) => AppLocalizations.of(context).myProfile,
           icon: Icons.person,
           route: routeName, // /users -> ProfilePage
         ),
         AppNavigationItem(
-          labelBuilder: (context) => 'Configurações', // TODO: Localizar
+          labelBuilder: (context) => AppLocalizations.of(context).settings,
           icon: Icons.settings,
           route: '$routeName/settings', // /users/settings
         ),
-        // Item condicional para admins (precisa de lógica de filtragem)
         AppNavigationItem(
-          labelBuilder: (context) => 'Gerenciar Usuários', // TODO: Localizar
+          labelBuilder: (context) => AppLocalizations.of(context).manageUsers,
           icon: Icons.admin_panel_settings,
           route: '$routeName/manage', // /users/manage
+          allowedRoles: [UserRole.admin, UserRole.owner],
         ),
       ],
     ),

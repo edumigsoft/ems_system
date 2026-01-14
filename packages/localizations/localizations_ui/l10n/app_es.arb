@@ -326,5 +326,13 @@
     "authSessionRenewalError": "Error al renovar sesión. Inicie sesión nuevamente.",
     "@authSessionRenewalError": {
         "description": "Mensaje de error al renovar sesión"
+    },
+    "myProfile": "Mi Perfil",
+    "@myProfile": {
+        "description": "Mi Perfil"
+    },
+    "manageUsers": "Administrar Usuarios",
+    "@manageUsers": {
+        "description": "Administrar Usuarios"
     }
 }

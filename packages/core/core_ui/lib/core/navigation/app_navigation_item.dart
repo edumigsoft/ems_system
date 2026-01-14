@@ -1,4 +1,6 @@
+import 'package:core_shared/core_shared.dart';
 import 'package:flutter/widgets.dart';
+
 import 'app_navigation_section.dart';
 
 /// Represents a navigation item in the application.
@@ -43,6 +45,12 @@ class AppNavigationItem {
   /// Only relevant if [children] is not empty.
   final bool defaultExpanded;
 
+  /// Lista de roles permitidas para visualizar este item.
+  ///
+  /// - **Null**: O item é visível para todas as roles.
+  /// - **Lista não vazia**: O item é visível apenas se o usuário tiver uma das roles listadas.
+  final List<UserRole>? allowedRoles;
+
   const AppNavigationItem({
     required this.labelBuilder,
     required this.icon,
@@ -50,6 +58,7 @@ class AppNavigationItem {
     this.section,
     this.children = const [],
     this.defaultExpanded = false,
+    this.allowedRoles,
   });
 
   /// Returns `true` if this item has children (is a parent item).
@@ -57,6 +66,15 @@ class AppNavigationItem {
 
   /// Returns `true` if this item has a navigation route.
   bool get hasRoute => route != null;
+
+  /// Verifica se o item é visível para uma determinada role.
+  ///
+  /// Se [allowedRoles] for nulo, retorna `true`.
+  /// Caso contrário, retorna `true` apenas se [role] estiver na lista.
+  bool isVisibleFor(UserRole role) {
+    if (allowedRoles == null) return true;
+    return allowedRoles!.contains(role);
+  }
 
   /// Checks if any child in this hierarchy matches the [activeRoute].
   ///

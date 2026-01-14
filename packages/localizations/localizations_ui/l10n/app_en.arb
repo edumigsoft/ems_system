@@ -285,51 +285,32 @@
     },
     "loginError": "Login failed: {reason}",
     "@loginError": {
-        "description": "Error message for login failures",
         "placeholders": {
-            "reason": {
-                "type": "String",
-                "example": "Invalid credentials"
-            }
+            "reason": {}
         }
     },
     "serverErrorLog": "SERVER ERROR: {error}",
     "@serverErrorLog": {
-        "description": "Server error log format",
         "placeholders": {
-            "error": {
-                "type": "String"
-            }
+            "error": {}
         }
     },
     "emailSubjectWelcome": "Welcome to the system, {userName}!",
     "@emailSubjectWelcome": {
-        "description": "Welcome email subject",
         "placeholders": {
-            "userName": {
-                "type": "String",
-                "example": "John"
-            }
+            "userName": {}
         }
     },
     "itemCount": "{count, plural, =0{No items} =1{1 item} other{{count} items}}",
     "@itemCount": {
-        "description": "Display count of items with pluralization",
         "placeholders": {
-            "count": {
-                "type": "int",
-                "format": "compact"
-            }
+            "count": {}
         }
     },
     "lastUpdated": "Last updated: {date}",
     "@lastUpdated": {
-        "description": "Shows the last update timestamp",
         "placeholders": {
-            "date": {
-                "type": "DateTime",
-                "format": "yMd"
-            }
+            "date": {}
         }
     },
     "buttonSave": "Save",
@@ -383,5 +364,13 @@
     "authSessionRenewalError": "Error renewing session. Please login again.",
     "@authSessionRenewalError": {
         "description": "Error message when session renewal fails"
+    },
+    "myProfile": "My Profile",
+    "@myProfile": {
+        "description": "My Profile"
+    },
+    "manageUsers": "Manage Users",
+    "@manageUsers": {
+        "description": "Manage Users"
     }
 }

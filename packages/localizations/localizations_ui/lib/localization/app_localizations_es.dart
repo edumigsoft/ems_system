@@ -226,31 +226,26 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dashboard => 'Panel';
 
   @override
-  String loginError(String reason) {
+  String loginError(Object reason) {
     return 'Error de inicio de sesión: $reason';
   }
 
   @override
-  String serverErrorLog(String error) {
+  String serverErrorLog(Object error) {
     return 'ERROR DEL SERVIDOR: $error';
   }
 
   @override
-  String emailSubjectWelcome(String userName) {
+  String emailSubjectWelcome(Object userName) {
     return '¡Bienvenido al sistema, $userName!';
   }
 
   @override
-  String itemCount(int count) {
-    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
-      locale: localeName,
-    );
-    final String countString = countNumberFormat.format(count);
-
+  String itemCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$countString elementos',
+      other: '$count elementos',
       one: '1 elemento',
       zero: 'Sin elementos',
     );
@@ -258,11 +253,8 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String lastUpdated(DateTime date) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-
-    return 'Última actualización: $dateString';
+  String lastUpdated(Object date) {
+    return 'Última actualización: $date';
   }
 
   @override
@@ -319,4 +311,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get authSessionRenewalError =>
       'Error al renovar sesión. Inicie sesión nuevamente.';
+
+  @override
+  String get myProfile => 'Mi Perfil';
+
+  @override
+  String get manageUsers => 'Administrar Usuarios';
 }

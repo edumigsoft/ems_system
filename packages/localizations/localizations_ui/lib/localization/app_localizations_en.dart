@@ -224,31 +224,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dashboard => 'Dashboard';
 
   @override
-  String loginError(String reason) {
+  String loginError(Object reason) {
     return 'Login failed: $reason';
   }
 
   @override
-  String serverErrorLog(String error) {
+  String serverErrorLog(Object error) {
     return 'SERVER ERROR: $error';
   }
 
   @override
-  String emailSubjectWelcome(String userName) {
+  String emailSubjectWelcome(Object userName) {
     return 'Welcome to the system, $userName!';
   }
 
   @override
-  String itemCount(int count) {
-    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
-      locale: localeName,
-    );
-    final String countString = countNumberFormat.format(count);
-
+  String itemCount(num count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$countString items',
+      other: '$count items',
       one: '1 item',
       zero: 'No items',
     );
@@ -256,11 +251,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String lastUpdated(DateTime date) {
-    final intl.DateFormat dateDateFormat = intl.DateFormat.yMd(localeName);
-    final String dateString = dateDateFormat.format(date);
-
-    return 'Last updated: $dateString';
+  String lastUpdated(Object date) {
+    return 'Last updated: $date';
   }
 
   @override
@@ -316,4 +308,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authSessionRenewalError =>
       'Error renewing session. Please login again.';
+
+  @override
+  String get myProfile => 'My Profile';
+
+  @override
+  String get manageUsers => 'Manage Users';
 }
