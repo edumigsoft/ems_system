@@ -13,7 +13,7 @@ class AuthRepository extends DatabaseAccessor<AuthDatabase>
   AuthRepository(AuthDatabase db) : super(db);
 
   /// Busca credenciais por userId.
-  Future<UserCredentialsData?> getCredentials(String userId) {
+  Future<UserCredential?> getCredentials(String userId) {
     return (select(
       userCredentials,
     )..where((tbl) => tbl.userId.equals(userId))).getSingleOrNull();
@@ -30,17 +30,21 @@ class AuthRepository extends DatabaseAccessor<AuthDatabase>
   }
 
   /// Busca um refresh token válido (não revogado e não expirado).
-  Future<RefreshTokensData?> getRefreshToken(String token) {
+  Future<RefreshToken?> getRefreshToken(String token) {
     return (select(refreshTokens)
-          ..where((tbl) => tbl.token.equals(token))
+          ..where((tbl) => tbl.tokenHash.equals(token))
           ..where((tbl) => tbl.revokedAt.isNull())
-          ..where((tbl) => tbl.expiresAt.isBiggerThanValue(DateTime.now())))
+          ..where(
+            (tbl) => tbl.expiresAt.isBiggerThanValue(
+              DateTime.now().toIso8601String(),
+            ),
+          ))
         .getSingleOrNull();
   }
 
   /// Revoga um refresh token específico.
   Future<void> revokeRefreshToken(String token) async {
-    await (update(refreshTokens)..where((tbl) => tbl.token.equals(token)))
+    await (update(refreshTokens)..where((tbl) => tbl.tokenHash.equals(token)))
         .write(RefreshTokensCompanion(revokedAt: Value(DateTime.now())));
   }
 
@@ -77,5 +81,11 @@ class AuthRepository extends DatabaseAccessor<AuthDatabase>
   Future<void> updatePassword(String userId, String passwordHash) async {
     await (update(userCredentials)..where((tbl) => tbl.userId.equals(userId)))
         .write(UserCredentialsCompanion(passwordHash: Value(passwordHash)));
+  }
+
+  /// Atualiza o último login.
+  Future<void> updateLastLogin(String userId) async {
+    await (update(userCredentials)..where((tbl) => tbl.userId.equals(userId)))
+        .write(UserCredentialsCompanion(lastLoginAt: Value(DateTime.now())));
   }
 }

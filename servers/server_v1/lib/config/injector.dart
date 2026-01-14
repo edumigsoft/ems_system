@@ -1,9 +1,14 @@
+import 'package:auth_server/auth_server.dart';
 import 'package:core_server/core_server.dart'
     show
         AddRoutes,
         BCryptService,
+        CryptService,
         DatabaseProvider,
+        EmailConfig,
+        EmailService,
         HealthRoutes,
+        HttpEmailService,
         JWTSecurityService,
         SecurityService,
         addRoutes;
@@ -11,6 +16,7 @@ import 'package:core_shared/core_shared.dart'
     show DependencyInjector, GetItInjector, LogService;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart' show JWT;
 import 'package:open_api_server/open_api_server.dart';
+import 'package:user_server/user_server.dart';
 import 'env/env.dart';
 
 Future<DependencyInjector> registryInjectors() async {
@@ -33,7 +39,7 @@ Future<DependencyInjector> registryInjectors() async {
   );
 
   // 2. Infraestrutura de Segurança e Rotas
-  di.registerLazySingleton<BCryptService>(BCryptService.new);
+  di.registerLazySingleton<CryptService>(BCryptService.new);
 
   di.registerLazySingleton<SecurityService<JWT>>(
     () => JWTSecurityService(jwtKey: Env.jwtKey),
@@ -41,6 +47,10 @@ Future<DependencyInjector> registryInjectors() async {
 
   di.registerLazySingleton<SecurityService<dynamic>>(
     () => di.get<SecurityService<JWT>>() as SecurityService<dynamic>,
+  );
+
+  di.registerLazySingleton<EmailService>(
+    () => HttpEmailService(EmailConfig.fromEnv()),
   );
 
   // Registro do AddRoutes (Lazy - depende do AuthRequired)
@@ -64,11 +74,17 @@ Future<DependencyInjector> registryInjectors() async {
 
   // 4. Inicialização dos Módulos (Orquestração)
 
-  // InitAuthModuleToServer(
-  //   di: di,
-  //   backendBaseApi: Env.backendPathApi,
-  //   security: false,
-  // );
+  InitUserModuleToServer(
+    di: di,
+    backendBaseApi: Env.backendPathApi,
+    security: false,
+  );
+
+  InitAuthModuleToServer(
+    di: di,
+    backendBaseApi: Env.backendPathApi,
+    security: false,
+  );
 
   logger.info('Injeção de dependência concluída.');
   return di;

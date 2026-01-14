@@ -72,6 +72,9 @@
 - [x] 10.3 Criar `email/email_template.dart` - Templates (verificação, reset)
 - [x] 10.4 Registrar `EmailService` no injector
 
+## 11. Testes e Validação
+- [x] 11.1 Testes Unitários `AuthService`
+
 
 ## 11. Auth Client - Serviços
 - [x] 11.1 Criar `AuthService` interface

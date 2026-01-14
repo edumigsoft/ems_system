@@ -60,7 +60,7 @@ class ResourcePermissionRepository extends DatabaseAccessor<AuthDatabase>
   }
 
   /// Lista membros de um recurso.
-  Future<List<ResourceMembersData>> listMembers({
+  Future<List<ResourceMember>> listMembers({
     required String resourceType,
     required String resourceId,
   }) {

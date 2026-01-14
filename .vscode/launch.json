@@ -10,6 +10,12 @@
             "type": "dart",
             "flutterMode": "debug",
             "program": "apps/app_design_draft/lib/main.dart"
+        },
+        {
+            "name": "Server V1",
+            "request": "launch",
+            "type": "dart",
+            "program": "servers/server_v1/bin/server.dart"
         }
     ]
 }

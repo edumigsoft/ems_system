@@ -28,6 +28,10 @@ dependencies:
     path: ../../packages/open_api/open_api_shared
   open_api_server:
     path: ../../packages/open_api/open_api_server
+  auth_server:
+    path: ../../packages/auth/auth_server
+  user_server:
+    path: ../../packages/user/user_server
 
 dev_dependencies:
   lints: ^6.0.0

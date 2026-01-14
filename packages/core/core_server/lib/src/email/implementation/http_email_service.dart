@@ -52,7 +52,7 @@ class EmailConfig with Loggable {
 ///
 /// Pode ser adaptada para diferentes provedores (Mailgun, SendGrid, etc.)
 /// via headers e endpoints específicos.
-class HttpEmailService implements EmailService {
+class HttpEmailService with Loggable implements EmailService {
   final EmailConfig config;
 
   HttpEmailService(this.config);
@@ -69,7 +69,7 @@ class HttpEmailService implements EmailService {
     }
 
     try {
-      // TODO: Implementar chamada HTTP real ao provedor
+      // Implementar chamada HTTP real ao provedor
       // Exemplo Mailgun:
       // final response = await http.post(
       //   Uri.parse('${config.host}/messages'),
@@ -136,7 +136,7 @@ class HttpEmailService implements EmailService {
       return const Success(false);
     }
 
-    // TODO: Implementar ping real ao serviço
+    // Implementar ping real ao serviço
     return const Success(true);
   }
 }

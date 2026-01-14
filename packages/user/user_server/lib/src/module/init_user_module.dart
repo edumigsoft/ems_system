@@ -1,7 +1,9 @@
-import 'package:core_shared/core_shared.dart';
 import 'package:core_server/core_server.dart';
+import 'package:core_shared/core_shared.dart';
 
 import '../repository/user_repository.dart';
+import '../repository/user_repository_impl.dart';
+import '../database/user_database.dart';
 import '../routes/user_routes.dart';
 
 /// Inicializa o módulo de usuários no servidor.
@@ -16,16 +18,26 @@ import '../routes/user_routes.dart';
 ///   backendBaseApi: '/api/v1',
 /// );
 /// ```
-Future<void> initUserModule({
-  required DependencyInjector di,
-  required String backendBaseApi,
-}) async {
-  // O repository será registrado quando tivermos a implementação concreta
-  // di.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(db));
+class InitUserModuleToServer implements InitServerModule {
+  InitUserModuleToServer({
+    required DependencyInjector di,
+    required String backendBaseApi,
+    bool security = true,
+  }) {
+    // 1. Database
+    final dbProvider = di.get<DatabaseProvider>();
+    final userDb = UserDatabase(dbProvider.executor);
+    di.registerSingleton<UserDatabase>(userDb);
 
-  // Por enquanto, registramos apenas as rotas (depois de ter o repository)
-  // di.registerLazySingleton<UserRoutes>(() => UserRoutes(di.get<UserRepository>()));
+    // 2. Repository
+    di.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(userDb));
 
-  // addRoutes será chamado quando o repository estiver implementado
-  // await addRoutes(di, di.get<UserRoutes>());
+    // 3. Routes
+    di.registerLazySingleton<UserRoutes>(
+      () => UserRoutes(di.get<UserRepository>()),
+    );
+
+    // 4. Mount Routes
+    addRoutes(di, di.get<UserRoutes>(), security: security);
+  }
 }

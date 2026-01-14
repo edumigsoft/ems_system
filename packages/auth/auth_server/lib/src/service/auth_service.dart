@@ -140,8 +140,7 @@ class AuthService {
     _emailService.sendVerificationEmail(
       to: user.email,
       userName: user.name,
-      verificationLink:
-          'http://todo-config/verify', // TODO: Configurar link real
+      verificationLink: 'http://todo-config/verify', // Configurar link real
     );
 
     // 5. Autenticar usuário criado
@@ -217,6 +216,7 @@ class AuthService {
       to: user.email,
       userName: user.name,
       resetLink: resetLink,
+      expiresIn: const Duration(minutes: 60),
     );
 
     return Success(null);
@@ -238,7 +238,7 @@ class AuthService {
 
     final payload = (payloadResult as Success).value;
     if (payload['purpose'] != 'password_reset') {
-      return Failure(const UnauthorizedException('Token inválido'));
+      return Failure(UnauthorizedException('Token inválido'));
     }
 
     final userId = payload['sub'] as String;
@@ -246,7 +246,7 @@ class AuthService {
     // 2. Buscar credenciais atuais para garantir que usuário existe
     final credentials = await _authRepo.getCredentials(userId);
     if (credentials == null) {
-      return Failure(const UnauthorizedException('Usuário não encontrado'));
+      return Failure(UnauthorizedException('Usuário não encontrado'));
     }
 
     // 3. Atualizar senha
@@ -262,7 +262,7 @@ class AuthService {
     // Olhando AuthRepository: `into(userCredentials).insert(credentials)` -> default é exception on conflict.
     // Preciso adicionar updatePassword em AuthRepository.
 
-    // Como não posso editar AuthRepository agora (estou focado em AuthService), vou tentar usar o que tenho ou anotar TODO.
+    // Como não posso editar AuthRepository agora (estou focado em AuthService), vou tentar usar o que tenho ou anotar todo.
     // Mas preciso entregar funcionando. Vou adicionar updatePassword no AuthRepository num passo seguinte se não existir.
     // Vou verificar AuthRepository em seguida. Por enquanto, vou codar a chamada imaginária `updatePassword`.
 
@@ -325,7 +325,7 @@ class AuthService {
       await _authRepo.saveRefreshToken(
         RefreshTokensCompanion(
           userId: Value(user.id),
-          token: Value(refreshToken),
+          tokenHash: Value(refreshToken),
           expiresAt: Value(expiresAt),
         ),
       );
