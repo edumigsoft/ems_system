@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
 import 'package:core_shared/core_shared.dart' show DependencyInjector;
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
@@ -98,6 +99,10 @@ class _AppLayoutState extends State<AppLayout> {
     // await widget.systemViewModel.init();
     // Configurações adicionais podem ser adicionadas aqui
     await widget.viewModel.init();
+
+    // Inicializar AuthViewModel para verificar sessão persistida
+    final authViewModel = widget.di.get<AuthViewModel>();
+    await authViewModel.initialize();
   }
 
   @override
@@ -114,7 +119,10 @@ class _AppLayoutState extends State<AppLayout> {
           // theme: widget.systemViewModel.themeDataLight,
           // darkTheme: widget.systemViewModel.themeDataDark,
           // themeMode: widget.systemViewModel.themeMode,
-          home: widget.di.get<AppPage>(),
+          home: AppPage(
+            viewModel: widget.viewModel,
+            authViewModel: widget.di.get<AuthViewModel>(),
+          ),
           debugShowCheckedModeBanner: false,
           // Configuração de internacionalização
           localizationsDelegates: AppLocalizations.localizationsDelegates,

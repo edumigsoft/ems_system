@@ -11,14 +11,16 @@ import '../service/auth_service.dart';
 /// Rotas de autenticação.
 class AuthRoutes extends Routes {
   final AuthService _authService;
+  final String _backendBaseApi;
 
-  AuthRoutes(this._authService)
-    : super(
+  AuthRoutes(this._authService, {required String backendBaseApi})
+    : _backendBaseApi = backendBaseApi,
+      super(
         security: false,
       ); // Rotas de auth não requerem autenticação (exceto refresh/logout que tratam internamente)
 
   @override
-  String get path => '/auth';
+  String get path => '$_backendBaseApi/auth';
 
   @override
   Router get router {

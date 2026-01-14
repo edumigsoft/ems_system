@@ -1,46 +1,80 @@
-import 'package:auth_client/auth_client.dart' show AuthService;
+import 'package:auth_client/auth_client.dart'
+    show AuthService, AuthApiService, TokenStorage;
 import 'package:core_shared/core_shared.dart' show Loggable, DependencyInjector;
-import 'package:core_ui/core_ui.dart' show AppModule;
+import 'package:core_ui/core_ui.dart'
+    show AppModule, AppNavigationItem, AppNavigationSection;
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:localizations_ui/localizations_ui.dart';
 
+import 'pages/login_page.dart';
+import 'pages/register_page.dart';
+import 'pages/forgot_password_page.dart';
 import 'view_models/auth_view_model.dart';
 
 class AuthModule extends AppModule with Loggable {
   final DependencyInjector di;
-  final Widget loggedInPage;
 
-  AuthModule({required this.di, required this.loggedInPage});
+  AuthModule({required this.di});
+
+  static const String routeName = '/auth';
 
   @override
   void registerDependencies(DependencyInjector di) {
-    di.registerLazySingleton<AuthService>(() => AuthService(di.get()));
-    di.registerLazySingleton<AuthRepository>(
-      () => AuthRepositoryClient(
-        service: di.get<AuthService>(),
-        storageService: di.get<AuthStorageService>(),
-      ),
-    );
-    di.registerLazySingleton<AuthViewModel>(
-      () => AuthViewModel(
-        repository: di.get<AuthRepository>(),
-        loggedIn: loggedInPage,
-      ),
-    );
-    di.registerLazySingleton<AuthPage>(
-      () => AuthPage(viewModel: di.get<AuthViewModel>()),
+    // Register AuthApiService (Retrofit service)
+    di.registerLazySingleton<AuthApiService>(
+      () => AuthApiService(di.get<Dio>()),
     );
 
-    di.registerLazySingleton<SplashPage>(
-      () => SplashPage(
-        viewModel: di.get<AuthViewModel>(),
-        notLoggedIn: di.get<AuthPage>(),
+    // Register TokenStorage
+    di.registerLazySingleton<TokenStorage>(() => TokenStorage());
+
+    // Register AuthService
+    di.registerLazySingleton<AuthService>(
+      () => AuthService(
+        api: di.get<AuthApiService>(),
+        tokenStorage: di.get<TokenStorage>(),
       ),
     );
-    di.registerLazySingleton<SignOutPage>(
-      () => SignOutPage(
-        viewModel: di.get<AuthViewModel>(),
-        notLoggedIn: di.get<AuthPage>(),
-      ),
+
+    // Register AuthViewModel
+    di.registerLazySingleton<AuthViewModel>(
+      () => AuthViewModel(authService: di.get<AuthService>()),
     );
+
+    // Register pages
+    di.registerLazySingleton<LoginPage>(
+      () => LoginPage(viewModel: di.get<AuthViewModel>()),
+    );
+
+    di.registerLazySingleton<RegisterPage>(
+      () => RegisterPage(viewModel: di.get<AuthViewModel>()),
+    );
+
+    di.registerLazySingleton<ForgotPasswordPage>(
+      () => ForgotPasswordPage(viewModel: di.get<AuthViewModel>()),
+    );
+
+    // Note: ResetPasswordPage is not registered here because it requires
+    // a runtime token parameter from the password reset link.
+    // Create it on-demand during navigation: ResetPasswordPage(viewModel: di.get(), token: token)
   }
+
+  @override
+  Map<String, Widget> get routes => {
+    '${routeName}/login': di.get<LoginPage>(),
+    '${routeName}/register': di.get<RegisterPage>(),
+    '${routeName}/forgot-password': di.get<ForgotPasswordPage>(),
+    // ResetPasswordPage not included - requires runtime token parameter
+  };
+
+  @override
+  List<AppNavigationItem> get navigationItems => [
+    AppNavigationItem(
+      labelBuilder: (context) => AppLocalizations.of(context).auth,
+      icon: Icons.login,
+      route: routeName,
+      section: AppNavigationSection.system,
+    ),
+  ];
 }

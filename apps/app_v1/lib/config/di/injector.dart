@@ -1,3 +1,4 @@
+import 'package:auth_ui/auth_ui.dart' show AuthModule;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
@@ -6,7 +7,6 @@ import 'package:user_ui/user_module.dart';
 
 import '../../app_layout.dart';
 import '../../data/services/navigation_service.dart';
-import '../../pages/app_page.dart';
 import '../../view_models/app_view_model.dart';
 import '../dio/dio_config.dart';
 import '../env/env.dart';
@@ -32,7 +32,7 @@ class Injector with Loggable {
       // AcademicConfigModule(di: _diMain),
       // AcademicStructureModule(di: _diMain),
       // SystemModule(di: _diMain),
-      // AuthModule(di: _diMain, loggedInPage: _diMain.get<AppPage>()),
+      AuthModule(di: _diMain),
     ];
 
     // Registra as dependências de cada módulo.
@@ -84,9 +84,6 @@ class Injector with Loggable {
         viewModel: di.get<AppViewModel>(),
         // systemViewModel: di.get<SystemViewModel>(),
       ),
-    );
-    di.registerLazySingleton<AppPage>(
-      () => AppPage(viewModel: di.get<AppViewModel>()),
     );
   }
 

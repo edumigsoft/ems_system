@@ -63,7 +63,7 @@ class InitAuthModuleToServer implements InitServerModule {
 
     // 4. Routes
     di.registerLazySingleton<AuthRoutes>(
-      () => AuthRoutes(di.get<AuthService>()),
+      () => AuthRoutes(di.get<AuthService>(), backendBaseApi: backendBaseApi),
     );
 
     // Adicionar rotas ao servidor

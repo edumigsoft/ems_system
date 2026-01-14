@@ -100,10 +100,10 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
-  /// The application name
+  /// EduMigSoft System Management
   ///
   /// In en, this message translates to:
-  /// **'My Application'**
+  /// **'EMS System'**
   String get appName;
 
   /// Welcome message shown on home screen
@@ -129,6 +129,396 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User'**
   String get user;
+
+  /// EduMigSoft
+  ///
+  /// In en, this message translates to:
+  /// **'EduMigSoft'**
+  String get appMake;
+
+  /// Home
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// Confirmar exclusão
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmar exclusão?'**
+  String get confirmDeletion;
+
+  /// Confirma Restauração?
+  ///
+  /// In en, this message translates to:
+  /// **'Confirma Restauração?'**
+  String get confirmsRestoration;
+
+  /// Are you sure you want to delete this item?
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this item?'**
+  String get areYouSureYouWantToDeleteThisItem;
+
+  /// Are you sure you want to restore this item?
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to restore this item?'**
+  String get areYouSureYouWantToRestoreThisItem;
+
+  /// Delete
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get deleted;
+
+  /// Restore
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// Restored
+  ///
+  /// In en, this message translates to:
+  /// **'Restored'**
+  String get restored;
+
+  /// Cancel
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Item deleted!
+  ///
+  /// In en, this message translates to:
+  /// **'Item deleted!'**
+  String get itemDeleted;
+
+  /// Edit
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// Registered! Please login again.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered! Please login again.'**
+  String get registeredPleaseLoginAgain;
+
+  /// Server Communication Error
+  ///
+  /// In en, this message translates to:
+  /// **'Server Communication Error'**
+  String get serverCommunicationError;
+
+  /// Register
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// Name
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// Enter a Name
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a Name'**
+  String get enterAName;
+
+  /// Email
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// Email:
+  ///
+  /// In en, this message translates to:
+  /// **'Email:'**
+  String get emailToPoint;
+
+  /// Enter an Email
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an Email'**
+  String get enterAnEmail;
+
+  /// Password
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// Enter a Password
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a Password'**
+  String get enterAPassword;
+
+  /// Confirm Password
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPassword;
+
+  /// Login
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// Check your email to login.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email to login.'**
+  String get checkYourEmailToLogin;
+
+  /// Create User
+  ///
+  /// In en, this message translates to:
+  /// **'Create User'**
+  String get createUser;
+
+  /// Active
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// Inactive
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// Access
+  ///
+  /// In en, this message translates to:
+  /// **'Access'**
+  String get rule;
+
+  /// Sign In
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get signIn;
+
+  /// Sign Up
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up'**
+  String get signUp;
+
+  /// Error while logging in
+  ///
+  /// In en, this message translates to:
+  /// **'Error while logging in'**
+  String get errorWhileLogin;
+
+  /// Check data with errors
+  ///
+  /// In en, this message translates to:
+  /// **'Check data with errors'**
+  String get checkDataWithErrors;
+
+  /// Create profile
+  ///
+  /// In en, this message translates to:
+  /// **'Create profile'**
+  String get createProfile;
+
+  /// Profile
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// Save Profile
+  ///
+  /// In en, this message translates to:
+  /// **'Save Profile'**
+  String get saveProfile;
+
+  /// Change Password
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePassword;
+
+  /// You need to change your password.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to change your password.'**
+  String get youNeedToChangeYourPassword;
+
+  /// Enter your new password.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new password.'**
+  String get enterYourNewPassword;
+
+  /// Repeat the new password.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat the new password.'**
+  String get repeatTheNewPassword;
+
+  /// Record saved!
+  ///
+  /// In en, this message translates to:
+  /// **'Record saved!'**
+  String get recordSaved;
+
+  /// Forget Password
+  ///
+  /// In en, this message translates to:
+  /// **'Forget Password'**
+  String get forgetPassword;
+
+  /// Don't have an account?
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account?'**
+  String get donTHaveAnAccount;
+
+  /// Already have an account?
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAnAccount;
+
+  /// Welcome
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get welcome;
+
+  /// Do not match
+  ///
+  /// In en, this message translates to:
+  /// **'Do not match'**
+  String get noCoinciden;
+
+  /// Passwords do not match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsDoNotMatch;
+
+  /// Password confirmation is mandatory
+  ///
+  /// In en, this message translates to:
+  /// **'Password confirmation is mandatory'**
+  String get passwordConfirmationIsMandatory;
+
+  /// Close
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// Yes
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// Save
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// User roles
+  ///
+  /// In en, this message translates to:
+  /// **'User roles'**
+  String get userRoles;
+
+  /// Roles
+  ///
+  /// In en, this message translates to:
+  /// **'Roles'**
+  String get roles;
+
+  /// Select at least one role.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one role.'**
+  String get selectAtLeastOneRoles;
+
+  /// Log in to your account
+  ///
+  /// In en, this message translates to:
+  /// **'Log in to your account'**
+  String get logInToYourAccount;
+
+  /// Enter your email
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email'**
+  String get enterYourEmail;
+
+  /// Enter your password
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get enterYourPassword;
+
+  /// Remember me
+  ///
+  /// In en, this message translates to:
+  /// **'Remember me'**
+  String get rememberMe;
+
+  /// Recover password
+  ///
+  /// In en, this message translates to:
+  /// **'Recover password'**
+  String get recoveryPassword;
+
+  /// Register now!
+  ///
+  /// In en, this message translates to:
+  /// **'Register now!'**
+  String get registerNow;
+
+  /// © 2025 EduMigSoft. All Rights Reserved. Designed, Anderson S. Andrade*
+  ///
+  /// In en, this message translates to:
+  /// **'© {year} EduMigSoft. All Rights Reserved. Designed, Anderson S. Andrade*'**
+  String copyright(Object year);
+
+  /// Settings
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// Dashboard
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboard;
 
   /// Error message for login failures
   ///
@@ -201,6 +591,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This field is required'**
   String get validationRequired;
+
+  /// No description provided for @auth.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication'**
+  String get auth;
 }
 
 class _AppLocalizationsDelegate

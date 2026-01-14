@@ -91,6 +91,16 @@ class DSSideNavigation extends StatelessWidget {
   /// Se null, usa espaço de 52x52 em branco.
   final Widget? logo;
 
+  /// URL do avatar do usuário (opcional).
+  ///
+  /// Se fornecido, substitui o ícone padrão por uma imagem.
+  final String? userAvatarUrl;
+
+  /// Callback chamado quando o usuário clica no botão de logout.
+  ///
+  /// Se null, o botão de logout não é exibido.
+  final VoidCallback? onLogout;
+
   const DSSideNavigation({
     super.key,
     required this.selectedRoute,
@@ -99,6 +109,8 @@ class DSSideNavigation extends StatelessWidget {
     this.userName,
     this.userRole,
     this.logo,
+    this.userAvatarUrl,
+    this.onLogout,
   });
 
   @override
@@ -119,7 +131,12 @@ class DSSideNavigation extends StatelessWidget {
                 children: _buildNavItems(context),
               ),
             ),
-            _NavFooter(userName: userName, userRole: userRole),
+            _NavFooter(
+              userName: userName,
+              userRole: userRole,
+              avatarUrl: userAvatarUrl,
+              onLogout: onLogout,
+            ),
           ],
         ),
       ),
@@ -533,16 +550,25 @@ class NavItem extends StatelessWidget {
 /// Footer da navegação lateral.
 ///
 /// Exibe informações do usuário logado:
-/// - Avatar circular com ícone de pessoa
+/// - Avatar circular com ícone de pessoa ou imagem ([avatarUrl])
 /// - Nome do usuário ([userName])
 /// - Cargo/função ([userRole])
-/// - Ícone de configurações
+/// - Botão de logout ([onLogout])
 ///
 /// Se [userName] ou [userRole] forem null, exibe textos padrão.
+/// Se [onLogout] for null, o botão de logout não é exibido.
 class _NavFooter extends StatelessWidget {
   final String? userName;
   final String? userRole;
-  const _NavFooter({this.userName, this.userRole});
+  final String? avatarUrl;
+  final VoidCallback? onLogout;
+
+  const _NavFooter({
+    this.userName,
+    this.userRole,
+    this.avatarUrl,
+    this.onLogout,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -560,11 +586,14 @@ class _NavFooter extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: dsColors.primary.withValues(alpha: 0.1),
-            child: Icon(
-              DSIcons.person,
-              color: dsColors.primary,
-              size: 20,
-            ),
+            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+            child: avatarUrl == null
+                ? Icon(
+                    DSIcons.person,
+                    color: dsColors.primary,
+                    size: 20,
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -590,11 +619,18 @@ class _NavFooter extends StatelessWidget {
               ],
             ),
           ),
-          Icon(
-            DSIcons.settings,
-            color: dsColors.onSurface.withValues(alpha: 0.5),
-            size: 18,
-          ),
+          if (onLogout != null)
+            IconButton(
+              icon: Icon(
+                Icons.logout,
+                color: dsColors.error,
+                size: 18,
+              ),
+              onPressed: onLogout,
+              tooltip: 'Sair',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
         ],
       ),
     );

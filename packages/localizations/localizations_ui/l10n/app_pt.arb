@@ -7,6 +7,269 @@
     "@users": {},
     "user": "Usuário",
     "@user": {},
+    "appMake": "EduMigSoft",
+    "@appMake": {
+        "description": "EduMigSoft"
+    },
+    "home": "Home",
+    "@home": {
+        "description": "Home"
+    },
+    "confirmDeletion": "Confirmar exclusão?",
+    "@confirmDeletion": {
+        "description": "Confirmar exclusão"
+    },
+    "confirmsRestoration": "Confirma Restauração?",
+    "@confirmsRestoration": {
+        "description": "Confirma Restauração?"
+    },
+    "areYouSureYouWantToDeleteThisItem": "Tem certeza de que deseja excluir este item?",
+    "@areYouSureYouWantToDeleteThisItem": {
+        "description": "Tem certeza de que deseja excluir este item?"
+    },
+    "areYouSureYouWantToRestoreThisItem": "Tem certeza de que deseja restaurar este item?",
+    "@areYouSureYouWantToRestoreThisItem": {
+        "description": "Tem certeza de que deseja restaurar este item?"
+    },
+    "delete": "Excluir",
+    "@delete": {
+        "description": "Excluir"
+    },
+    "deleted": "Excluído",
+    "@deleted": {
+        "description": "Excluído"
+    },
+    "restore": "Restaurar",
+    "@restore": {
+        "description": "Restaurar"
+    },
+    "restored": "Restaurado",
+    "@restored": {
+        "description": "Restaurado"
+    },
+    "cancel": "Cancelar",
+    "@cancel": {
+        "description": "Cancelar"
+    },
+    "itemDeleted": "Item excluído!",
+    "@itemDeleted": {
+        "description": "Item excluído!"
+    },
+    "edit": "Editar",
+    "@edit": {
+        "description": "Editar"
+    },
+    "registeredPleaseLoginAgain": "Registrado! Faça o Login novamente.",
+    "@registeredPleaseLoginAgain": {
+        "description": "Registrado! Faça o Login novamente."
+    },
+    "serverCommunicationError": "Erro de Comunicação com o Servidor",
+    "@serverCommunicationError": {
+        "description": "Erro de Comunicação com o Servidor"
+    },
+    "register": "Registrar-se",
+    "@register": {
+        "description": "Registrar-se"
+    },
+    "name": "Nome",
+    "@name": {
+        "description": "Nome"
+    },
+    "enterAName": "Entre com um Nome",
+    "@enterAName": {
+        "description": "Entre com um Nome"
+    },
+    "email": "Email",
+    "@email": {
+        "description": "Email"
+    },
+    "emailToPoint": "Email:",
+    "@emailToPoint": {
+        "description": "Email:"
+    },
+    "enterAnEmail": "Entre com um Email",
+    "@enterAnEmail": {
+        "description": "Entre com um Email"
+    },
+    "password": "Senha",
+    "@password": {
+        "description": "Senha"
+    },
+    "enterAPassword": "Entre com uma Senha",
+    "@enterAPassword": {
+        "description": "Entre com uma Senha"
+    },
+    "confirmPassword": "Confirme a Senha",
+    "@confirmPassword": {
+        "description": "Confirme a Senha"
+    },
+    "login": "Conecte-se",
+    "@login": {
+        "description": "Conecte-se"
+    },
+    "checkYourEmailToLogin": "Verifique seu email, para fazer o login.",
+    "@checkYourEmailToLogin": {
+        "description": "Verifique seu email, para fazer o login."
+    },
+    "createUser": "Criar Usuário",
+    "@createUser": {
+        "description": "Criar usuário"
+    },
+    "active": "Ativo",
+    "@active": {
+        "description": "Ativo"
+    },
+    "inactive": "Inativo",
+    "@inactive": {
+        "description": "Inativo"
+    },
+    "rule": "Acesso",
+    "@rule": {
+        "description": "Acesso"
+    },
+    "signIn": "Entrar",
+    "@signIn": {
+        "description": "Entrar"
+    },
+    "signUp": "Inscrever-se",
+    "@signUp": {
+        "description": "Inscrever-se"
+    },
+    "errorWhileLogin": "Erro durante o login",
+    "@errorWhileLogin": {
+        "description": "Erro durante o login"
+    },
+    "checkDataWithErrors": "Verifique os dados com erros",
+    "@checkDataWithErrors": {
+        "description": "Verifique os dados com erros"
+    },
+    "createProfile": "Criar perfil",
+    "@createProfile": {
+        "description": "Criar perfil"
+    },
+    "profile": "Perfil",
+    "@profile": {
+        "description": "Perfil"
+    },
+    "saveProfile": "Salvar Perfil",
+    "@saveProfile": {
+        "description": "Salvar Perfil"
+    },
+    "changePassword": "Altere a Senha",
+    "@changePassword": {
+        "description": "Altere a Senha"
+    },
+    "youNeedToChangeYourPassword": "É necessário alterar a senha.",
+    "@youNeedToChangeYourPassword": {
+        "description": "É necessário alterar a senha."
+    },
+    "enterYourNewPassword": "Entre com nova senha.",
+    "@enterYourNewPassword": {
+        "description": "Entre com nova senha."
+    },
+    "repeatTheNewPassword": "Repita a nova senha.",
+    "@repeatTheNewPassword": {
+        "description": "Repita a nova senha."
+    },
+    "recordSaved": "Registro salvo!",
+    "@recordSaved": {
+        "description": "Registro salvo!"
+    },
+    "forgetPassword": "Esqueci a senha",
+    "@forgetPassword": {
+        "description": "Esqueci a senha"
+    },
+    "donTHaveAnAccount": "Não tem uma conta?",
+    "@donTHaveAnAccount": {
+        "description": "Não tem uma conta?"
+    },
+    "alreadyHaveAnAccount": "Já tem uma conta?",
+    "@alreadyHaveAnAccount": {
+        "description": "Já tem uma conta?"
+    },
+    "welcome": "Bem-vindo",
+    "@welcome": {
+        "description": "Bem-vindo"
+    },
+    "noCoinciden": "Não coincidem",
+    "@noCoinciden": {
+        "description": "Não coincidem"
+    },
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "@passwordsDoNotMatch": {
+        "description": "As senhas não coincidem"
+    },
+    "passwordConfirmationIsMandatory": "A confirmação de senha é obrigatória",
+    "@passwordConfirmationIsMandatory": {
+        "description": "A confirmação de senha é obrigatória"
+    },
+    "close": "Fechar",
+    "@close": {
+        "description": "Fechar"
+    },
+    "yes": "Sim",
+    "@yes": {
+        "description": "Sim"
+    },
+    "no": "Não",
+    "@no": {
+        "description": "Não"
+    },
+    "save": "Salvar",
+    "@save": {
+        "description": "Salvar"
+    },
+    "userRoles": "Funções de usuário",
+    "@userRoles": {
+        "description": "Funções de usuário"
+    },
+    "roles": "Funções",
+    "@roles": {
+        "description": "Funções"
+    },
+    "selectAtLeastOneRoles": "Selecione pelo menos uma função.",
+    "@selectAtLeastOneRoles": {
+        "description": "Selecione pelo menos uma função."
+    },
+    "logInToYourAccount": "Entre na sua conta",
+    "@logInToYourAccount": {
+        "description": "Entre na sua conta"
+    },
+    "enterYourEmail": "Entre com seu email",
+    "@enterYourEmail": {
+        "description": "Entre com seu email"
+    },
+    "enterYourPassword": "Digite sua senha",
+    "@enterYourPassword": {
+        "description": "Digite sua senha"
+    },
+    "rememberMe": "Lembre de mim",
+    "@rememberMe": {
+        "description": "Lembre de mim"
+    },
+    "recoveryPassword": "Recuperar a senha",
+    "@recoveryPassword": {
+        "description": "Recuperar a senha"
+    },
+    "registerNow": "Cadastre-se agora!",
+    "@registerNow": {
+        "description": "Cadastre-se agora!"
+    },
+    "copyright": "© {year} EduMigSoft. All Rights Reserved. Designed, Anderson S. Andrade*",
+    "@copyright": {
+        "description": "© 2025 EduMigSoft. All Rights Reserved. Designed, Anderson S. Andrade*",
+        "placeholders": {
+            "year": {}
+        }
+    },
+    "settings": "Configurações",
+    "@settings": {
+        "description": "Configurações"
+    },
+    "dashboard": "Painel",
+    "@dashboard": {
+        "description": "Painel"
+    },
     "loginError": "Falha no login: {reason}",
     "serverErrorLog": "ERRO DO SERVIDOR: {error}",
     "emailSubjectWelcome": "Bem-vindo ao sistema, {userName}!",
@@ -25,5 +288,7 @@
     "validationPasswordTooShort": "A senha deve ter pelo menos 8 caracteres",
     "@validationPasswordTooShort": {},
     "validationRequired": "Este campo é obrigatório",
-    "@validationRequired": {}
+    "@validationRequired": {},
+    "auth": "Autenticação",
+    "@auth": {}
 }

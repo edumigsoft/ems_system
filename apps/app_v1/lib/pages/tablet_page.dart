@@ -1,11 +1,17 @@
+import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
 import 'package:flutter/material.dart';
 
 import '../view_models/app_view_model.dart';
 
 class TabletPage extends StatelessWidget {
   final AppViewModel viewModel;
+  final AuthViewModel authViewModel;
 
-  const TabletPage({super.key, required this.viewModel});
+  const TabletPage({
+    super.key,
+    required this.viewModel,
+    required this.authViewModel,
+  });
 
   @override
   Widget build(BuildContext context) {

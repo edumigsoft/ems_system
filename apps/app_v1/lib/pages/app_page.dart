@@ -1,3 +1,4 @@
+import 'package:auth_ui/auth_ui.dart' show AuthViewModel, AuthGuard, AuthFlowPage;
 import 'package:design_system_ui/design_system_ui.dart';
 import 'desktop_page.dart';
 import 'mobile_page.dart';
@@ -8,7 +9,13 @@ import 'package:flutter/material.dart';
 
 class AppPage extends StatefulWidget {
   final AppViewModel viewModel;
-  const AppPage({super.key, required this.viewModel});
+  final AuthViewModel authViewModel;
+
+  const AppPage({
+    super.key,
+    required this.viewModel,
+    required this.authViewModel,
+  });
 
   @override
   State<AppPage> createState() => _AppPageState();
@@ -22,12 +29,30 @@ class _AppPageState extends State<AppPage> {
         margin: EdgeInsets.zero,
         isBorderRadius: false,
         child: ListenableBuilder(
-          listenable: widget.viewModel,
+          listenable: Listenable.merge([
+            widget.viewModel,
+            widget.authViewModel,
+          ]),
           builder: (context, _) {
-            return ResponsiveLayout(
-              mobile: MobilePage(viewModel: widget.viewModel),
-              tablet: TabletPage(viewModel: widget.viewModel),
-              desktop: DesktopPage(viewModel: widget.viewModel),
+            return AuthGuard(
+              authViewModel: widget.authViewModel,
+              authenticatedChild: ResponsiveLayout(
+                mobile: MobilePage(
+                  viewModel: widget.viewModel,
+                  authViewModel: widget.authViewModel,
+                ),
+                tablet: TabletPage(
+                  viewModel: widget.viewModel,
+                  authViewModel: widget.authViewModel,
+                ),
+                desktop: DesktopPage(
+                  viewModel: widget.viewModel,
+                  authViewModel: widget.authViewModel,
+                ),
+              ),
+              unauthenticatedChild: AuthFlowPage(
+                authViewModel: widget.authViewModel,
+              ),
             );
           },
         ),

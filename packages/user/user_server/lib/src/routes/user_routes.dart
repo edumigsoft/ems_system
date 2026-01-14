@@ -15,11 +15,14 @@ import '../../user_server.dart';
 /// - DELETE /users/:id - Soft delete de usuário (admin)
 class UserRoutes extends Routes {
   final UserRepository userRepository;
+  final String _backendBaseApi;
 
-  UserRoutes(this.userRepository) : super(security: true);
+  UserRoutes(this.userRepository, {required String backendBaseApi})
+    : _backendBaseApi = backendBaseApi,
+      super(security: true);
 
   @override
-  String get path => '/users';
+  String get path => '$_backendBaseApi/users';
 
   @override
   Router get router {

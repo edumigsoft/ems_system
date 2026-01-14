@@ -38,7 +38,8 @@ class InitUserModuleToServer implements InitServerModule {
 
     // 3. Routes
     di.registerLazySingleton<UserRoutes>(
-      () => UserRoutes(di.get<UserRepository>()),
+      () =>
+          UserRoutes(di.get<UserRepository>(), backendBaseApi: backendBaseApi),
     );
 
     // 4. Mount Routes
