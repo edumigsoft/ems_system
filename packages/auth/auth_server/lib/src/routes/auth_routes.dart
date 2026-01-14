@@ -1,19 +1,21 @@
+import 'dart:convert';
+
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:core_shared/core_shared.dart';
 import 'package:core_server/core_server.dart';
+import 'package:auth_shared/auth_shared.dart';
+
+import '../service/auth_service.dart';
 
 /// Rotas de autenticação.
-///
-/// Endpoints:
-/// - POST /auth/login - Autenticação com email/senha
-/// - POST /auth/register - Registro de novo usuário
-/// - POST /auth/refresh - Renovação de access token
-/// - POST /auth/logout - Invalidação de refresh token
-/// - POST /auth/forgot-password - Solicitação de reset de senha
-/// - POST /auth/reset-password - Reset de senha com token
 class AuthRoutes extends Routes {
-  AuthRoutes()
-    : super(security: false); // Rotas de auth não requerem autenticação
+  final AuthService _authService;
+
+  AuthRoutes(this._authService)
+    : super(
+        security: false,
+      ); // Rotas de auth não requerem autenticação (exceto refresh/logout que tratam internamente)
 
   @override
   String get path => '/auth';
@@ -32,86 +34,176 @@ class AuthRoutes extends Routes {
     return router;
   }
 
-  /// POST /auth/login - Autenticação com email e senha.
+  /// POST /auth/login
   Future<Response> _login(Request request) async {
-    // TODO: Implementar
-    // 1. Parse LoginRequest do body
-    // 2. Verificar credenciais
-    // 3. Gerar tokens
-    // 4. Retornar AuthResponse
-    return Response.ok(
-      '{"message": "Not implemented yet"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body);
+      final loginRequest = LoginRequest.fromJson(json);
+
+      final result = await _authService.login(loginRequest);
+
+      return switch (result) {
+        Success(value: final value) => Response.ok(
+          jsonEncode(value.toJson()),
+          headers: {'Content-Type': 'application/json'},
+        ),
+        Failure(error: final error) =>
+          error is ValidationException
+              ? Response(400, body: jsonEncode({'error': error.toString()}))
+              : Response(401, body: jsonEncode({'error': error.toString()})),
+      };
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao processar login: $e'}),
+      );
+    }
   }
 
-  /// POST /auth/register - Registro de novo usuário.
+  /// POST /auth/register
   Future<Response> _register(Request request) async {
-    // TODO: Implementar
-    // 1. Parse RegisterRequest do body
-    // 2. Validar dados
-    // 3. Verificar email/username único
-    // 4. Criar usuário e credenciais
-    // 5. Enviar email de verificação (se configurado)
-    // 6. Retornar 201 Created
-    return Response(
-      201,
-      body: '{"message": "Not implemented yet"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body);
+      final registerRequest = RegisterRequest.fromJson(json);
+
+      final result = await _authService.register(registerRequest);
+
+      return switch (result) {
+        Success(value: final value) => Response(
+          201,
+          body: jsonEncode(value.toJson()),
+          headers: {'Content-Type': 'application/json'},
+        ),
+        Failure(error: final error) =>
+          error is ValidationException
+              ? Response(400, body: jsonEncode({'error': error.toString()}))
+              : Response(400, body: jsonEncode({'error': error.toString()})),
+        // Nota: Response 400 genérico para falha de registro
+      };
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao processar registro: $e'}),
+      );
+    }
   }
 
-  /// POST /auth/refresh - Renovação de access token.
+  /// POST /auth/refresh
   Future<Response> _refresh(Request request) async {
-    // TODO: Implementar
-    // 1. Parse refresh token do body
-    // 2. Validar token
-    // 3. Implementar rotation (invalidar antigo)
-    // 4. Gerar novos tokens
-    // 5. Retornar RefreshResponse
-    return Response.ok(
-      '{"message": "Not implemented yet"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body);
+      final refreshToken = json['refresh_token'] as String?;
+
+      if (refreshToken == null) {
+        return Response(
+          400,
+          body: jsonEncode({'error': 'Refresh token required'}),
+        );
+      }
+
+      final result = await _authService.refresh(refreshToken);
+
+      return switch (result) {
+        Success(value: final value) => Response.ok(
+          jsonEncode(value.toJson()),
+          headers: {'Content-Type': 'application/json'},
+        ),
+        Failure(error: final error) => Response(
+          401,
+          body: jsonEncode({'error': error.toString()}),
+        ),
+      };
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao renovar token: $e'}),
+      );
+    }
   }
 
-  /// POST /auth/logout - Invalidação de refresh token.
+  /// POST /auth/logout
   Future<Response> _logout(Request request) async {
-    // TODO: Implementar
-    // 1. Parse refresh token do body
-    // 2. Invalidar token
-    // 3. Retornar 200 OK
-    return Response.ok(
-      '{"message": "Logged out"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body);
+      final refreshToken = json['refresh_token'] as String?;
+
+      if (refreshToken == null) {
+        return Response.ok(jsonEncode({'message': 'Logged out'}));
+      }
+
+      await _authService.logout(refreshToken);
+
+      return Response.ok(
+        jsonEncode({'message': 'Logged out'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao processar logout: $e'}),
+      );
+    }
   }
 
-  /// POST /auth/forgot-password - Solicitação de reset de senha.
+  /// POST /auth/forgot-password
   Future<Response> _forgotPassword(Request request) async {
-    // TODO: Implementar
-    // 1. Parse email do body
-    // 2. Verificar se email existe
-    // 3. Gerar token de reset
-    // 4. Enviar email com link (se configurado)
-    // 5. Retornar 200 OK (mesmo se email não existir)
-    return Response.ok(
-      '{"message": "If email exists, reset link was sent"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body);
+      final email = json['email'] as String?;
+
+      if (email == null) {
+        return Response(400, body: jsonEncode({'error': 'Email required'}));
+      }
+
+      await _authService.forgotPassword(email);
+
+      // Sempre retorna sucesso por segurança
+      return Response.ok(
+        jsonEncode({'message': 'If email exists, reset instructions sent.'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao processar request: $e'}),
+      );
+    }
   }
 
-  /// POST /auth/reset-password - Reset de senha com token.
+  /// POST /auth/reset-password
   Future<Response> _resetPassword(Request request) async {
-    // TODO: Implementar
-    // 1. Parse token e nova senha do body
-    // 2. Validar token
-    // 3. Atualizar senha
-    // 4. Invalidar todos refresh tokens do usuário
-    // 5. Retornar 200 OK
-    return Response.ok(
-      '{"message": "Not implemented yet"}',
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body);
+      final token = json['token'] as String?;
+      final newPassword = json['new_password'] as String?;
+
+      if (token == null || newPassword == null) {
+        return Response(
+          400,
+          body: jsonEncode({'error': 'Token and new password required'}),
+        );
+      }
+
+      final result = await _authService.resetPassword(
+        token: token,
+        newPassword: newPassword,
+      );
+
+      return switch (result) {
+        Success(value: final _) => Response.ok(
+          jsonEncode({'message': 'Password reset successfully'}),
+          headers: {'Content-Type': 'application/json'},
+        ),
+        Failure(error: final error) => Response(
+          400,
+          body: jsonEncode({'error': error.toString()}),
+        ),
+      };
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao processar reset: $e'}),
+      );
+    }
   }
 }

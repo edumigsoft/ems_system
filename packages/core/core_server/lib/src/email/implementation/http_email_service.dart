@@ -1,10 +1,12 @@
 import 'dart:io';
-import 'package:logging/logging.dart';
+
 import 'package:core_shared/core_shared.dart';
+
 import '../email_service.dart';
+import '../email_template.dart';
 
 /// Configuração do serviço de email.
-class EmailConfig {
+class EmailConfig with Loggable {
   /// Host do serviço SMTP ou API.
   final String host;
 
@@ -52,7 +54,6 @@ class EmailConfig {
 /// via headers e endpoints específicos.
 class HttpEmailService implements EmailService {
   final EmailConfig config;
-  final Logger _log = LogService.getLogger('HttpEmailService');
 
   HttpEmailService(this.config);
 
@@ -77,8 +78,8 @@ class HttpEmailService implements EmailService {
       // );
 
       // Por enquanto, log stub
-      _log.info('Would send email to: $to');
-      _log.info('Subject: $subject');
+      logger.info('Would send email to: $to');
+      logger.info('Subject: $subject');
 
       return successOfUnit();
     } catch (e) {
@@ -92,22 +93,12 @@ class HttpEmailService implements EmailService {
     required String userName,
     required String verificationLink,
   }) async {
-    const subject = 'Verifique seu email - EMS System';
-    final body =
-        '''
-      Olá $userName,
+    final template = EmailTemplate(fromName: config.fromName).verification(
+      userName: userName,
+      link: verificationLink,
+    );
 
-      Por favor, clique no link abaixo para verificar seu email:
-
-      $verificationLink
-
-      Este link expira em 24 horas.
-
-      Atenciosamente,
-      ${config.fromName}
-    ''';
-
-    return send(to: to, subject: subject, body: body);
+    return send(to: to, subject: template.subject, body: template.body);
   }
 
   @override
@@ -118,24 +109,13 @@ class HttpEmailService implements EmailService {
     required Duration expiresIn,
   }) async {
     final minutes = expiresIn.inMinutes;
-    const subject = 'Reset de Senha - EMS System';
-    final body =
-        '''
-      Olá $userName,
+    final template = EmailTemplate(fromName: config.fromName).passwordReset(
+      userName: userName,
+      link: resetLink,
+      expirationMinutes: minutes,
+    );
 
-      Você solicitou um reset de senha. Clique no link abaixo:
-
-      $resetLink
-
-      Este link expira em $minutes minutos.
-
-      Se você não solicitou este reset, ignore este email.
-
-      Atenciosamente,
-      ${config.fromName}
-    ''';
-
-    return send(to: to, subject: subject, body: body);
+    return send(to: to, subject: template.subject, body: template.body);
   }
 
   @override
@@ -143,20 +123,11 @@ class HttpEmailService implements EmailService {
     required String to,
     required String userName,
   }) async {
-    const subject = 'Bem-vindo ao EMS System!';
-    final body =
-        '''
-      Olá $userName,
+    final template = EmailTemplate(fromName: config.fromName).welcome(
+      userName: userName,
+    );
 
-      Seja bem-vindo ao EMS System!
-
-      Sua conta foi criada com sucesso.
-
-      Atenciosamente,
-      ${config.fromName}
-    ''';
-
-    return send(to: to, subject: subject, body: body);
+    return send(to: to, subject: template.subject, body: template.body);
   }
 
   @override

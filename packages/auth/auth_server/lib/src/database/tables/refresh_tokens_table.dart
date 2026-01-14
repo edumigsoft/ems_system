@@ -1,13 +1,12 @@
-import 'package:drift/drift.dart';
 import 'package:core_server/core_server.dart';
-import 'package:user_server/user_server.dart';
+import 'package:drift/drift.dart';
 
 /// Tabela de refresh tokens.
 ///
 /// Armazena tokens de refresh para implementar rotation e revogação.
 class RefreshTokens extends Table with DriftTableMixinPostgres {
   /// FK para tabela users.
-  TextColumn get userId => text().references(Users, #id)();
+  TextColumn get userId => text()();
 
   /// Hash do refresh token (nunca armazenar token raw).
   TextColumn get tokenHash => text()();

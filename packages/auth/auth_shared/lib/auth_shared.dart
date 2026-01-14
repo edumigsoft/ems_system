@@ -11,3 +11,6 @@ export 'src/models/token_payload.dart';
 // Authorization
 export 'src/authorization/resource_permission.dart';
 export 'src/authorization/auth_context.dart';
+
+// Validators
+export 'src/validators/auth_validators.dart';

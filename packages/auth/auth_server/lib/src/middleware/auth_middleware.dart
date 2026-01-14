@@ -1,15 +1,16 @@
+import 'package:core_shared/core_shared.dart' show UserRole, Failure, Success;
 import 'package:shelf/shelf.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
 
-/// Middleware de autenticação JWT.
-///
-/// Valida tokens JWT e popula o `AuthContext` no request.
+/// Middleware de autenticação e autorização.
 class AuthMiddleware {
+  final SecurityService _securityService;
+
+  AuthMiddleware(this._securityService);
+
   /// Verifica e valida o token JWT no header Authorization.
-  ///
-  /// Popula `request.context['authContext']` com [AuthContext] se válido.
-  Middleware verifyJwt() {
+  Middleware get verifyJwt {
     return (Handler innerHandler) {
       return (Request request) async {
         final authorization = request.headers['authorization'];
@@ -25,14 +26,28 @@ class AuthMiddleware {
         final token = authorization.substring(7);
 
         try {
-          // TODO: Implementar validação real do JWT usando SecurityService
-          // Por enquanto, stub que retorna erro
-          final payload = _decodeToken(token);
+          // Valida token usando SecurityService
+          final result = await _securityService.verifyToken(
+            token,
+            'ems_system',
+          );
 
-          if (payload == null || payload.isExpired) {
+          if (result case Failure(error: final error)) {
             return Response(
               401,
-              body: '{"error": "Token expired or invalid"}',
+              body: '{"error": "Invalid token: ${error.toString()}"}',
+              headers: {'Content-Type': 'application/json'},
+            );
+          }
+
+          // O payload vem como Map<String, dynamic> do SecurityService
+          final payloadMap = (result as Success).value as Map<String, dynamic>;
+          final payload = TokenPayload.fromJson(payloadMap);
+
+          if (payload.isExpired) {
+            return Response(
+              401,
+              body: '{"error": "Token expired"}',
               headers: {'Content-Type': 'application/json'},
             );
           }
@@ -51,7 +66,7 @@ class AuthMiddleware {
         } catch (e) {
           return Response(
             401,
-            body: '{"error": "Invalid token"}',
+            body: '{"error": "Token validation failed"}',
             headers: {'Content-Type': 'application/json'},
           );
         }
@@ -111,12 +126,5 @@ class AuthMiddleware {
         return innerHandler(request);
       };
     };
-  }
-
-  /// Decodifica o token JWT (stub - será implementado com SecurityService).
-  TokenPayload? _decodeToken(String token) {
-    // TODO: Implementar usando SecurityService.verifyToken()
-    // Por enquanto retorna null
-    return null;
   }
 }

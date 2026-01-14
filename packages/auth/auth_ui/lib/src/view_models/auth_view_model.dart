@@ -133,6 +133,34 @@ class AuthViewModel extends ChangeNotifier {
     return false;
   }
 
+  /// Confirma reset de senha com token.
+  Future<bool> confirmPasswordReset({
+    required String token,
+    required String newPassword,
+  }) async {
+    _state = AuthState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    final result = await _authService.confirmPasswordReset(
+      token: token,
+      newPassword: newPassword,
+    );
+
+    if (result case Success()) {
+      _state = AuthState.unauthenticated;
+      notifyListeners();
+      return true;
+    } else if (result case Failure(error: final error)) {
+      _errorMessage = error.toString();
+      _state = AuthState.error;
+      notifyListeners();
+      return false;
+    }
+
+    return false;
+  }
+
   /// Realiza logout.
   Future<void> logout() async {
     _state = AuthState.loading;

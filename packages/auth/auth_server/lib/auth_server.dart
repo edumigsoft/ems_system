@@ -8,6 +8,14 @@ export 'src/database/tables/user_credentials_table.dart';
 export 'src/database/tables/refresh_tokens_table.dart';
 export 'src/database/tables/resource_members_table.dart';
 
+// Repositories
+export 'src/repository/auth_repository.dart';
+export 'src/repository/resource_permission_repository.dart';
+
+// Services
+export 'src/service/auth_service.dart';
+export 'src/service/resource_permission_service.dart';
+
 // Middleware
 export 'src/middleware/auth_middleware.dart';
 

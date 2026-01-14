@@ -112,4 +112,21 @@ class AuthService {
       return Failure(Exception('Password reset request failed: $e'));
     }
   }
+
+  /// Confirma reset de senha com token.
+  Future<Result<void>> confirmPasswordReset({
+    required String token,
+    required String newPassword,
+  }) async {
+    try {
+      await _api.resetPassword(
+        PasswordResetConfirm(token: token, newPassword: newPassword),
+      );
+      return successOfUnit();
+    } on DioException catch (e) {
+      return Failure(Exception(e.message ?? 'Password reset failed'));
+    } catch (e) {
+      return Failure(Exception('Password reset failed: $e'));
+    }
+  }
 }

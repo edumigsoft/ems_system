@@ -33,3 +33,23 @@ class StorageException extends DataException {
 class LoginException extends DataException {
   LoginException(super.message, {super.stackTrace, super.statusCode});
 }
+
+class UnauthorizedException extends BaseException {
+  UnauthorizedException(
+    super.message, {
+    super.stackTrace,
+    super.statusCode = 401,
+  });
+}
+
+class ValidationException extends BaseException {
+  final Map<String, List<String>> errors;
+
+  ValidationException(this.errors, {StackTrace? stackTrace})
+    : super('Erro de validação', stackTrace: stackTrace, statusCode: 400);
+
+  @override
+  String toString() {
+    return 'ValidationException: $errors';
+  }
+}

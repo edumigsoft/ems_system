@@ -1,14 +1,17 @@
 import 'package:drift/drift.dart';
 import 'package:core_server/core_server.dart';
-import 'package:user_server/user_server.dart';
+// import 'package:user_server/user_server.dart'; // Removido para evitar erro do Drift
 
 /// Tabela de credenciais de usuário.
 ///
-/// Armazena dados sensíveis de autenticação separados da tabela [Users].
-/// O password hash nunca é exposto na entity [UserDetails].
+/// Armazena dados sensíveis de autenticação separados da tabela Users.
+/// O password hash nunca é exposto na entity UserDetails.
 class UserCredentials extends Table with DriftTableMixinPostgres {
   /// FK para tabela users.
-  TextColumn get userId => text().references(Users, #id)();
+  ///
+  /// Nota: Referência removida temporariamente para evitar erro de build cross-package.
+  /// Deve garantir consistência via aplicação.
+  TextColumn get userId => text()();
 
   /// Hash bcrypt da senha.
   TextColumn get passwordHash => text()();
