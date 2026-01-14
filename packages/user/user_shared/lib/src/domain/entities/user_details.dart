@@ -77,9 +77,6 @@ class UserDetails implements BaseDetails {
   /// Verifica se o usuário é administrador.
   bool get isAdmin => data.isAdmin;
 
-  /// Verifica se o usuário está autenticado.
-  bool get isAuthenticated => data.isAuthenticated;
-
   /// Cria uma cópia com os campos especificados alterados.
   UserDetails copyWith({
     String? id,

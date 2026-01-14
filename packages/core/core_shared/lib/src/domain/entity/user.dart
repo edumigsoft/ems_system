@@ -44,9 +44,6 @@ class User {
   /// Verifica se o usuário é administrador.
   bool get isAdmin => role.isAdmin;
 
-  /// Verifica se o usuário está autenticado (não é guest).
-  bool get isAuthenticated => role.isAuthenticated;
-
   /// Verifica se o email do usuário está verificado.
   bool get canLogin => emailVerified;
 

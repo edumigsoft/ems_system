@@ -1,11 +1,9 @@
 import 'package:auth_client/auth_client.dart'
     show AuthService, AuthApiService, TokenStorage;
 import 'package:core_shared/core_shared.dart' show Loggable, DependencyInjector;
-import 'package:core_ui/core_ui.dart'
-    show AppModule, AppNavigationItem, AppNavigationSection;
+import 'package:core_ui/core_ui.dart' show AppModule, AppNavigationItem;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:localizations_ui/localizations_ui.dart';
 
 import 'pages/login_page.dart';
 import 'pages/register_page.dart';
@@ -69,12 +67,5 @@ class AuthModule extends AppModule with Loggable {
   };
 
   @override
-  List<AppNavigationItem> get navigationItems => [
-    AppNavigationItem(
-      labelBuilder: (context) => AppLocalizations.of(context).auth,
-      icon: Icons.login,
-      route: routeName,
-      section: AppNavigationSection.system,
-    ),
-  ];
+  List<AppNavigationItem> get navigationItems => [];
 }

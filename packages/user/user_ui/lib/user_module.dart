@@ -66,8 +66,28 @@ class UserModule extends AppModule with Loggable {
     AppNavigationItem(
       labelBuilder: (context) => AppLocalizations.of(context).users,
       icon: DSIcons.users,
-      route: routeName,
       section: AppNavigationSection.system,
+      // O item pai não tem rota própria, serve apenas para agrupar
+      route: null,
+      defaultExpanded: true,
+      children: [
+        AppNavigationItem(
+          labelBuilder: (context) => 'Meu Perfil', // TODO: Localizar
+          icon: Icons.person,
+          route: routeName, // /users -> ProfilePage
+        ),
+        AppNavigationItem(
+          labelBuilder: (context) => 'Configurações', // TODO: Localizar
+          icon: Icons.settings,
+          route: '$routeName/settings', // /users/settings
+        ),
+        // Item condicional para admins (precisa de lógica de filtragem)
+        AppNavigationItem(
+          labelBuilder: (context) => 'Gerenciar Usuários', // TODO: Localizar
+          icon: Icons.admin_panel_settings,
+          route: '$routeName/manage', // /users/manage
+        ),
+      ],
     ),
   ];
 }
