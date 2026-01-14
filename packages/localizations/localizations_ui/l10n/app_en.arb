@@ -347,5 +347,41 @@
     "validationRequired": "This field is required",
     "@validationRequired": {},
     "auth": "Authentication",
-    "@auth": {}
+    "@auth": {},
+    "authRememberMeLabel": "Remember me on this device",
+    "@authRememberMeLabel": {
+        "description": "Remember me checkbox label"
+    },
+    "authRememberMeSessionActive": "Session active for 7 days",
+    "@authRememberMeSessionActive": {
+        "description": "Message when remember me is active"
+    },
+    "authRememberMeSessionExpires": "Session expires in 15 minutes",
+    "@authRememberMeSessionExpires": {
+        "description": "Message when remember me is disabled"
+    },
+    "authSessionExpiringTitle": "Your session is expiring",
+    "@authSessionExpiringTitle": {
+        "description": "Session expiration dialog title"
+    },
+    "authSessionExpiringMessage": "Your session will expire soon. Do you want to renew now or logout?",
+    "@authSessionExpiringMessage": {
+        "description": "Session expiration dialog message"
+    },
+    "authRenewSession": "Renew Now",
+    "@authRenewSession": {
+        "description": "Button to renew session"
+    },
+    "authLogout": "Logout",
+    "@authLogout": {
+        "description": "Button to logout"
+    },
+    "authSessionRenewed": "Session renewed successfully",
+    "@authSessionRenewed": {
+        "description": "Success message when session is renewed"
+    },
+    "authSessionRenewalError": "Error renewing session. Please login again.",
+    "@authSessionRenewalError": {
+        "description": "Error message when session renewal fails"
+    }
 }

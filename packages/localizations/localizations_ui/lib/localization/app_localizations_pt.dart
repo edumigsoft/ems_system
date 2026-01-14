@@ -290,4 +290,33 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get auth => 'Autenticação';
+
+  @override
+  String get authRememberMeLabel => 'Lembrar-me neste dispositivo';
+
+  @override
+  String get authRememberMeSessionActive => 'Sessão ativa por 7 dias';
+
+  @override
+  String get authRememberMeSessionExpires => 'Sessão expira em 15 minutos';
+
+  @override
+  String get authSessionExpiringTitle => 'Sua sessão está expirando';
+
+  @override
+  String get authSessionExpiringMessage =>
+      'Sua sessão irá expirar em breve. Deseja renovar agora ou fazer logout?';
+
+  @override
+  String get authRenewSession => 'Renovar Agora';
+
+  @override
+  String get authLogout => 'Fazer Logout';
+
+  @override
+  String get authSessionRenewed => 'Sessão renovada com sucesso';
+
+  @override
+  String get authSessionRenewalError =>
+      'Erro ao renovar sessão. Faça login novamente.';
 }

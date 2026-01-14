@@ -290,5 +290,41 @@
     "validationRequired": "Este campo é obrigatório",
     "@validationRequired": {},
     "auth": "Autenticação",
-    "@auth": {}
+    "@auth": {},
+    "authRememberMeLabel": "Lembrar-me neste dispositivo",
+    "@authRememberMeLabel": {
+        "description": "Label do checkbox de lembrar-me"
+    },
+    "authRememberMeSessionActive": "Sessão ativa por 7 dias",
+    "@authRememberMeSessionActive": {
+        "description": "Mensagem quando lembrar-me está ativo"
+    },
+    "authRememberMeSessionExpires": "Sessão expira em 15 minutos",
+    "@authRememberMeSessionExpires": {
+        "description": "Mensagem quando lembrar-me está desativado"
+    },
+    "authSessionExpiringTitle": "Sua sessão está expirando",
+    "@authSessionExpiringTitle": {
+        "description": "Título do diálogo de expiração de sessão"
+    },
+    "authSessionExpiringMessage": "Sua sessão irá expirar em breve. Deseja renovar agora ou fazer logout?",
+    "@authSessionExpiringMessage": {
+        "description": "Mensagem do diálogo de expiração de sessão"
+    },
+    "authRenewSession": "Renovar Agora",
+    "@authRenewSession": {
+        "description": "Botão para renovar sessão"
+    },
+    "authLogout": "Fazer Logout",
+    "@authLogout": {
+        "description": "Botão para fazer logout"
+    },
+    "authSessionRenewed": "Sessão renovada com sucesso",
+    "@authSessionRenewed": {
+        "description": "Mensagem de sucesso ao renovar sessão"
+    },
+    "authSessionRenewalError": "Erro ao renovar sessão. Faça login novamente.",
+    "@authSessionRenewalError": {
+        "description": "Mensagem de erro ao renovar sessão"
+    }
 }

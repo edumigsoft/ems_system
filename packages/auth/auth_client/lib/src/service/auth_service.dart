@@ -29,13 +29,21 @@ class AuthService {
   }
 
   /// Realiza login com email e senha.
-  Future<Result<UserDetails>> login(LoginRequest request) async {
+  ///
+  /// Se [rememberMe] for true (padrão), o refresh token será armazenado,
+  /// permitindo sessões de longa duração. Se false, apenas o access token
+  /// será armazenado, expirando a sessão em 15 minutos.
+  Future<Result<UserDetails>> login(
+    LoginRequest request, {
+    bool rememberMe = true,
+  }) async {
     try {
       final authResponse = await _api.login(request);
 
       await _tokenStorage.saveTokens(
         authResponse.tokens,
         expiresIn: authResponse.expiresIn,
+        rememberMe: rememberMe,
       );
 
       _currentUser = authResponse.user;
@@ -60,12 +68,17 @@ class AuthService {
   }
 
   /// Renova o access token usando o refresh token.
+  ///
+  /// Preserva a preferência "lembrar-me" durante a renovação.
   Future<Result<void>> refreshToken() async {
     try {
       final refreshToken = await _tokenStorage.getRefreshToken();
       if (refreshToken == null) {
         return Failure(Exception('No refresh token available'));
       }
+
+      // Preservar preferência rememberMe
+      final rememberMe = await _tokenStorage.getRememberMe();
 
       final refreshResponse = await _api.refresh({
         'refresh_token': refreshToken,
@@ -74,6 +87,7 @@ class AuthService {
       await _tokenStorage.saveTokens(
         refreshResponse.tokens,
         expiresIn: refreshResponse.expiresIn,
+        rememberMe: rememberMe,
       );
 
       return successOfUnit();
@@ -128,5 +142,12 @@ class AuthService {
     } catch (e) {
       return Failure(Exception('Password reset failed: $e'));
     }
+  }
+
+  /// Verifica se o token expira dentro de uma duração específica.
+  ///
+  /// Útil para monitorar expiração e avisar o usuário proativamente.
+  Future<bool> tokenExpiresWithin(Duration duration) async {
+    return _tokenStorage.tokenExpiresWithin(duration);
   }
 }

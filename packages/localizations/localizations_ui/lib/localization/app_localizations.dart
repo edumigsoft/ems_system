@@ -597,6 +597,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Authentication'**
   String get auth;
+
+  /// Remember me checkbox label
+  ///
+  /// In en, this message translates to:
+  /// **'Remember me on this device'**
+  String get authRememberMeLabel;
+
+  /// Message when remember me is active
+  ///
+  /// In en, this message translates to:
+  /// **'Session active for 7 days'**
+  String get authRememberMeSessionActive;
+
+  /// Message when remember me is disabled
+  ///
+  /// In en, this message translates to:
+  /// **'Session expires in 15 minutes'**
+  String get authRememberMeSessionExpires;
+
+  /// Session expiration dialog title
+  ///
+  /// In en, this message translates to:
+  /// **'Your session is expiring'**
+  String get authSessionExpiringTitle;
+
+  /// Session expiration dialog message
+  ///
+  /// In en, this message translates to:
+  /// **'Your session will expire soon. Do you want to renew now or logout?'**
+  String get authSessionExpiringMessage;
+
+  /// Button to renew session
+  ///
+  /// In en, this message translates to:
+  /// **'Renew Now'**
+  String get authRenewSession;
+
+  /// Button to logout
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get authLogout;
+
+  /// Success message when session is renewed
+  ///
+  /// In en, this message translates to:
+  /// **'Session renewed successfully'**
+  String get authSessionRenewed;
+
+  /// Error message when session renewal fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error renewing session. Please login again.'**
+  String get authSessionRenewalError;
 }
 
 class _AppLocalizationsDelegate

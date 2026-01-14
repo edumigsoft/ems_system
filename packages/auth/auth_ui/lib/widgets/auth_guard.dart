@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../view_models/auth_view_model.dart';
+import 'session_expiration_dialog.dart';
 
 /// Widget responsável por verificar autenticação e decidir qual interface mostrar.
 ///
@@ -25,7 +26,8 @@ import '../view_models/auth_view_model.dart';
 /// - Reage automaticamente a mudanças no [AuthViewModel] via [ListenableBuilder]
 /// - Mostra splash screen durante verificação inicial de tokens
 /// - Evita "flash" de tela de login ao iniciar app com sessão válida
-class AuthGuard extends StatelessWidget {
+/// - Monitora expiração de sessão e exibe diálogo de aviso
+class AuthGuard extends StatefulWidget {
   /// ViewModel que gerencia o estado de autenticação.
   final AuthViewModel authViewModel;
 
@@ -43,23 +45,67 @@ class AuthGuard extends StatelessWidget {
   });
 
   @override
+  State<AuthGuard> createState() => _AuthGuardState();
+}
+
+class _AuthGuardState extends State<AuthGuard> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Registrar callback para mostrar diálogo de expiração
+    widget.authViewModel.onTokenExpiring = _showExpirationDialog;
+
+    // Adicionar listener para detectar quando mostrar diálogo
+    widget.authViewModel.addListener(_checkShowExpirationDialog);
+  }
+
+  @override
+  void dispose() {
+    widget.authViewModel.removeListener(_checkShowExpirationDialog);
+    super.dispose();
+  }
+
+  /// Verifica se deve mostrar o diálogo de expiração.
+  void _checkShowExpirationDialog() {
+    if (widget.authViewModel.isAuthenticated &&
+        widget.authViewModel.hasShownExpirationWarning &&
+        mounted) {
+      _showExpirationDialog(context);
+    }
+  }
+
+  /// Exibe o diálogo de aviso de expiração de sessão.
+  void _showExpirationDialog(BuildContext context) {
+    // Verifica se já não há diálogo aberto
+    if (ModalRoute.of(context)?.isCurrent != true) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          SessionExpirationDialog(viewModel: widget.authViewModel),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: authViewModel,
+      listenable: widget.authViewModel,
       builder: (context, _) {
         // Estado inicial ou carregando: mostra splash screen
-        if (authViewModel.state == AuthState.initial ||
-            authViewModel.state == AuthState.loading) {
+        if (widget.authViewModel.state == AuthState.initial ||
+            widget.authViewModel.state == AuthState.loading) {
           return _buildSplashScreen(context);
         }
 
         // Autenticado: mostra app principal
-        if (authViewModel.isAuthenticated) {
-          return authenticatedChild;
+        if (widget.authViewModel.isAuthenticated) {
+          return widget.authenticatedChild;
         }
 
         // Não autenticado ou erro: mostra fluxo de login
-        return unauthenticatedChild;
+        return widget.unauthenticatedChild;
       },
     );
   }
@@ -88,9 +134,7 @@ class AuthGuard extends StatelessWidget {
             const SizedBox(height: 32),
 
             // Indicador de carregamento
-            CircularProgressIndicator(
-              color: theme.colorScheme.primary,
-            ),
+            CircularProgressIndicator(color: theme.colorScheme.primary),
             const SizedBox(height: 24),
 
             // Mensagem

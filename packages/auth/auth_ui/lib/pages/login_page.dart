@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:localizations_ui/localizations_ui.dart';
 import '../view_models/auth_view_model.dart';
 
 /// Página de Login.
@@ -38,6 +39,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _showWelcomeBanner = true;
+  bool _rememberMe = true;
 
   @override
   void initState() {
@@ -65,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
     await widget.viewModel.login(
       _emailController.text.trim(),
       _passwordController.text,
+      rememberMe: _rememberMe,
     );
   }
 
@@ -243,7 +246,35 @@ class _LoginPageState extends State<LoginPage> {
                             child: const Text('Esqueci minha senha'),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
+
+                        // Checkbox Lembrar-me
+                        CheckboxListTile(
+                          value: _rememberMe,
+                          onChanged: (value) {
+                            setState(() {
+                              _rememberMe = value ?? true;
+                            });
+                          },
+                          title: Text(
+                            AppLocalizations.of(context).authRememberMeLabel,
+                          ),
+                          subtitle: Text(
+                            _rememberMe
+                                ? AppLocalizations.of(
+                                    context,
+                                  ).authRememberMeSessionActive
+                                : AppLocalizations.of(
+                                    context,
+                                  ).authRememberMeSessionExpires,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        const SizedBox(height: 8),
 
                         // Erro
                         if (widget.viewModel.errorMessage != null)

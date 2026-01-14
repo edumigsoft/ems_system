@@ -8,6 +8,7 @@ class TokenStorage {
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
   static const _accessExpiresAtKey = 'access_expires_at';
+  static const _rememberMeKey = 'remember_me';
 
   final FlutterSecureStorage _storage;
 
@@ -22,17 +23,36 @@ class TokenStorage {
           );
 
   /// Salva um par de tokens.
-  Future<void> saveTokens(TokenPair tokens, {required int expiresIn}) async {
+  ///
+  /// Se [rememberMe] for false, o refresh token não será armazenado,
+  /// fazendo com que a sessão expire após o access token expirar.
+  Future<void> saveTokens(
+    TokenPair tokens, {
+    required int expiresIn,
+    bool rememberMe = true,
+  }) async {
     final expiresAt = DateTime.now().add(Duration(seconds: expiresIn));
 
-    await Future.wait([
+    final writes = [
       _storage.write(key: _accessTokenKey, value: tokens.accessToken),
-      _storage.write(key: _refreshTokenKey, value: tokens.refreshToken),
       _storage.write(
         key: _accessExpiresAtKey,
         value: expiresAt.toIso8601String(),
       ),
-    ]);
+      _storage.write(key: _rememberMeKey, value: rememberMe.toString()),
+    ];
+
+    // Só salvar refresh token se rememberMe = true
+    if (rememberMe) {
+      writes.add(
+        _storage.write(key: _refreshTokenKey, value: tokens.refreshToken),
+      );
+    } else {
+      // Limpar refresh token antigo se existir
+      writes.add(_storage.delete(key: _refreshTokenKey));
+    }
+
+    await Future.wait(writes);
   }
 
   /// Recupera o access token.
@@ -68,6 +88,12 @@ class TokenStorage {
     if (expiresAt == null) return true;
 
     return DateTime.now().add(duration).isAfter(expiresAt);
+  }
+
+  /// Recupera a preferência de "lembrar-me".
+  Future<bool> getRememberMe() async {
+    final value = await _storage.read(key: _rememberMeKey);
+    return value == 'true';
   }
 
   /// Limpa todos os tokens (logout).
