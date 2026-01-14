@@ -4,6 +4,7 @@ import 'package:open_api_shared/open_api_shared.dart';
 /// Payload do token JWT.
 ///
 /// Contém as claims do token para validação e identificação do usuário.
+@apiModel
 @Model(name: 'TokenPayload', description: 'Payload do token JWT')
 class TokenPayload {
   /// ID do usuário.

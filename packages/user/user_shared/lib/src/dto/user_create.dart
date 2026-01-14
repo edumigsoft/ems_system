@@ -1,12 +1,25 @@
+import 'package:open_api_shared/open_api_shared.dart';
+
 /// DTO para criação de usuário.
 ///
 /// Contém apenas os campos necessários para criar um novo usuário.
 /// A validação é feita via CoreValidator separado.
+@apiModel
+@Model(name: 'UserCreate', description: 'DTO para criação de usuário')
 class UserCreate {
+  @Property(description: 'Nome completo', required: true)
   final String name;
+
+  @Property(description: 'Email do usuário', required: true)
   final String email;
+
+  @Property(description: 'Nome de usuário (único)', required: true)
   final String username;
+
+  @Property(description: 'Senha (min 8 car)', required: true)
   final String password;
+
+  @Property(description: 'Telefone (opcional)')
   final String? phone;
 
   const UserCreate({

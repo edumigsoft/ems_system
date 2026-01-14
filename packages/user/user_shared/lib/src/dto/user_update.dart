@@ -1,11 +1,23 @@
+import 'package:open_api_shared/open_api_shared.dart';
+
 /// DTO para atualização de perfil de usuário.
 ///
 /// Contém apenas os campos que o usuário pode atualizar.
 /// Campos como email, role e emailVerified são atualizados apenas por admin.
 /// A validação é feita via CoreValidator separado.
+@apiModel
+@Model(
+  name: 'UserUpdate',
+  description: 'DTO para atualização de perfil de usuário',
+)
 class UserUpdate {
+  @Property(description: 'Nome completo')
   final String? name;
+
+  @Property(description: 'URL do avatar')
   final String? avatarUrl;
+
+  @Property(description: 'Telefone')
   final String? phone;
 
   const UserUpdate({this.name, this.avatarUrl, this.phone});

@@ -2,6 +2,7 @@ import 'package:open_api_shared/open_api_shared.dart';
 import 'package:user_shared/user_shared.dart';
 
 /// Par de tokens JWT (access + refresh).
+@apiModel
 @Model(name: 'TokenPair', description: 'Par de tokens JWT (access + refresh)')
 class TokenPair {
   @Property(description: 'Token de acesso')
@@ -28,6 +29,7 @@ class TokenPair {
   name: 'AuthResponse',
   description: 'Resposta de autenticação bem-sucedida',
 )
+@apiModel
 class AuthResponse {
   @Property(description: 'Par de tokens')
   final TokenPair tokens;
@@ -61,6 +63,7 @@ class AuthResponse {
 
 /// Resposta de refresh de token.
 @Model(name: 'RefreshResponse', description: 'Resposta de refresh de token')
+@apiModel
 class RefreshResponse {
   @Property(description: 'Novos tokens')
   final TokenPair tokens;

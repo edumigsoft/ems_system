@@ -1,4 +1,5 @@
 import 'package:core_shared/core_shared.dart';
+import 'package:open_api_shared/open_api_shared.dart';
 import '../domain/user_details.dart';
 
 /// Model de serialização JSON para [UserDetails].
@@ -7,7 +8,13 @@ import '../domain/user_details.dart';
 /// - Model contém a entity (campo `entity`)
 /// - Métodos `fromJson`, `toJson`, `toDomain`, `fromDomain`
 /// - SEM dependências de code generation
+@apiModel
+@Model(
+  name: 'UserDetailsModel',
+  description: 'Model de serialização JSON para UserDetails',
+)
 class UserDetailsModel {
+  @Property(description: 'Entidade de detalhes do usuário')
   final UserDetails entity;
 
   const UserDetailsModel(this.entity);

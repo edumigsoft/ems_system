@@ -1,26 +1,35 @@
 import 'package:core_shared/core_shared.dart';
+import 'package:open_api_shared/open_api_shared.dart';
 
 /// Detalhes completos do usuário com campos de persistência.
 ///
 /// Implementa [BaseDetails] conforme entity_patterns.md.
 /// Compõe a entity [User] de core_shared com metadados de persistência.
+@apiModel
+@Model(name: 'UserDetails', description: 'Detalhes completos do usuário')
 class UserDetails implements BaseDetails {
   @override
+  @Property(description: 'ID do usuário', required: true)
   final String id;
 
   @override
+  @Property(description: 'Data de criação', required: true)
   final DateTime createdAt;
 
   @override
+  @Property(description: 'Data de atualização', required: true)
   final DateTime updatedAt;
 
   @override
+  @Property(description: 'Se o usuário está deletado')
   final bool isDeleted;
 
   @override
+  @Property(description: 'Se o usuário está ativo')
   final bool isActive;
 
   /// Dados de domínio do usuário.
+  @Property(description: 'Dados do usuário', required: true)
   final User data;
 
   const UserDetails({

@@ -1,6 +1,7 @@
 class Model {
   final String name;
   final String description;
+
   const Model({required this.name, this.description = ''});
 }
 

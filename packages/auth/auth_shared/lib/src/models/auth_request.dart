@@ -1,6 +1,7 @@
 import 'package:open_api_shared/open_api_shared.dart';
 
 /// Request de login com email e senha.
+@apiModel
 @Model(name: 'LoginRequest', description: 'Request de login com email e senha')
 class LoginRequest {
   @Property(description: 'Email do usuário', required: true)
@@ -23,10 +24,12 @@ class LoginRequest {
 }
 
 /// Request de registro de novo usuário.
+/// Request de registro de novo usuário.
 @Model(
   name: 'RegisterRequest',
   description: 'Request de registro de novo usuário',
 )
+@apiModel
 class RegisterRequest {
   @Property(description: 'Nome completo', required: true)
   final String name;
@@ -77,7 +80,9 @@ class RegisterRequest {
 }
 
 /// Request de reset de senha.
+/// Request de reset de senha.
 @Model(name: 'PasswordResetRequest', description: 'Request de reset de senha')
+@apiModel
 class PasswordResetRequest {
   @Property(description: 'Email cadastrado', required: true)
   final String email;
@@ -91,10 +96,12 @@ class PasswordResetRequest {
 }
 
 /// Confirmação de reset de senha com token.
+/// Confirmação de reset de senha com token.
 @Model(
   name: 'PasswordResetConfirm',
   description: 'Confirmação de reset de senha com token',
 )
+@apiModel
 class PasswordResetConfirm {
   @Property(description: 'Token recebido por email', required: true)
   final String token;
