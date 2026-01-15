@@ -3,6 +3,7 @@ import 'package:core_ui/core_ui.dart'
 import 'package:design_system_shared/design_system_shared.dart'
     show DSSpacing, DSPaddings, DSRadius;
 import 'package:flutter/material.dart';
+import 'package:images_ui/images_ui.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
 
 import '../design_system_ui.dart' show DSIcons;
@@ -248,7 +249,7 @@ class _NavHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: logo ?? const SizedBox(width: 52, height: 52),
+            child: logo ?? Assets.images.appLogo.image(width: 52.0),
           ),
           const SizedBox(width: 12),
           const Expanded(
@@ -586,7 +587,9 @@ class _NavFooter extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: dsColors.primary.withValues(alpha: 0.1),
-            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl!) : null,
+            backgroundImage: avatarUrl != null
+                ? NetworkImage(avatarUrl!)
+                : null,
             child: avatarUrl == null
                 ? Icon(
                     DSIcons.person,

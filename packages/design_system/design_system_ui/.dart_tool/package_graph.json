@@ -12,6 +12,7 @@
         "dio",
         "flutter",
         "get_it",
+        "images_ui",
         "localizations_ui",
         "logging"
       ],
@@ -43,6 +44,13 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "images_ui",
+      "version": "0.1.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -214,20 +222,20 @@
       ]
     },
     {
-      "name": "flutter_localizations",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter",
-        "intl",
-        "path"
-      ]
-    },
-    {
       "name": "intl",
       "version": "0.20.2",
       "dependencies": [
         "clock",
         "meta",
+        "path"
+      ]
+    },
+    {
+      "name": "flutter_localizations",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter",
+        "intl",
         "path"
       ]
     },
