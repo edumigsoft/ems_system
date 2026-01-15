@@ -47,7 +47,7 @@ import 'view_models/app_view_model.dart';
 /// - [key]: Chave opcional para o widget
 /// - [di]: Gerenciador de injeção de dependências
 /// - [viewModel]: ViewModel principal do aplicativo
-/// - [systemViewModel]: ViewModel responsável pelas configurações do sistema
+/// - [settingsViewModel]: ViewModel responsável pelas configurações do sistema
 ///
 /// ## Melhorias Futuras
 /// - Adicionar suporte a temas personalizados
