@@ -32,4 +32,33 @@ abstract class Env {
   )
   static const String allowedOrigins =
       '${_Env.allowedOrigins}:${_Env.serverPort}';
+
+  // Auth Configuration
+  @EnviedField(varName: 'ACCESS_TOKEN_EXPIRES_MINUTES', defaultValue: 15)
+  static const int accessTokenExpiresMinutes = _Env.accessTokenExpiresMinutes;
+
+  @EnviedField(varName: 'REFRESH_TOKEN_EXPIRES_DAYS', defaultValue: 7)
+  static const int refreshTokenExpiresDays = _Env.refreshTokenExpiresDays;
+
+  @EnviedField(varName: 'MAX_LOGIN_ATTEMPTS_PER_ACCOUNT', defaultValue: 5)
+  static const int maxLoginAttemptsPerAccount = _Env.maxLoginAttemptsPerAccount;
+
+  @EnviedField(varName: 'MAX_LOGIN_ATTEMPTS_PER_IP', defaultValue: 10)
+  static const int maxLoginAttemptsPerIp = _Env.maxLoginAttemptsPerIp;
+
+  @EnviedField(varName: 'ACCOUNT_LOCKOUT_MINUTES', defaultValue: 30)
+  static const int accountLockoutMinutes = _Env.accountLockoutMinutes;
+
+  @EnviedField(varName: 'IP_BLOCK_MINUTES', defaultValue: 15)
+  static const int ipBlockMinutes = _Env.ipBlockMinutes;
+
+  // Email Service
+  @EnviedField(varName: 'EMAIL_SERVICE_HOST')
+  static const String emailServiceHost = _Env.emailServiceHost;
+
+  @EnviedField(varName: 'EMAIL_SERVICE_PORT')
+  static const int emailServicePort = _Env.emailServicePort;
+
+  @EnviedField(varName: 'EMAIL_SERVICE_API_KEY', obfuscate: true)
+  static final String emailServiceApiKey = _Env.emailServiceApiKey;
 }

@@ -16,12 +16,11 @@
 - [x] 3.2 Criar `UserCreate` DTO
 - [x] 3.3 Criar `UserUpdate` DTO
 - [x] 3.4 Criar `UserDetailsModel` com serialização JSON
-- [ ] 3.5 Criar validators com Zard para todos os models
 
 ## 4. User Server - Database e Rotas
 - [x] 4.1 Criar tabela `users` com `@UseRowClass(UserDetails)`
 - [x] 4.2 Criar `UserRepository` com CRUD básico
-- [ ] 4.3 Criar `UserService` com lógica de negócio
+- [x] 4.3 Criar `UserService` com lógica de negócio
 - [x] 4.4 Criar `UserRoutes` com endpoints `/users/me`, `/users`, `/users/{id}`
 - [x] 4.5 Criar `InitUserModuleToServer` para registro no injector
 
@@ -40,7 +39,6 @@
 - [x] 6.5 Criar `PasswordResetRequest` e `PasswordResetConfirm`
 - [x] 6.6 Criar `ResourcePermission` enum (read, write, delete, manage)
 - [x] 6.7 Criar `AuthContext` (userId, globalRole)
-- [ ] 6.8 Criar validators com Zard para todos os models
 
 ## 7. Auth Server - Database
 - [x] 7.1 Criar tabela `user_credentials` (userId FK, passwordHash, lastLoginAt)
@@ -75,27 +73,26 @@
 ## 11. Testes e Validação
 - [x] 11.1 Testes Unitários `AuthService`
 
+## 12. Auth Client - Serviços
+- [x] 12.1 Criar `AuthService` interface
+- [x] 12.2 Implementar `AuthServiceImpl` com Dio
+- [x] 12.3 Criar `TokenStorage` com `FlutterSecureStorage`
+- [x] 12.4 Implementar interceptor Dio para refresh automático
 
-## 11. Auth Client - Serviços
-- [x] 11.1 Criar `AuthService` interface
-- [x] 11.2 Implementar `AuthServiceImpl` com Dio
-- [x] 11.3 Criar `TokenStorage` com `FlutterSecureStorage`
-- [x] 11.4 Implementar interceptor Dio para refresh automático
+## 13. Auth UI - Telas
+- [x] 13.1 Criar `LoginPage` com form validation
+- [x] 13.2 Criar `RegisterPage`
+- [x] 13.3 Criar `ForgotPasswordPage`
+- [x] 13.4 Criar `ResetPasswordPage`
+- [x] 13.5 Criar `AuthViewModel` base
 
-## 12. Auth UI - Telas
-- [x] 12.1 Criar `LoginPage` com form validation
-- [x] 12.2 Criar `RegisterPage`
-- [x] 12.3 Criar `ForgotPasswordPage`
-- [x] 12.4 Criar `ResetPasswordPage`
-- [x] 12.5 Criar `AuthViewModel` base
+## 14. User Client/UI (Opcional - Fase 2)
+- [x] 14.1 Criar `UserClient` para chamadas HTTP
+- [x] 14.2 Criar `UserProfilePage`
+- [x] 14.3 Criar `UserProfileViewModel`
 
-## 13. User Client/UI (Opcional - Fase 2)
-- [x] 13.1 Criar `UserClient` para chamadas HTTP
-- [x] 13.2 Criar `UserProfilePage`
-- [x] 13.3 Criar `UserProfileViewModel`
-
-## 14. Integração
-- [ ] 14.1 Adicionar variáveis de ambiente em `.env.example`:
+## 15. Integração
+- [x] 15.1 Adicionar variáveis de ambiente em `.env.example`:
   - `ACCESS_TOKEN_EXPIRES_MINUTES` (padrão: 15)
   - `REFRESH_TOKEN_EXPIRES_DAYS` (padrão: 7)
   - `EMAIL_SERVICE_HOST`, `EMAIL_SERVICE_PORT`, `EMAIL_SERVICE_API_KEY`
@@ -103,17 +100,16 @@
   - `MAX_LOGIN_ATTEMPTS_PER_IP` (padrão: 10)
   - `ACCOUNT_LOCKOUT_MINUTES` (padrão: 30)
   - `IP_BLOCK_MINUTES` (padrão: 15)
-- [ ] 14.2 Registrar `InitUserModuleToServer` em `server_v1`
-- [ ] 14.3 Registrar `InitAuthModuleToServer` em `server_v1`
-- [ ] 14.4 Configurar GetIt com serviços de auth/user no client
+- [x] 15.2 Registrar `InitUserModuleToServer` em `server_v1`
+- [x] 15.3 Registrar `InitAuthModuleToServer` em `server_v1`
+- [x] 15.4 Configurar GetIt com serviços de auth/user no client
 
-## 15. Testes
-- [ ] 15.1 Testes unitários para validators (user + auth)
-- [ ] 15.2 Testes unitários para services
-- [ ] 15.3 Testes unitários para routes
-- [ ] 15.4 Testes de integração para fluxo completo de auth
+## 16. Testes
+- [ ] 16.2 Testes unitários para services
+- [ ] 16.3 Testes unitários para routes
+- [ ] 16.4 Testes de integração para fluxo completo de auth
 
-## 16. Documentação
-- [x] 16.1 README.md para cada variante (user + auth)
-- [ ] 16.2 Exemplos de uso no README principal
+## 17. Documentação
+- [x] 17.1 README.md para cada variante (user + auth)
+- [x] 17.2 Exemplos de uso no README principal
 
