@@ -8,6 +8,21 @@
 
 Sistema de Gestão de features para o EduMigSoft.
 
+## 🆕 Atualizações Recentes
+
+### Sistema de Autorização por Papéis em Features ✨
+
+O sistema agora implementa um modelo robusto de autorização em dois níveis:
+
+1. **Papéis Globais** - UserRole expandido com novo papel `manager`
+2. **Papéis por Feature** - Controle de acesso granular para projetos, finanças, tarefas, etc.
+
+Cada feature pode ter seus próprios membros com papéis independentes (owner, admin, manager, member, viewer), permitindo que diferentes usuários tenham diferentes níveis de acesso em diferentes projetos.
+
+**Exemplo de implementação disponível**: `project_user_role` em `packages/auth/auth_server`
+
+📚 Documentação completa: [Auth Server README](packages/auth/auth_server/README.md)
+
 ## 📊 Status do Projeto
 
 | Módulo | Status | Versão | Descrição |
@@ -98,13 +113,65 @@ Abaixo estão os principais endpoints disponíveis na API:
 | `PUT`  | `/users/me` | Atualiza dados do usuário logado | ✅ Sim |
 | `GET`  | `/users` | Lista usuários (Admin apenas) | ✅ Admin |
 | `GET`  | `/users/{id}` | Busca usuário por ID (Admin apenas) | ✅ Admin |
+| `POST` | `/projects/{id}/members` | Adiciona membro ao projeto | ✅ Manager |
+| `DELETE` | `/projects/{id}/members/{userId}` | Remove membro do projeto | ✅ Manager |
+| `GET`  | `/projects/{id}/members` | Lista membros do projeto | ✅ Viewer |
+| `PATCH` | `/projects/{id}/members/{userId}` | Atualiza papel do membro | ✅ Manager |
 
-### Permissões e Roles
+### Autorização e Papéis
 
-O sistema implementa **RBAC (Role-Based Access Control)**.
-- **Roles**: `admin`, `user` (padrão), `guest`.
-- **Proteção**: Rotas protegidas exigem um header `Authorization: Bearer <token>`.
-- O `AuthMiddleware` no servidor valida o token e popula o `AuthContext` para uso nos handlers.
+O sistema implementa **RBAC (Role-Based Access Control)** em dois níveis:
+
+#### 1. Papéis Globais (UserRole)
+- **Owner (4)** - Proprietário do sistema, acesso total
+- **Admin (3)** - Administrador global, bypassa verificações de features
+- **Manager (2)** - Gerente com permissões limitadas
+- **User (1)** - Usuário comum (padrão)
+
+#### 2. Papéis por Feature (FeatureUserRole)
+Cada feature (projetos, finanças, tarefas) possui controle de acesso independente:
+- **Owner (5)** - Proprietário da feature
+- **Admin (4)** - Administrador da feature
+- **Manager (3)** - Gerente (pode adicionar/remover membros)
+- **Member (2)** - Membro contribuidor
+- **Viewer (1)** - Visualizador (somente leitura)
+
+**Importante**: Usuários com papel global `admin` ou `owner` têm acesso irrestrito a todas as features.
+
+#### Proteção de Rotas
+- **Autenticação**: Header `Authorization: Bearer <token>`
+- **AuthMiddleware**: Valida JWT e popula `AuthContext`
+- **FeatureRoleMiddleware**: Verifica papel específico em features
+
+#### Exemplo de Uso
+
+```dart
+// Verificar papel global
+if (user.role.isAdmin) {
+  // Acesso administrativo global
+}
+
+// Proteger rota com papel de feature
+router.post(
+  '/projects/<projectId>/tasks',
+  Pipeline()
+    .addMiddleware(authMiddleware.protect())
+    .addMiddleware(featureRoleMiddleware.requireFeatureRole(
+      FeatureUserRole.member,  // Papel mínimo necessário
+      (req) => req.params['projectId']!,
+    ))
+    .addHandler(_createTask),
+);
+```
+
+### Arquitetura Modular de Features
+
+Cada feature (projetos, finanças, tarefas) mantém sua própria tabela de papéis, garantindo:
+- **Isolamento**: Papéis de uma feature não interferem em outras
+- **Escalabilidade**: Fácil adicionar novas features com controle de acesso
+- **Flexibilidade**: Cada usuário pode ter diferentes papéis em diferentes contextos
+
+**Implementação de referência**: Veja `ProjectUserRoleRepository`, `ProjectUserRoleService` e `ProjectUserRoleRoutes` em `packages/auth/auth_server` como exemplo completo para criar novas features.
 
 ## Estrutura do Projeto
 
