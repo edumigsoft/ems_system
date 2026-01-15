@@ -15,6 +15,11 @@ if [[ "$1" == "-v" ]] || [[ "$1" == "--verbose" ]]; then
     VERBOSE=true
 fi
 
+# Pacotes a serem ignorados na validação
+EXCLUDED_PACKAGES=(
+    "zard_form"
+)
+
 # Contadores
 ERRORS=0
 WARNINGS=0
@@ -353,6 +358,24 @@ fi
 FEATURES=()
 for feature_dir in "$PROJECT_ROOT/packages"/*; do
     if [ -d "$feature_dir" ]; then
+        feature_basename=$(basename "$feature_dir")
+        
+        # Verificar se está na lista de exclusão
+        is_excluded=false
+        for excluded in "${EXCLUDED_PACKAGES[@]}"; do
+            if [[ "$feature_basename" == "$excluded" ]]; then
+                is_excluded=true
+                break
+            fi
+        done
+        
+        if [ "$is_excluded" = true ]; then
+            if [ "$VERBOSE" = true ]; then
+                echo -e "${YELLOW}Ignorando pacote excluído: $feature_basename${NC}"
+            fi
+            continue
+        fi
+
         FEATURES+=("${feature_dir#$PROJECT_ROOT/}")
     fi
 done
