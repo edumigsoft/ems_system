@@ -4,7 +4,7 @@ import 'config/di/injector.dart';
 import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:flutter/material.dart';
 
-/// Ponto de entrada principal do aplicativo School Manager System.
+/// Ponto de entrada principal do aplicativo EMS System.
 ///
 /// ## Visão Geral
 /// Este arquivo é responsável por inicializar e configurar os componentes essenciais

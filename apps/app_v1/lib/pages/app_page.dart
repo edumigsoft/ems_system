@@ -1,11 +1,13 @@
-import 'package:auth_ui/auth_ui.dart' show AuthViewModel, AuthGuard, AuthFlowPage;
+import 'package:auth_ui/auth_ui.dart'
+    show AuthViewModel, AuthGuard, AuthFlowPage;
+import 'package:core_ui/core_ui.dart' show ResponsiveLayout;
 import 'package:design_system_ui/design_system_ui.dart';
+import 'package:flutter/material.dart';
+
+import '../view_models/app_view_model.dart';
 import 'desktop_page.dart';
 import 'mobile_page.dart';
 import 'tablet_page.dart';
-import '../view_models/app_view_model.dart';
-import 'package:core_ui/core_ui.dart' show ResponsiveLayout;
-import 'package:flutter/material.dart';
 
 class AppPage extends StatefulWidget {
   final AppViewModel viewModel;

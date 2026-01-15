@@ -1,9 +1,13 @@
 import 'dart:ui';
 
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
+import 'package:design_system_shared/design_system_shared.dart'
+    show DSThemeEnum;
+import 'package:design_system_ui/design_system_ui.dart' show DSTheme;
 
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
+import 'package:user_ui/view_models/settings_view_model.dart';
 
 import 'pages/app_page.dart';
 import 'view_models/app_view_model.dart';
@@ -56,11 +60,13 @@ import 'view_models/app_view_model.dart';
 class AppLayout extends StatefulWidget {
   final AppViewModel viewModel;
   final AuthViewModel authViewModel;
+  final SettingsViewModel settingsViewModel;
 
   const AppLayout({
     super.key,
     required this.viewModel,
     required this.authViewModel,
+    required this.settingsViewModel,
   });
 
   @override
@@ -100,6 +106,8 @@ class _AppLayoutState extends State<AppLayout> {
 
     // Inicializar AuthViewModel para verificar sessão persistida
     await widget.authViewModel.initialize();
+
+    await widget.settingsViewModel.loadSettings();
   }
 
   @override
@@ -107,6 +115,7 @@ class _AppLayoutState extends State<AppLayout> {
     return ListenableBuilder(
       listenable: Listenable.merge([
         widget.viewModel, // Para mudanças no estado do aplicativo
+        widget.settingsViewModel,
       ]),
       builder: (context, child) {
         return MaterialApp(
@@ -116,6 +125,10 @@ class _AppLayoutState extends State<AppLayout> {
             authViewModel: widget.authViewModel,
           ),
           debugShowCheckedModeBanner: false,
+          // Themes
+          theme: DSTheme.forPreset(DSThemeEnum.acqua, Brightness.light),
+          darkTheme: DSTheme.forPreset(DSThemeEnum.acqua, Brightness.dark),
+          themeMode: widget.settingsViewModel.themeMode,
           // Configuração de internacionalização
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

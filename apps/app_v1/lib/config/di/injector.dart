@@ -1,11 +1,11 @@
-import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
 import 'package:auth_client/auth_client.dart'
     show TokenStorage, AuthInterceptor;
+import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
 import 'package:dio/dio.dart';
-import 'package:user_ui/user_module.dart';
+import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
 
 import '../../app_layout.dart';
 import '../../data/services/navigation_service.dart';
@@ -51,6 +51,7 @@ class Injector with Loggable {
       () => AppLayout(
         viewModel: _diMain.get<AppViewModel>(),
         authViewModel: _diMain.get<AuthViewModel>(),
+        settingsViewModel: _diMain.get<SettingsViewModel>(),
       ),
     );
 

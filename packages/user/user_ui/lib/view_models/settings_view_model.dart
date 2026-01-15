@@ -203,4 +203,6 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     notifyListeners();
     return _passwordChangeError;
   }
+
+  ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
 }

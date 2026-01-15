@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:localizations_ui/localization/app_localizations.dart'
+    show AppLocalizations;
 import '../view_models/settings_view_model.dart';
 
 /// Página de Configurações do Usuário.
@@ -41,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
         final theme = Theme.of(context);
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Configurações')),
+          appBar: AppBar(title: Text(AppLocalizations.of(context).settings)),
           body: ListView(
             children: [
               // Seção Conta
