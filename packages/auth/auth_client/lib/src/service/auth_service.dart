@@ -22,9 +22,9 @@ class AuthService {
     required AuthApiService api,
     required TokenStorage tokenStorage,
     required TokenRefreshService refreshService,
-  })  : _api = api,
-        _tokenStorage = tokenStorage,
-        _refreshService = refreshService;
+  }) : _api = api,
+       _tokenStorage = tokenStorage,
+       _refreshService = refreshService;
 
   /// Usuário atualmente autenticado.
   UserDetails? get currentUser => _currentUser;
@@ -34,11 +34,23 @@ class AuthService {
   /// Tenta renovar o token automaticamente se estiver expirado mas
   /// houver um refresh token válido disponível.
   Future<bool> isAuthenticated() async {
-    final hasValid = await _tokenStorage.hasValidToken();
-    if (hasValid) return true;
+    bool isAuth = await _tokenStorage.hasValidToken();
 
-    // Tentar refresh se token expirado mas refresh disponível
-    return _refreshService.refreshOnStartup();
+    if (!isAuth) {
+      // Tentar refresh se token expirado mas refresh disponível
+      isAuth = await _refreshService.refreshOnStartup();
+    }
+
+    if (isAuth && _currentUser == null) {
+      _currentUser = await _tokenStorage.getUser();
+      if (_currentUser == null) {
+        // Estado inconsistente: token válido mas sem dados de usuário
+        await _tokenStorage.clearTokens();
+        return false;
+      }
+    }
+
+    return isAuth;
   }
 
   /// Realiza login com email e senha.
@@ -58,6 +70,8 @@ class AuthService {
         expiresIn: authResponse.expiresIn,
         rememberMe: rememberMe,
       );
+
+      await _tokenStorage.saveUser(authResponse.user);
 
       _currentUser = authResponse.user;
       _refreshService.startMonitoring();

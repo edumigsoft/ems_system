@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:auth_shared/auth_shared.dart';
+import 'package:user_shared/user_shared.dart';
 
 /// Storage seguro para tokens de autenticação.
 ///
@@ -9,6 +11,7 @@ class TokenStorage {
   static const _refreshTokenKey = 'refresh_token';
   static const _accessExpiresAtKey = 'access_expires_at';
   static const _rememberMeKey = 'remember_me';
+  static const _userKey = 'user_details';
 
   final FlutterSecureStorage _storage;
 
@@ -98,12 +101,33 @@ class TokenStorage {
     return value == 'true';
   }
 
-  /// Limpa todos os tokens (logout).
+  /// Salva os detalhes do usuário.
+  Future<void> saveUser(UserDetails user) async {
+    final userJson = jsonEncode(UserDetailsModel.fromDomain(user).toJson());
+    await _storage.write(key: _userKey, value: userJson);
+  }
+
+  /// Recupera os detalhes do usuário.
+  Future<UserDetails?> getUser() async {
+    final userJson = await _storage.read(key: _userKey);
+    if (userJson == null) return null;
+
+    try {
+      final map = jsonDecode(userJson) as Map<String, dynamic>;
+      return UserDetailsModel.fromJson(map).toDomain();
+    } catch (_) {
+      await _storage.delete(key: _userKey);
+      return null;
+    }
+  }
+
+  /// Limpa todos os tokens e dados do usuário (logout).
   Future<void> clearTokens() async {
     await Future.wait([
       _storage.delete(key: _accessTokenKey),
       _storage.delete(key: _refreshTokenKey),
       _storage.delete(key: _accessExpiresAtKey),
+      _storage.delete(key: _userKey),
     ]);
   }
 }
