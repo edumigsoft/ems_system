@@ -174,7 +174,6 @@ ems_system/
 │
 ├── scripts/
 ├── docs/
-├── containers/
 ├── README.md
 ├── CHANGELOG.md
 ├── LICENSE.md

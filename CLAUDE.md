@@ -278,7 +278,6 @@ ems_system/
 │   └── open_api/          # API definitions (skeleton)
 ├── scripts/               # Development automation scripts
 ├── docs/                  # Documentation
-├── containers/            # Docker configurations
 ├── analysis_options_dart.yaml     # Linting for pure Dart
 ├── analysis_options_flutter.yaml  # Linting for Flutter
 └── CONTRIBUTING.md        # Contribution guidelines

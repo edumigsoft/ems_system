@@ -244,7 +244,6 @@ O sistema trata temas, localizações e outras configurações como **dados tran
 ### Planejadas
 
 - **CI/CD**: GitHub Actions ou similar
-- **Container**: Docker (diretório `containers/` preparado)
 
 ### Scripts de Automação
 

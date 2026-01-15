@@ -52,7 +52,6 @@ O EMS System é um monorepo organizado em:
   - `{features}/` - Features isoladas
 - **`scripts/`** - Scripts de automação
 - **`docs/`** - Documentação adicional
-- **`containers/`** - Configurações Docker
 
 ## 🎯 Padrões de Desenvolvimento
 
