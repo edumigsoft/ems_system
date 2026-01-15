@@ -132,6 +132,7 @@ class _AppLayoutState extends State<AppLayout> {
           // Configuração de internacionalização
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          locale: widget.settingsViewModel.locale,
           // Configuração do comportamento de rolagem para suportar
           // diferentes dispositivos de entrada
           scrollBehavior: const MaterialScrollBehavior().copyWith(

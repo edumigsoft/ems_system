@@ -32,6 +32,14 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
   String _language = 'pt_BR';
   String get language => _language;
 
+  Locale get locale {
+    final parts = _language.split('_');
+    if (parts.length == 2) {
+      return Locale(parts[0], parts[1]);
+    }
+    return const Locale('pt', 'BR');
+  }
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -205,4 +213,25 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
   }
 
   ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
+
+  // ThemeData getTheme(Brightness brightness) {
+  //   switch (_selectedTheme) {
+  //     case 'blueGray':
+  //       return DSTheme.forPreset(DSThemeEnum.blueGray, brightness);
+  //     case 'acqua':
+  //       return DSTheme.forPreset(DSThemeEnum.acqua, brightness);
+  //     case 'lolo':
+  //       return DSTheme.forPreset(DSThemeEnum.lolo, brightness);
+  //     case 'teal':
+  //       return DSTheme.forPreset(DSThemeEnum.teal, brightness);
+  //     default:
+  //       return DSTheme.forPreset(DSThemeEnum.system, brightness);
+  //   }
+  // }
+
+  // void _handleThemeChange(String theme) {
+  //   setState(() {
+  //     _selectedTheme = theme;
+  //   });
+  // }
 }
