@@ -101,6 +101,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 onChanged: widget.viewModel.toggleDarkMode,
               ),
               _buildListTile(
+                icon: Icons.palette,
+                title: 'Tema',
+                subtitle: _getThemeName(widget.viewModel.theme),
+                onTap: () => _showThemeDialog(context),
+              ),
+              _buildListTile(
                 icon: Icons.language,
                 title: 'Idioma',
                 subtitle: _getLanguageName(widget.viewModel.language),
@@ -335,6 +341,93 @@ class _SettingsPageState extends State<SettingsPage> {
             child: const Text('Entendi'),
           ),
         ],
+      ),
+    );
+  }
+
+  String _getThemeName(String theme) {
+    switch (theme) {
+      case 'acqua':
+        return 'Acqua';
+      case 'blueGray':
+        return 'Blue Gray';
+      case 'teal':
+        return 'Teal';
+      case 'lolo':
+        return 'Lolo';
+      case 'system':
+      default:
+        return 'Padrão do Sistema';
+    }
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Selecionar Tema'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioListTile<String>(
+                title: const Text('Padrão do Sistema'),
+                value: 'system',
+                groupValue: widget.viewModel.theme,
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.viewModel.setTheme(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Acqua'),
+                value: 'acqua',
+                groupValue: widget.viewModel.theme,
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.viewModel.setTheme(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Blue Gray'),
+                value: 'blueGray',
+                groupValue: widget.viewModel.theme,
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.viewModel.setTheme(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Teal'),
+                value: 'teal',
+                groupValue: widget.viewModel.theme,
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.viewModel.setTheme(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              RadioListTile<String>(
+                title: const Text('Lolo'),
+                value: 'lolo',
+                groupValue: widget.viewModel.theme,
+                onChanged: (value) {
+                  if (value != null) {
+                    widget.viewModel.setTheme(value);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

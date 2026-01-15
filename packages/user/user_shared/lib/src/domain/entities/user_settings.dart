@@ -8,6 +8,7 @@ class UserSettings {
   final bool pushNotifications;
   final bool darkMode;
   final String language;
+  final String theme;
 
   const UserSettings({
     this.notificationsEnabled = true,
@@ -15,6 +16,7 @@ class UserSettings {
     this.pushNotifications = true,
     this.darkMode = false,
     this.language = 'pt_BR',
+    this.theme = 'acqua',
   });
 
   /// Default settings instance.
@@ -22,12 +24,13 @@ class UserSettings {
 
   /// Serialization to Map for storage.
   Map<String, dynamic> toMap() => {
-        'notifications_enabled': notificationsEnabled,
-        'email_notifications': emailNotifications,
-        'push_notifications': pushNotifications,
-        'dark_mode': darkMode,
-        'language': language,
-      };
+    'notifications_enabled': notificationsEnabled,
+    'email_notifications': emailNotifications,
+    'push_notifications': pushNotifications,
+    'dark_mode': darkMode,
+    'language': language,
+    'theme': theme,
+  };
 
   /// Deserialization from Map.
   factory UserSettings.fromMap(Map<String, dynamic> map) {
@@ -37,6 +40,7 @@ class UserSettings {
       pushNotifications: map['push_notifications'] as bool? ?? true,
       darkMode: map['dark_mode'] as bool? ?? false,
       language: map['language'] as String? ?? 'pt_BR',
+      theme: map['theme'] as String? ?? 'acqua',
     );
   }
 
@@ -47,6 +51,7 @@ class UserSettings {
     bool? pushNotifications,
     bool? darkMode,
     String? language,
+    String? theme,
   }) {
     return UserSettings(
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -54,6 +59,7 @@ class UserSettings {
       pushNotifications: pushNotifications ?? this.pushNotifications,
       darkMode: darkMode ?? this.darkMode,
       language: language ?? this.language,
+      theme: theme ?? this.theme,
     );
   }
 
@@ -66,7 +72,8 @@ class UserSettings {
           emailNotifications == other.emailNotifications &&
           pushNotifications == other.pushNotifications &&
           darkMode == other.darkMode &&
-          language == other.language;
+          language == other.language &&
+          theme == other.theme;
 
   @override
   int get hashCode =>
@@ -74,10 +81,12 @@ class UserSettings {
       emailNotifications.hashCode ^
       pushNotifications.hashCode ^
       darkMode.hashCode ^
-      language.hashCode;
+      language.hashCode ^
+      theme.hashCode;
 
   @override
-  String toString() => 'UserSettings(notifications: $notificationsEnabled, '
+  String toString() =>
+      'UserSettings(notifications: $notificationsEnabled, '
       'email: $emailNotifications, push: $pushNotifications, '
-      'darkMode: $darkMode, language: $language)';
+      'darkMode: $darkMode, language: $language, theme: $theme)';
 }

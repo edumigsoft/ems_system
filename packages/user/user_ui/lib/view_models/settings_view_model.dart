@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:core_shared/core_shared.dart';
-import 'package:user_shared/user_shared.dart';
-import 'package:user_client/user_client.dart';
 import 'package:auth_client/auth_client.dart';
+import 'package:core_shared/core_shared.dart';
+import 'package:design_system_shared/design_system_shared.dart';
+import 'package:design_system_ui/design_system_ui.dart' show DSTheme;
+import 'package:flutter/material.dart';
+import 'package:user_client/user_client.dart';
+import 'package:user_shared/user_shared.dart';
 
 /// ViewModel para gerenciar configurações do usuário.
 ///
@@ -31,6 +33,16 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
 
   String _language = 'pt_BR';
   String get language => _language;
+
+  String _theme = 'acqua';
+  String get theme => _theme;
+
+  DSThemeEnum get themeEnum {
+    return DSThemeEnum.values.firstWhere(
+      (e) => e.name == _theme,
+      orElse: () => DSThemeEnum.system,
+    );
+  }
 
   Locale get locale {
     final parts = _language.split('_');
@@ -84,6 +96,20 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     _autoSave();
   }
 
+  /// Define tema.
+  void setTheme(String themeName) {
+    _theme = themeName;
+    notifyListeners();
+    _autoSave();
+  }
+
+  ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
+
+  ThemeData get themeDataLight =>
+      DSTheme.forPreset(themeEnum, Brightness.light);
+
+  ThemeData get themeDataDark => DSTheme.forPreset(themeEnum, Brightness.dark);
+
   /// Auto-save after changes (fire-and-forget).
   void _autoSave() {
     saveSettings();
@@ -104,6 +130,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
         _pushNotifications = settings.pushNotifications;
         _darkMode = settings.darkMode;
         _language = settings.language;
+        _theme = settings.theme;
         logger.info('Settings loaded successfully');
       },
       failure: (error) {
@@ -124,6 +151,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
       pushNotifications: _pushNotifications,
       darkMode: _darkMode,
       language: _language,
+      theme: _theme,
     );
 
     logger.info('Saving settings...');
@@ -149,6 +177,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     _pushNotifications = defaults.pushNotifications;
     _darkMode = defaults.darkMode;
     _language = defaults.language;
+    _theme = defaults.theme;
     notifyListeners();
     await saveSettings();
   }
@@ -211,27 +240,4 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     notifyListeners();
     return _passwordChangeError;
   }
-
-  ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
-
-  // ThemeData getTheme(Brightness brightness) {
-  //   switch (_selectedTheme) {
-  //     case 'blueGray':
-  //       return DSTheme.forPreset(DSThemeEnum.blueGray, brightness);
-  //     case 'acqua':
-  //       return DSTheme.forPreset(DSThemeEnum.acqua, brightness);
-  //     case 'lolo':
-  //       return DSTheme.forPreset(DSThemeEnum.lolo, brightness);
-  //     case 'teal':
-  //       return DSTheme.forPreset(DSThemeEnum.teal, brightness);
-  //     default:
-  //       return DSTheme.forPreset(DSThemeEnum.system, brightness);
-  //   }
-  // }
-
-  // void _handleThemeChange(String theme) {
-  //   setState(() {
-  //     _selectedTheme = theme;
-  //   });
-  // }
 }

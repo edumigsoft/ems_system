@@ -1,10 +1,6 @@
 import 'dart:ui';
 
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
-import 'package:design_system_shared/design_system_shared.dart'
-    show DSThemeEnum;
-import 'package:design_system_ui/design_system_ui.dart' show DSTheme;
-
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import 'package:user_ui/view_models/settings_view_model.dart';
@@ -126,8 +122,8 @@ class _AppLayoutState extends State<AppLayout> {
           ),
           debugShowCheckedModeBanner: false,
           // Themes
-          theme: DSTheme.forPreset(DSThemeEnum.acqua, Brightness.light),
-          darkTheme: DSTheme.forPreset(DSThemeEnum.acqua, Brightness.dark),
+          theme: widget.settingsViewModel.themeDataLight,
+          darkTheme: widget.settingsViewModel.themeDataDark,
           themeMode: widget.settingsViewModel.themeMode,
           // Configuração de internacionalização
           localizationsDelegates: AppLocalizations.localizationsDelegates,
