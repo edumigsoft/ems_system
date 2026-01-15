@@ -240,4 +240,52 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     notifyListeners();
     return _passwordChangeError;
   }
+
+  /// Lista de idiomas suportados.
+  List<AppLocale> get supportedLocales => [
+    const AppLocale(label: 'Português (Brasil)', code: 'pt_BR'),
+    const AppLocale(label: 'English (US)', code: 'en_US'),
+    const AppLocale(label: 'Español', code: 'es_ES'),
+  ];
+
+  /// Lista de temas suportados.
+  List<AppTheme> get supportedThemes => [
+    const AppTheme(label: 'Padrão do Sistema', value: 'system'),
+    const AppTheme(label: 'Acqua', value: 'acqua'),
+    const AppTheme(label: 'Blue Gray', value: 'blueGray'),
+    const AppTheme(label: 'Teal', value: 'teal'),
+    const AppTheme(label: 'Lolo', value: 'lolo'),
+  ];
+
+  String getLanguageLabel(String code) {
+    return supportedLocales
+        .firstWhere(
+          (e) => e.code == code,
+          orElse: () => const AppLocale(label: '', code: ''),
+        )
+        .label;
+  }
+
+  String getThemeLabel(String value) {
+    return supportedThemes
+        .firstWhere(
+          (e) => e.value == value,
+          orElse: () => const AppTheme(label: '', value: ''),
+        )
+        .label;
+  }
+}
+
+class AppLocale {
+  final String label;
+  final String code;
+
+  const AppLocale({required this.label, required this.code});
+}
+
+class AppTheme {
+  final String label;
+  final String value;
+
+  const AppTheme({required this.label, required this.value});
 }
