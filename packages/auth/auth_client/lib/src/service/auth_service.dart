@@ -5,27 +5,40 @@ import 'package:user_shared/user_shared.dart';
 
 import '../storage/token_storage.dart';
 import 'auth_api_service.dart';
+import 'token_refresh_service.dart';
 
 /// Serviço de autenticação no cliente.
 ///
 /// Orquestra chamadas via [AuthApiService] com gerenciamento de
-/// tokens via [TokenStorage].
+/// tokens via [TokenStorage] e refresh proativo via [TokenRefreshService].
 class AuthService {
   final AuthApiService _api;
   final TokenStorage _tokenStorage;
+  final TokenRefreshService _refreshService;
 
   UserDetails? _currentUser;
 
-  AuthService({required AuthApiService api, required TokenStorage tokenStorage})
-    : _api = api,
-      _tokenStorage = tokenStorage;
+  AuthService({
+    required AuthApiService api,
+    required TokenStorage tokenStorage,
+    required TokenRefreshService refreshService,
+  })  : _api = api,
+        _tokenStorage = tokenStorage,
+        _refreshService = refreshService;
 
   /// Usuário atualmente autenticado.
   UserDetails? get currentUser => _currentUser;
 
   /// Verifica se está autenticado.
+  ///
+  /// Tenta renovar o token automaticamente se estiver expirado mas
+  /// houver um refresh token válido disponível.
   Future<bool> isAuthenticated() async {
-    return _tokenStorage.hasValidToken();
+    final hasValid = await _tokenStorage.hasValidToken();
+    if (hasValid) return true;
+
+    // Tentar refresh se token expirado mas refresh disponível
+    return _refreshService.refreshOnStartup();
   }
 
   /// Realiza login com email e senha.
@@ -47,6 +60,7 @@ class AuthService {
       );
 
       _currentUser = authResponse.user;
+      _refreshService.startMonitoring();
       return Success(authResponse.user);
     } on DioException catch (e) {
       return Failure(Exception(e.message ?? 'Login failed'));
@@ -111,6 +125,7 @@ class AuthService {
       // Ignora erros - continua com logout local
     } finally {
       await _tokenStorage.clearTokens();
+      _refreshService.stopMonitoring();
       _currentUser = null;
     }
   }

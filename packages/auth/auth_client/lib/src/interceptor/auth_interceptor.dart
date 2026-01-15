@@ -121,7 +121,7 @@ class AuthInterceptor extends Interceptor {
       // Para simplificar, chamar via dio direto:
       final response = await _dio.post(
         _refreshUrl,
-        data: {'refreshToken': refreshToken},
+        data: {'refresh_token': refreshToken},
       ); // O onRequest vai ignorar _refreshUrl
 
       if (response.statusCode == 200) {

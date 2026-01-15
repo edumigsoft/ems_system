@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:core_shared/core_shared.dart';
 import 'package:auth_shared/auth_shared.dart';
@@ -11,7 +10,7 @@ enum AuthState { initial, loading, authenticated, unauthenticated, error }
 /// ViewModel para gerenciar autenticação.
 ///
 /// Segue padrão MVVM com injeção via construtor.
-/// Inclui monitoramento de expiração de sessão.
+/// O refresh de tokens é gerenciado automaticamente pelo [TokenRefreshService].
 class AuthViewModel extends ChangeNotifier {
   final AuthService _authService;
 
@@ -21,13 +20,6 @@ class AuthViewModel extends ChangeNotifier {
   AuthState _state = AuthState.initial;
   String? _errorMessage;
   UserDetails? _currentUser;
-
-  // Monitoramento de expiração
-  Timer? _expirationCheckTimer;
-  bool hasShownExpirationWarning = false;
-
-  /// Callback para mostrar diálogo de expiração (injetado pela UI).
-  void Function(BuildContext context)? onTokenExpiring;
 
   /// Estado atual da autenticação.
   AuthState get state => _state;
@@ -44,66 +36,6 @@ class AuthViewModel extends ChangeNotifier {
   /// Verifica se está carregando.
   bool get isLoading => _state == AuthState.loading;
 
-  @override
-  void dispose() {
-    _expirationCheckTimer?.cancel();
-    super.dispose();
-  }
-
-  /// Inicia monitoramento de expiração de token.
-  void _startExpirationMonitoring() {
-    _expirationCheckTimer?.cancel();
-    hasShownExpirationWarning = false;
-
-    // Verifica a cada 1 minuto
-    _expirationCheckTimer = Timer.periodic(
-      const Duration(minutes: 1),
-      (_) => _checkTokenExpiration(),
-    );
-  }
-
-  /// Para monitoramento de expiração.
-  void _stopExpirationMonitoring() {
-    _expirationCheckTimer?.cancel();
-    _expirationCheckTimer = null;
-    hasShownExpirationWarning = false;
-  }
-
-  /// Verifica se token está expirando.
-  Future<void> _checkTokenExpiration() async {
-    if (!isAuthenticated) return;
-    if (hasShownExpirationWarning) return;
-
-    final isExpiringSoon = await _authService.tokenExpiresWithin(
-      const Duration(minutes: 5),
-    );
-
-    if (isExpiringSoon) {
-      hasShownExpirationWarning = true;
-      // onTokenExpiring será chamado pelo AuthGuard para mostrar diálogo
-      notifyListeners();
-    }
-  }
-
-  /// Renova sessão manualmente.
-  Future<bool> renewSession() async {
-    _state = AuthState.loading;
-    notifyListeners();
-
-    final result = await _authService.refreshToken();
-
-    if (result case Success()) {
-      hasShownExpirationWarning = false;
-      _state = AuthState.authenticated;
-      notifyListeners();
-      return true;
-    } else {
-      // Se falhar, fazer logout
-      await logout();
-      return false;
-    }
-  }
-
   /// Inicializa verificando estado de autenticação.
   Future<void> initialize() async {
     _state = AuthState.loading;
@@ -113,7 +45,6 @@ class AuthViewModel extends ChangeNotifier {
     if (isAuth) {
       _currentUser = _authService.currentUser;
       _state = AuthState.authenticated;
-      _startExpirationMonitoring();
     } else {
       _state = AuthState.unauthenticated;
     }
@@ -141,7 +72,6 @@ class AuthViewModel extends ChangeNotifier {
     if (result case Success(value: final user)) {
       _currentUser = user;
       _state = AuthState.authenticated;
-      _startExpirationMonitoring();
       notifyListeners();
       return true;
     } else if (result case Failure(error: final error)) {
@@ -246,7 +176,6 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
 
     await _authService.logout();
-    _stopExpirationMonitoring();
 
     _currentUser = null;
     _state = AuthState.unauthenticated;

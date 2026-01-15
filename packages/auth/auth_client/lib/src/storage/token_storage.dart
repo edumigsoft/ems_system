@@ -20,6 +20,8 @@ class TokenStorage {
             iOptions: IOSOptions(
               accessibility: KeychainAccessibility.first_unlock,
             ),
+            // Nota: Linux, Windows, macOS e Web são suportados automaticamente
+            // pela versão 9.2.4+ sem configuração explícita de opções
           );
 
   /// Salva um par de tokens.

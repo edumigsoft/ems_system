@@ -1,5 +1,5 @@
 import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
-import 'package:auth_client/auth_client.dart' show TokenStorage;
+import 'package:auth_client/auth_client.dart' show TokenStorage, AuthInterceptor;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
@@ -9,7 +9,6 @@ import 'package:user_ui/user_module.dart';
 import '../../app_layout.dart';
 import '../../data/services/navigation_service.dart';
 import '../../view_models/app_view_model.dart';
-import '../dio/dio_config.dart';
 import '../env/env.dart';
 
 final _diMain = GetItInjector();
@@ -83,19 +82,20 @@ class Injector with Loggable {
   }
 
   void _setupDioInterceptors(DependencyInjector di) {
-    di.registerLazySingleton<BackendAuthInterceptor>(
-      () => BackendAuthInterceptor(
-        dio: di.get<Dio>(),
+    final dio = di.get<Dio>();
+
+    // Registra AuthInterceptor do pacote auth_client
+    di.registerLazySingleton<AuthInterceptor>(
+      () => AuthInterceptor(
         tokenStorage: di.get<TokenStorage>(),
-        backendBaseApi: Env.backendBaseUrl,
-        onUnauthorized: () {},
+        dio: dio,
+        refreshUrl: '${Env.backendBaseUrl}${Env.backendPathApi}/auth/refresh',
       ),
     );
 
-    final dio = di.get<Dio>();
-    if (!dio.interceptors.any((i) => i is BackendAuthInterceptor)) {
+    if (!dio.interceptors.any((i) => i is AuthInterceptor)) {
       dio.interceptors.addAll([
-        di.get<BackendAuthInterceptor>(),
+        di.get<AuthInterceptor>(),
         LogInterceptor(
           request: true,
           requestHeader: true,

@@ -1,5 +1,5 @@
 import 'package:auth_client/auth_client.dart'
-    show AuthService, AuthApiService, TokenStorage;
+    show AuthService, AuthApiService, TokenStorage, TokenRefreshService;
 import 'package:core_shared/core_shared.dart' show Loggable, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule, AppNavigationItem;
 import 'package:dio/dio.dart';
@@ -27,11 +27,20 @@ class AuthModule extends AppModule with Loggable {
     // Register TokenStorage
     di.registerLazySingleton<TokenStorage>(() => TokenStorage());
 
+    // Register TokenRefreshService
+    di.registerLazySingleton<TokenRefreshService>(
+      () => TokenRefreshService(
+        tokenStorage: di.get<TokenStorage>(),
+        apiService: di.get<AuthApiService>(),
+      ),
+    );
+
     // Register AuthService
     di.registerLazySingleton<AuthService>(
       () => AuthService(
         api: di.get<AuthApiService>(),
         tokenStorage: di.get<TokenStorage>(),
+        refreshService: di.get<TokenRefreshService>(),
       ),
     );
 
