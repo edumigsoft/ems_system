@@ -1,5 +1,6 @@
 import 'package:auth_client/auth_client.dart';
 import 'package:core_shared/core_shared.dart';
+import 'package:localizations_shared/localizations_shared.dart';
 import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/design_system_ui.dart' show DSTheme;
 import 'package:flutter/material.dart';
@@ -242,26 +243,25 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
   }
 
   /// Lista de idiomas suportados.
-  List<AppLocale> get supportedLocales => [
-    const AppLocale(label: 'Português (Brasil)', code: 'pt_BR'),
-    const AppLocale(label: 'English (US)', code: 'en_US'),
-    const AppLocale(label: 'Español', code: 'es_ES'),
-  ];
+  List<LocaleData> get supportedLocales => LocaleData.supportedLocales;
 
   /// Lista de temas suportados.
-  List<AppTheme> get supportedThemes => [
-    const AppTheme(label: 'Padrão do Sistema', value: 'system'),
-    const AppTheme(label: 'Acqua', value: 'acqua'),
-    const AppTheme(label: 'Blue Gray', value: 'blueGray'),
-    const AppTheme(label: 'Teal', value: 'teal'),
-    const AppTheme(label: 'Lolo', value: 'lolo'),
-  ];
+  List<AppTheme> get supportedThemes => DSThemeEnum.values.map((e) {
+    final label = switch (e) {
+      DSThemeEnum.system => 'Padrão do Sistema',
+      DSThemeEnum.acqua => 'Acqua',
+      DSThemeEnum.blueGray => 'Blue Gray',
+      DSThemeEnum.teal => 'Teal',
+      DSThemeEnum.lolo => 'Lolo',
+    };
+    return AppTheme(label: label, value: e.name);
+  }).toList();
 
   String getLanguageLabel(String code) {
     return supportedLocales
         .firstWhere(
           (e) => e.code == code,
-          orElse: () => const AppLocale(label: '', code: ''),
+          orElse: () => const LocaleData('', '', ''),
         )
         .label;
   }
@@ -274,13 +274,6 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
         )
         .label;
   }
-}
-
-class AppLocale {
-  final String label;
-  final String code;
-
-  const AppLocale({required this.label, required this.code});
 }
 
 class AppTheme {

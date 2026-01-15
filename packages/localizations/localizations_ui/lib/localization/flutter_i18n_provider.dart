@@ -22,9 +22,5 @@ class FlutterI18nProvider implements I18nProvider {
   }
 
   @override
-  List<LocaleData> get supportedLocales => const [
-    LocaleData('pt', 'BR'),
-    LocaleData('en', 'US'),
-    LocaleData('es', 'ES'),
-  ];
+  List<LocaleData> get supportedLocales => LocaleData.supportedLocales;
 }

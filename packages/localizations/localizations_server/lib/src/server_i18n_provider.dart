@@ -28,11 +28,7 @@ class ServerI18nProvider implements I18nProvider {
   LocaleData get currentLocale => _currentLocale;
 
   @override
-  List<LocaleData> get supportedLocales => const [
-    LocaleData('pt', 'BR'),
-    LocaleData('en', 'US'),
-    LocaleData('es', 'ES'),
-  ];
+  List<LocaleData> get supportedLocales => LocaleData.supportedLocales;
 
   /// Define o locale atual
   void setLocale(LocaleData locale) {
