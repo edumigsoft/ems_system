@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
-import 'package:core_shared/core_shared.dart' show DependencyInjector;
+
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 
@@ -54,15 +54,13 @@ import 'view_models/app_view_model.dart';
 /// - Implementar transições de tela personalizadas
 /// - Adicionar suporte a múltiplos esquemas de cores
 class AppLayout extends StatefulWidget {
-  final DependencyInjector di;
   final AppViewModel viewModel;
-  // final SystemViewModel systemViewModel;
+  final AuthViewModel authViewModel;
 
   const AppLayout({
     super.key,
-    required this.di,
     required this.viewModel,
-    // required this.systemViewModel,
+    required this.authViewModel,
   });
 
   @override
@@ -98,38 +96,29 @@ class _AppLayoutState extends State<AppLayout> {
 
   Future<void> _initializeApp() async {
     // Inicialização assíncrona de recursos
-    // await widget.systemViewModel.init();
-    // Configurações adicionais podem ser adicionadas aqui
     await widget.viewModel.init();
 
     // Inicializar AuthViewModel para verificar sessão persistida
-    final authViewModel = widget.di.get<AuthViewModel>();
-    await authViewModel.initialize();
+    await widget.authViewModel.initialize();
   }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: Listenable.merge([
-        // widget.systemViewModel, // Para mudanças de tema/localização
         widget.viewModel, // Para mudanças no estado do aplicativo
       ]),
       builder: (context, child) {
         return MaterialApp(
           title: 'EMS System',
-          // Configuração de temas
-          // theme: widget.systemViewModel.themeDataLight,
-          // darkTheme: widget.systemViewModel.themeDataDark,
-          // themeMode: widget.systemViewModel.themeMode,
           home: AppPage(
             viewModel: widget.viewModel,
-            authViewModel: widget.di.get<AuthViewModel>(),
+            authViewModel: widget.authViewModel,
           ),
           debugShowCheckedModeBanner: false,
           // Configuração de internacionalização
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          // locale: systemLocaleState.value,  // Descomente para forçar um idioma específico
           // Configuração do comportamento de rolagem para suportar
           // diferentes dispositivos de entrada
           scrollBehavior: const MaterialScrollBehavior().copyWith(

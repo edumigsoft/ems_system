@@ -1,5 +1,6 @@
 import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
-import 'package:auth_client/auth_client.dart' show TokenStorage, AuthInterceptor;
+import 'package:auth_client/auth_client.dart'
+    show TokenStorage, AuthInterceptor;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
@@ -44,11 +45,11 @@ class Injector with Loggable {
       ),
     );
 
-    // 4. Registra AppLayout (depende de AppViewModel)
+    // 4. Registra AppLayout (depende de AppViewModel e AuthViewModel)
     _diMain.registerLazySingleton<AppLayout>(
       () => AppLayout(
-        di: _diMain,
         viewModel: _diMain.get<AppViewModel>(),
+        authViewModel: _diMain.get<AuthViewModel>(),
       ),
     );
 
