@@ -18,8 +18,9 @@ abstract class UserService {
   Future<UserDetailsModel> updateProfile(@Body() UserUpdateModel data);
 
   /// Lista todos os usuários (admin only).
+  /// Retorna resposta paginada com lista de usuários e metadados.
   @GET('/users')
-  Future<List<UserDetailsModel>> listUsers({
+  Future<UsersListResponse> listUsers({
     @Query('page') int? page,
     @Query('limit') int? limit,
   });

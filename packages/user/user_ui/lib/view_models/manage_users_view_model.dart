@@ -56,13 +56,13 @@ class ManageUsersViewModel extends ChangeNotifier
 
     final result = await _executeLoadUsers();
 
-    if (result case Success(value: final data)) {
+    if (result case Success(value: final response)) {
       if (refresh) {
-        _users = data.map((m) => m.toDomain()).toList();
+        _users = response.data.map((m) => m.toDomain()).toList();
       } else {
-        _users.addAll(data.map((m) => m.toDomain()));
+        _users.addAll(response.data.map((m) => m.toDomain()));
       }
-      _totalUsers = data.length;
+      _totalUsers = response.total;
       _isLoading = false;
       notifyListeners();
     } else if (result case Failure(error: final error)) {
@@ -72,7 +72,7 @@ class ManageUsersViewModel extends ChangeNotifier
     }
   }
 
-  Future<Result<List<UserDetailsModel>>> _executeLoadUsers() async {
+  Future<Result<UsersListResponse>> _executeLoadUsers() async {
     try {
       final response = await _userService.listUsers(
         page: _currentPage,
@@ -80,7 +80,7 @@ class ManageUsersViewModel extends ChangeNotifier
       );
       return Success(response);
     } on DioException catch (e) {
-      return handleDioError<List<UserDetailsModel>>(e, context: 'loadUsers');
+      return handleDioError<UsersListResponse>(e, context: 'loadUsers');
     }
   }
 

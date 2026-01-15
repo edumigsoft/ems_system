@@ -87,56 +87,72 @@ class AuthMiddleware with Loggable {
   }
 
   /// Requer que o usuário tenha uma role específica.
+  ///
+  /// Este middleware inclui automaticamente a verificação JWT.
   Middleware requireRole(UserRole required) {
     return (Handler innerHandler) {
-      return (Request request) async {
-        final authContext = request.context['authContext'] as AuthContext?;
+      return Pipeline()
+          .addMiddleware(verifyJwt)
+          .addMiddleware((Handler handler) {
+            return (Request request) async {
+              final authContext = request.context['authContext'] as AuthContext?;
 
-        if (authContext == null) {
-          return Response(
-            401,
-            body: '{"error": "Not authenticated"}',
-            headers: {'Content-Type': 'application/json'},
-          );
-        }
+              // authContext nunca deve ser null aqui pois verifyJwt já validou
+              if (authContext == null) {
+                return Response(
+                  401,
+                  body: '{"error": "Not authenticated"}',
+                  headers: {'Content-Type': 'application/json'},
+                );
+              }
 
-        if (!authContext.hasRole(required)) {
-          return Response(
-            403,
-            body: '{"error": "Insufficient permissions"}',
-            headers: {'Content-Type': 'application/json'},
-          );
-        }
+              if (!authContext.hasRole(required)) {
+                return Response(
+                  403,
+                  body: '{"error": "Insufficient permissions"}',
+                  headers: {'Content-Type': 'application/json'},
+                );
+              }
 
-        return innerHandler(request);
-      };
+              return handler(request);
+            };
+          })
+          .addHandler(innerHandler);
     };
   }
 
   /// Requer que o usuário tenha uma das roles especificadas.
+  ///
+  /// Este middleware inclui automaticamente a verificação JWT.
   Middleware requireAnyRole(List<UserRole> roles) {
     return (Handler innerHandler) {
-      return (Request request) async {
-        final authContext = request.context['authContext'] as AuthContext?;
+      return Pipeline()
+          .addMiddleware(verifyJwt)
+          .addMiddleware((Handler handler) {
+            return (Request request) async {
+              final authContext = request.context['authContext'] as AuthContext?;
 
-        if (authContext == null) {
-          return Response(
-            401,
-            body: '{"error": "Not authenticated"}',
-            headers: {'Content-Type': 'application/json'},
-          );
-        }
+              // authContext nunca deve ser null aqui pois verifyJwt já validou
+              if (authContext == null) {
+                return Response(
+                  401,
+                  body: '{"error": "Not authenticated"}',
+                  headers: {'Content-Type': 'application/json'},
+                );
+              }
 
-        if (!authContext.hasAnyRole(roles)) {
-          return Response(
-            403,
-            body: '{"error": "Insufficient permissions"}',
-            headers: {'Content-Type': 'application/json'},
-          );
-        }
+              if (!authContext.hasAnyRole(roles)) {
+                return Response(
+                  403,
+                  body: '{"error": "Insufficient permissions"}',
+                  headers: {'Content-Type': 'application/json'},
+                );
+              }
 
-        return innerHandler(request);
-      };
+              return handler(request);
+            };
+          })
+          .addHandler(innerHandler);
     };
   }
 }
