@@ -11,6 +11,7 @@ import '../../app_layout.dart';
 import '../../data/services/navigation_service.dart';
 import '../../view_models/app_view_model.dart';
 import '../env/env.dart';
+import '../network/dio_factory.dart';
 
 final _diMain = GetItInjector();
 
@@ -69,16 +70,7 @@ class Injector with Loggable {
   }
 
   void _registerCoreServices(DependencyInjector di) {
-    di.registerLazySingleton<Dio>(
-      () => Dio(
-        BaseOptions(
-          baseUrl: '${Env.backendBaseUrl}${Env.backendPathApi}',
-          connectTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-          headers: {'Content-Type': 'application/json'},
-        ),
-      ),
-    );
+    di.registerLazySingleton<Dio>(() => DioFactory.create());
     // Outros serviços core básicos...
   }
 
