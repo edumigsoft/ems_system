@@ -246,16 +246,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
   List<LocaleData> get supportedLocales => LocaleData.supportedLocales;
 
   /// Lista de temas suportados.
-  List<AppTheme> get supportedThemes => DSThemeEnum.values.map((e) {
-    final label = switch (e) {
-      DSThemeEnum.system => 'Padrão do Sistema',
-      DSThemeEnum.acqua => 'Acqua',
-      DSThemeEnum.blueGray => 'Blue Gray',
-      DSThemeEnum.teal => 'Teal',
-      DSThemeEnum.lolo => 'Lolo',
-    };
-    return AppTheme(label: label, value: e.name);
-  }).toList();
+  List<DSThemeEnum> get supportedThemes => DSThemeEnum.values;
 
   String getLanguageLabel(String code) {
     return supportedLocales
@@ -267,18 +258,11 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
   }
 
   String getThemeLabel(String value) {
-    return supportedThemes
-        .firstWhere(
-          (e) => e.value == value,
-          orElse: () => const AppTheme(label: '', value: ''),
-        )
-        .label;
+    // Busca o enum pelo nome (value)
+    final themeEnum = DSThemeEnum.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => DSThemeEnum.system,
+    );
+    return themeEnum.label;
   }
-}
-
-class AppTheme {
-  final String label;
-  final String value;
-
-  const AppTheme({required this.label, required this.value});
 }

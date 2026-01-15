@@ -1,3 +1,4 @@
+import 'package:design_system_shared/design_system_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localization/app_localizations.dart'
     show AppLocalizations;
@@ -362,7 +363,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: widget.viewModel.supportedThemes.map((theme) {
                     return RadioListTile<String>(
                       title: Text(theme.label),
-                      value: theme.value,
+                      value: theme.name,
                     );
                   }).toList(),
                 ),
