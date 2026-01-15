@@ -12,6 +12,7 @@ dependencies:
     sdk: flutter
   logging: ^1.3.0
   get_it: ^9.2.0
+  dio: ^5.9.0
   core_shared:
     path: ../../core/core_shared
   core_client:
@@ -20,6 +21,8 @@ dependencies:
     path: ../../core/core_ui
   design_system_shared:
     path: ../../design_system/design_system_shared
+  design_system_ui:
+    path: ../../design_system/design_system_ui
   localizations_ui:
     path: ../../localizations/localizations_ui
   localizations_shared:

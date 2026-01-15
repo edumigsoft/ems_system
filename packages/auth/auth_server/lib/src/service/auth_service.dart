@@ -14,7 +14,7 @@ import '../repository/auth_repository.dart';
 class AuthService {
   final AuthRepository _authRepo;
   final UserRepository _userRepo;
-  final SecurityService _securityService; // JWT
+  final SecurityService<dynamic> _securityService; // JWT
   final CryptService _cryptService; // Password Hash
   final EmailService _emailService;
   final LoginRequestValidator _loginValidator;
@@ -28,7 +28,7 @@ class AuthService {
   AuthService({
     required AuthRepository authRepo,
     required UserRepository userRepo,
-    required SecurityService securityService,
+    required SecurityService<dynamic> securityService,
     required CryptService cryptService,
     required EmailService emailService,
     this.accessTokenExpiresMinutes = 15,
@@ -119,7 +119,7 @@ class AuthService {
       return Failure((userResult as Failure).error);
     }
 
-    final user = (userResult as Success).value;
+    final user = (userResult as Success<UserDetails>).value;
 
     // 3. Salvar credenciais (hash)
     final passwordHash = _cryptService.generateHash(request.password);
@@ -209,7 +209,7 @@ class AuthService {
     if (tokenResult.isFailure) {
       return Failure((tokenResult as Failure).error);
     }
-    final resetToken = (tokenResult as Success).value;
+    final resetToken = (tokenResult as Success).value as String;
 
     // 3. Enviar email
     final resetLink = 'http://localhost:3000/reset-password?token=$resetToken';
@@ -238,7 +238,7 @@ class AuthService {
       return Failure(UnauthorizedException('Token inválido ou expirado'));
     }
 
-    final payload = (payloadResult as Success).value;
+    final payload = (payloadResult as Success).value as Map<String, dynamic>;
     if (payload['purpose'] != 'password_reset') {
       return Failure(UnauthorizedException('Token inválido'));
     }
@@ -376,8 +376,8 @@ class AuthService {
         return Failure((refreshTokenResult as Failure).error);
       }
 
-      final accessToken = (accessTokenResult as Success).value;
-      final refreshToken = (refreshTokenResult as Success).value;
+      final accessToken = (accessTokenResult as Success).value as String;
+      final refreshToken = (refreshTokenResult as Success).value as String;
       final expiresAt =
           refreshPayload.exp; // Data exata de expiração do Refresh
 

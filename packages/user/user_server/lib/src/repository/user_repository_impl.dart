@@ -72,7 +72,7 @@ class UserRepositoryImpl implements UserRepository {
     String? search,
   }) async {
     try {
-      var query = db.select(db.users);
+      final query = db.select(db.users);
 
       if (roleFilter != null) {
         try {

@@ -1,7 +1,6 @@
-/// User Server Library
-///
-/// Contains database tables, repositories and routes for User Management.
-library user_server;
+// User Server Library
+//
+// Contains database tables, repositories and routes for User Management.
 
 export 'src/database/tables/users_table.dart';
 export 'src/database/converters/user_role_converter.dart';

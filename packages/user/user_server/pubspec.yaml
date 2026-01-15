@@ -18,6 +18,8 @@ dependencies:
     path: ../../open_api/open_api_shared
   auth_server:
     path: ../../auth/auth_server
+  auth_shared:
+    path: ../../auth/auth_shared
   user_shared:
     path: ../user_shared
 

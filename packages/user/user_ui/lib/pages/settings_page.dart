@@ -185,7 +185,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
 
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false, // Prevent dismiss while loading
       builder: (context) => ListenableBuilder(
@@ -284,7 +284,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showLanguageDialog(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Selecionar Idioma'),
@@ -318,7 +318,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showPrivacyInfo(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Privacidade'),
@@ -342,7 +342,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _showThemeDialog(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Selecionar Tema'),

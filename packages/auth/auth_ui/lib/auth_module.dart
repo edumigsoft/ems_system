@@ -69,9 +69,9 @@ class AuthModule extends AppModule with Loggable {
 
   @override
   Map<String, Widget> get routes => {
-    '${routeName}/login': di.get<LoginPage>(),
-    '${routeName}/register': di.get<RegisterPage>(),
-    '${routeName}/forgot-password': di.get<ForgotPasswordPage>(),
+    '$routeName/login': di.get<LoginPage>(),
+    '$routeName/register': di.get<RegisterPage>(),
+    '$routeName/forgot-password': di.get<ForgotPasswordPage>(),
     // ResetPasswordPage not included - requires runtime token parameter
   };
 

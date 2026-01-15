@@ -10,7 +10,7 @@ part 'auth_repository.g.dart';
 @DriftAccessor(tables: [UserCredentials, RefreshTokens])
 class AuthRepository extends DatabaseAccessor<AuthDatabase>
     with _$AuthRepositoryMixin {
-  AuthRepository(AuthDatabase db) : super(db);
+  AuthRepository(super.db);
 
   /// Busca credenciais por userId.
   Future<UserCredential?> getCredentials(String userId) {

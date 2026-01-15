@@ -1,7 +1,6 @@
-/// User UI Library
-///
-/// Contains UI screens and view models for User management.
-library user_ui;
+// User UI Library
+//
+// Contains UI screens and view models for User management.
 
 export 'view_models/manage_users_view_model.dart';
 export 'view_models/profile_view_model.dart';

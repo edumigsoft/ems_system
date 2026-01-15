@@ -16,6 +16,8 @@ dependencies:
     path: ../../core/core_shared
   auth_shared:
     path: ../auth_shared
+  user_shared:
+    path: ../../user/user_shared
 
 dev_dependencies:
   lints: ^6.0.0

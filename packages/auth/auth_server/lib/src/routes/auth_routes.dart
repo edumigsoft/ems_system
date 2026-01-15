@@ -41,7 +41,7 @@ class AuthRoutes extends Routes {
   Future<Response> _login(Request request) async {
     try {
       final body = await request.readAsString();
-      final json = jsonDecode(body);
+      final json = jsonDecode(body) as Map<String, dynamic>;
       final loginRequest = LoginRequest.fromJson(json);
 
       final result = await _authService.login(loginRequest);
@@ -67,7 +67,7 @@ class AuthRoutes extends Routes {
   Future<Response> _register(Request request) async {
     try {
       final body = await request.readAsString();
-      final json = jsonDecode(body);
+      final json = jsonDecode(body) as Map<String, dynamic>;
       final registerRequest = RegisterRequest.fromJson(json);
 
       final result = await _authService.register(registerRequest);
@@ -95,7 +95,7 @@ class AuthRoutes extends Routes {
   Future<Response> _refresh(Request request) async {
     try {
       final body = await request.readAsString();
-      final json = jsonDecode(body);
+      final json = jsonDecode(body) as Map<String, dynamic>;
       final refreshToken = json['refresh_token'] as String?;
 
       if (refreshToken == null) {
@@ -128,7 +128,7 @@ class AuthRoutes extends Routes {
   Future<Response> _logout(Request request) async {
     try {
       final body = await request.readAsString();
-      final json = jsonDecode(body);
+      final json = jsonDecode(body) as Map<String, dynamic>;
       final refreshToken = json['refresh_token'] as String?;
 
       if (refreshToken == null) {
@@ -152,7 +152,7 @@ class AuthRoutes extends Routes {
   Future<Response> _forgotPassword(Request request) async {
     try {
       final body = await request.readAsString();
-      final json = jsonDecode(body);
+      final json = jsonDecode(body) as Map<String, dynamic>;
       final email = json['email'] as String?;
 
       if (email == null) {
@@ -177,7 +177,7 @@ class AuthRoutes extends Routes {
   Future<Response> _resetPassword(Request request) async {
     try {
       final body = await request.readAsString();
-      final json = jsonDecode(body);
+      final json = jsonDecode(body) as Map<String, dynamic>;
       final token = json['token'] as String?;
       final newPassword = json['new_password'] as String?;
 

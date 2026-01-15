@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:auth_shared/src/authorization/feature_user_role_enum.dart';
+import 'package:auth_shared/auth_shared.dart';
 
 /// Conversor Drift para o enum FeatureUserRole.
 ///

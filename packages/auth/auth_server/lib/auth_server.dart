@@ -1,7 +1,7 @@
 /// Auth Server Library
 ///
 /// Contains database tables, services, middlewares and routes for Authentication.
-library auth_server;
+library;
 
 // Database Tables
 export 'src/database/tables/user_credentials_table.dart';

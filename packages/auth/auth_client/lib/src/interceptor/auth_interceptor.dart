@@ -93,7 +93,7 @@ class AuthInterceptor extends Interceptor {
     );
 
     try {
-      final response = await _dio.request(
+      final response = await _dio.request<dynamic>(
         requestOptions.path,
         data: requestOptions.data,
         queryParameters: requestOptions.queryParameters,
@@ -119,20 +119,20 @@ class AuthInterceptor extends Interceptor {
       // Ou injetar uma função de refresh.
 
       // Para simplificar, chamar via dio direto:
-      final response = await _dio.post(
+      final response = await _dio.post<Map<String, dynamic>>(
         _refreshUrl,
         data: {'refresh_token': refreshToken},
       ); // O onRequest vai ignorar _refreshUrl
 
-      if (response.statusCode == 200) {
-        final data = response.data;
+      final data = response.data;
+      if (response.statusCode == 200 && data != null) {
         // AuthResponse ou RefreshResponse
         // Endpoint server retorna AuthResponse com access e refresh
         final newAccessToken = data['accessToken'];
         final newRefreshToken = data['refreshToken'];
         final expiresIn = data['expiresIn'];
 
-        if (newAccessToken != null && newRefreshToken != null) {
+        if (newAccessToken is String && newRefreshToken is String) {
           await _tokenStorage.saveTokens(
             TokenPair(
               accessToken: newAccessToken,

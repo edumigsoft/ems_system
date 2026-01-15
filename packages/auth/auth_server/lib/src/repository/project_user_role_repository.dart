@@ -15,7 +15,7 @@ part 'project_user_role_repository.g.dart';
 class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
     with _$ProjectUserRoleRepositoryMixin
     implements FeatureUserRoleRepository {
-  ProjectUserRoleRepository(AuthDatabase db) : super(db);
+  ProjectUserRoleRepository(super.db);
 
   @override
   Future<Result<FeatureUserRoleDetails>> grant(
@@ -45,7 +45,7 @@ class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
         success: (details) => details != null
             ? Success(details)
             : Failure(DataException('Failed to retrieve created role')),
-        failure: (error) => Failure(error),
+        failure: Failure.new,
       );
     } catch (e) {
       return Failure(DataException('Failed to grant role: $e'));
@@ -95,8 +95,8 @@ class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
         id: result.id,
         createdAt: result.createdAt,
         updatedAt: result.updatedAt,
-        isDeleted: result.isDeleted != 0,
-        isActive: result.isActive != 0,
+        isDeleted: result.isDeleted,
+        isActive: result.isActive,
         userId: result.userId,
         featureId: result.projectId,
         role: result.role,
@@ -129,8 +129,8 @@ class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
               id: r.id,
               createdAt: r.createdAt,
               updatedAt: r.updatedAt,
-              isDeleted: r.isDeleted != 0,
-              isActive: r.isActive != 0,
+              isDeleted: r.isDeleted,
+              isActive: r.isActive,
               userId: r.userId,
               featureId: r.projectId,
               role: r.role,
@@ -165,8 +165,8 @@ class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
               id: r.id,
               createdAt: r.createdAt,
               updatedAt: r.updatedAt,
-              isDeleted: r.isDeleted != 0,
-              isActive: r.isActive != 0,
+              isDeleted: r.isDeleted,
+              isActive: r.isActive,
               userId: r.userId,
               featureId: r.projectId,
               role: r.role,
@@ -216,8 +216,8 @@ class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
         id: result.id,
         createdAt: result.createdAt,
         updatedAt: result.updatedAt,
-        isDeleted: result.isDeleted != 0,
-        isActive: result.isActive != 0,
+        isDeleted: result.isDeleted,
+        isActive: result.isActive,
         userId: result.userId,
         featureId: result.projectId,
         role: result.role,
@@ -242,7 +242,7 @@ class ProjectUserRoleRepository extends DatabaseAccessor<AuthDatabase>
         if (details == null) return const Success(false);
         return Success(details.role >= minRole);
       },
-      failure: (error) => Failure(error),
+      failure: Failure.new,
     );
   }
 }

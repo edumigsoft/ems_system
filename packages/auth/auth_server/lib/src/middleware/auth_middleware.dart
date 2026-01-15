@@ -1,11 +1,12 @@
-import 'package:core_shared/core_shared.dart' show UserRole, Failure, Success;
+import 'package:core_shared/core_shared.dart'
+    show UserRole, Failure, Success, Loggable;
 import 'package:shelf/shelf.dart';
 import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
 
 /// Middleware de autenticação e autorização.
-class AuthMiddleware {
-  final SecurityService _securityService;
+class AuthMiddleware with Loggable {
+  final SecurityService<dynamic> _securityService;
 
   AuthMiddleware(this._securityService);
 
@@ -14,12 +15,12 @@ class AuthMiddleware {
     return (Handler innerHandler) {
       return (Request request) async {
         final authorization = request.headers['authorization'];
-        print(
+        logger.info(
           '🔐 Authorization header: ${authorization?.substring(0, 30) ?? 'null'}...',
         );
 
         if (authorization == null || !authorization.startsWith('Bearer ')) {
-          print('❌ Header ausente ou malformado');
+          logger.warning('❌ Header ausente ou malformado');
           return Response(
             401,
             body: '{"error": "Missing or invalid authorization header"}',
@@ -28,7 +29,7 @@ class AuthMiddleware {
         }
 
         final token = authorization.substring(7);
-        print('🎫 Token extraído: ${token.substring(0, 20)}...');
+        logger.info('🎫 Token extraído: ${token.substring(0, 20)}...');
 
         try {
           // Valida token usando SecurityService
@@ -38,7 +39,7 @@ class AuthMiddleware {
           );
 
           if (result case Failure(error: final error)) {
-            print('❌ Token inválido: $error');
+            logger.warning('❌ Token inválido: $error');
             return Response(
               401,
               body: '{"error": "Invalid token: ${error.toString()}"}',
@@ -48,12 +49,13 @@ class AuthMiddleware {
 
           // Extrai o payload do JWT
           final jwt = (result as Success).value;
+          // ignore: avoid_dynamic_calls
           final payloadMap = jwt.payload as Map<String, dynamic>;
           final payload = TokenPayload.fromJson(payloadMap);
-          print('✅ Token válido - userId: ${payload.sub}');
+          logger.info('✅ Token válido - userId: ${payload.sub}');
 
           if (payload.isExpired) {
-            print('❌ Token expirado');
+            logger.warning('❌ Token expirado');
             return Response(
               401,
               body: '{"error": "Token expired"}',
@@ -73,7 +75,7 @@ class AuthMiddleware {
 
           return innerHandler(updatedRequest);
         } catch (e) {
-          print('❌ Erro na validação: $e');
+          logger.severe('❌ Erro na validação: $e');
           return Response(
             401,
             body: '{"error": "Token validation failed: $e"}',

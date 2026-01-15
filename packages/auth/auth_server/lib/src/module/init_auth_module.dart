@@ -1,7 +1,7 @@
 import 'package:core_shared/core_shared.dart';
 import 'package:core_server/core_server.dart';
 import 'package:user_server/user_server.dart';
-import 'package:auth_server/auth_server.dart';
+import '../../auth_server.dart';
 
 import '../database/auth_database.dart';
 
@@ -38,7 +38,9 @@ class InitAuthModuleToServer implements InitServerModule {
         authRepo: di.get<AuthRepository>(),
         userRepo: di.get<UserRepository>(),
         securityService: di
-            .get<SecurityService>(), // Deve ser registrado pelo CoreModule
+            .get<
+              SecurityService<dynamic>
+            >(), // Deve ser registrado pelo CoreModule
         cryptService: di
             .get<CryptService>(), // Deve ser registrado pelo CoreModule
         emailService: di

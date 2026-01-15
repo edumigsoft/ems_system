@@ -55,7 +55,7 @@ class ProjectUserRoleRoutes extends Routes {
         projectId: projectId,
       );
 
-      if (canManage is Failure || !(canManage as Success).value) {
+      if (canManage is Failure || !(canManage as Success<bool>).value) {
         return Response.forbidden(
           jsonEncode({'error': 'Insufficient permissions to manage members'}),
         );
@@ -120,7 +120,7 @@ class ProjectUserRoleRoutes extends Routes {
         projectId: projectId,
       );
 
-      if (canManage is Failure || !(canManage as Success).value) {
+      if (canManage is Failure || !(canManage as Success<bool>).value) {
         return Response.forbidden(
           jsonEncode({'error': 'Insufficient permissions to manage members'}),
         );
@@ -269,7 +269,7 @@ class ProjectUserRoleRoutes extends Routes {
         projectId: projectId,
       );
 
-      if (canManage is Failure || !(canManage as Success).value) {
+      if (canManage is Failure || !(canManage as Success<bool>).value) {
         return Response.forbidden(
           jsonEncode({'error': 'Insufficient permissions to manage members'}),
         );
@@ -298,7 +298,7 @@ class ProjectUserRoleRoutes extends Routes {
       }
 
       final update = FeatureUserRoleUpdate(
-        id: (currentRole as Success).value!.id,
+        id: (currentRole as Success<FeatureUserRoleDetails?>).value!.id,
         role: newRole,
         isActive: data['is_active'] as bool?,
       );

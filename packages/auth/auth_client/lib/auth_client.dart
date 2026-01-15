@@ -1,7 +1,7 @@
 /// Auth Client Library
 ///
 /// Contains client services and storage for Authentication.
-library auth_client;
+library;
 
 export 'src/storage/token_storage.dart';
 export 'src/service/auth_api_service.dart';

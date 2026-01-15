@@ -172,7 +172,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
 
   /// Reseta configurações para os valores padrão.
   Future<void> resetSettings() async {
-    final defaults = UserSettings.defaultSettings;
+    const defaults = UserSettings.defaultSettings;
     _notificationsEnabled = defaults.notificationsEnabled;
     _emailNotifications = defaults.emailNotifications;
     _pushNotifications = defaults.pushNotifications;

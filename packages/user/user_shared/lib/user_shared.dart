@@ -1,7 +1,6 @@
-/// User Shared Library
-///
-/// Contains shared models, DTOs and entities for User Management.
-library user_shared;
+// User Shared Library
+//
+// Contains shared models, DTOs and entities for User Management.
 
 export 'src/domain/entities/user_details.dart';
 export 'src/domain/entities/user_settings.dart';

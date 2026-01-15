@@ -28,6 +28,9 @@ dependencies:
     path: ../auth_shared
   auth_client:
     path: ../auth_client
+  user_shared:
+    path: ../../user/user_shared
+  dio: ^5.9.0
 
 dev_dependencies:
   flutter_test:

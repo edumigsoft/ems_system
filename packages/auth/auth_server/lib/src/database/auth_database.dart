@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:core_server/core_server.dart';
-import 'package:auth_shared/src/authorization/feature_user_role_enum.dart';
+import 'package:auth_shared/auth_shared.dart';
 import 'tables/user_credentials_table.dart';
 import 'tables/refresh_tokens_table.dart';
 import 'tables/project_user_role_table.dart';
@@ -11,7 +11,7 @@ part 'auth_database.g.dart';
 /// Banco de dados modular para Autenticação.
 @DriftDatabase(tables: [UserCredentials, RefreshTokens, ProjectUserRoles])
 class AuthDatabase extends _$AuthDatabase {
-  AuthDatabase(QueryExecutor e) : super(e);
+  AuthDatabase(super.e);
 
   @override
   int get schemaVersion => 2;

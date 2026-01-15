@@ -197,7 +197,8 @@ class AuthService {
       return successOfUnit();
     } on DioException catch (e) {
       // Parse error message
-      final errorMessage = e.response?.data?['error'] ?? e.message;
+      final data = e.response?.data;
+      final errorMessage = (data is Map ? data['error'] : null) ?? e.message;
       return Failure(Exception(errorMessage ?? 'Password change failed'));
     } catch (e) {
       return Failure(Exception('Password change failed: $e'));

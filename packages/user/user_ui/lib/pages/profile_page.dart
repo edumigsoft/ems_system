@@ -59,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final nameController = TextEditingController(text: profile.name);
     final phoneController = TextEditingController(text: profile.phone ?? '');
 
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Editar Perfil'),

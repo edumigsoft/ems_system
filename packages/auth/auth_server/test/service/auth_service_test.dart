@@ -16,7 +16,7 @@ class MockUserRepository extends Mock implements UserRepository {}
 
 class MockEmailService extends Mock implements EmailService {}
 
-class MockSecurityService extends Mock implements SecurityService {}
+class MockSecurityService extends Mock implements SecurityService<dynamic> {}
 
 class MockCryptService extends Mock implements CryptService {}
 

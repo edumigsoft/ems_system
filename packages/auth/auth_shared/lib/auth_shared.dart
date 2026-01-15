@@ -1,7 +1,6 @@
-/// Auth Shared Library
-///
-/// Contains shared models and contracts for Authentication.
-library auth_shared;
+// Auth Shared Library
+//
+// Contains shared models and contracts for Authentication.
 
 // Models
 export 'src/models/auth_request.dart';

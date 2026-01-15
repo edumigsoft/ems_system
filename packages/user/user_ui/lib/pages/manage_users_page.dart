@@ -371,7 +371,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
   }
 
   void _showUserDetails(UserDetails user) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(user.name),
@@ -427,10 +427,10 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
   void _showChangeRoleDialog(UserDetails user) {
     UserRole? selectedRole = user.role;
 
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (innerContext, setState) => AlertDialog(
           title: const Text('Alterar Role'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -449,7 +449,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                             ? Icons.radio_button_checked
                             : Icons.radio_button_unchecked,
                         color: isSelected
-                            ? Theme.of(context).colorScheme.primary
+                            ? Theme.of(innerContext).colorScheme.primary
                             : null,
                       ),
                       const SizedBox(width: 16),
@@ -462,13 +462,13 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(innerContext),
               child: const Text('Cancelar'),
             ),
             FilledButton(
               onPressed: selectedRole != user.role
                   ? () async {
-                      Navigator.pop(context);
+                      Navigator.pop(innerContext);
                       final success = await widget.viewModel.updateUserRole(
                         user.id,
                         selectedRole!,

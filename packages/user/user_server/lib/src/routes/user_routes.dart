@@ -201,7 +201,7 @@ class UserRoutes extends Routes {
     }
 
     // Log para debug
-    print('[ListUsers] User: ${authContext.userId}, Role: ${authContext.role}');
+    // print('[ListUsers] User: ${authContext.userId}, Role: ${authContext.role}');
 
     try {
       final queryParams = request.url.queryParameters;
