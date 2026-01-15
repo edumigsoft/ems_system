@@ -9,6 +9,7 @@ environment:
 dependencies:
   dio: ^5.0.0
   retrofit: 4.9.1
+  flutter_secure_storage: ^9.2.4
   core_client:
     path: ../../core/core_client
   core_shared:

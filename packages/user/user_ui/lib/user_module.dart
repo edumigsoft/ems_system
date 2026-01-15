@@ -5,12 +5,13 @@ import 'package:core_ui/core_ui.dart'
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
-import 'package:user_client/user_client.dart' show UserService;
+import 'package:user_client/user_client.dart' show UserService, SettingsStorage;
 
 import 'pages/manage_users_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/settings_page.dart';
 import 'view_models/profile_view_model.dart';
+import 'view_models/settings_view_model.dart';
 
 class UserModule extends AppModule with Loggable {
   final DependencyInjector di;
@@ -25,6 +26,9 @@ class UserModule extends AppModule with Loggable {
 
     di.registerLazySingleton<UserService>(() => UserService(di.get()));
 
+    // Register SettingsStorage
+    di.registerLazySingleton<SettingsStorage>(() => SettingsStorage());
+
     // ViewModels e Pages
     di.registerLazySingleton<ProfileViewModel>(
       () => ProfileViewModel(userService: di.get<UserService>()),
@@ -33,8 +37,14 @@ class UserModule extends AppModule with Loggable {
       () => ProfilePage(viewModel: di.get<ProfileViewModel>()),
     );
 
-    // Placeholder Pages - Registrando para facilitar navegação via DI se necessário futuramente
-    di.registerLazySingleton<SettingsPage>(() => const SettingsPage());
+    di.registerLazySingleton<SettingsViewModel>(
+      () => SettingsViewModel(storage: di.get<SettingsStorage>()),
+    );
+    di.registerLazySingleton<SettingsPage>(
+      () => SettingsPage(viewModel: di.get<SettingsViewModel>()),
+    );
+
+    // Placeholder Pages
     di.registerLazySingleton<ManageUsersPage>(() => const ManageUsersPage());
   }
 

@@ -24,8 +24,12 @@ dependencies:
     path: ../../packages/design_system/design_system_ui
   auth_ui:
     path: ../../packages/auth/auth_ui
+  auth_client:
+    path: ../../packages/auth/auth_client
   user_ui:
     path: ../../packages/user/user_ui
+  user_client:
+    path: ../../packages/user/user_client
 
 dev_dependencies:
   flutter_test:

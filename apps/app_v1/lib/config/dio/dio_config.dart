@@ -2,8 +2,9 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:auth_client/auth_client.dart' show TokenStorage;
+import 'package:core_shared/core_shared.dart' show Loggable;
 
-class BackendAuthInterceptor extends Interceptor {
+class BackendAuthInterceptor extends Interceptor with Loggable {
   final Dio dio;
   final TokenStorage tokenStorage;
   final String backendBaseApi;
@@ -26,9 +27,9 @@ class BackendAuthInterceptor extends Interceptor {
 
     if (accessToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
-      print('🔑 Token adicionado: ${accessToken.substring(0, 20)}...');
+      logger.info('🔑 Token adicionado: ${accessToken.substring(0, 20)}...');
     } else {
-      print('⚠️ Nenhum token disponível');
+      logger.info('⚠️ Nenhum token disponível');
     }
 
     handler.next(options);
