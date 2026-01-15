@@ -54,6 +54,25 @@ class AuthRepository extends DatabaseAccessor<AuthDatabase>
         .write(RefreshTokensCompanion(revokedAt: Value(DateTime.now())));
   }
 
+  /// Revoga todos os refresh tokens de um usuário, exceto o token especificado.
+  ///
+  /// Usado na mudança de senha para invalidar outras sessões mas manter
+  /// a sessão atual ativa.
+  Future<void> revokeAllRefreshTokensExcept(
+    String userId,
+    String? currentToken,
+  ) async {
+    final query = update(refreshTokens)
+      ..where((tbl) => tbl.userId.equals(userId));
+
+    // Se há token atual, exclui da revogação
+    if (currentToken != null) {
+      query.where((tbl) => tbl.tokenHash.equals(currentToken).not());
+    }
+
+    await query.write(RefreshTokensCompanion(revokedAt: Value(DateTime.now())));
+  }
+
   /// Registra tentativa de login falha.
   Future<void> incrementFailedAttempts(String userId) async {
     // Nota: Lógica simplificada, idealmente seria transacional com verificação de lockout

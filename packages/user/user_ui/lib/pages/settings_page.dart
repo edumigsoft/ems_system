@@ -187,68 +187,98 @@ class _SettingsPageState extends State<SettingsPage> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Alterar Senha'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: currentPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Senha Atual',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: newPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Nova Senha',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: confirmPasswordController,
-              decoration: const InputDecoration(
-                labelText: 'Confirmar Nova Senha',
-                border: OutlineInputBorder(),
-              ),
-              obscureText: true,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              // TODO: Implementar mudança de senha
-              if (newPasswordController.text ==
-                  confirmPasswordController.text) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Senha alterada com sucesso!'),
-                    behavior: SnackBarBehavior.floating,
+      barrierDismissible: false, // Prevent dismiss while loading
+      builder: (context) => ListenableBuilder(
+        listenable: widget.viewModel,
+        builder: (context, _) {
+          final isLoading = widget.viewModel.isChangingPassword;
+
+          return AlertDialog(
+            title: const Text('Alterar Senha'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: currentPasswordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Senha Atual',
+                    border: OutlineInputBorder(),
                   ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('As senhas não coincidem'),
-                    behavior: SnackBarBehavior.floating,
+                  obscureText: true,
+                  enabled: !isLoading,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: newPasswordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nova Senha',
+                    helperText:
+                        'Mín. 8 caracteres: maiúscula, minúscula, número e especial',
+                    helperMaxLines: 2,
+                    border: OutlineInputBorder(),
                   ),
-                );
-              }
-            },
-            child: const Text('Alterar'),
-          ),
-        ],
+                  obscureText: true,
+                  enabled: !isLoading,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: confirmPasswordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirmar Nova Senha',
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                  enabled: !isLoading,
+                ),
+                if (isLoading) ...[
+                  const SizedBox(height: 16),
+                  const CircularProgressIndicator(),
+                ],
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        final error = await widget.viewModel.changePassword(
+                          currentPassword: currentPasswordController.text,
+                          newPassword: newPasswordController.text,
+                          confirmPassword: confirmPasswordController.text,
+                        );
+
+                        if (context.mounted) {
+                          if (error == null) {
+                            // Sucesso
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Senha alterada com sucesso!'),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          } else {
+                            // Erro
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(error),
+                                backgroundColor: Colors.red,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                child: const Text('Alterar'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -144,6 +144,37 @@ class AuthService {
     }
   }
 
+  /// Muda a senha do usuário autenticado.
+  ///
+  /// Verifica a senha atual e atualiza para a nova senha.
+  /// Mantém a sessão atual ativa mas revoga outros tokens.
+  Future<Result<void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    try {
+      // Obter refresh token atual para manter a sessão
+      final refreshToken = await _tokenStorage.getRefreshToken();
+
+      final requestData = {
+        'current_password': currentPassword,
+        'new_password': newPassword,
+        'confirm_password': confirmPassword,
+        if (refreshToken != null) 'refresh_token': refreshToken,
+      };
+
+      await _api.changePassword(requestData);
+      return successOfUnit();
+    } on DioException catch (e) {
+      // Parse error message
+      final errorMessage = e.response?.data?['error'] ?? e.message;
+      return Failure(Exception(errorMessage ?? 'Password change failed'));
+    } catch (e) {
+      return Failure(Exception('Password change failed: $e'));
+    }
+  }
+
   /// Verifica se o token expira dentro de uma duração específica.
   ///
   /// Útil para monitorar expiração e avisar o usuário proativamente.

@@ -32,4 +32,8 @@ abstract class AuthApiService {
   /// POST /auth/reset-password - Reset de senha com token.
   @POST('/auth/reset-password')
   Future<void> resetPassword(@Body() PasswordResetConfirm request);
+
+  /// POST /auth/change-password - Mudança de senha do usuário autenticado.
+  @POST('/auth/change-password')
+  Future<void> changePassword(@Body() Map<String, dynamic> data);
 }

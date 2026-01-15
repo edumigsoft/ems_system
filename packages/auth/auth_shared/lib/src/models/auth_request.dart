@@ -124,3 +124,48 @@ class PasswordResetConfirm {
 
   bool get isValid => token.isNotEmpty && newPassword.length >= 8;
 }
+
+/// Request de mudança de senha para usuário autenticado.
+@Model(
+  name: 'ChangePasswordRequest',
+  description: 'Request de mudança de senha para usuário autenticado',
+)
+@apiModel
+class ChangePasswordRequest {
+  @Property(description: 'Senha atual do usuário', required: true)
+  final String currentPassword;
+
+  @Property(
+    description: 'Nova senha (min 8 car com complexidade)',
+    required: true,
+  )
+  final String newPassword;
+
+  @Property(description: 'Confirmação da nova senha', required: true)
+  final String confirmPassword;
+
+  const ChangePasswordRequest({
+    required this.currentPassword,
+    required this.newPassword,
+    required this.confirmPassword,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'current_password': currentPassword,
+    'new_password': newPassword,
+    'confirm_password': confirmPassword,
+  };
+
+  factory ChangePasswordRequest.fromJson(Map<String, dynamic> json) =>
+      ChangePasswordRequest(
+        currentPassword: json['current_password'] as String,
+        newPassword: json['new_password'] as String,
+        confirmPassword: json['confirm_password'] as String,
+      );
+
+  /// Validação básica de presença e match.
+  bool get isValid =>
+      currentPassword.isNotEmpty &&
+      newPassword.length >= 8 &&
+      newPassword == confirmPassword;
+}

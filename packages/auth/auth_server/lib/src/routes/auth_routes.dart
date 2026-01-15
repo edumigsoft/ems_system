@@ -32,6 +32,7 @@ class AuthRoutes extends Routes {
     router.post('/logout', _logout);
     router.post('/forgot-password', _forgotPassword);
     router.post('/reset-password', _resetPassword);
+    router.post('/change-password', _changePassword);
 
     return router;
   }
@@ -205,6 +206,69 @@ class AuthRoutes extends Routes {
     } catch (e) {
       return Response.internalServerError(
         body: jsonEncode({'error': 'Erro ao processar reset: $e'}),
+      );
+    }
+  }
+
+  /// POST /auth/change-password (requires authentication)
+  ///
+  /// IMPORTANTE: Esta rota deve ser protegida por middleware de autenticação JWT.
+  /// O userId é extraído do contexto de autenticação populado pelo middleware.
+  Future<Response> _changePassword(Request request) async {
+    try {
+      // Extrair contexto de autenticação (populado pelo middleware)
+      final authContext = request.context['authContext'] as AuthContext?;
+      if (authContext == null) {
+        return Response(
+          401,
+          body: jsonEncode({'error': 'Not authenticated'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // Parse request body
+      final body = await request.readAsString();
+      final json = jsonDecode(body) as Map<String, dynamic>;
+      final changeRequest = ChangePasswordRequest.fromJson(json);
+
+      // Extrair refresh token (se disponível) para não revogar a sessão atual
+      final currentRefreshToken = json['refresh_token'] as String?;
+
+      // Chamar service
+      final result = await _authService.changePassword(
+        userId: authContext.userId,
+        request: changeRequest,
+        currentRefreshToken: currentRefreshToken,
+      );
+
+      return switch (result) {
+        Success(value: final _) => Response.ok(
+          jsonEncode({'message': 'Password changed successfully'}),
+          headers: {'Content-Type': 'application/json'},
+        ),
+        Failure(error: final error) =>
+          error is ValidationException
+              ? Response(
+                  400,
+                  body: jsonEncode({'error': error.toString()}),
+                  headers: {'Content-Type': 'application/json'},
+                )
+              : error is UnauthorizedException
+              ? Response(
+                  401,
+                  body: jsonEncode({'error': error.toString()}),
+                  headers: {'Content-Type': 'application/json'},
+                )
+              : Response(
+                  500,
+                  body: jsonEncode({'error': error.toString()}),
+                  headers: {'Content-Type': 'application/json'},
+                ),
+      };
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Erro ao processar mudança de senha: $e'}),
+        headers: {'Content-Type': 'application/json'},
       );
     }
   }

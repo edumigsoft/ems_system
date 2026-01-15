@@ -28,6 +28,8 @@ dependencies:
     path: ../user_shared
   user_client:
     path: ../user_client
+  auth_client:
+    path: ../../auth/auth_client
 
 dev_dependencies:
   flutter_test:

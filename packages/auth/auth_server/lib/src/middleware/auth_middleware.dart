@@ -14,7 +14,9 @@ class AuthMiddleware {
     return (Handler innerHandler) {
       return (Request request) async {
         final authorization = request.headers['authorization'];
-        print('🔐 Authorization header: ${authorization?.substring(0, 30) ?? 'null'}...');
+        print(
+          '🔐 Authorization header: ${authorization?.substring(0, 30) ?? 'null'}...',
+        );
 
         if (authorization == null || !authorization.startsWith('Bearer ')) {
           print('❌ Header ausente ou malformado');

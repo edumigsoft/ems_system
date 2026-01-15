@@ -19,6 +19,7 @@ class AuthService {
   final EmailService _emailService;
   final LoginRequestValidator _loginValidator;
   final RegisterRequestValidator _registerValidator;
+  final ChangePasswordRequestValidator _changePasswordValidator;
 
   // Configurações (injetadas ou env)
   final int accessTokenExpiresMinutes;
@@ -38,7 +39,8 @@ class AuthService {
        _cryptService = cryptService,
        _emailService = emailService,
        _loginValidator = const LoginRequestValidator(),
-       _registerValidator = const RegisterRequestValidator();
+       _registerValidator = const RegisterRequestValidator(),
+       _changePasswordValidator = const ChangePasswordRequestValidator();
 
   /// Realiza login com email e senha.
   Future<Result<AuthResponse>> login(LoginRequest request) async {
@@ -271,6 +273,64 @@ class AuthService {
     // 4. Invalidar todos os refresh tokens (logout de todos os dispositivos)
     // AuthRepository deve ter revokeAllRefreshTokens(userId).
     await _authRepo.revokeAllRefreshTokens(userId);
+
+    return Success(null);
+  }
+
+  /// Muda a senha do usuário autenticado.
+  ///
+  /// Verifica a senha atual, valida a nova senha, atualiza o hash e
+  /// revoga todos os refresh tokens EXCETO o token da requisição atual.
+  Future<Result<void>> changePassword({
+    required String userId,
+    required ChangePasswordRequest request,
+    String? currentRefreshToken, // Token da sessão atual para NÃO revogar
+  }) async {
+    // 1. Validar request
+    final validation = _changePasswordValidator.validate(request);
+    if (!validation.isValid) {
+      return Failure(
+        ValidationException(_mapValidationErrors(validation.errors)),
+      );
+    }
+
+    // 2. Buscar credenciais
+    final credentials = await _authRepo.getCredentials(userId);
+    if (credentials == null) {
+      return Failure(UnauthorizedException('Usuário não encontrado'));
+    }
+
+    // 3. Verificar senha atual
+    final isValidPassword = _cryptService.verify(
+      request.currentPassword,
+      credentials.passwordHash,
+    );
+    if (!isValidPassword) {
+      return Failure(UnauthorizedException('Senha atual incorreta'));
+    }
+
+    // 4. Verificar se nova senha é diferente da atual
+    final isSamePassword = _cryptService.verify(
+      request.newPassword,
+      credentials.passwordHash,
+    );
+    if (isSamePassword) {
+      return Failure(
+        ValidationException({
+          'newPassword': ['Nova senha deve ser diferente da senha atual'],
+        }),
+      );
+    }
+
+    // 5. Gerar hash da nova senha
+    final newPasswordHash = _cryptService.generateHash(request.newPassword);
+
+    // 6. Atualizar senha
+    await _authRepo.updatePassword(userId, newPasswordHash);
+
+    // 7. Revogar OUTROS refresh tokens (segurança)
+    // Mantém o token atual ativo para não deslogar o usuário
+    await _authRepo.revokeAllRefreshTokensExcept(userId, currentRefreshToken);
 
     return Success(null);
   }

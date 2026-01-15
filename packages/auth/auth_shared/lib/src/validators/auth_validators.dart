@@ -223,3 +223,123 @@ class PasswordResetConfirmValidator
         : CoreValidationResult.failure(errors);
   }
 }
+
+/// Validator para ChangePasswordRequest.
+///
+/// Valida mudança de senha com regras de complexidade:
+/// - Senha atual: presença
+/// - Nova senha: mínimo 8 caracteres com complexidade (maiúscula, minúscula, número, especial)
+/// - Confirmação: deve corresponder à nova senha
+class ChangePasswordRequestValidator
+    extends CoreValidator<ChangePasswordRequest> {
+  const ChangePasswordRequestValidator();
+
+  @override
+  CoreValidationResult validate(ChangePasswordRequest value) {
+    final errors = <CoreValidationError>[];
+
+    // Validar senha atual
+    if (value.currentPassword.isEmpty) {
+      errors.add(
+        const CoreValidationError(
+          field: 'currentPassword',
+          message: 'Senha atual é obrigatória',
+        ),
+      );
+    }
+
+    // Validar nova senha - presença
+    if (value.newPassword.isEmpty) {
+      errors.add(
+        const CoreValidationError(
+          field: 'newPassword',
+          message: 'Nova senha é obrigatória',
+        ),
+      );
+    } else {
+      // Validar comprimento mínimo
+      if (value.newPassword.length < 8) {
+        errors.add(
+          const CoreValidationError(
+            field: 'newPassword',
+            message: 'Nova senha deve ter no mínimo 8 caracteres',
+          ),
+        );
+      }
+
+      // Validar complexidade - maiúscula
+      if (!_hasUppercase(value.newPassword)) {
+        errors.add(
+          const CoreValidationError(
+            field: 'newPassword',
+            message: 'Nova senha deve conter ao menos uma letra maiúscula',
+          ),
+        );
+      }
+
+      // Validar complexidade - minúscula
+      if (!_hasLowercase(value.newPassword)) {
+        errors.add(
+          const CoreValidationError(
+            field: 'newPassword',
+            message: 'Nova senha deve conter ao menos uma letra minúscula',
+          ),
+        );
+      }
+
+      // Validar complexidade - número
+      if (!_hasDigit(value.newPassword)) {
+        errors.add(
+          const CoreValidationError(
+            field: 'newPassword',
+            message: 'Nova senha deve conter ao menos um número',
+          ),
+        );
+      }
+
+      // Validar complexidade - caractere especial
+      if (!_hasSpecialChar(value.newPassword)) {
+        errors.add(
+          const CoreValidationError(
+            field: 'newPassword',
+            message: 'Nova senha deve conter ao menos um caractere especial',
+          ),
+        );
+      }
+    }
+
+    // Validar confirmação
+    if (value.confirmPassword.isEmpty) {
+      errors.add(
+        const CoreValidationError(
+          field: 'confirmPassword',
+          message: 'Confirmação de senha é obrigatória',
+        ),
+      );
+    } else if (value.newPassword != value.confirmPassword) {
+      errors.add(
+        const CoreValidationError(
+          field: 'confirmPassword',
+          message: 'As senhas não coincidem',
+        ),
+      );
+    }
+
+    return errors.isEmpty
+        ? CoreValidationResult.success()
+        : CoreValidationResult.failure(errors);
+  }
+
+  /// Verifica se a senha contém pelo menos uma letra maiúscula.
+  bool _hasUppercase(String password) => RegExp(r'[A-Z]').hasMatch(password);
+
+  /// Verifica se a senha contém pelo menos uma letra minúscula.
+  bool _hasLowercase(String password) => RegExp(r'[a-z]').hasMatch(password);
+
+  /// Verifica se a senha contém pelo menos um dígito.
+  bool _hasDigit(String password) => RegExp(r'\d').hasMatch(password);
+
+  /// Verifica se a senha contém pelo menos um caractere especial.
+  bool _hasSpecialChar(String password) =>
+      RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password);
+}

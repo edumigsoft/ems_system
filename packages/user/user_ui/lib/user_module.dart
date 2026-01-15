@@ -6,6 +6,7 @@ import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
 import 'package:user_client/user_client.dart' show UserService, SettingsStorage;
+import 'package:auth_client/auth_client.dart' show AuthService;
 
 import 'pages/manage_users_page.dart';
 import 'pages/profile_page.dart';
@@ -38,7 +39,10 @@ class UserModule extends AppModule with Loggable {
     );
 
     di.registerLazySingleton<SettingsViewModel>(
-      () => SettingsViewModel(storage: di.get<SettingsStorage>()),
+      () => SettingsViewModel(
+        storage: di.get<SettingsStorage>(),
+        authService: di.get<AuthService>(),
+      ),
     );
     di.registerLazySingleton<SettingsPage>(
       () => SettingsPage(viewModel: di.get<SettingsViewModel>()),
