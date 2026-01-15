@@ -8,7 +8,6 @@ import 'package:dio/dio.dart';
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
 
 import '../../app_layout.dart';
-import '../../data/services/navigation_service.dart';
 import '../../view_models/app_view_model.dart';
 import '../env/env.dart';
 import '../network/dio_factory.dart';
@@ -57,14 +56,8 @@ class Injector with Loggable {
 
     final appViewModel = _diMain.get<AppViewModel>();
 
-    // 5. Registra NavigationService
-    _diMain.registerLazySingleton<NavigationService>(
-      () =>
-          NavigationService(appViewModel: appViewModel, appModules: appModules),
-    );
-
-    // Constrói a navegação e as views da UI.
-    _diMain.get<NavigationService>().buildNavigation();
+    // 5. Registra Módulos e Configura Navegação
+    appViewModel.registerModules(appModules);
 
     // Configura os interceptors do Dio após tudo ser registrado.
     _setupDioInterceptors(_diMain);
