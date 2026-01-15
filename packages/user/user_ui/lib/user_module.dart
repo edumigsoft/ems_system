@@ -11,6 +11,7 @@ import 'package:auth_client/auth_client.dart' show AuthService;
 import 'pages/manage_users_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/settings_page.dart';
+import 'view_models/manage_users_view_model.dart';
 import 'view_models/profile_view_model.dart';
 import 'view_models/settings_view_model.dart';
 
@@ -48,8 +49,12 @@ class UserModule extends AppModule with Loggable {
       () => SettingsPage(viewModel: di.get<SettingsViewModel>()),
     );
 
-    // Placeholder Pages
-    di.registerLazySingleton<ManageUsersPage>(() => const ManageUsersPage());
+    di.registerLazySingleton<ManageUsersViewModel>(
+      () => ManageUsersViewModel(userService: di.get<UserService>()),
+    );
+    di.registerLazySingleton<ManageUsersPage>(
+      () => ManageUsersPage(viewModel: di.get<ManageUsersViewModel>()),
+    );
   }
 
   @override
