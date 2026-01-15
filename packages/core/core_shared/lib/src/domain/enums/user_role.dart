@@ -4,10 +4,13 @@
 /// Permissões específicas por recurso são tratadas separadamente.
 enum UserRole {
   /// Acesso supremo (pode deletar usuários e admins)
-  owner(3),
+  owner(4),
 
   /// Acesso total ao sistema (exceto deleção de usuários)
-  admin(2),
+  admin(3),
+
+  /// Acesso de gerenciamento limitado (gerenciar recursos em seu escopo)
+  manager(2),
 
   /// Acesso padrão
   user(1)
@@ -26,4 +29,7 @@ enum UserRole {
 
   /// Verifica se esta role é owner.
   bool get isOwner => this == UserRole.owner;
+
+  /// Verifica se esta role tem privilégios de gerenciamento (ou superior).
+  bool get isManager => this >= UserRole.manager;
 }

@@ -594,6 +594,8 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
         return 'Proprietário';
       case UserRole.admin:
         return 'Administrador';
+      case UserRole.manager:
+        return 'Gerente';
       case UserRole.user:
         return 'Usuário';
     }
@@ -605,6 +607,8 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
         return Colors.purple;
       case UserRole.admin:
         return Colors.orange;
+      case UserRole.manager:
+        return Colors.green;
       case UserRole.user:
         return Colors.blue;
     }

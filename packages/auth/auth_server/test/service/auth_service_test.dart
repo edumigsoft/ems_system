@@ -2,7 +2,6 @@ import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:auth_server/src/service/auth_service.dart';
 import 'package:auth_server/src/repository/auth_repository.dart';
-import 'package:auth_server/src/repository/resource_permission_repository.dart';
 import 'package:user_server/user_server.dart';
 import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
@@ -14,9 +13,6 @@ import 'package:auth_server/src/database/auth_database.dart'; // UserCredential
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockUserRepository extends Mock implements UserRepository {}
-
-class MockResourcePermissionRepository extends Mock
-    implements ResourcePermissionRepository {}
 
 class MockEmailService extends Mock implements EmailService {}
 

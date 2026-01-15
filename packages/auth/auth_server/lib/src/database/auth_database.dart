@@ -1,18 +1,33 @@
 import 'package:drift/drift.dart';
 import 'package:core_server/core_server.dart';
+import 'package:auth_shared/src/authorization/feature_user_role_enum.dart';
 import 'tables/user_credentials_table.dart';
 import 'tables/refresh_tokens_table.dart';
-import 'tables/resource_members_table.dart';
+import 'tables/project_user_role_table.dart';
+import 'converters/feature_user_role_converter.dart';
 
 part 'auth_database.g.dart';
 
 /// Banco de dados modular para Autenticação.
-@DriftDatabase(tables: [UserCredentials, RefreshTokens, ResourceMembers])
+@DriftDatabase(tables: [UserCredentials, RefreshTokens, ProjectUserRoles])
 class AuthDatabase extends _$AuthDatabase {
   AuthDatabase(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        // Criar nova tabela project_user_roles
+        await m.createTable(projectUserRoles);
+
+        // Nota: ResourceMembers será removida em um passo posterior
+        // após confirmar que a migração funciona corretamente
+      }
+    },
+  );
 
   /// Garante que as tabelas do módulo existam.
   Future<void> init() async {

@@ -26,8 +26,10 @@ class InitAuthModuleToServer implements InitServerModule {
     di.registerSingleton<AuthDatabase>(authDb);
 
     di.registerLazySingleton<AuthRepository>(() => AuthRepository(authDb));
-    di.registerLazySingleton<ResourcePermissionRepository>(
-      () => ResourcePermissionRepository(authDb),
+
+    // Feature User Role Repositories
+    di.registerLazySingleton<ProjectUserRoleRepository>(
+      () => ProjectUserRoleRepository(authDb),
     );
 
     // 2. Services
@@ -47,16 +49,18 @@ class InitAuthModuleToServer implements InitServerModule {
       ),
     );
 
-    di.registerLazySingleton<ResourcePermissionService>(
-      () => ResourcePermissionService(di.get<ResourcePermissionRepository>()),
+    // Feature User Role Services
+    di.registerLazySingleton<ProjectUserRoleService>(
+      () => ProjectUserRoleService(di.get<ProjectUserRoleRepository>()),
     );
 
     // 3. Middleware
     // NOTA: AuthMiddleware está pré-registrado no injector global (antes do UserModule)
     // para resolver dependência circular com UserRoutes
 
-    di.registerLazySingleton<ResourcePermissionMiddleware>(
-      () => ResourcePermissionMiddleware(di.get<ResourcePermissionService>()),
+    // Feature Role Middleware (genérico)
+    di.registerLazySingleton<FeatureRoleMiddleware>(
+      () => FeatureRoleMiddleware(di.get<ProjectUserRoleRepository>()),
     );
 
     // 4. Routes
@@ -64,7 +68,16 @@ class InitAuthModuleToServer implements InitServerModule {
       () => AuthRoutes(di.get<AuthService>(), backendBaseApi: backendBaseApi),
     );
 
+    // Feature User Role Routes
+    di.registerLazySingleton<ProjectUserRoleRoutes>(
+      () => ProjectUserRoleRoutes(
+        di.get<ProjectUserRoleService>(),
+        backendBaseApi: backendBaseApi,
+      ),
+    );
+
     // Adicionar rotas ao servidor
     addRoutes(di, di.get<AuthRoutes>(), security: security);
+    addRoutes(di, di.get<ProjectUserRoleRoutes>(), security: security);
   }
 }
