@@ -11,13 +11,28 @@ import '../../user_server.dart';
 
 /// Rotas de gerenciamento de usuários.
 ///
-/// Endpoints:
+/// **Endpoints Públicos (autenticado):**
 /// - GET /users/me - Perfil do usuário autenticado
 /// - PUT /users/me - Atualizar perfil próprio
-/// - GET /users - Listar usuários (admin)
-/// - GET /users/:id - Buscar usuário por ID (admin)
-/// - PUT /users/:id - Atualizar usuário (admin)
-/// - DELETE /users/:id - Soft delete de usuário (admin)
+///
+/// **Endpoints Administrativos (admin ou owner):**
+/// - GET /users - Listar usuários
+/// - GET /users/:id - Buscar usuário por ID
+/// - PUT /users/:id - Atualizar usuário (com restrições de hierarquia)
+///
+/// **Endpoints Restritos (apenas owner):**
+/// - DELETE /users/:id - Soft delete de usuário
+///
+/// **Hierarquia de Permissões:**
+/// - Owner (nível 4): Acesso total, incluindo:
+///   - Conceder role de owner a outros usuários
+///   - Modificar outros owners
+///   - Deletar qualquer usuário (incluindo outros owners)
+///
+/// - Admin (nível 3): Acesso administrativo, exceto:
+///   - NÃO pode conceder role de owner
+///   - NÃO pode modificar owners
+///   - NÃO pode deletar nenhum usuário
 class UserRoutes extends Routes {
   final UserRepository userRepository;
   final AuthMiddleware authMiddleware;
@@ -312,6 +327,8 @@ class UserRoutes extends Routes {
       );
     }
 
+    final authContext = request.context['authContext'] as AuthContext;
+
     try {
       final body = await request.readAsString();
       final json = jsonDecode(body) as Map<String, dynamic>;
@@ -332,6 +349,38 @@ class UserRoutes extends Routes {
             headers: {'Content-Type': 'application/json'},
           );
         }
+
+        // PROTEÇÃO: Apenas owner pode conceder role de owner
+        if (userRole == UserRole.owner && !authContext.role.isOwner) {
+          return Response.forbidden(
+            jsonEncode({
+              'error': 'Only owners can grant owner role',
+            }),
+            headers: {'Content-Type': 'application/json'},
+          );
+        }
+      }
+
+      // PROTEÇÃO: Verificar se o usuário alvo existe e seu role atual
+      final targetUserResult = await userRepository.findById(id);
+
+      if (targetUserResult case Failure(error: final error)) {
+        return Response.notFound(
+          jsonEncode({'error': 'User not found'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      final targetUser = (targetUserResult as Success).value;
+
+      // PROTEÇÃO: Apenas owner pode modificar outro owner
+      if (targetUser.role == UserRole.owner && !authContext.role.isOwner) {
+        return Response.forbidden(
+          jsonEncode({
+            'error': 'Only owners can modify other owners',
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
       }
 
       // Atualizar via método admin do repositório
@@ -372,12 +421,38 @@ class UserRoutes extends Routes {
     }
   }
 
-  /// DELETE /users/:id - Soft delete de usuário (admin only).
+  /// DELETE /users/:id - Soft delete de usuário (owner only).
+  ///
+  /// Apenas owners podem deletar usuários (incluindo outros owners).
+  /// Admins NÃO podem deletar ninguém para evitar abuso de privilégios.
   Future<Response> _deleteUser(Request request, String id) async {
     if (id.isEmpty) {
       return Response(
         400,
         body: jsonEncode({'error': 'User ID is required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final authContext = request.context['authContext'] as AuthContext;
+
+    // PROTEÇÃO: Apenas owner pode deletar usuários
+    if (!authContext.role.isOwner) {
+      return Response.forbidden(
+        jsonEncode({
+          'error': 'Only owners can delete users',
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    // PROTEÇÃO ADICIONAL: Impedir auto-deleção acidental
+    if (id == authContext.userId) {
+      return Response(
+        400,
+        body: jsonEncode({
+          'error': 'Cannot delete yourself. Transfer ownership first.',
+        }),
         headers: {'Content-Type': 'application/json'},
       );
     }
