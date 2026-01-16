@@ -171,6 +171,52 @@ $ENTITY_NAME
 $ENTITY_PLURAL" | "$GENERATORS_DIR/11_generate_routes.sh"
   
   success "Server gerado!"
+
+  # ========================================================================
+  # 4.5. FeatureUserRole (opcional para server)
+  # ========================================================================
+
+  echo ""
+  info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  info "🔐 Controle de Acesso por Usuário (FeatureUserRole)"
+  info "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo ""
+  info "FeatureUserRole permite controle de acesso granular baseado em papéis:"
+  info "  • owner, admin, manager, member, viewer"
+  info "  • Cada usuário pode ter um papel diferente em cada instância"
+  info "  • Exemplo: João é 'owner' do Projeto A, mas 'viewer' do Projeto B"
+  echo ""
+  info "Componentes gerados:"
+  info "  • Tabela ${FEATURE_NAME}_user_role (Drift)"
+  info "  • Repository (implementa FeatureUserRoleRepository)"
+  info "  • Service (lógica de negócio)"
+  echo ""
+
+  ask "Adicionar FeatureUserRole a esta feature? (s/n)" ADD_FEATURE_ROLE "n"
+
+  if [[ "$ADD_FEATURE_ROLE" == "s" || "$ADD_FEATURE_ROLE" == "S" ]]; then
+    progress "Gerando FeatureUserRole..."
+
+    # Determinar o nome do ID da feature (ex: projectId, financeId)
+    FEATURE_ID_NAME="${FEATURE_NAME}Id"
+
+    info "Nome do ID da feature será: $FEATURE_ID_NAME"
+    ask "Confirmar ou alterar? (pressione Enter para confirmar)" CUSTOM_ID_NAME "$FEATURE_ID_NAME"
+
+    if [ -n "$CUSTOM_ID_NAME" ]; then
+      FEATURE_ID_NAME="$CUSTOM_ID_NAME"
+    fi
+
+    # Executar gerador FeatureUserRole
+    echo "$FEATURE_NAME
+$FEATURE_ID_NAME" | "$GENERATORS_DIR/17_generate_feature_user_role.sh"
+
+    success "FeatureUserRole gerado!"
+    info "📚 Consulte FEATURE_USER_ROLE_GUIDE.md para instruções de uso"
+    echo ""
+  else
+    info "FeatureUserRole não será adicionado (pode ser adicionado depois)"
+  fi
 fi
 
 # ============================================================================
