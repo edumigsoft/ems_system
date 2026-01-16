@@ -5,7 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:core_client/core_client.dart' show DioErrorHandler;
 import 'package:user_shared/user_shared.dart'
-    show UserDetails, UsersListResponse, UserDetailsModel;
+    show
+        UserDetails,
+        UsersListResponse,
+        UserDetailsModel,
+        UserCreateAdmin,
+        UserCreateAdminModel;
 import 'package:user_client/user_client.dart' show UserService;
 
 /// ViewModel para gerenciamento administrativo de usuários.
@@ -235,6 +240,43 @@ class ManageUsersViewModel extends ChangeNotifier
       return const Success(null);
     } on DioException catch (e) {
       return handleDioError<void>(e, context: 'deleteUser');
+    }
+  }
+
+  /// Cria um novo usuário administrativamente (owner only).
+  Future<bool> createUser(UserCreateAdmin data) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    final result = await _executeCreateUser(data);
+
+    if (result case Success(value: final newUser)) {
+      // Adicionar novo usuário ao topo da lista
+      _users.insert(0, newUser.toDomain());
+      _totalUsers++;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } else if (result case Failure(error: final error)) {
+      _error = error.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
+    return false;
+  }
+
+  Future<Result<UserDetailsModel>> _executeCreateUser(
+    UserCreateAdmin data,
+  ) async {
+    try {
+      final model = UserCreateAdminModel.fromDomain(data);
+      final response = await _userService.createUser(model);
+      return Success(response);
+    } on DioException catch (e) {
+      return handleDioError<UserDetailsModel>(e, context: 'createUser');
     }
   }
 
