@@ -5,7 +5,7 @@ export 'src/theme/presets/blue_gray_preset.dart';
 export 'src/theme/presets/acqua_preset.dart';
 export 'src/theme/presets/lolo_preset.dart';
 export 'src/theme/presets/teal_preset.dart';
-export 'src/enums/ds_enums.dart';
+export 'src/enums/ds_theme_enum.dart';
 export 'src/constants/ds_spacing.dart';
 export 'src/constants/ds_radius.dart';
 export 'src/constants/ds_paddings.dart';

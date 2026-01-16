@@ -332,6 +332,26 @@ class ManageUsersViewModel extends ChangeNotifier
     // notifyListeners();
   }
 
+  bool canResetPassword(UserDetails user) {
+    if (_currentUser == null) return false;
+
+    // Cannot reset own password through this UI
+    if (_currentUser!.id == user.id && !_currentUser!.role.isOwner) {
+      return false;
+    }
+
+    // Owner can reset password for anyone
+    if (_currentUser!.role.isOwner) return true;
+
+    // Admin can reset password for users below admin level
+    if (_currentUser!.role.isAdmin) {
+      return user.role < UserRole.admin;
+    }
+
+    // Managers and regular users cannot reset passwords
+    return false;
+  }
+
   bool get isAdmin => _currentUser?.role == UserRole.admin;
   bool get isOwner => _currentUser?.role == UserRole.owner;
 }

@@ -1,5 +1,8 @@
+import 'package:core_ui/core_ui.dart' show UserRoleExtension;
+import 'package:design_system_ui/design_system_ui.dart' show DsDialog;
 import 'package:flutter/material.dart';
 import 'package:core_shared/core_shared.dart';
+import 'package:localizations_ui/localizations_ui.dart';
 import 'package:user_shared/user_shared.dart' show UserDetails, UserCreateAdmin;
 import '../view_models/manage_users_view_model.dart';
 
@@ -64,7 +67,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                   ...UserRole.values.map(
                     (role) => PopupMenuItem(
                       value: role,
-                      child: Text(_roleLabel(role)),
+                      child: Text(role.label),
                     ),
                   ),
                 ],
@@ -134,7 +137,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                       if (widget.viewModel.roleFilter != null)
                         Chip(
                           label: Text(
-                            'Role: ${_roleLabel(widget.viewModel.roleFilter!)}',
+                            'Role: ${widget.viewModel.roleFilter!.label}',
                           ),
                           onDeleted: () => widget.viewModel.filterByRole(null),
                         ),
@@ -261,11 +264,11 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: _roleColor(user.role),
+                color: user.role.color,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                _roleLabel(user.role),
+                user.role.label,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: Colors.white,
                 ),
@@ -339,7 +342,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                 ],
               ),
             ),
-            if (_canResetPassword(user))
+            if (widget.viewModel.canResetPassword(user))
               const PopupMenuItem(
                 value: 'reset-password',
                 child: Row(
@@ -387,13 +390,41 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
         _showChangeRoleDialog(user);
         break;
       case 'reset-password':
-        _confirmResetPassword(user);
+        // _confirmResetPassword(user);
+        DsDialog.confirm(
+          context,
+          title: 'Resetar Senha',
+          message: 'Tem certeza que deseja resetar a senha de ${user.name}?',
+          confirmText: 'Resetar Senha', // AppLocalizations.of(context).delete
+          messageAlert:
+              'O usuário será obrigado a alterar a senha no próximo login.',
+          bannerAlert: 'Esta ação não pode ser desfeita.',
+          confirmedText:
+              'Senha resetada com sucesso. ${user.name} deverá alterar a senha no próximo login.',
+          canceledText: widget.viewModel.error ?? 'Erro ao resetar senha',
+          onConfirm: () async {
+            final success = await widget.viewModel.resetUserPassword(user.id);
+            return success;
+          },
+        );
         break;
       case 'toggle':
         _toggleUserStatus(user);
         break;
       case 'delete':
-        _confirmDeleteUser(user);
+        DsDialog.confirm(
+          context,
+          title: 'Deletar usuário',
+          message: 'Tem certeza que deseja deletar ${user.name}?',
+          confirmText: AppLocalizations.of(context).delete,
+          messageAlert: 'Esta ação não pode ser desfeita.',
+          confirmedText: 'Usuário deletado com sucesso',
+          canceledText: 'Erro ao deletar usuário',
+          onConfirm: () async {
+            final success = await widget.viewModel.deleteUser(user.id);
+            return success;
+          },
+        );
         break;
     }
   }
@@ -411,7 +442,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
               _detailRow('ID', user.id),
               _detailRow('Email', user.email),
               _detailRow('Username', user.username),
-              _detailRow('Role', _roleLabel(user.role)),
+              _detailRow('Role', user.role.label),
               _detailRow('Telefone', user.phone ?? 'N/A'),
               _detailRow(
                 'Email Verificado',
@@ -481,7 +512,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                             : null,
                       ),
                       const SizedBox(width: 16),
-                      Text(_roleLabel(role)),
+                      Text(role.label),
                     ],
                   ),
                 ),
@@ -568,125 +599,125 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
     }
   }
 
-  Future<void> _confirmDeleteUser(UserDetails user) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Deletar usuário'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tem certeza que deseja deletar ${user.name}?'),
-            const SizedBox(height: 8),
-            const Text(
-              'Esta ação não pode ser desfeita.',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Deletar'),
-          ),
-        ],
-      ),
-    );
+  // Future<void> _confirmDeleteUser(UserDetails user) async {
+  //   final confirmed = await showDialog<bool>(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Deletar usuário'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text('Tem certeza que deseja deletar ${user.name}?'),
+  //           const SizedBox(height: 8),
+  //           const Text(
+  //             'Esta ação não pode ser desfeita.',
+  //             style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context, false),
+  //           child: const Text('Cancelar'),
+  //         ),
+  //         FilledButton(
+  //           onPressed: () => Navigator.pop(context, true),
+  //           style: FilledButton.styleFrom(backgroundColor: Colors.red),
+  //           child: const Text('Deletar'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
 
-    if (confirmed == true && mounted) {
-      final success = await widget.viewModel.deleteUser(user.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Usuário deletado com sucesso'
-                  : 'Erro ao deletar usuário',
-            ),
-            backgroundColor: success ? Colors.green : Colors.red,
-          ),
-        );
-      }
-    }
-  }
+  //   if (confirmed == true && mounted) {
+  //     final success = await widget.viewModel.deleteUser(user.id);
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(
+  //             success
+  //                 ? 'Usuário deletado com sucesso'
+  //                 : 'Erro ao deletar usuário',
+  //           ),
+  //           backgroundColor: success ? Colors.green : Colors.red,
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
-  Future<void> _confirmResetPassword(UserDetails user) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Resetar Senha'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tem certeza que deseja resetar a senha de ${user.name}?'),
-            const SizedBox(height: 12),
-            const Text(
-              'O usuário será obrigado a alterar a senha no próximo login.',
-              style: TextStyle(
-                fontSize: 13,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.shade200),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.info_outline, size: 20, color: Colors.orange),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Esta ação não pode ser desfeita.',
-                      style: TextStyle(fontSize: 12, color: Colors.orange),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
+  // Future<void> _confirmResetPassword(UserDetails user) async {
+  //   final confirmed = await showDialog<bool>(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Resetar Senha'),
+  //       content: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text('Tem certeza que deseja resetar a senha de ${user.name}?'),
+  //           const SizedBox(height: 12),
+  //           const Text(
+  //             'O usuário será obrigado a alterar a senha no próximo login.',
+  //             style: TextStyle(
+  //               fontSize: 13,
+  //               fontStyle: FontStyle.italic,
+  //             ),
+  //           ),
+  //           const SizedBox(height: 8),
+  //           Container(
+  //             padding: const EdgeInsets.all(8),
+  //             decoration: BoxDecoration(
+  //               color: Colors.orange.shade50,
+  //               borderRadius: BorderRadius.circular(8),
+  //               border: Border.all(color: Colors.orange.shade200),
+  //             ),
+  //             child: const Row(
+  //               children: [
+  //                 Icon(Icons.info_outline, size: 20, color: Colors.orange),
+  //                 SizedBox(width: 8),
+  //                 Expanded(
+  //                   child: Text(
+  //                     'Esta ação não pode ser desfeita.',
+  //                     style: TextStyle(fontSize: 12, color: Colors.orange),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context, false),
+  //           child: const Text('Cancelar'),
+  //         ),
+  //         FilledButton(
+  //           onPressed: () => Navigator.pop(context, true),
+  //           child: const Text('Confirmar'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
 
-    if (confirmed == true && mounted) {
-      final success = await widget.viewModel.resetUserPassword(user.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Senha resetada com sucesso. ${user.name} deverá alterar a senha no próximo login.'
-                  : widget.viewModel.error ?? 'Erro ao resetar senha',
-            ),
-            backgroundColor: success ? Colors.green : Colors.red,
-            duration: Duration(seconds: success ? 4 : 3),
-          ),
-        );
-      }
-    }
-  }
+  //   if (confirmed == true && mounted) {
+  //     final success = await widget.viewModel.resetUserPassword(user.id);
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text(
+  //             success
+  //                 ? 'Senha resetada com sucesso. ${user.name} deverá alterar a senha no próximo login.'
+  //                 : widget.viewModel.error ?? 'Erro ao resetar senha',
+  //           ),
+  //           backgroundColor: success ? Colors.green : Colors.red,
+  //           duration: Duration(seconds: success ? 4 : 3),
+  //         ),
+  //       );
+  //     }
+  //   }
+  // }
 
   void _showCreateUserDialog() {
     final nameController = TextEditingController();
@@ -802,7 +833,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                         items: UserRole.values.map((role) {
                           return DropdownMenuItem(
                             value: role,
-                            child: Text(_roleLabel(role)),
+                            child: Text(role.label),
                           );
                         }).toList(),
                         onChanged: isLoading
@@ -885,52 +916,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
     );
   }
 
-  String _roleLabel(UserRole role) {
-    switch (role) {
-      case UserRole.owner:
-        return 'Proprietário';
-      case UserRole.admin:
-        return 'Administrador';
-      case UserRole.manager:
-        return 'Gerente';
-      case UserRole.user:
-        return 'Usuário';
-    }
-  }
-
-  Color _roleColor(UserRole role) {
-    switch (role) {
-      case UserRole.owner:
-        return Colors.purple;
-      case UserRole.admin:
-        return Colors.orange;
-      case UserRole.manager:
-        return Colors.green;
-      case UserRole.user:
-        return Colors.blue;
-    }
-  }
-
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  bool _canResetPassword(UserDetails user) {
-    final currentUser = widget.viewModel.currentUser;
-    if (currentUser == null) return false;
-
-    // Cannot reset own password through this UI
-    if (currentUser.id == user.id && !currentUser.role.isOwner) return false;
-
-    // Owner can reset password for anyone
-    if (currentUser.role.isOwner) return true;
-
-    // Admin can reset password for users below admin level
-    if (currentUser.role.isAdmin) {
-      return user.role < UserRole.admin;
-    }
-
-    // Managers and regular users cannot reset passwords
-    return false;
   }
 }
