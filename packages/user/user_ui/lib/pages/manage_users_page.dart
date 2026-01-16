@@ -25,6 +25,7 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
     super.initState();
     // Carrega usuários ao abrir a página
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.viewModel.initialize();
       widget.viewModel.loadUsers(refresh: true);
     });
 
@@ -105,6 +106,19 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                   onSubmitted: widget.viewModel.searchUsers,
                 ),
               ),
+
+              if (widget.viewModel.isOwner)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('Adicionar Usuário'),
+                      ),
+                    ],
+                  ),
+                ),
 
               // Filtros ativos
               if (widget.viewModel.roleFilter != null ||

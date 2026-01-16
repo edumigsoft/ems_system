@@ -50,7 +50,10 @@ class UserModule extends AppModule with Loggable {
     );
 
     di.registerLazySingleton<ManageUsersViewModel>(
-      () => ManageUsersViewModel(userService: di.get<UserService>()),
+      () => ManageUsersViewModel(
+        userService: di.get<UserService>(),
+        authService: di.get<AuthService>(),
+      ),
     );
     di.registerFactory<ManageUsersPage>(
       () {

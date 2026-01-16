@@ -1,9 +1,12 @@
+import 'package:auth_client/auth_client.dart' show AuthService;
+import 'package:core_shared/core_shared.dart'
+    show Loggable, UserRole, Success, Failure, Result;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:core_shared/core_shared.dart';
-import 'package:core_client/core_client.dart';
-import 'package:user_shared/user_shared.dart';
-import 'package:user_client/user_client.dart';
+import 'package:core_client/core_client.dart' show DioErrorHandler;
+import 'package:user_shared/user_shared.dart'
+    show UserDetails, UsersListResponse, UserDetailsModel;
+import 'package:user_client/user_client.dart' show UserService;
 
 /// ViewModel para gerenciamento administrativo de usuários.
 ///
@@ -11,9 +14,17 @@ import 'package:user_client/user_client.dart';
 class ManageUsersViewModel extends ChangeNotifier
     with Loggable, DioErrorHandler {
   final UserService _userService;
+  final AuthService _authService;
 
-  ManageUsersViewModel({required UserService userService})
-    : _userService = userService;
+  ManageUsersViewModel({
+    required UserService userService,
+    required AuthService authService,
+  }) : _userService = userService,
+       _authService = authService;
+
+  /// Usuário atualmente autenticado.
+  UserDetails? _currentUser;
+  UserDetails? get currentUser => _currentUser;
 
   List<UserDetails> _users = [];
   List<UserDetails> get users => _users;
@@ -232,4 +243,19 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
   }
+
+  /// Inicializa verificando estado de autenticação.
+  Future<void> initialize() async {
+    // notifyListeners();
+    _currentUser = null;
+
+    final isAuth = await _authService.isAuthenticated();
+    if (isAuth) {
+      _currentUser = _authService.currentUser;
+    }
+    // notifyListeners();
+  }
+
+  bool get isAdmin => _currentUser?.role == UserRole.admin;
+  bool get isOwner => _currentUser?.role == UserRole.owner;
 }
