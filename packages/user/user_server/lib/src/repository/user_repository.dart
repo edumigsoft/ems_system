@@ -25,6 +25,12 @@ abstract class UserRepository {
   /// Cria um novo usuário.
   Future<Result<UserDetails>> create(UserCreate dto);
 
+  /// Cria um novo usuário administrativamente (sem senha inicial).
+  ///
+  /// Gera hash aleatório seguro e define mustChangePassword=true.
+  /// Usado por owners para criar usuários que receberão email de ativação.
+  Future<Result<UserDetails>> createByAdmin(UserCreateAdmin dto);
+
   /// Atualiza um usuário existente.
   Future<Result<UserDetails>> update(String id, UserUpdate dto);
 
@@ -38,6 +44,11 @@ abstract class UserRepository {
 
   /// Soft delete de usuário.
   Future<Result<void>> softDelete(String id);
+
+  /// Define se o usuário deve mudar a senha no próximo login.
+  ///
+  /// Usado quando admin força mudança de senha.
+  Future<Result<void>> setMustChangePassword(String userId, bool value);
 
   /// Verifica se email já existe.
   Future<bool> emailExists(String email);

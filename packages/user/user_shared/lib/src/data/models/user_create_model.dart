@@ -33,12 +33,12 @@ class UserCreateModel {
 
   /// Serializa para JSON.
   Map<String, dynamic> toJson() => {
-        'name': dto.name,
-        'email': dto.email,
-        'username': dto.username,
-        'password': dto.password,
-        if (dto.phone != null) 'phone': dto.phone,
-      };
+    'name': dto.name,
+    'email': dto.email,
+    'username': dto.username,
+    'password': dto.password,
+    if (dto.phone != null) 'phone': dto.phone,
+  };
 
   /// Converte para DTO de domínio.
   UserCreate toDomain() => dto;

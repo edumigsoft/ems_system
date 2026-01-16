@@ -28,6 +28,10 @@ class UserDetails implements BaseDetails {
   @Property(description: 'Se o usuário está ativo')
   final bool isActive;
 
+  /// Indica se o usuário deve mudar a senha no próximo login.
+  @Property(description: 'Se deve mudar senha no próximo login')
+  final bool mustChangePassword;
+
   /// Dados de domínio do usuário.
   @Property(description: 'Dados do usuário', required: true)
   final User data;
@@ -38,6 +42,7 @@ class UserDetails implements BaseDetails {
     required this.updatedAt,
     this.isDeleted = false,
     this.isActive = true,
+    this.mustChangePassword = false,
     required this.data,
   });
 
@@ -48,6 +53,7 @@ class UserDetails implements BaseDetails {
     required this.updatedAt,
     this.isDeleted = false,
     this.isActive = true,
+    this.mustChangePassword = false,
     required String name,
     required String email,
     required String username,
@@ -84,6 +90,7 @@ class UserDetails implements BaseDetails {
     DateTime? updatedAt,
     bool? isDeleted,
     bool? isActive,
+    bool? mustChangePassword,
     String? name,
     String? email,
     String? username,
@@ -98,6 +105,7 @@ class UserDetails implements BaseDetails {
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
       isActive: isActive ?? this.isActive,
+      mustChangePassword: mustChangePassword ?? this.mustChangePassword,
       data: data.copyWith(
         name: name,
         email: email,

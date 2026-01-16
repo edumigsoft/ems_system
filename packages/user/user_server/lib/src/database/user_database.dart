@@ -13,7 +13,18 @@ class UserDatabase extends _$UserDatabase {
   UserDatabase(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onUpgrade: (migrator, from, to) async {
+        if (from == 1) {
+          await migrator.addColumn(users, users.mustChangePassword);
+        }
+      },
+    );
+  }
 
   /// Garante que as tabelas do módulo existam.
   Future<void> init() async {

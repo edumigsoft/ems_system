@@ -48,11 +48,11 @@ class PaginatedResponse<T> {
 
   /// Serializa para JSON.
   Map<String, dynamic> toJson(Map<String, dynamic> Function(T) itemToJson) => {
-        'data': data.map(itemToJson).toList(),
-        'page': page,
-        'limit': limit,
-        'total': total,
-      };
+    'data': data.map(itemToJson).toList(),
+    'page': page,
+    'limit': limit,
+    'total': total,
+  };
 
   /// Cria uma nova PaginatedResponse transformando os dados.
   PaginatedResponse<R> map<R>(R Function(T) transform) {

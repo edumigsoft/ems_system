@@ -42,6 +42,7 @@ class InitUserModuleToServer implements InitServerModule {
       () => UserRoutes(
         di.get<UserRepository>(),
         di.get<AuthMiddleware>(),
+        di, // Passa DI para lazy resolution de AuthService
         backendBaseApi: backendBaseApi,
       ),
     );

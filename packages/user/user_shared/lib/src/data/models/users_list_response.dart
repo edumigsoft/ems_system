@@ -34,7 +34,9 @@ class UsersListResponse {
     final dataList = json['data'] as List<dynamic>;
     return UsersListResponse(
       data: dataList
-          .map((item) => UserDetailsModel.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) => UserDetailsModel.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
       page: json['page'] as int,
       limit: json['limit'] as int,
@@ -44,9 +46,9 @@ class UsersListResponse {
 
   /// Serializa para JSON.
   Map<String, dynamic> toJson() => {
-        'data': data.map((item) => item.toJson()).toList(),
-        'page': page,
-        'limit': limit,
-        'total': total,
-      };
+    'data': data.map((item) => item.toJson()).toList(),
+    'page': page,
+    'limit': limit,
+    'total': total,
+  };
 }

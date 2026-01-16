@@ -122,6 +122,25 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<Result<UserDetails>> createByAdmin(UserCreateAdmin dto) async {
+    try {
+      final companion = UsersCompanion.insert(
+        email: dto.email,
+        name: dto.name,
+        username: dto.username,
+        role: Value(dto.role),
+        phone: Value(dto.phone),
+        mustChangePassword: const Value(true),
+      );
+
+      final row = await db.into(db.users).insertReturning(companion);
+      return Success(row);
+    } catch (e, s) {
+      return Failure(StorageException('Error creating user', stackTrace: s));
+    }
+  }
+
+  @override
   Future<Result<UserDetails>> update(String id, UserUpdate dto) async {
     try {
       final companion = UsersCompanion(
@@ -182,6 +201,19 @@ class UserRepositoryImpl implements UserRepository {
       return Success(null);
     } catch (e, s) {
       return Failure(StorageException('Error deleting user', stackTrace: s));
+    }
+  }
+
+  @override
+  Future<Result<void>> setMustChangePassword(String userId, bool value) async {
+    try {
+      final query = db.update(db.users)..where((t) => t.id.equals(userId));
+      await query.write(UsersCompanion(mustChangePassword: Value(value)));
+      return Success(null);
+    } catch (e, s) {
+      return Failure(
+        StorageException('Error setting mustChangePassword', stackTrace: s),
+      );
     }
   }
 

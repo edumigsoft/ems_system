@@ -40,4 +40,19 @@ abstract class UserService {
   /// Desativa um usuário (admin only).
   @DELETE('/users/{id}')
   Future<void> deactivateUser(@Path('id') String id);
+
+  /// Cria um usuário administrativamente (owner only).
+  /// O usuário receberá email para definir senha no primeiro acesso.
+  @POST('/users')
+  Future<UserDetailsModel> createUser(@Body() UserCreateAdminModel data);
+
+  /// Força mudança de senha no próximo login (admin+).
+  /// Admin não pode forçar em owners ou outros admins.
+  @POST('/users/{id}/force-password-change')
+  Future<void> forcePasswordChange(@Path('id') String id);
+
+  /// Inicia reset de senha (envia email com token) (admin+).
+  /// Admin não pode resetar senha de owners.
+  @POST('/users/{id}/reset-password')
+  Future<void> resetPassword(@Path('id') String id);
 }

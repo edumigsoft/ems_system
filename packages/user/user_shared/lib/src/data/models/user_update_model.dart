@@ -34,13 +34,13 @@ class UserUpdateModel {
 
   /// Serializa para JSON.
   Map<String, dynamic> toJson() => {
-        'id': dto.id,
-        if (dto.name != null) 'name': dto.name,
-        if (dto.avatarUrl != null) 'avatar_url': dto.avatarUrl,
-        if (dto.phone != null) 'phone': dto.phone,
-        if (dto.isActive != null) 'is_active': dto.isActive,
-        if (dto.isDeleted != null) 'is_deleted': dto.isDeleted,
-      };
+    'id': dto.id,
+    if (dto.name != null) 'name': dto.name,
+    if (dto.avatarUrl != null) 'avatar_url': dto.avatarUrl,
+    if (dto.phone != null) 'phone': dto.phone,
+    if (dto.isActive != null) 'is_active': dto.isActive,
+    if (dto.isDeleted != null) 'is_deleted': dto.isDeleted,
+  };
 
   /// Converte para DTO de domínio.
   UserUpdate toDomain() => dto;

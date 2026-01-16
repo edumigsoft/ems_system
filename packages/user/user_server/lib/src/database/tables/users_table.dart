@@ -40,4 +40,9 @@ class Users extends Table with DriftTableMixinPostgres {
 
   /// Número de telefone do usuário.
   TextColumn get phone => text().nullable()();
+
+  /// Indica se o usuário deve mudar a senha no próximo login.
+  @JsonKey('must_change_password')
+  IntColumn get mustChangePassword =>
+      integer().map(const BooleanConverter()).withDefault(const Constant(0))();
 }

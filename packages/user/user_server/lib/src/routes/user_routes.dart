@@ -36,14 +36,22 @@ import '../../user_server.dart';
 class UserRoutes extends Routes {
   final UserRepository userRepository;
   final AuthMiddleware authMiddleware;
+  final DependencyInjector di;
   final String _backendBaseApi;
 
   UserRoutes(
     this.userRepository,
-    this.authMiddleware, {
+    this.authMiddleware,
+    this.di, {
     required String backendBaseApi,
   }) : _backendBaseApi = backendBaseApi,
        super(security: true);
+
+  /// Lazy getter para AuthService (resolve dependência circular).
+  ///
+  /// AuthService é inicializado depois de UserRoutes, então não pode
+  /// ser injetado via construtor. Usamos lazy resolution via DI.
+  AuthService get _authService => di.get<AuthService>();
 
   @override
   String get path => '$_backendBaseApi/users';
@@ -90,6 +98,29 @@ class UserRoutes extends Routes {
       Pipeline()
           .addMiddleware(adminMiddleware)
           .addHandler((req) => _deleteUser(req, req.params['id']!)),
+    );
+
+    // Criação de usuários (apenas owner)
+    final ownerMiddleware = authMiddleware.requireRole(UserRole.owner);
+
+    router.post(
+      '/',
+      Pipeline().addMiddleware(ownerMiddleware).addHandler(_createUser),
+    );
+
+    // Gerenciamento de senha (admin+)
+    router.post(
+      '/<id>/force-password-change',
+      Pipeline()
+          .addMiddleware(adminMiddleware)
+          .addHandler((req) => _forcePasswordChange(req, req.params['id']!)),
+    );
+
+    router.post(
+      '/<id>/reset-password',
+      Pipeline()
+          .addMiddleware(adminMiddleware)
+          .addHandler((req) => _adminResetPassword(req, req.params['id']!)),
     );
 
     return router;
@@ -475,6 +506,217 @@ class UserRoutes extends Routes {
           headers: {'Content-Type': 'application/json'},
         );
       },
+    );
+  }
+
+  /// POST /users - Cria usuário administrativamente (owner only).
+  ///
+  /// Owner cria usuários sem senha inicial. Sistema gera hash aleatório
+  /// e envia email para o usuário definir senha no primeiro acesso.
+  Future<Response> _createUser(Request request) async {
+    final authContext = request.context['authContext'] as AuthContext?;
+
+    if (authContext == null) {
+      return Response.forbidden(
+        jsonEncode({'error': 'Authentication required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    try {
+      final body = await request.readAsString();
+      final json = jsonDecode(body) as Map<String, dynamic>;
+      final createModel = UserCreateAdminModel.fromJson(json);
+      final createDto = createModel.toDomain();
+
+      // Validar DTO
+      final validator = UserCreateAdminValidator();
+      final validationResult = validator.validate(createDto);
+
+      if (!validationResult.isValid) {
+        return Response(
+          422,
+          body: jsonEncode({
+            'error': 'Validation failed',
+            'details': validationResult.errors
+                .map((e) => {'field': e.field, 'message': e.message})
+                .toList(),
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // PROTEÇÃO: Apenas owner pode criar owners
+      if (createDto.role == UserRole.owner && !authContext.role.isOwner) {
+        return Response.forbidden(
+          jsonEncode({
+            'error': 'Only owners can create owner accounts',
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // Verificar unicidade de email
+      if (await userRepository.emailExists(createDto.email)) {
+        return Response(
+          409,
+          body: jsonEncode({'error': 'Email already exists'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // Verificar unicidade de username
+      if (await userRepository.usernameExists(createDto.username)) {
+        return Response(
+          409,
+          body: jsonEncode({'error': 'Username already exists'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // Criar usuário
+      final result = await userRepository.createByAdmin(createDto);
+
+      if (result case Failure(error: _)) {
+        return Response.internalServerError(
+          body: jsonEncode({'error': 'Failed to create user'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      final user = (result as Success<UserDetails>).value;
+
+      // Enviar email de ativação (password reset)
+      // Fire and forget - não bloqueia a resposta
+      _authService.forgotPassword(user.email);
+
+      // Retornar usuário criado
+      final model = UserDetailsModel.fromDomain(user);
+      return Response(
+        201,
+        body: jsonEncode(model.toJson()),
+        headers: {'Content-Type': 'application/json'},
+      );
+    } catch (e) {
+      return Response(
+        400,
+        body: jsonEncode({'error': 'Invalid request body'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+  }
+
+  /// POST /users/:id/force-password-change - Força mudança de senha (admin+).
+  ///
+  /// Admin/owner marca usuário para mudar senha no próximo login.
+  /// Admins não podem forçar em owners ou outros admins.
+  Future<Response> _forcePasswordChange(Request request, String id) async {
+    if (id.isEmpty) {
+      return Response(
+        400,
+        body: jsonEncode({'error': 'User ID is required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final authContext = request.context['authContext'] as AuthContext;
+
+    // Buscar usuário alvo
+    final targetUserResult = await userRepository.findById(id);
+
+    if (targetUserResult case Failure(error: _)) {
+      return Response.notFound(
+        jsonEncode({'error': 'User not found'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final targetUser = (targetUserResult as Success<UserDetails>).value;
+
+    // PROTEÇÃO: Apenas owner pode forçar mudança em owners
+    if (targetUser.role == UserRole.owner && !authContext.role.isOwner) {
+      return Response.forbidden(
+        jsonEncode({
+          'error': 'Only owners can force password change on other owners',
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    // PROTEÇÃO: Apenas owner pode forçar mudança em admins
+    if (targetUser.role == UserRole.admin && !authContext.role.isOwner) {
+      return Response.forbidden(
+        jsonEncode({
+          'error': 'Only owners can force password change on admins',
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    // Definir mustChangePassword
+    final result = await userRepository.setMustChangePassword(id, true);
+
+    return result.when(
+      success: (_) {
+        return Response.ok(
+          jsonEncode({
+            'message': 'User will be required to change password on next login',
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
+      },
+      failure: (exception) {
+        return Response.internalServerError(
+          body: jsonEncode({'error': 'Failed to set password change flag'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      },
+    );
+  }
+
+  /// POST /users/:id/reset-password - Inicia reset de senha (admin+).
+  ///
+  /// Admin/owner envia email de reset de senha para o usuário.
+  /// Admins não podem resetar senha de owners.
+  Future<Response> _adminResetPassword(Request request, String id) async {
+    if (id.isEmpty) {
+      return Response(
+        400,
+        body: jsonEncode({'error': 'User ID is required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final authContext = request.context['authContext'] as AuthContext;
+
+    // Buscar usuário alvo
+    final targetUserResult = await userRepository.findById(id);
+
+    if (targetUserResult case Failure(error: _)) {
+      return Response.notFound(
+        jsonEncode({'error': 'User not found'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final targetUser = (targetUserResult as Success<UserDetails>).value;
+
+    // PROTEÇÃO: Apenas owner pode resetar senha de owners
+    if (targetUser.role == UserRole.owner && !authContext.role.isOwner) {
+      return Response.forbidden(
+        jsonEncode({
+          'error': 'Only owners can reset password of other owners',
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    // Enviar email de reset (reutiliza fluxo existente)
+    await _authService.forgotPassword(targetUser.email);
+
+    return Response.ok(
+      jsonEncode({'message': 'Password reset email sent to user'}),
+      headers: {'Content-Type': 'application/json'},
     );
   }
 }
