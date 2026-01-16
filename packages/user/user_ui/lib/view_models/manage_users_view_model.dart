@@ -280,6 +280,40 @@ class ManageUsersViewModel extends ChangeNotifier
     }
   }
 
+  /// Reseta senha de um usuário (admin+).
+  ///
+  /// Define mustChangePassword=true, forçando o usuário a alterar senha
+  /// no próximo login. Apenas owners podem resetar senha de admins.
+  Future<bool> resetUserPassword(String userId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    final result = await _executeResetUserPassword(userId);
+
+    if (result case Success()) {
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } else if (result case Failure(error: final error)) {
+      _error = error.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+
+    return false;
+  }
+
+  Future<Result<void>> _executeResetUserPassword(String userId) async {
+    try {
+      await _userService.forcePasswordChange(userId);
+      return const Success(null);
+    } on DioException catch (e) {
+      return handleDioError<void>(e, context: 'resetUserPassword');
+    }
+  }
+
   /// Limpa erro atual.
   void clearError() {
     _error = null;

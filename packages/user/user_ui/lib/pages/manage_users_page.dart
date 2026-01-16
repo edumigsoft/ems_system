@@ -339,6 +339,17 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                 ],
               ),
             ),
+            if (_canResetPassword(user))
+              const PopupMenuItem(
+                value: 'reset-password',
+                child: Row(
+                  children: [
+                    Icon(Icons.lock_reset),
+                    SizedBox(width: 8),
+                    Text('Resetar senha'),
+                  ],
+                ),
+              ),
             PopupMenuItem(
               value: 'toggle',
               child: Row(
@@ -374,6 +385,9 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
         break;
       case 'role':
         _showChangeRoleDialog(user);
+        break;
+      case 'reset-password':
+        _confirmResetPassword(user);
         break;
       case 'toggle':
         _toggleUserStatus(user);
@@ -596,6 +610,78 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
                   : 'Erro ao deletar usuário',
             ),
             backgroundColor: success ? Colors.green : Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _confirmResetPassword(UserDetails user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Resetar Senha'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Tem certeza que deseja resetar a senha de ${user.name}?'),
+            const SizedBox(height: 12),
+            const Text(
+              'O usuário será obrigado a alterar a senha no próximo login.',
+              style: TextStyle(
+                fontSize: 13,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, size: 20, color: Colors.orange),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Esta ação não pode ser desfeita.',
+                      style: TextStyle(fontSize: 12, color: Colors.orange),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Confirmar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final success = await widget.viewModel.resetUserPassword(user.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Senha resetada com sucesso. ${user.name} deverá alterar a senha no próximo login.'
+                  : widget.viewModel.error ?? 'Erro ao resetar senha',
+            ),
+            backgroundColor: success ? Colors.green : Colors.red,
+            duration: Duration(seconds: success ? 4 : 3),
           ),
         );
       }
@@ -827,5 +913,24 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+
+  bool _canResetPassword(UserDetails user) {
+    final currentUser = widget.viewModel.currentUser;
+    if (currentUser == null) return false;
+
+    // Cannot reset own password through this UI
+    if (currentUser.id == user.id && !currentUser.role.isOwner) return false;
+
+    // Owner can reset password for anyone
+    if (currentUser.role.isOwner) return true;
+
+    // Admin can reset password for users below admin level
+    if (currentUser.role.isAdmin) {
+      return user.role < UserRole.admin;
+    }
+
+    // Managers and regular users cannot reset passwords
+    return false;
   }
 }
