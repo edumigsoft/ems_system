@@ -364,14 +364,14 @@ class UserRoutes extends Routes {
       // PROTEÇÃO: Verificar se o usuário alvo existe e seu role atual
       final targetUserResult = await userRepository.findById(id);
 
-      if (targetUserResult case Failure(error: final error)) {
+      if (targetUserResult case Failure(error: _)) {
         return Response.notFound(
           jsonEncode({'error': 'User not found'}),
           headers: {'Content-Type': 'application/json'},
         );
       }
 
-      final targetUser = (targetUserResult as Success).value;
+      final targetUser = (targetUserResult as Success<UserDetails>).value;
 
       // PROTEÇÃO: Apenas owner pode modificar outro owner
       if (targetUser.role == UserRole.owner && !authContext.role.isOwner) {
