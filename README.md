@@ -244,5 +244,166 @@ ems_system/
 ├── README.md
 ├── CHANGELOG.md
 ├── LICENSE.md
-└── CONTRIBUTING.md
+
+### Estrutura
+
+A estrutura do projeto será a seguinte:
+
 ```
+ems_system/
+├── apps/
+│   ├── app_design_draft/
+│   │   ├── lib/
+│   │   │   ├── ui/
+│   │   │   │   ├── pages/
+│   │   │   │   └── view_models/
+│   │   │   └── app_layout.dart
+│   │   ├── pubspec.yaml
+│   │   └── README.md
+│   │
+│   ├── app_mobile/
+│   │   ├── lib/
+│   │   │   ├── ui/
+│   │   │   │   ├── pages/
+│   │   │   │   └── view_models/
+│   │   │   └── app_layout.dart
+│   │   ├── pubspec.yaml
+│   │   └── README.md
+│   │
+│   └── app_web/
+│       ├── lib/
+│       │   ├── ui/
+│       │   │   ├── pages/
+│       │   │   └── view_models/
+│       │   └── app_layout.dart
+│       ├── pubspec.yaml
+│       └── README.md
+│
+├── servers/
+│   └── server/
+│       ├── bin/
+│       └── lib/
+│           ├── config/
+│           │    ├── di/
+│           │    └── env/
+│           └── middlewares/
+│
+├── packages/
+│   ├── core/
+│   │   ├── README.md
+│   │   ├── CHANGELOG.md
+│   │   ├── LICENSE.md
+│   │   ├── CONTRIBUTING.md
+│   │   ├── core_shared/
+│   │   │   ├── README.md
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── lib/
+│   │   │   │   └── src/
+│   │   │   └── test/
+│   │   ├── core_server/
+│   │   │   ├── README.md
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── lib/
+│   │   │   │   └── src/
+│   │   │   └── test/
+│   │   ├── core_client/
+│   │   │   ├── README.md
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── lib/
+│   │   │   │   └── src/
+│   │   │   └── test/
+│   │   └── ui/
+│   │       ├── README.md
+│   │       ├── CHANGELOG.md
+│   │       ├── lib/
+│   │       │   └── ui/
+│   │       └── test/
+│   │
+│   ├── design_system/ # estrutura semelhante ao core
+│   ├── images/ # estrutura semelhante ao core
+│   ├── localizations/ # estrutura semelhante ao core
+│   ├── open_api/ # estrutura semelhante ao core
+│   └── {features}/ # estrutura semelhante ao core
+│
+├── scripts/
+├── docs/
+├── README.md
+├── CHANGELOG.md
+├── LICENSE.md
+└── CONTRIBUTING.md
+
+## 🆕 Novo objetivo e  estrutura
+
+### Objetivo
+
+O novo objetivo é utilizar o sistema EMS System como base para sistemas orientado por features e aplicativos (app e server) este tendo as features base do sistema compartilhados para que seja modular e escalável.
+Ambos aplicativos deverá ter seus proprios .env (variáveis de ambientes), databse independentes.
+Será compartilhado somente a base de códigos.
+Em relação a localização para evitar duplicidade e excesso de traduções sem necessidade em um aplicativo que não precisa, teremos: localization > para as traduções comuns, localization_ems > para o sistema EMS e assim para os demais sistemas.
+Em relaçao ao design_system, inicialmente seŕa compartilhado, mas futuramente, será feito estudos/expreiência para diferencia-los.
+O sistema deve ser capaz de gerenciar features diversas de forma eficiente, com funcionalidades como:
+
+```
+- App
+  - ems_app                       # aplicativo voltado para o sistema de gestão pessoal/empresarial
+    - ems_app_v1
+  - sms_app
+    - sms_app_v1                  # aplicativo voltado para o sistema de gestão School Manager System
+- Server
+  - ems_server
+    - ems_server_v1               # servidor voltado para o sistema de gestão pessoal/empresarial
+  - sms_server
+    - sms_server_v1               # servidor voltado para o sistema de gestão School Manager System
+- packages
+  - core
+    - core_shared
+    - core_server
+    - core_client
+    - core_ui
+  - design_system
+    - design_system_shared
+    - design_system_server
+    - design_system_client
+    - design_system_ui
+  - images
+    - images_shared
+    - images_server
+    - images_client
+    - images_ui
+  - localizations                 # traduções compartilhado entre os sistemas, cada sistema terá sua própria feature de traduções (localizations_ems, localizations_sms, etc)
+    - localizations_shared
+    - localizations_server
+    - localizations_client
+    - localizations_ui
+  - open_api
+    - open_api_shared
+    - open_api_server
+    - open_api_client
+    - open_api_ui
+  - {features}                    # exemplo de feature que poderá ser utilizada em qualquer um dos aplicativos
+    - {feature}_shared
+    - {feature}_server
+    
+Ideias de features:
+- Gestão de tarefas             # para o EMS e SMS
+- Gestão de projetos            # para o EMS e SMS 
+- Gestão de usuários            # para o EMS e SMS
+- Gestão de finanças            # para o EMS e SMS
+- Gestão de imagens             # para o EMS e SMS
+- Gestão de alunos              # para o SMS
+- Gestão de turmas              # para o SMS
+- Gestão de notas               # para o SMS
+- Gestão de professores         # para o SMS
+- Gestão de turmas              # para o SMS
+
+### Por que esta decisão?
+
+A idéia é aproveitar os conceitos e técnicas de códigos para ambas os sistemas e futuros, facilitando a manutenção e evolução conjunta.
+
+### Problemas possíveis
+
+Uma alteração nos pacotes base, afetará todos os sistemas, o que pode ser um problema em caso de mudanças drásticas na arquitetura ou nas tecnologias utilizadas.
+
+### Soluções possíveis
+
+Mudanças nas bases devem ser feitas em branches separadas e testadas exaustivamente antes de serem mescladas nas bases principais.
