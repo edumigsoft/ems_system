@@ -1,5 +1,7 @@
-import 'package:core_shared/core_shared.dart';
-import 'package:open_api_shared/open_api_shared.dart';
+import 'package:ems_system_core_shared/core_shared.dart' show UserRole;
+import 'package:open_api_shared/open_api_shared.dart'
+    show apiModel, Model, Property;
+
 import '../../domain/entities/user_details.dart';
 
 /// Model de serialização JSON para [UserDetails].

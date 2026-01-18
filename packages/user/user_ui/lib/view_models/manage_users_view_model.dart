@@ -1,9 +1,9 @@
 import 'package:auth_client/auth_client.dart' show AuthService;
-import 'package:core_shared/core_shared.dart'
+import 'package:ems_system_core_shared/core_shared.dart'
     show Loggable, UserRole, Success, Failure, Result;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:core_client/core_client.dart' show DioErrorHandler;
+import 'package:ems_system_core_client/core_client.dart' show DioErrorHandler;
 import 'package:user_shared/user_shared.dart'
     show
         UserDetails,

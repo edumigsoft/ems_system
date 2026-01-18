@@ -1,5 +1,5 @@
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
-import 'package:core_ui/core_ui.dart' show BaseNavigationViewModel;
+import 'package:ems_system_core_ui/core_ui.dart' show BaseNavigationViewModel;
 
 /// ViewModel principal do aplicativo que gerencia o estado global da interface do usuário.
 ///

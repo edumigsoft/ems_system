@@ -1,7 +1,7 @@
 import 'package:app_v1/app_layout.dart';
 
 import 'config/di/injector.dart';
-import 'package:core_shared/core_shared.dart' show GetItInjector;
+import 'package:ems_system_core_shared/core_shared.dart' show GetItInjector;
 import 'package:flutter/material.dart';
 
 /// Ponto de entrada principal do aplicativo EMS System.

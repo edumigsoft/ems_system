@@ -1,5 +1,6 @@
-import 'package:core_server/core_server.dart';
 import 'package:drift/drift.dart';
+import 'package:ems_system_core_server/core_server.dart'
+    show DriftTableMixinPostgres, DateTimeConverterNonNull;
 
 /// Tabela de refresh tokens.
 ///

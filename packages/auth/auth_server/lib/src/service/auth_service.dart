@@ -1,9 +1,27 @@
-import 'package:auth_shared/auth_shared.dart';
-import 'package:core_server/core_server.dart';
-import 'package:core_shared/core_shared.dart'; // Required for Result, Exceptions
+import 'package:auth_shared/auth_shared.dart'
+    show
+        LoginRequestValidator,
+        RegisterRequestValidator,
+        ChangePasswordRequestValidator,
+        LoginRequest,
+        AuthResponse,
+        RegisterRequest,
+        ChangePasswordRequest,
+        TokenPayload,
+        TokenPair;
 import 'package:drift/drift.dart';
-import 'package:user_server/user_server.dart';
-import 'package:user_shared/user_shared.dart';
+import 'package:ems_system_core_server/core_server.dart'
+    show SecurityService, CryptService, EmailService;
+import 'package:ems_system_core_shared/core_shared.dart'
+    show
+        ValidationException,
+        Result,
+        Failure,
+        Success,
+        CoreValidationError,
+        UnauthorizedException;
+import 'package:user_server/user_server.dart' show UserRepository;
+import 'package:user_shared/user_shared.dart' show UserCreate, UserDetails;
 
 import '../database/auth_database.dart';
 import '../repository/auth_repository.dart';

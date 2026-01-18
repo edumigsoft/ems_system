@@ -15,8 +15,20 @@
       ]
     },
     {
+      "name": "lints",
+      "version": "6.0.0",
+      "dependencies": []
+    },
+    {
+      "name": "localizations_shared",
+      "version": "0.1.0",
+      "dependencies": [
+        "meta"
+      ]
+    },
+    {
       "name": "test",
-      "version": "1.28.0",
+      "version": "1.29.0",
       "dependencies": [
         "analyzer",
         "async",
@@ -46,20 +58,8 @@
       ]
     },
     {
-      "name": "lints",
-      "version": "6.0.0",
-      "dependencies": []
-    },
-    {
-      "name": "localizations_shared",
-      "version": "0.1.0",
-      "dependencies": [
-        "meta"
-      ]
-    },
-    {
       "name": "test_core",
-      "version": "0.6.14",
+      "version": "0.6.15",
       "dependencies": [
         "analyzer",
         "args",
@@ -86,7 +86,7 @@
     },
     {
       "name": "test_api",
-      "version": "0.7.8",
+      "version": "0.7.9",
       "dependencies": [
         "async",
         "boolean_selector",
@@ -126,17 +126,17 @@
       ]
     },
     {
-      "name": "meta",
-      "version": "1.17.0",
-      "dependencies": []
-    },
-    {
       "name": "cli_config",
       "version": "0.2.0",
       "dependencies": [
         "args",
         "yaml"
       ]
+    },
+    {
+      "name": "meta",
+      "version": "1.18.0",
+      "dependencies": []
     },
     {
       "name": "glob",
@@ -360,8 +360,25 @@
       ]
     },
     {
+      "name": "mime",
+      "version": "2.0.0",
+      "dependencies": []
+    },
+    {
+      "name": "shelf",
+      "version": "1.4.2",
+      "dependencies": [
+        "async",
+        "collection",
+        "http_parser",
+        "path",
+        "stack_trace",
+        "stream_channel"
+      ]
+    },
+    {
       "name": "analyzer",
-      "version": "9.0.0",
+      "version": "10.0.1",
       "dependencies": [
         "_fe_analyzer_shared",
         "collection",
@@ -379,9 +396,10 @@
     },
     {
       "name": "_fe_analyzer_shared",
-      "version": "92.0.0",
+      "version": "93.0.0",
       "dependencies": [
-        "meta"
+        "meta",
+        "source_span"
       ]
     },
     {
@@ -393,34 +411,17 @@
     },
     {
       "name": "watcher",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "dependencies": [
         "async",
         "path"
       ]
     },
     {
-      "name": "mime",
-      "version": "2.0.0",
-      "dependencies": []
-    },
-    {
       "name": "crypto",
       "version": "3.0.7",
       "dependencies": [
         "typed_data"
-      ]
-    },
-    {
-      "name": "shelf",
-      "version": "1.4.2",
-      "dependencies": [
-        "async",
-        "collection",
-        "http_parser",
-        "path",
-        "stack_trace",
-        "stream_channel"
       ]
     },
     {

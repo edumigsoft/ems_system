@@ -13,14 +13,27 @@ dependencies:
   envied: ^1.3.2
   dio: ^5.9.0
   flutter_secure_storage: ^10.0.0
-  core_shared:
-    path: ../../packages/core/core_shared
-  core_ui:
-    path: ../../packages/core/core_ui
+  ems_system_core_shared:
+    git:
+      url: git@github.com:edumigsoft/ems_system_core.git
+      ref: refactor/new_structure
+      path: core_shared
+  ems_system_core_ui:
+    git:
+      url: git@github.com:edumigsoft/ems_system_core.git
+      ref: refactor/new_structure
+      path: core_ui
   design_system_shared:
     path: ../../packages/design_system/design_system_shared
   design_system_ui:
     path: ../../packages/design_system/design_system_ui
+
+dependency_overrides:
+  ems_system_core_shared:
+    git:
+      url: git@github.com:edumigsoft/ems_system_core.git
+      path: core_shared
+      ref: refactor/new_structure
 
 dev_dependencies:
   flutter_test:

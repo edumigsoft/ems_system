@@ -9,8 +9,8 @@
 
 import 'dart:io';
 
-import 'package:core_server/core_server.dart' show Routes;
-import 'package:core_shared/core_shared.dart' show Loggable;
+import 'package:ems_system_core_server/core_server.dart' show Routes;
+import 'package:ems_system_core_shared/core_shared.dart' show Loggable;
 import 'package:open_api_shared/open_api_shared.dart' hide Response;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';

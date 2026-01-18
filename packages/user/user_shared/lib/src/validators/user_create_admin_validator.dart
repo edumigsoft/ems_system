@@ -1,4 +1,6 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:ems_system_core_shared/core_shared.dart'
+    show CoreValidator, CoreValidationResult, CoreValidationError;
+
 import '../domain/dtos/user_create_admin.dart';
 
 /// Validator para UserCreateAdmin DTO.

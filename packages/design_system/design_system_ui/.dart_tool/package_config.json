@@ -32,18 +32,6 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "core_shared",
-      "rootUri": "../../../core/core_shared",
-      "packageUri": "lib/",
-      "languageVersion": "3.10"
-    },
-    {
-      "name": "core_ui",
-      "rootUri": "../../../core/core_ui",
-      "packageUri": "lib/",
-      "languageVersion": "3.10"
-    },
-    {
       "name": "design_system_shared",
       "rootUri": "../../design_system_shared",
       "packageUri": "lib/",
@@ -60,6 +48,18 @@
       "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/dio_web_adapter-2.1.1",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "ems_system_core_shared",
+      "rootUri": "file:///home/anderson/.pub-cache/git/ems_system_core-e9164a8cc7065fb2a3f261a94d7f077f7cb7baab/core_shared",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
+    },
+    {
+      "name": "ems_system_core_ui",
+      "rootUri": "file:///home/anderson/.pub-cache/git/ems_system_core-e9164a8cc7065fb2a3f261a94d7f077f7cb7baab/core_ui",
+      "packageUri": "lib/",
+      "languageVersion": "3.10"
     },
     {
       "name": "fake_async",
@@ -333,8 +333,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.10.4",
+  "generatorVersion": "3.10.7",
   "flutterRoot": "file:///home/anderson/development/flutter",
-  "flutterVersion": "3.38.5",
+  "flutterVersion": "3.38.7",
   "pubCache": "file:///home/anderson/.pub-cache"
 }

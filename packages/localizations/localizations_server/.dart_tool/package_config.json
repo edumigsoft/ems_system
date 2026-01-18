@@ -3,13 +3,13 @@
   "packages": [
     {
       "name": "_fe_analyzer_shared",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-92.0.0",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/_fe_analyzer_shared-93.0.0",
       "packageUri": "lib/",
       "languageVersion": "3.9"
     },
     {
       "name": "analyzer",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/analyzer-9.0.0",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/analyzer-10.0.1",
       "packageUri": "lib/",
       "languageVersion": "3.9"
     },
@@ -123,7 +123,7 @@
     },
     {
       "name": "meta",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/meta-1.17.0",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/meta-1.18.0",
       "packageUri": "lib/",
       "languageVersion": "3.5"
     },
@@ -231,19 +231,19 @@
     },
     {
       "name": "test",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/test-1.28.0",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/test-1.29.0",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
     {
       "name": "test_api",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/test_api-0.7.8",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/test_api-0.7.9",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
     {
       "name": "test_core",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/test_core-0.6.14",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/test_core-0.6.15",
       "packageUri": "lib/",
       "languageVersion": "3.7"
     },
@@ -261,7 +261,7 @@
     },
     {
       "name": "watcher",
-      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/watcher-1.2.0",
+      "rootUri": "file:///home/anderson/.pub-cache/hosted/pub.dev/watcher-1.2.1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -303,8 +303,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.10.4",
+  "generatorVersion": "3.10.7",
   "flutterRoot": "file:///home/anderson/development/flutter",
-  "flutterVersion": "3.38.5",
+  "flutterVersion": "3.38.7",
   "pubCache": "file:///home/anderson/.pub-cache"
 }

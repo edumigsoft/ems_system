@@ -1,4 +1,5 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:ems_system_core_shared/core_shared.dart' show BaseDetails;
+
 import '../../authorization/feature_user_role.dart';
 import '../../authorization/feature_user_role_enum.dart' as feature_role;
 
@@ -49,10 +50,10 @@ class FeatureUserRoleDetails implements BaseDetails {
     required String featureId,
     required feature_role.FeatureUserRole role,
   }) : data = FeatureUserRole(
-          userId: userId,
-          featureId: featureId,
-          role: role,
-        );
+         userId: userId,
+         featureId: featureId,
+         role: role,
+       );
 
   // Getters de conveniência para campos da entity
   String get userId => data.userId;

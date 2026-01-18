@@ -7,9 +7,9 @@
       "name": "design_system_ui",
       "version": "0.1.0",
       "dependencies": [
-        "core_ui",
         "design_system_shared",
         "dio",
+        "ems_system_core_ui",
         "flutter",
         "get_it",
         "images_ui",
@@ -74,12 +74,10 @@
       ]
     },
     {
-      "name": "core_ui",
-      "version": "0.1.0",
+      "name": "ems_system_core_ui",
+      "version": "2.0.0",
       "dependencies": [
-        "core_shared",
-        "design_system_shared",
-        "design_system_ui",
+        "ems_system_core_shared",
         "flutter",
         "logging",
         "path_provider",
@@ -240,8 +238,8 @@
       ]
     },
     {
-      "name": "core_shared",
-      "version": "0.1.0",
+      "name": "ems_system_core_shared",
+      "version": "2.0.0",
       "dependencies": [
         "get_it",
         "logging",

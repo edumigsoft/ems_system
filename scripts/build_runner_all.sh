@@ -11,7 +11,9 @@ set -e
 ACTION="${1:-rebuild}"
 
 # Busca todos os diretórios com pubspec.yaml
-PACKAGES=$(find ../packages ../apps ../servers -name "pubspec.yaml" -type f -exec dirname {} \; 2>/dev/null | sort)
+PACKAGES=$(find packages apps servers -name "pubspec.yaml" -type f -exec dirname {} \; 2>/dev/null | sort)
+
+echo "📦 Packages: $PACKAGES..."
 
 # Função para limpar arquivos gerados
 clean_generated_files() {

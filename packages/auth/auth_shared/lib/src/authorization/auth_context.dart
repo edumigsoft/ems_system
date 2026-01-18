@@ -1,4 +1,4 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:ems_system_core_shared/core_shared.dart' show UserRole;
 
 /// Contexto de autenticação extraído do token JWT.
 ///

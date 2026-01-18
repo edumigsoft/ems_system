@@ -1,7 +1,9 @@
 import 'dart:io';
 
-import 'package:core_server/core_server.dart' show AddRoutes, RateLimit, Server;
-import 'package:core_shared/core_shared.dart' show LogService, LogLevel;
+import 'package:ems_system_core_server/core_server.dart'
+    show AddRoutes, RateLimit, Server;
+import 'package:ems_system_core_shared/core_shared.dart'
+    show LogService, LogLevel;
 import 'package:ems_server_v1/config/env/env.dart';
 import 'package:open_api_shared/open_api_shared.dart' show api, ApiInfo;
 import 'package:shelf/shelf.dart' hide Server;

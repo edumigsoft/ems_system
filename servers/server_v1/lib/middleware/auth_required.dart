@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:core_server/core_server.dart' show AuthRequired;
-// import 'package:core_shared/core_shared.dart' show Success;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:ems_system_core_server/core_server.dart' show AuthRequired;
 import 'package:shelf/shelf.dart';
-// import 'package:user_core/user_core.dart' show UserRepository, UserDetails;
 
 class AuthRequiredImpl extends AuthRequired {
   // final UserRepository _userRepository;

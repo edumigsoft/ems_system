@@ -1,7 +1,13 @@
+import 'package:auth_shared/auth_shared.dart'
+    show
+        LoginRequest,
+        RegisterRequest,
+        PasswordResetRequest,
+        PasswordResetConfirm;
 import 'package:dio/dio.dart';
-import 'package:core_shared/core_shared.dart';
-import 'package:auth_shared/auth_shared.dart';
-import 'package:user_shared/user_shared.dart';
+import 'package:ems_system_core_shared/core_shared.dart'
+    show Result, Failure, Success, successOfUnit;
+import 'package:user_shared/user_shared.dart' show UserDetails;
 
 import '../storage/token_storage.dart';
 import 'auth_api_service.dart';

@@ -9,11 +9,17 @@ environment:
 dependencies:
   shelf: ^1.4.2
   shelf_router: ^1.1.4
-  drift: ^2.30.0
-  core_shared:
-    path: ../../core/core_shared
-  core_server:
-    path: ../../core/core_server
+  drift: ^2.30.1
+  ems_system_core_shared:
+    git:
+      url: git@github.com:edumigsoft/ems_system_core.git
+      ref: refactor/new_structure
+      path: core_shared
+  ems_system_core_server:
+    git:
+      url: git@github.com:edumigsoft/ems_system_core.git
+      ref: refactor/new_structure
+      path: core_server
   open_api_shared:
     path: ../../open_api/open_api_shared
   auth_server:
@@ -23,8 +29,15 @@ dependencies:
   user_shared:
     path: ../user_shared
 
+dependency_overrides:
+  ems_system_core_shared:
+    git:
+      url: git@github.com:edumigsoft/ems_system_core.git
+      path: core_shared
+      ref: refactor/new_structure
+
 dev_dependencies:
   lints: ^6.0.0
-  test: ^1.28.0
+  test: ^1.29.0
   build_runner: 2.10.4
   drift_dev: ^2.30.0

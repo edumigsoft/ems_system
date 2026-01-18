@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:core_server/core_server.dart';
-// import 'package:user_server/user_server.dart'; // Removido para evitar erro do Drift
+import 'package:ems_system_core_server/core_server.dart'
+    show DriftTableMixinPostgres, DateTimeConverterNonNull;
 
 /// Tabela de credenciais de usuário.
 ///
