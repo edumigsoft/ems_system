@@ -1,4 +1,16 @@
 # Changelog
+## [2.1.0] - 2026-01-18
+
+### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+
+
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
