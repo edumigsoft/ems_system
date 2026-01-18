@@ -1,3 +1,9 @@
+# Breaking Changes
+*Ultimo commit, antes da mudança de estrutura.*
+*A estrutura será alterada para repositórios idividuais.*
+*Este sistema será agregador de vaŕios sistemas, que possam compartilhar as bases de códigos.*
+
+
 # EMS System (EduMigSoft System)
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/edumigsoft/ems_system/releases)
