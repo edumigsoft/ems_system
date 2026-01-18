@@ -1,12 +1,7 @@
-# Breaking Changes
-*Ultimo commit, antes da mudança de estrutura.*
-*A estrutura será alterada para repositórios idividuais.*
-*Este sistema será agregador de vaŕios sistemas, que possam compartilhar as bases de códigos.*
-
 
 # EMS System (EduMigSoft System)
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/edumigsoft/ems_system/releases)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/edumigsoft/ems_system/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.0.0-02569B.svg?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%3E%3D3.0.0-0175C2.svg?logo=dart&logoColor=white)](https://dart.dev)
