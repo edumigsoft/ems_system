@@ -48,8 +48,8 @@ workspace:
   - packages/auth/auth_ui
 
   # Servers
-  - servers/server_v1
+  - servers/ems/server_v1
 
   # Apps
-  - apps/app_v1
-  - apps/app_design_draft
+  - apps/ems/app_v1
+  - apps/ems/app_design_draft

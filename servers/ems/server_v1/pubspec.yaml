@@ -24,17 +24,17 @@ dependencies:
   postgres: ^3.5.9
   uuid: ^4.5.2
   core_shared:
-    path: ../../packages/core/core_shared
+    path: ../../../packages/core/core_shared
   core_server:
-    path: ../../packages/core/core_server
+    path: ../../../packages/core/core_server
   open_api_shared:
-    path: ../../packages/open_api/open_api_shared
+    path: ../../../packages/open_api/open_api_shared
   open_api_server:
-    path: ../../packages/open_api/open_api_server
+    path: ../../../packages/open_api/open_api_server
   auth_server:
-    path: ../../packages/auth/auth_server
+    path: ../../../packages/auth/auth_server
   user_server:
-    path: ../../packages/user/user_server
+    path: ../../../packages/user/user_server
 
 dev_dependencies:
   lints: ^6.0.0

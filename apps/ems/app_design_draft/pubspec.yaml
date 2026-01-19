@@ -15,13 +15,13 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   core_shared:
-    path: ../../packages/core/core_shared
+    path: ../../../packages/core/core_shared
   core_ui:
-    path: ../../packages/core/core_ui
+    path: ../../../packages/core/core_ui
   design_system_shared:
-    path: ../../packages/design_system/design_system_shared
+    path: ../../../packages/design_system/design_system_shared
   design_system_ui:
-    path: ../../packages/design_system/design_system_ui
+    path: ../../../packages/design_system/design_system_ui
 
 dev_dependencies:
   flutter_test:
