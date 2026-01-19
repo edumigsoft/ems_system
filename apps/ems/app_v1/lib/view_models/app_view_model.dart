@@ -32,8 +32,22 @@ class AppViewModel extends BaseNavigationViewModel {
   bool _isInitialized = false;
 
   /// Cria uma instância do [AppViewModel].
-  AppViewModel({required AuthViewModel authViewModel})
-    : _authViewModel = authViewModel;
+  ///
+  /// Exemplo de uso com DSCard customizado:
+  /// ```dart
+  /// AppViewModel(
+  ///   authViewModel: authViewModel,
+  ///   cardBuilder: (child) => DSCard(
+  ///     padding: EdgeInsets.all(16),
+  ///     elevation: 4,
+  ///     child: child,
+  ///   ),
+  /// )
+  /// ```
+  AppViewModel({
+    required AuthViewModel authViewModel,
+    super.cardBuilder, // Passa o cardBuilder para o BaseNavigationViewModel
+  }) : _authViewModel = authViewModel;
 
   @override
   Future<void> init() async {

@@ -4,6 +4,7 @@ import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
+import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:dio/dio.dart';
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
 
@@ -38,10 +39,13 @@ class Injector with Loggable {
       module.registerDependencies(_diMain);
     }
 
-    // 3. Registra AppViewModel (agora que AuthViewModel já está registrado)
+    // 3. Registra AppViewModel
     _diMain.registerLazySingleton<AppViewModel>(
       () => AppViewModel(
         authViewModel: _diMain.get<AuthViewModel>(),
+        cardBuilder: (child) => DSCard(
+          child: child,
+        ),
       ),
     );
 
