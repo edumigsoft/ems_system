@@ -1,11 +1,15 @@
 import 'package:core_shared/core_shared.dart' show Loggable, UserRole;
-import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:flutter/material.dart';
 
 import '../../core/commons/app_module.dart';
 import '../../core/navigation/app_navigation_item.dart';
 
 abstract class BaseNavigationViewModel extends ChangeNotifier with Loggable {
+  BaseNavigationViewModel({Widget Function(Widget child)? cardBuilder})
+    : _cardBuilder = cardBuilder;
+
+  final Widget Function(Widget child)? _cardBuilder;
+
   Future<void> init();
 
   final Map<String, Widget> _routesMap = {};
@@ -30,12 +34,16 @@ abstract class BaseNavigationViewModel extends ChangeNotifier with Loggable {
   }
 
   Widget get currentView {
+    final content =
+        _routesMap[_selectedRoute] ??
+        const Center(child: Text('Rota não encontrada'));
+
     return Scaffold(
-      body: DSCard(
-        child:
-            _routesMap[_selectedRoute] ??
-            const Center(child: Text('Rota não encontrada')),
-      ),
+      body:
+          _cardBuilder?.call(content) ??
+          Card(
+            child: content,
+          ),
     );
   }
 

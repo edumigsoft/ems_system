@@ -1,4 +1,5 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Result, Unit;
+
 import '../entities/feature_user_role_details.dart';
 import '../dtos/feature_user_role_create.dart';
 import '../dtos/feature_user_role_update.dart';

@@ -1,7 +1,9 @@
-import '../security_service.dart';
-import 'package:core_shared/core_shared.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:core_shared/core_shared.dart'
+    show Loggable, Success, Result, Failure;
 import 'package:shelf/shelf.dart';
+
+import '../security_service.dart';
 
 class JWTSecurityService with Loggable implements SecurityService<JWT> {
   final String _jwtKey;

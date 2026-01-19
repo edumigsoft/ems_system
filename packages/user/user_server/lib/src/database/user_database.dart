@@ -1,8 +1,10 @@
-import 'package:core_shared/core_shared.dart' show UserRole;
 import 'package:drift/drift.dart';
-import 'package:core_server/core_server.dart';
-import '../../user_server.dart' show UserRoleConverter;
+import 'package:core_server/core_server.dart'
+    show BooleanConverter, DateTimeConverterNonNull;
+import 'package:core_shared/core_shared.dart' show UserRole;
 import 'package:user_shared/user_shared.dart' show UserDetails;
+
+import '../../user_server.dart' show UserRoleConverter;
 import 'tables/users_table.dart';
 
 part 'user_database.g.dart';

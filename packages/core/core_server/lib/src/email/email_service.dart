@@ -1,4 +1,4 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Result;
 
 /// Contrato para serviço de envio de emails.
 ///

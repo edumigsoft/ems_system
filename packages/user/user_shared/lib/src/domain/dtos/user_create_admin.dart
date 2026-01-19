@@ -1,5 +1,6 @@
-import 'package:core_shared/core_shared.dart';
-import 'package:open_api_shared/open_api_shared.dart';
+import 'package:core_shared/core_shared.dart' show UserRole;
+import 'package:open_api_shared/open_api_shared.dart'
+    show apiModel, Model, Property;
 
 /// DTO para criação administrativa de usuário.
 ///

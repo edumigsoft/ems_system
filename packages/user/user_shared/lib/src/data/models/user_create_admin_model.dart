@@ -1,5 +1,6 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show UserRole;
 import 'package:open_api_shared/open_api_shared.dart';
+
 import '../../domain/dtos/user_create_admin.dart';
 
 /// Model de serialização JSON para [UserCreateAdmin].

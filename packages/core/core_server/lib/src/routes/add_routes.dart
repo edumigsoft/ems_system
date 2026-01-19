@@ -1,9 +1,10 @@
-import '../middleware/auth_required.dart';
-import 'routes.dart';
 import 'package:core_shared/core_shared.dart'
     show DependencyInjector, LogService;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+
+import '../middleware/auth_required.dart';
+import 'routes.dart';
 
 final _logger = LogService.getLogger('AddRoutes');
 

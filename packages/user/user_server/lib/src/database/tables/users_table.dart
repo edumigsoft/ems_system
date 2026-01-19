@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:core_server/core_server.dart';
-import 'package:user_shared/user_shared.dart';
+import 'package:core_server/core_server.dart'
+    show DriftTableMixinPostgres, BooleanConverter;
+import 'package:user_shared/user_shared.dart' show UserDetails;
 
 import '../converters/user_role_converter.dart';
 

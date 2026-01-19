@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'package:shelf/shelf.dart';
+
 import 'package:core_shared/core_shared.dart' show Result, Success, Failure;
+import 'package:shelf/shelf.dart';
 
 /// Helper para converter [Result] em respostas HTTP do Shelf.
 ///

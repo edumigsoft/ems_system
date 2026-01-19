@@ -1,0 +1,45 @@
+name: ems_server_v1
+description: EMS System Server V1
+publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  shelf_cors_headers: ^0.1.5
+  envied: ^1.3.2
+  reflectable: ^5.1.0
+  dart_jsonwebtoken: ^3.3.1
+  logging: ^1.3.0
+  get_it: ^9.2.0
+  drift: ^2.30.0
+  drift_postgres: ^1.3.1
+  postgres: ^3.5.9
+  uuid: ^4.5.2
+  core_shared:
+    path: ../../../packages/core/core_shared
+  core_server:
+    path: ../../../packages/core/core_server
+  open_api_shared:
+    path: ../../../packages/open_api/open_api_shared
+  open_api_server:
+    path: ../../../packages/open_api/open_api_server
+  auth_server:
+    path: ../../../packages/auth/auth_server
+  user_server:
+    path: ../../../packages/user/user_server
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0
+  build_runner: ^2.10.5
+  envied_generator: ^1.3.2
+  mocktail: ^1.0.4
+  reflectable_builder: ^1.1.0

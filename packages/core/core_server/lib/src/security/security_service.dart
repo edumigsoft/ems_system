@@ -1,4 +1,4 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Result;
 import 'package:shelf/shelf.dart';
 
 int expiresIn({int timeSeconds = 0, int timeMinutes = 0, int timeDays = 0}) {

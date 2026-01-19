@@ -7,7 +7,9 @@ set -e
 echo "🔧 Executando dart pub get em todos os pacotes..."
 
 # Busca todos os diretórios com pubspec.yaml
-PACKAGES=$(find ../packages ../apps ../servers -name "pubspec.yaml" -type f -exec dirname {} \; 2>/dev/null | sort)
+PACKAGES=$(find packages /apps /servers -name "pubspec.yaml" -type f -exec dirname {} \; 2>/dev/null | sort)
+
+echo "📦 Packages: $PACKAGES..."
 
 for pkg in $PACKAGES; do
   echo "📦 Processing $pkg..."

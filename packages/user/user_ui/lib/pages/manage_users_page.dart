@@ -1,7 +1,7 @@
+import 'package:core_shared/core_shared.dart' show UserRole;
 import 'package:core_ui/core_ui.dart' show UserRoleExtension;
 import 'package:design_system_ui/design_system_ui.dart' show DsDialog;
 import 'package:flutter/material.dart';
-import 'package:core_shared/core_shared.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import 'package:user_shared/user_shared.dart' show UserDetails, UserCreateAdmin;
 import '../view_models/manage_users_view_model.dart';

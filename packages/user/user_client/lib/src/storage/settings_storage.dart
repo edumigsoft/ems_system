@@ -1,7 +1,15 @@
 import 'dart:convert';
+import 'package:core_shared/core_shared.dart'
+    show
+        Loggable,
+        Unit,
+        Result,
+        successOfUnit,
+        StorageException,
+        Failure,
+        Success;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:user_shared/user_shared.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:user_shared/user_shared.dart' show UserSettings;
 
 /// Secure storage for user settings.
 ///

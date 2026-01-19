@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Loggable;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart';
 

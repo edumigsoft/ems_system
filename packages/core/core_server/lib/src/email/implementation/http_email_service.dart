@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart'
+    show Loggable, Result, Success, Failure, successOfUnit;
 
 import '../email_service.dart';
 import '../email_template.dart';

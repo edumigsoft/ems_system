@@ -1,5 +1,6 @@
-import 'package:core_shared/core_shared.dart';
-import 'package:user_shared/user_shared.dart';
+import 'package:core_shared/core_shared.dart' show Result, UserRole;
+import 'package:user_shared/user_shared.dart'
+    show UserDetails, UserCreate, UserCreateAdmin, UserUpdate;
 
 /// Repository para operações CRUD de usuários.
 ///

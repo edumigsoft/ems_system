@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show UserRole;
 
 /// Converter para [UserRole] em colunas de texto Drift.
 ///

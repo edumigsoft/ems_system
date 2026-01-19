@@ -1,4 +1,4 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Result, Success;
 import 'package:flutter/material.dart';
 
 typedef CommandAction0<T> = Future<Result<T>> Function();

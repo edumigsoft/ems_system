@@ -1,4 +1,5 @@
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Result, Failure, Success;
+
 import '../dtos/generate_tokens_dto.dart';
 import '../security_service.dart';
 

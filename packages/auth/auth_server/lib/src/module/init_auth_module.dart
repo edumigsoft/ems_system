@@ -1,6 +1,14 @@
-import 'package:core_shared/core_shared.dart';
-import 'package:core_server/core_server.dart';
-import 'package:user_server/user_server.dart';
+import 'package:core_server/core_server.dart'
+    show
+        InitServerModule,
+        DatabaseProvider,
+        SecurityService,
+        CryptService,
+        EmailService,
+        addRoutes;
+import 'package:core_shared/core_shared.dart' show DependencyInjector;
+import 'package:user_server/user_server.dart' show UserRepository;
+
 import '../../auth_server.dart';
 
 import '../database/auth_database.dart';

@@ -1,5 +1,3 @@
-import 'package:core_shared/core_shared.dart'
-    show UserRole, Failure, Success, Loggable;
 import 'package:shelf/shelf.dart';
 import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
@@ -95,7 +93,8 @@ class AuthMiddleware with Loggable {
           .addMiddleware(verifyJwt)
           .addMiddleware((Handler handler) {
             return (Request request) async {
-              final authContext = request.context['authContext'] as AuthContext?;
+              final authContext =
+                  request.context['authContext'] as AuthContext?;
 
               // authContext nunca deve ser null aqui pois verifyJwt já validou
               if (authContext == null) {
@@ -130,7 +129,8 @@ class AuthMiddleware with Loggable {
           .addMiddleware(verifyJwt)
           .addMiddleware((Handler handler) {
             return (Request request) async {
-              final authContext = request.context['authContext'] as AuthContext?;
+              final authContext =
+                  request.context['authContext'] as AuthContext?;
 
               // authContext nunca deve ser null aqui pois verifyJwt já validou
               if (authContext == null) {

@@ -1,13 +1,17 @@
 name: auth_shared
 description: Shared models and contracts for Authentication.
-version: 0.1.0
 publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
 
 environment:
-  sdk: ^3.10.4
+  sdk: ^3.10.7
 
 dependencies:
-  meta: ^1.11.0
+  meta: ^1.17.0
   core_shared:
     path: ../../core/core_shared
   user_shared:
@@ -17,4 +21,4 @@ dependencies:
 
 dev_dependencies:
   lints: ^6.0.0
-  test: ^1.24.0
+  test: ^1.26.0

@@ -8,3 +8,6 @@ export 'ui/widgets/responsive_layout_mode.dart';
 export 'ui/view_models/base_crud_view_model.dart';
 export 'ui/view_models/base_navigation_view_model.dart';
 export 'core/extensions/user_role_extension.dart';
+
+//
+export 'package:core_shared/core_shared.dart';

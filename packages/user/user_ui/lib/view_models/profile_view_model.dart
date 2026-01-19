@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:core_shared/core_shared.dart';
 import 'package:core_client/core_client.dart';
 import 'package:user_shared/user_shared.dart';
 import 'package:user_client/user_client.dart';

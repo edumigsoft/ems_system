@@ -1,10 +1,11 @@
 # Changelog
 
-## [0.1.0] - 2026-01-12
+## [1.0.0] - 2026-01-18
 
 ### Added
-- Criação inicial do pacote `core_ui`.
-- Adicionado `ResponsiveLayout` e `ResponsiveLayoutMode`.
-- Adicionado `BaseViewModel` e infraestrutura MVVM.
-- Adicionado `FormValidationMixin`.
-- Adicionado utilitários de navegação e módulos.
+- `ResponsiveLayout` e `ResponsiveLayoutMode` para layouts responsivos.
+- `BaseViewModel` e infraestrutura completa MVVM.
+- `FormValidationMixin` para validação de formulários.
+- Utilitários de navegação e sistema de módulos.
+- Integração com Flutter e suporte a persistência local via path_provider.
+- Integração com `ems_system_core_shared` para funcionalidades compartilhadas.

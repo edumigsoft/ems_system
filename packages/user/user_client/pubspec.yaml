@@ -1,25 +1,29 @@
 name: user_client
 description: Client implementation for User Management.
-version: 0.1.0
 publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
 
 environment:
-  sdk: ^3.10.4
+  sdk: ^3.10.7
 
 dependencies:
   dio: ^5.0.0
   retrofit: 4.9.1
   flutter_secure_storage: ^9.2.4
-  core_client:
-    path: ../../core/core_client
   core_shared:
     path: ../../core/core_shared
+  core_client:
+    path: ../../core/core_client
   user_shared:
     path: ../user_shared
 
 dev_dependencies:
   lints: ^6.0.0
-  test: ^1.24.0
-  build_runner: 2.10.4
-  retrofit_generator: 10.2.0
-  analyzer: 8.4.1
+  test: ^1.26.0
+  build_runner: ^2.10.5
+  retrofit_generator: ^10.2.0
+  analyzer: ^8.4.1

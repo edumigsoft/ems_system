@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart' show Loggable;
 
 import '../storage/token_storage.dart';
 import 'auth_api_service.dart';
@@ -23,8 +23,8 @@ class TokenRefreshService with Loggable {
   TokenRefreshService({
     required TokenStorage tokenStorage,
     required AuthApiService apiService,
-  })  : _tokenStorage = tokenStorage,
-        _apiService = apiService;
+  }) : _tokenStorage = tokenStorage,
+       _apiService = apiService;
 
   /// Inicia o monitoramento em background.
   ///
@@ -50,8 +50,9 @@ class TokenRefreshService with Loggable {
       return;
     }
 
-    final needsRefresh =
-        await _tokenStorage.tokenExpiresWithin(_refreshThreshold);
+    final needsRefresh = await _tokenStorage.tokenExpiresWithin(
+      _refreshThreshold,
+    );
     if (!needsRefresh) {
       logger.info('Token ainda válido, não precisa refresh');
       return;
@@ -110,7 +111,9 @@ class TokenRefreshService with Loggable {
 
     final refreshToken = await _tokenStorage.getRefreshToken();
     if (refreshToken == null) {
-      logger.info('Access token expirado e sem refresh token - logout necessário');
+      logger.info(
+        'Access token expirado e sem refresh token - logout necessário',
+      );
       return false;
     }
 

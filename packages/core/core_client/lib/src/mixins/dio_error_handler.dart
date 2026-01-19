@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:core_shared/core_shared.dart';
+import 'package:core_shared/core_shared.dart'
+    show Loggable, Failure, Result, DataException;
 
 /// Mixin para tratamento centralizado de erros do Dio
 mixin DioErrorHandler on Loggable {

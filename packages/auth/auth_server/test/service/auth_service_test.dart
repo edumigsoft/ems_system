@@ -6,8 +6,7 @@ import 'package:user_server/user_server.dart';
 import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
 import 'package:user_shared/user_shared.dart';
-import 'package:core_shared/core_shared.dart';
-import 'package:auth_server/src/database/auth_database.dart'; // UserCredential
+import 'package:auth_server/src/database/auth_database.dart';
 
 // Mocks
 class MockAuthRepository extends Mock implements AuthRepository {}

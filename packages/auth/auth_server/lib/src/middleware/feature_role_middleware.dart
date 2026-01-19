@@ -1,5 +1,6 @@
+import 'package:auth_shared/auth_shared.dart'
+    show FeatureUserRoleRepository, FeatureUserRole, AuthContext;
 import 'package:shelf/shelf.dart';
-import 'package:auth_shared/auth_shared.dart';
 
 /// Middleware genérico para verificação de papéis em features.
 ///
