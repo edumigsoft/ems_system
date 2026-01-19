@@ -1,7 +1,7 @@
 
 # EMS System (EduMigSoft System)
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/edumigsoft/ems_system/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/edumigsoft/ems_system/releases)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D3.0.0-02569B.svg?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-%3E%3D3.0.0-0175C2.svg?logo=dart&logoColor=white)](https://dart.dev)
@@ -28,15 +28,15 @@ Cada feature pode ter seus próprios membros com papéis independentes (owner, a
 
 | Módulo | Status | Versão | Descrição |
 |--------|--------|--------|-----------|
-| Core Shared | 🟢 Ativo | 0.1.0 | Funcionalidades compartilhadas |
-| Core Server | 🟢 Ativo | 0.1.0 | Núcleo do servidor |
-| Core Client | 🟢 Ativo | 0.1.0 | Núcleo do cliente |
-| Auth Module | 🟢 Ativo | 0.1.0 | Autenticação e Segurança |
-| User Module | 🟢 Ativo | 0.1.0 | Gestão de Usuários |
-| UI Components | 🟡 Em desenvolvimento | 0.1.0 | Componentes de interface |
-| Design System | 🟡 Em desenvolvimento | 0.1.0 | Sistema de design |
-| App Flutter | 🟡 Em desenvolvimento | 0.1.0 | Aplicativo mobile |
-| Server Dart/Shelf | 🟡 Em desenvolvimento | 0.1.0 | Backend API |
+| Core | 🟢 Ativo | 1.0.0 | Funcionalidades base (shared, client, server, ui) |
+| Auth | 🟢 Ativo | 1.0.0 | Autenticação e Autorização RBAC |
+| User | 🟢 Ativo | 1.0.0 | Gestão de Usuários |
+| Design System | 🟡 Em desenvolvimento | 1.0.0 | Sistema de design (shared, ui) |
+| Images | 🟡 Em desenvolvimento | 1.0.0 | Gestão de imagens (ui) |
+| Localizations | 🟡 Em desenvolvimento | 1.0.0 | Internacionalização (server, shared, ui) |
+| Open API | 🟡 Em desenvolvimento | 1.0.0 | Especificações OpenAPI (server, shared) |
+| EMS App V1 | 🟡 Em desenvolvimento | 1.0.0 | Aplicativo EMS Flutter |
+| EMS Server V1 | 🟡 Em desenvolvimento | 1.0.0 | Backend EMS API |
 
 **Legenda:** 🟢 Ativo | 🟡 Em desenvolvimento | 🔴 Planejado
 
@@ -174,160 +174,66 @@ Cada feature (projetos, finanças, tarefas) mantém sua própria tabela de papé
 
 **Implementação de referência**: Veja `ProjectUserRoleRepository`, `ProjectUserRoleService` e `ProjectUserRoleRoutes` em `packages/auth/auth_server` como exemplo completo para criar novas features.
 
-## Estrutura do Projeto
+## 📁 Estrutura do Projeto
 
-```bash
-ems_system/
-├── apps/
-│   └── app/
-│       ├── config/
-│       │    ├── di/ #dependence injection
-│       │    ├── dio/ # config Dio
-│       │    └── env/ # config environment  
-│       │
-│       ├── data/
-│       │    ├── local/
-│       │    └── services/
-│       │
-│       └── ui/
-│           ├── pages/
-│           ├── view_models/
-│           └── app_layout.dart
-│
-├── servers/
-│   └── server/
-│       ├── bin/
-│       └── lib/
-│           ├── config/
-│           │    ├── di/
-│           │    └── env/
-│           └── middlewares/
-│
-├── packages/
-│   ├── core/
-│   │   ├── README.md
-│   │   ├── CHANGELOG.md
-│   │   ├── LICENSE.md
-│   │   ├── CONTRIBUTING.md
-│   │   ├── core_shared/
-│   │   │   ├── README.md
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── lib/
-│   │   │   │   └── src/
-│   │   │   └── test/
-│   │   ├── core_server/
-│   │   │   ├── README.md
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── lib/
-│   │   │   │   └── src/
-│   │   │   └── test/
-│   │   ├── core_client/
-│   │   │   ├── README.md
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── lib/
-│   │   │   │   └── src/
-│   │   │   └── test/
-│   │   └── ui/
-│   │       ├── README.md
-│   │       ├── CHANGELOG.md
-│   │       ├── lib/
-│   │       │   └── ui/
-│   │       └── test/
-│   │
-│   ├── design_system/ # estrutura semelhante ao core
-│   ├── images/ # estrutura semelhante ao core
-│   ├── localizations/ # estrutura semelhante ao core
-│   ├── open_api/ # estrutura semelhante ao core
-│   └── {features}/ # estrutura semelhante ao core
-│
-├── scripts/
-├── docs/
-├── README.md
-├── CHANGELOG.md
-├── LICENSE.md
-
-### Estrutura
-
-A estrutura do projeto será a seguinte:
+A estrutura do projeto reflete a **arquitetura multi-sistema**:
 
 ```
 ems_system/
-├── apps/
-│   ├── app_design_draft/
-│   │   ├── lib/
-│   │   │   ├── ui/
-│   │   │   │   ├── pages/
-│   │   │   │   └── view_models/
-│   │   │   └── app_layout.dart
-│   │   ├── pubspec.yaml
-│   │   └── README.md
-│   │
-│   ├── app_mobile/
-│   │   ├── lib/
-│   │   │   ├── ui/
-│   │   │   │   ├── pages/
-│   │   │   │   └── view_models/
-│   │   │   └── app_layout.dart
-│   │   ├── pubspec.yaml
-│   │   └── README.md
-│   │
-│   └── app_web/
-│       ├── lib/
-│       │   ├── ui/
-│       │   │   ├── pages/
-│       │   │   └── view_models/
-│       │   └── app_layout.dart
-│       ├── pubspec.yaml
-│       └── README.md
+├── apps/                      # Aplicativos Flutter
+│   ├── ems/                   # Aplicativos EMS
+│   │   ├── app_v1/            # App principal EMS (produção)
+│   │   └── app_design_draft/  # Rascunhos e experimentos de design
+│   └── sms/                   # Futuro: School Management System apps
 │
-├── servers/
-│   └── server/
-│       ├── bin/
-│       └── lib/
-│           ├── config/
-│           │    ├── di/
-│           │    └── env/
-│           └── middlewares/
+├── servers/                   # Servidores Dart/Shelf
+│   ├── ems/                   # Servidores EMS
+│   │   └── server_v1/         # API principal EMS
+│   └── sms/                   # Futuro: SMS server
 │
-├── packages/
-│   ├── core/
-│   │   ├── README.md
-│   │   ├── CHANGELOG.md
-│   │   ├── LICENSE.md
-│   │   ├── CONTRIBUTING.md
-│   │   ├── core_shared/
-│   │   │   ├── README.md
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── lib/
-│   │   │   │   └── src/
-│   │   │   └── test/
-│   │   ├── core_server/
-│   │   │   ├── README.md
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── lib/
-│   │   │   │   └── src/
-│   │   │   └── test/
-│   │   ├── core_client/
-│   │   │   ├── README.md
-│   │   │   ├── CHANGELOG.md
-│   │   │   ├── lib/
-│   │   │   │   └── src/
-│   │   │   └── test/
-│   │   └── ui/
-│   │       ├── README.md
-│   │       ├── CHANGELOG.md
-│   │       ├── lib/
-│   │       │   └── ui/
-│   │       └── test/
+├── packages/                  # Features compartilhadas entre sistemas
+│   ├── core/                  # Base do sistema
+│   │   ├── core_shared/       # Pure Dart - Domínio e utilitários
+│   │   ├── core_server/       # Shelf/Drift infrastructure
+│   │   ├── core_client/       # HTTP/Dio client
+│   │   └── core_ui/           # Flutter widgets base
 │   │
-│   ├── design_system/ # estrutura semelhante ao core
-│   ├── images/ # estrutura semelhante ao core
-│   ├── localizations/ # estrutura semelhante ao core
-│   ├── open_api/ # estrutura semelhante ao core
-│   └── {features}/ # estrutura semelhante ao core
+│   ├── auth/                  # Autenticação e autorização
+│   │   ├── auth_shared/       # Modelos de domínio
+│   │   ├── auth_server/       # Backend (JWT, RBAC)
+│   │   ├── auth_client/       # Cliente HTTP
+│   │   └── auth_ui/           # UI de autenticação
+│   │
+│   ├── user/                  # Gestão de usuários
+│   │   ├── user_shared/       # Modelos de usuário
+│   │   ├── user_server/       # CRUD de usuários
+│   │   ├── user_client/       # Cliente HTTP
+│   │   └── user_ui/           # UI de perfil/usuários
+│   │
+│   ├── design_system/         # Sistema de design
+│   │   ├── design_system_shared/
+│   │   └── design_system_ui/
+│   │
+│   ├── images/                # Gestão de imagens
+│   │   └── images_ui/
+│   │
+│   ├── localizations/         # Internacionalização
+│   │   ├── localizations_shared/
+│   │   ├── localizations_server/
+│   │   └── localizations_ui/
+│   │
+│   ├── open_api/              # Especificações OpenAPI
+│   │   ├── open_api_shared/
+│   │   └── open_api_server/
+│   │
+│   └── {features}/            # Novas features seguem padrão:
+│       ├── {feature}_shared/  # Pure Dart models
+│       ├── {feature}_server/  # Backend implementation
+│       ├── {feature}_client/  # HTTP client
+│       └── {feature}_ui/      # Flutter UI
 │
-├── scripts/
-├── docs/
+├── scripts/                   # Scripts de automação
+├── docs/                      # Documentação adicional
 ├── README.md
 ├── CHANGELOG.md
 ├── LICENSE.md
