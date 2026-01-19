@@ -1,10 +1,14 @@
 name: user_server
 description: Server implementation for User Management.
-version: 0.1.0
 publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
 
 environment:
-  sdk: ^3.10.4
+  sdk: ^3.10.7
 
 dependencies:
   shelf: ^1.4.2
@@ -25,6 +29,6 @@ dependencies:
 
 dev_dependencies:
   lints: ^6.0.0
-  test: ^1.29.0
-  build_runner: 2.10.4
+  test: ^1.26.0
+  build_runner: ^2.10.5
   drift_dev: ^2.30.0

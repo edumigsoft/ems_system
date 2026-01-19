@@ -4,7 +4,7 @@ publish_to: none
 
 version: 1.0.0
 
-repository: https://github.com/edumigsoft/ems_system_core
+# repository: https://github.com/edumigsoft/ems_system_core
 
 resolution: workspace
 

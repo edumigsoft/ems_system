@@ -5,7 +5,51 @@ environment:
   sdk: ^3.10.7
 
 workspace:
+  # Core
   - packages/core/core_client
   - packages/core/core_server
   - packages/core/core_shared
   - packages/core/core_ui
+
+  # Design System
+  # - packages/design_system/design_system_client
+  # - packages/design_system/design_system_server
+  - packages/design_system/design_system_shared
+  - packages/design_system/design_system_ui
+
+  # Images
+  # - packages/images/images_client
+  # - packages/images/images_server
+  # - packages/images/images_shared
+  - packages/images/images_ui
+
+  # Localization
+  # - packages/localization/localization_client
+  - packages/localizations/localizations_server
+  - packages/localizations/localizations_shared
+  - packages/localizations/localizations_ui
+
+  # Open API
+  # - packages/open_api/open_api_client
+  - packages/open_api/open_api_server
+  - packages/open_api/open_api_shared
+  # - packages/open_api/open_api_ui
+
+  # User
+  - packages/user/user_client
+  - packages/user/user_server
+  - packages/user/user_shared
+  - packages/user/user_ui
+
+  # Auth
+  - packages/auth/auth_client
+  - packages/auth/auth_server
+  - packages/auth/auth_shared
+  - packages/auth/auth_ui
+
+  # Servers
+  - servers/server_v1
+
+  # Apps
+  - apps/app_v1
+  - apps/app_design_draft

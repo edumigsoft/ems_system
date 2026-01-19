@@ -1,10 +1,14 @@
 name: localizations_ui
 description: UI Package for Localizations Configuration.
-version: 0.1.0
 publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
 
 environment:
-  sdk: ^3.10.4
+  sdk: ^3.10.7
   flutter: ">=1.17.0"
 
 dependencies:
