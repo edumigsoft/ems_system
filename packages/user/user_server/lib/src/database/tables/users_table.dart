@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:ems_system_core_server/core_server.dart'
+import 'package:core_server/core_server.dart'
     show DriftTableMixinPostgres, BooleanConverter;
 import 'package:user_shared/user_shared.dart' show UserDetails;
 

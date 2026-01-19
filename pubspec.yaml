@@ -1,0 +1,11 @@
+name: ems_system
+publish_to: none
+
+environment:
+  sdk: ^3.10.7
+
+workspace:
+  - packages/core/core_client
+  - packages/core/core_server
+  - packages/core/core_shared
+  - packages/core/core_ui

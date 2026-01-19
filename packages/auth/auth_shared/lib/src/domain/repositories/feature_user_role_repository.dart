@@ -1,4 +1,4 @@
-import 'package:ems_system_core_shared/core_shared.dart' show Result, Unit;
+import 'package:core_shared/core_shared.dart' show Result, Unit;
 
 import '../entities/feature_user_role_details.dart';
 import '../dtos/feature_user_role_create.dart';

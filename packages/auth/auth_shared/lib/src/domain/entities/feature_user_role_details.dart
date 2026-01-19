@@ -1,4 +1,4 @@
-import 'package:ems_system_core_shared/core_shared.dart' show BaseDetails;
+import 'package:core_shared/core_shared.dart' show BaseDetails;
 
 import '../../authorization/feature_user_role.dart';
 import '../../authorization/feature_user_role_enum.dart' as feature_role;

@@ -1,5 +1,4 @@
-import 'package:ems_system_core_shared/core_shared.dart'
-    show LogService, LogLevel;
+import 'package:core_shared/core_shared.dart' show LogService, LogLevel;
 import 'package:flutter/material.dart';
 import 'main.dart' as app;
 

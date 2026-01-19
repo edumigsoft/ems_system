@@ -1,7 +1,7 @@
 import 'package:auth_ui/auth_ui.dart'
     show AuthViewModel, AuthGuard, AuthFlowPage;
 import 'package:design_system_ui/design_system_ui.dart';
-import 'package:ems_system_core_ui/core_ui.dart' show ResponsiveLayout;
+import 'package:core_ui/core_ui.dart' show ResponsiveLayout;
 import 'package:flutter/material.dart';
 
 import '../view_models/app_view_model.dart';

@@ -8,11 +8,8 @@ environment:
 
 dependencies:
   meta: 1.17.0
-  ems_system_core_shared:
-    git:
-      url: git@github.com:edumigsoft/ems_system_core.git
-      ref: refactor/new_structure
-      path: core_shared
+  core_shared:
+    path: ../../core/core_shared
   open_api_shared:
     path: ../../open_api/open_api_shared
 

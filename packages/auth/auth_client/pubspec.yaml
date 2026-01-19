@@ -10,27 +10,14 @@ dependencies:
   dio: ^5.0.0
   retrofit: 4.9.1
   flutter_secure_storage: ^9.2.4
-  ems_system_core_shared:
-    git:
-      url: git@github.com:edumigsoft/ems_system_core.git
-      ref: refactor/new_structure
-      path: core_shared
-  ems_system_core_client:
-    git:
-      url: git@github.com:edumigsoft/ems_system_core.git
-      ref: refactor/new_structure
-      path: core_client
+  core_shared:
+    path: ../../core/core_shared
+  core_client:
+    path: ../../core/core_client
   auth_shared:
     path: ../auth_shared
   user_shared:
     path: ../../user/user_shared
-
-dependency_overrides:
-  ems_system_core_shared:
-    git:
-      url: git@github.com:edumigsoft/ems_system_core.git
-      path: core_shared
-      ref: refactor/new_structure
 
 dev_dependencies:
   lints: ^6.0.0

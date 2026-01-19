@@ -1,6 +1,6 @@
 import 'package:auth_server/auth_server.dart'
     show InitAuthModuleToServer, AuthMiddleware;
-import 'package:ems_system_core_server/core_server.dart'
+import 'package:core_server/core_server.dart'
     show
         AddRoutes,
         BCryptService,
@@ -13,7 +13,7 @@ import 'package:ems_system_core_server/core_server.dart'
         JWTSecurityService,
         SecurityService,
         addRoutes;
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show DependencyInjector, GetItInjector, LogService;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart' show JWT;
 import 'package:open_api_server/open_api_server.dart';

@@ -1,8 +1,6 @@
-import 'package:ems_system_core_shared/core_shared.dart'
-    show Loggable, Success, Failure, Result;
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:ems_system_core_client/core_client.dart';
+import 'package:core_client/core_client.dart';
 import 'package:user_shared/user_shared.dart';
 import 'package:user_client/user_client.dart';
 

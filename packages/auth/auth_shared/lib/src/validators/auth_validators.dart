@@ -1,4 +1,4 @@
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show CoreValidator, CoreValidationResult, CoreValidationError;
 
 import '../models/auth_request.dart';

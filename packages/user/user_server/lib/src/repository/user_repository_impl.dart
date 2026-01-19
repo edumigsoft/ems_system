@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show Failure, StorageException, Result, UserRole, Success;
 import 'package:user_shared/user_shared.dart'
     show UserDetails, UserCreate, UserCreateAdmin, UserUpdate;

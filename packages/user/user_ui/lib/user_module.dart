@@ -1,6 +1,6 @@
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show DependencyInjector, Loggable, UserRole;
-import 'package:ems_system_core_ui/core_ui.dart'
+import 'package:core_ui/core_ui.dart'
     show AppModule, AppNavigationItem, AppNavigationSection;
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';

@@ -1,9 +1,9 @@
 import 'package:auth_client/auth_client.dart'
     show TokenStorage, AuthInterceptor;
 import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
-import 'package:ems_system_core_ui/core_ui.dart' show AppModule;
+import 'package:core_ui/core_ui.dart' show AppModule;
 import 'package:dio/dio.dart';
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
 

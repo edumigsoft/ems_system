@@ -1,7 +1,5 @@
-import 'package:ems_system_core_shared/core_shared.dart'
-    show UserRole, Failure, Success, Loggable;
 import 'package:shelf/shelf.dart';
-import 'package:ems_system_core_server/core_server.dart';
+import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
 
 /// Middleware de autenticação e autorização.

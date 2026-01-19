@@ -1,8 +1,7 @@
 import 'package:auth_server/auth_server.dart' show AuthMiddleware;
-import 'package:ems_system_core_server/core_server.dart'
+import 'package:core_server/core_server.dart'
     show InitServerModule, DatabaseProvider, addRoutes;
-import 'package:ems_system_core_shared/core_shared.dart'
-    show DependencyInjector;
+import 'package:core_shared/core_shared.dart' show DependencyInjector;
 
 import '../repository/user_repository.dart';
 import '../repository/user_repository_impl.dart';

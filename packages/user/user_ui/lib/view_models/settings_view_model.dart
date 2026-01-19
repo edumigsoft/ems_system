@@ -2,7 +2,7 @@ import 'package:auth_client/auth_client.dart' show AuthService;
 import 'package:design_system_shared/design_system_shared.dart'
     show DSThemeEnum, DSThemeEnumLabel;
 import 'package:design_system_ui/design_system_ui.dart' show DSTheme;
-import 'package:ems_system_core_shared/core_shared.dart' show Loggable;
+import 'package:core_shared/core_shared.dart' show Loggable;
 import 'package:flutter/material.dart';
 import 'package:localizations_shared/localizations_shared.dart' show LocaleData;
 import 'package:user_client/user_client.dart' show SettingsStorage;

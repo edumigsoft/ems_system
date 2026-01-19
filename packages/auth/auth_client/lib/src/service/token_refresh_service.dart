@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:ems_system_core_shared/core_shared.dart' show Loggable;
+import 'package:core_shared/core_shared.dart' show Loggable;
 
 import '../storage/token_storage.dart';
 import 'auth_api_service.dart';

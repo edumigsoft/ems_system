@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:ems_system_core_server/core_server.dart'
+import 'package:core_server/core_server.dart'
     show BooleanConverter, DateTimeConverterNonNull;
-import 'package:ems_system_core_shared/core_shared.dart' show UserRole;
+import 'package:core_shared/core_shared.dart' show UserRole;
 import 'package:user_shared/user_shared.dart' show UserDetails;
 
 import '../../user_server.dart' show UserRoleConverter;

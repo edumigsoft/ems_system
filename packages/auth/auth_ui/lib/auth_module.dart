@@ -1,9 +1,7 @@
 import 'package:auth_client/auth_client.dart'
     show AuthService, AuthApiService, TokenStorage, TokenRefreshService;
-import 'package:ems_system_core_shared/core_shared.dart'
-    show Loggable, DependencyInjector;
-import 'package:ems_system_core_ui/core_ui.dart'
-    show AppModule, AppNavigationItem;
+import 'package:core_shared/core_shared.dart' show Loggable, DependencyInjector;
+import 'package:core_ui/core_ui.dart' show AppModule, AppNavigationItem;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 

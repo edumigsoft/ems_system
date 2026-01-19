@@ -1,4 +1,4 @@
-import 'package:ems_system_core_ui/core_ui.dart'
+import 'package:core_ui/core_ui.dart'
     show AppNavigationItem, AppNavigationSection;
 import 'package:design_system_shared/design_system_shared.dart'
     show DSSpacing, DSPaddings, DSRadius;

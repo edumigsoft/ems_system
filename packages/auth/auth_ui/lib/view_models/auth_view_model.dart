@@ -1,7 +1,7 @@
 import 'package:auth_client/auth_client.dart' show AuthService;
 import 'package:auth_shared/auth_shared.dart'
     show LoginRequest, RegisterRequest;
-import 'package:ems_system_core_shared/core_shared.dart' show Success, Failure;
+import 'package:core_shared/core_shared.dart' show Success, Failure;
 import 'package:flutter/material.dart';
 import 'package:user_shared/user_shared.dart' show UserDetails;
 

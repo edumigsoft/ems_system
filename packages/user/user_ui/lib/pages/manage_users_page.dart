@@ -1,5 +1,5 @@
-import 'package:ems_system_core_shared/core_shared.dart' show UserRole;
-import 'package:ems_system_core_ui/core_ui.dart' show UserRoleExtension;
+import 'package:core_shared/core_shared.dart' show UserRole;
+import 'package:core_ui/core_ui.dart' show UserRoleExtension;
 import 'package:design_system_ui/design_system_ui.dart' show DsDialog;
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';

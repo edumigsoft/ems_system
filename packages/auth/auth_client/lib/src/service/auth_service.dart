@@ -5,7 +5,7 @@ import 'package:auth_shared/auth_shared.dart'
         PasswordResetRequest,
         PasswordResetConfirm;
 import 'package:dio/dio.dart';
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show Result, Failure, Success, successOfUnit;
 import 'package:user_shared/user_shared.dart' show UserDetails;
 

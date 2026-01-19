@@ -1,4 +1,4 @@
-import 'package:ems_system_core_shared/core_shared.dart' show Result, UserRole;
+import 'package:core_shared/core_shared.dart' show Result, UserRole;
 import 'package:user_shared/user_shared.dart'
     show UserDetails, UserCreate, UserCreateAdmin, UserUpdate;
 

@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:auth_shared/auth_shared.dart'
     show LoginRequest, RegisterRequest, AuthContext, ChangePasswordRequest;
-import 'package:ems_system_core_server/core_server.dart' show Routes;
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_server/core_server.dart' show Routes;
+import 'package:core_shared/core_shared.dart'
     show ValidationException, Failure, Success, UnauthorizedException;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';

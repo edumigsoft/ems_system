@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:ems_system_core_shared/core_shared.dart'
+import 'package:core_shared/core_shared.dart'
     show
         Loggable,
         Unit,
