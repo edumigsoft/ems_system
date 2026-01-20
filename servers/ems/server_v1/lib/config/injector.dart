@@ -32,10 +32,10 @@ Future<DependencyInjector> registryInjectors() async {
 
   await databaseProvider.connect(
     host: Env.serverAddress,
-    port: int.tryParse(Env.dbPort) ?? 5433,
-    name: Env.dbDatabaseName,
-    user: Env.dbUsername,
-    password: Env.dbPassword,
+    port: int.tryParse(EnvDatabase.dbPort) ?? 5433,
+    name: EnvDatabase.dbDatabaseName,
+    user: EnvDatabase.dbUsername,
+    password: EnvDatabase.dbPassword,
     useSsl: false,
   );
 

@@ -5,7 +5,7 @@ targets:
       - bin/**
       - lib/**
       - test/**
-      # - $package$
+      - $package$
     builders:
       reflectable_builder:reflectable_builder:
         generate_for:
@@ -18,11 +18,11 @@ targets:
         generate_for:
           - lib/config/env/**.dart
         options:
-          # path: .env.custom
+          # path: ../container/.env_database
           override: true
-      drift_dev:
-        options:
-          store_date_time_values_as_text: true
-          sql:
-            dialects:
-              - postgres
+      # drift_dev:
+      #   options:
+      #     store_date_time_values_as_text: true
+      #     sql:
+      #       dialects:
+      #         - postgres

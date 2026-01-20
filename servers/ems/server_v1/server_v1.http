@@ -1,0 +1,32 @@
+###
+http://localhost:8181/api/v1
+
+###
+POST http://localhost:8181/api/v1/auth/login
+Authorization: Basic ZWR1bWlnc29mdEBnbWFpbC5jb206UzlAZEtMRnU=
+Content-Type: application/json
+
+{
+    "email": "edumigsoft@gmail.com",
+    "password": "S9@dKLFu"
+}
+
+###
+POST http://localhost:8181/api/v1/auth/signout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYTkwN2E1MjItYWRjMy00YTcxLTlmMzEtYjgyMDhkYzk5ZmU5IiwiZW1haWwiOiJlZHVtaWdzb2Z0QGdtYWlsLmNvbSIsImlhdCI6MTc2MjI5NDI1NiwiZXhwIjoxNzYyODk5MDU2LCJhdWQiOiJhY2Nlc3NUb2tlbiJ9.mfwIs4ogwN4PwrtQZ6MYaeDqrJGXsD3fUhOG5oGvNa4
+Content-Type: application/json
+
+###
+http://localhost:8181/api/v1/health
+
+###
+http://localhost:8181/api/v1/users
+
+###
+http://localhost:8181/api/v1/docs/openapi.json
+
+###
+http://localhost:8181/api/v1/docs
+
+###
+http://localhost:8181/api/v1/areas
