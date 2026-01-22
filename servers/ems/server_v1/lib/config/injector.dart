@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auth_server/auth_server.dart'
     show InitAuthModuleToServer, AuthMiddleware;
 import 'package:core_server/core_server.dart'
@@ -30,12 +32,20 @@ Future<DependencyInjector> registryInjectors() async {
   final databaseProvider = DatabaseProvider();
   di.registerSingleton<DatabaseProvider>(databaseProvider);
 
+  final dbHost = Platform.environment['DB_HOST'] ?? 'localhost';
+  final dbPort =
+      int.tryParse(Platform.environment['DB_PORT'] ?? EnvDatabase.dbPort) ??
+      5432;
+  final dbUser = Platform.environment['DB_USER'] ?? EnvDatabase.dbUser;
+  final dbPass = Platform.environment['DB_PASS'] ?? EnvDatabase.dbPass;
+  final dbName = Platform.environment['DB_NAME'] ?? EnvDatabase.dbName;
+
   await databaseProvider.connect(
-    host: Env.serverAddress,
-    port: int.tryParse(EnvDatabase.dbPort) ?? 5433,
-    name: EnvDatabase.dbDatabaseName,
-    user: EnvDatabase.dbUsername,
-    password: EnvDatabase.dbPassword,
+    host: dbHost,
+    port: dbPort,
+    name: dbName,
+    user: dbUser,
+    password: dbPass,
     useSsl: false,
   );
 

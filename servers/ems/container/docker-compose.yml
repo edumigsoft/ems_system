@@ -1,6 +1,7 @@
 services:
   ems_server:
     container_name: ems_server
+    image: ems_server_image:v1
     build:
       # Sobe até a raiz do projeto (ems_system)
       context: ../../../
@@ -11,9 +12,6 @@ services:
     env_file:
       - .env
     restart: unless-stopped
-    # Espera o banco subir (opcional, mas recomendado)
-    depends_on:
-      - postgres_ems_system # Referência ao container da infra
     networks:
       - ems_system_net
 

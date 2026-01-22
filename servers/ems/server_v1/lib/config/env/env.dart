@@ -9,10 +9,10 @@ part 'env.g.dart';
 )
 final class EnvDatabase {
   @EnviedField()
-  static const String dbUsername = _EnvDatabase.dbUsername;
+  static const String dbUser = _EnvDatabase.dbUser;
 
   @EnviedField()
-  static const String dbPassword = _EnvDatabase.dbPassword;
+  static const String dbPass = _EnvDatabase.dbPass;
 
   @EnviedField()
   static const String dbHost = _EnvDatabase.dbHost;
@@ -21,7 +21,7 @@ final class EnvDatabase {
   static const String dbPort = _EnvDatabase.dbPort;
 
   @EnviedField()
-  static const String dbDatabaseName = _EnvDatabase.dbDatabaseName;
+  static const String dbName = _EnvDatabase.dbName;
 }
 
 @Envied(path: '.env', name: 'Env', useConstantCase: true)
