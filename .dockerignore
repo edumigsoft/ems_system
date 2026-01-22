@@ -1,0 +1,15 @@
+.git
+.dart_tool
+build
+.fvm
+.idea
+.vscode
+**/doc/api
+**/build.git
+.dart_tool
+build
+.fvm
+.idea
+.vscode
+**/doc/api
+**/build
