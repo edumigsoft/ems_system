@@ -89,17 +89,17 @@ class UserModule extends AppModule with Loggable {
         AppNavigationItem(
           labelBuilder: (context) => AppLocalizations.of(context).myProfile,
           icon: Icons.person,
-          route: routeName, // /users -> ProfilePage
+          route: routeName,
         ),
         AppNavigationItem(
           labelBuilder: (context) => AppLocalizations.of(context).settings,
           icon: Icons.settings,
-          route: '$routeName/settings', // /users/settings
+          route: '$routeName/settings',
         ),
         AppNavigationItem(
           labelBuilder: (context) => AppLocalizations.of(context).manageUsers,
           icon: Icons.admin_panel_settings,
-          route: '$routeName/manage', // /users/manage
+          route: '$routeName/manage',
           allowedRoles: [UserRole.admin, UserRole.owner],
         ),
       ],

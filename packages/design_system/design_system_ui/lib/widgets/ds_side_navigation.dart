@@ -203,16 +203,15 @@ class DSSideNavigation extends StatelessWidget {
   /// - `system` → Sistema
   String _getSectionTitle(BuildContext context, AppNavigationSection section) {
     final l10n = AppLocalizations.of(context);
-    final name = section.toString().split('.').last;
-    switch (name) {
-      // case 'academic':
-      //   return l10n?.academicManagement ?? 'GESTÃO ACADÊMICA';
-      // case 'environment':
-      //   return l10n?.environmentManagement ?? 'GESTÃO DE AMBIENTES';
-      case 'system':
+    switch (section) {
+      case AppNavigationSection.dashboard:
+        return l10n.dashboard;
+      case AppNavigationSection.academic:
+        return ''; //l10n?.academicManagement ?? 'GESTÃO ACADÊMICA';
+      case AppNavigationSection.environment:
+        return ''; //l10n?.environmentManagement ?? 'GESTÃO DE AMBIENTES';
+      case AppNavigationSection.system:
         return l10n.systemManagement;
-      default:
-        return '';
     }
   }
 }
