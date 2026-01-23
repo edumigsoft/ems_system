@@ -79,43 +79,48 @@ class UserRepositoryServer implements UserRepository {
     String? search,
   }) async {
     try {
-      // Query base para dados
-      final query = db.select(db.users);
-
-      // Query base para count (sem limit/offset)
-      final countQuery = db.selectOnly(db.users)
-        ..addColumns([db.users.id.count()]);
-
-      // Aplicar mesmos filtros em ambas as queries
-      void applyFilters(dynamic q) {
-        if (roleFilter != null) {
-          try {
-            final roleEnum = UserRole.values.byName(roleFilter);
-            q.where((t) => t.role.equals(roleEnum.name));
-          } catch (_) {
-            // Se a role não existir no enum, filtro inválido
-          }
-        }
-
-        if (search != null && search.isNotEmpty) {
-          q.where(
-            (t) =>
-                t.name.contains(search) |
-                t.email.contains(search) |
-                t.username.contains(search),
+      // Validar role se fornecida
+      UserRole? roleEnum;
+      if (roleFilter != null) {
+        try {
+          roleEnum = UserRole.values.byName(roleFilter);
+        } catch (_) {
+          // Role inválida, retorna vazio
+          return Success(
+            PaginatedResult<UserDetails>(
+              items: [],
+              total: 0,
+              page: (offset ~/ limit) + 1,
+              limit: limit,
+            ),
           );
         }
       }
 
-      applyFilters(query);
-      applyFilters(countQuery);
+      // Query base para buscar dados
+      final baseQuery = db.select(db.users);
 
-      // Executar count
-      final countResult = await countQuery.getSingle();
-      final total = countResult.read(db.users.id.count()) ?? 0;
+      // Aplicar filtros
+      if (roleEnum != null) {
+        baseQuery.where((t) => t.role.equals(roleEnum!.name));
+      }
 
-      // Se total é 0, retorna resultado vazio
-      if (total == 0) {
+      if (search != null && search.isNotEmpty) {
+        baseQuery.where(
+          (t) =>
+              t.name.contains(search) |
+              t.email.contains(search) |
+              t.username.contains(search),
+        );
+      }
+
+      // Buscar todos os resultados para contar
+      // NOTA: Para otimização futura, considere usar customStatement com COUNT(*)
+      final allResults = await baseQuery.get();
+      final totalCount = allResults.length;
+
+      // Se total é 0, retorna vazio
+      if (totalCount == 0) {
         return Success(
           PaginatedResult<UserDetails>(
             items: [],
@@ -126,14 +131,18 @@ class UserRepositoryServer implements UserRepository {
         );
       }
 
-      // Aplicar paginação e buscar dados
-      query.limit(limit, offset: offset);
-      final items = await query.get();
+      // Aplicar paginação manualmente nos resultados
+      final startIndex = offset;
+      final endIndex = (offset + limit).clamp(0, totalCount);
+      final items = allResults.sublist(
+        startIndex.clamp(0, totalCount),
+        endIndex,
+      );
 
       return Success(
         PaginatedResult<UserDetails>(
           items: items,
-          total: total,
+          total: totalCount,
           page: (offset ~/ limit) + 1,
           limit: limit,
         ),
