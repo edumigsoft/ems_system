@@ -663,6 +663,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage Users'**
   String get manageUsers;
+
+  /// System Management
+  ///
+  /// In en, this message translates to:
+  /// **'System Management'**
+  String get systemManagement;
 }
 
 class _AppLocalizationsDelegate

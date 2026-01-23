@@ -317,4 +317,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get manageUsers => 'Gerenciar Usuários';
+
+  @override
+  String get systemManagement => 'Gestão do Sistema';
 }

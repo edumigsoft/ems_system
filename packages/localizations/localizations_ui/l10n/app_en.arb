@@ -372,5 +372,9 @@
     "manageUsers": "Manage Users",
     "@manageUsers": {
         "description": "Manage Users"
+    },
+    "systemManagement": "System Management",
+    "@systemManagement": {
+        "description": "System Management"
     }
 }

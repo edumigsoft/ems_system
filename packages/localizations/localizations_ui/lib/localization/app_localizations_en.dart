@@ -314,4 +314,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get manageUsers => 'Manage Users';
+
+  @override
+  String get systemManagement => 'System Management';
 }

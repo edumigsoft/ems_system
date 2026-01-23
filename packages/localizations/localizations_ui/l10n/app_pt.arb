@@ -334,5 +334,9 @@
     "manageUsers": "Gerenciar Usuários",
     "@manageUsers": {
         "description": "Gerenciar Usuários"
+    },
+    "systemManagement": "Gestão do Sistema",
+    "@systemManagement": {
+        "description": "Gestão do Sistema"
     }
 }

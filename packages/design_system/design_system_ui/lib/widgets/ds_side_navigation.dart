@@ -202,15 +202,15 @@ class DSSideNavigation extends StatelessWidget {
   /// - `environment` → Gestão de Ambientes
   /// - `system` → Sistema
   String _getSectionTitle(BuildContext context, AppNavigationSection section) {
-    // final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context);
     final name = section.toString().split('.').last;
     switch (name) {
       // case 'academic':
       //   return l10n?.academicManagement ?? 'GESTÃO ACADÊMICA';
       // case 'environment':
       //   return l10n?.environmentManagement ?? 'GESTÃO DE AMBIENTES';
-      // case 'system':
-      //   return l10n?.systemManagement ?? 'SISTEMA';
+      case 'system':
+        return l10n.systemManagement;
       default:
         return '';
     }
