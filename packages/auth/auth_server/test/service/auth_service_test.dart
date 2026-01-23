@@ -2,7 +2,6 @@ import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:auth_server/src/service/auth_service.dart';
 import 'package:auth_server/src/repository/auth_repository.dart';
-import 'package:user_server/user_server.dart';
 import 'package:core_server/core_server.dart';
 import 'package:auth_shared/auth_shared.dart';
 import 'package:user_shared/user_shared.dart';

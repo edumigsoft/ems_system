@@ -17,7 +17,7 @@ class MobilePage extends StatelessWidget {
     return Scaffold(
       body: viewModel.currentView,
       bottomNavigationBar: BottomNavigationBar(
-        items: viewModel.navigationItems.map((item) {
+        items: viewModel.visibleNavigationItems.map((item) {
           return BottomNavigationBarItem(
             icon: Icon(item.icon),
             label: item.labelBuilder(context),
@@ -25,8 +25,8 @@ class MobilePage extends StatelessWidget {
         }).toList(),
         currentIndex: _getSelectedIndex(context),
         onTap: (index) {
-          if (index >= 0 && index < viewModel.navigationItems.length) {
-            final item = viewModel.navigationItems[index];
+          if (index >= 0 && index < viewModel.visibleNavigationItems.length) {
+            final item = viewModel.visibleNavigationItems[index];
             if (item.hasRoute) {
               viewModel.navigateTo(item.route!);
             }
@@ -37,7 +37,7 @@ class MobilePage extends StatelessWidget {
   }
 
   int _getSelectedIndex(BuildContext context) {
-    final index = viewModel.navigationItems.indexWhere(
+    final index = viewModel.visibleNavigationItems.indexWhere(
       (item) => item.route == viewModel.selectedRoute,
     );
     return index != -1 ? index : 0; // Proteção para rota não encontrada

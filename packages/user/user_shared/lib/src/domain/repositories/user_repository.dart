@@ -1,6 +1,6 @@
 import 'package:core_shared/core_shared.dart' show Result, UserRole;
-import 'package:user_shared/user_shared.dart'
-    show UserDetails, UserCreate, UserCreateAdmin, UserUpdate;
+import '../../../user_shared.dart'
+    show UserDetails, UserCreate, UserCreateAdmin, UserUpdate, PaginatedResult;
 
 /// Repository para operações CRUD de usuários.
 ///
@@ -15,10 +15,16 @@ abstract class UserRepository {
   /// Busca usuário por username.
   Future<Result<UserDetails>> findByUsername(String username);
 
-  /// Lista todos os usuários ativos.
-  Future<Result<List<UserDetails>>> findAll({
-    int? limit,
-    int? offset,
+  /// Lista todos os usuários ativos com paginação.
+  ///
+  /// Retorna [PaginatedResult] contendo:
+  /// - items: Lista de usuários da página atual
+  /// - total: Número total de usuários (antes da paginação)
+  /// - page: Página atual (calculada a partir do offset)
+  /// - limit: Número de itens por página
+  Future<Result<PaginatedResult<UserDetails>>> findAll({
+    required int limit,
+    required int offset,
     String? roleFilter,
     String? search,
   });

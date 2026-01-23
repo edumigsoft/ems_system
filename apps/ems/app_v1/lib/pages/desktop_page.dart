@@ -53,7 +53,7 @@ class _DesktopPageState extends State<DesktopPage> {
         DSSideNavigation(
           selectedRoute: widget.viewModel.selectedRoute,
           onDestinationSelected: (route) => widget.viewModel.navigateTo(route),
-          items: widget.viewModel.navigationItems,
+          items: widget.viewModel.visibleNavigationItems,
           userName: currentUser?.name,
           userRole: currentUser?.role.name.toUpperCase(),
           userAvatarUrl: currentUser?.avatarUrl,

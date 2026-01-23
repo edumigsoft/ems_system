@@ -50,7 +50,10 @@ class ManageUsersViewModel extends ChangeNotifier
   int _totalUsers = 0;
   int get totalUsers => _totalUsers;
 
-  bool get hasMorePages => _users.length >= _pageSize;
+  int _totalPages = 0;
+  int get totalPages => _totalPages;
+
+  bool get hasMorePages => _currentPage < _totalPages;
 
   // Filtros
   String? _searchQuery;
@@ -79,6 +82,7 @@ class ManageUsersViewModel extends ChangeNotifier
         _users.addAll(response.data.map((m) => m.toDomain()));
       }
       _totalUsers = response.total;
+      _totalPages = response.totalPages ?? (response.total / _pageSize).ceil();
       _isLoading = false;
       notifyListeners();
     } else if (result case Failure(error: final error)) {
@@ -93,6 +97,8 @@ class ManageUsersViewModel extends ChangeNotifier
       final response = await _userService.listUsers(
         page: _currentPage,
         limit: _pageSize,
+        role: _roleFilter?.name,
+        search: _searchQuery,
       );
       return Success(response);
     } on DioException catch (e) {

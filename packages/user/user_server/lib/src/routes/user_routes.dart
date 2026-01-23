@@ -14,9 +14,8 @@ import 'package:user_shared/user_shared.dart'
         UserUpdateValidator,
         UserUpdate,
         UserCreateAdminModel,
-        UserCreateAdminValidator;
-
-import '../../user_server.dart';
+        UserCreateAdminValidator,
+        UserRepository;
 
 /// Rotas de gerenciamento de usuários.
 ///
@@ -255,9 +254,6 @@ class UserRoutes extends Routes {
       );
     }
 
-    // Log para debug
-    // print('[ListUsers] User: ${authContext.userId}, Role: ${authContext.role}');
-
     try {
       final queryParams = request.url.queryParameters;
 
@@ -293,16 +289,19 @@ class UserRoutes extends Routes {
       );
 
       return result.when(
-        success: (users) {
-          final models = users
+        success: (paginatedResult) {
+          final models = paginatedResult.items
               .map((u) => UserDetailsModel.fromDomain(u).toJson())
               .toList();
           return Response.ok(
             jsonEncode({
               'data': models,
-              'page': page,
-              'limit': limit,
-              'total': users.length,
+              'page': paginatedResult.page,
+              'limit': paginatedResult.limit,
+              'total': paginatedResult.total,
+              'totalPages': paginatedResult.totalPages,
+              'hasNextPage': paginatedResult.hasNextPage,
+              'hasPreviousPage': paginatedResult.hasPreviousPage,
             }),
             headers: {'Content-Type': 'application/json'},
           );

@@ -19,10 +19,65 @@ abstract class BaseNavigationViewModel extends ChangeNotifier with Loggable {
   String get selectedRoute => _selectedRoute;
 
   void navigateTo(String route) {
-    if (_selectedRoute != route && _routesMap.containsKey(route)) {
+    // Verifica se a rota existe
+    if (!_routesMap.containsKey(route)) {
+      logger.severe('Rota não encontrada: $route');
+      return;
+    }
+
+    // Verifica se o usuário tem permissão para acessar a rota
+    if (!_canAccessRoute(route)) {
+      logger.warning(
+        'Acesso negado à rota $route para role ${_currentUserRole?.name}',
+      );
+      return;
+    }
+
+    // Navega para a rota se diferente da atual
+    if (_selectedRoute != route) {
       _selectedRoute = route;
       notifyListeners();
     }
+  }
+
+  /// Verifica se o usuário atual pode acessar uma rota específica.
+  ///
+  /// Busca o item de navegação correspondente à rota e verifica
+  /// se o usuário tem permissão baseado em [allowedRoles].
+  bool _canAccessRoute(String route) {
+    // Se não há role definida, permite (cenário de login/inicial)
+    if (_currentUserRole == null) {
+      return true;
+    }
+
+    // Procura o item de navegação correspondente à rota
+    final navItem = _findNavigationItemByRoute(route);
+
+    // Se não encontrou item de navegação, permite acesso
+    // (pode ser uma rota sem restrição ou dinâmica)
+    if (navItem == null) {
+      return true;
+    }
+
+    // Verifica se o item permite acesso para a role atual
+    return navItem.isVisibleFor(_currentUserRole!);
+  }
+
+  /// Busca recursivamente um item de navegação pela rota.
+  AppNavigationItem? _findNavigationItemByRoute(String route) {
+    for (final item in _navigationItems) {
+      if (item.route == route) {
+        return item;
+      }
+
+      // Busca nos filhos
+      for (final child in item.children) {
+        if (child.route == route) {
+          return child;
+        }
+      }
+    }
+    return null;
   }
 
   void registerRoute(String route, Widget view) {

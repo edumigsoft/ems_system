@@ -7,7 +7,7 @@ import 'package:core_server/core_server.dart'
         EmailService,
         addRoutes;
 import 'package:core_shared/core_shared.dart' show DependencyInjector;
-import 'package:user_server/user_server.dart' show UserRepository;
+import 'package:user_shared/user_shared.dart' show UserRepository;
 
 import '../../auth_server.dart';
 

@@ -19,10 +19,18 @@ abstract class UserService {
 
   /// Lista todos os usuários (admin only).
   /// Retorna resposta paginada com lista de usuários e metadados.
+  ///
+  /// Parâmetros:
+  /// - [page]: Número da página (padrão: 1)
+  /// - [limit]: Itens por página (padrão: 50, máximo: 100)
+  /// - [role]: Filtro por role (user, admin, owner)
+  /// - [search]: Busca por nome, email ou username
   @GET('/users')
   Future<UsersListResponse> listUsers({
     @Query('page') int? page,
     @Query('limit') int? limit,
+    @Query('role') String? role,
+    @Query('search') String? search,
   });
 
   /// Obtém um usuário por ID (admin only).

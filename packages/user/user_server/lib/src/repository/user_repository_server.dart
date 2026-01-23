@@ -2,17 +2,22 @@ import 'package:drift/drift.dart';
 import 'package:core_shared/core_shared.dart'
     show Failure, StorageException, Result, UserRole, Success;
 import 'package:user_shared/user_shared.dart'
-    show UserDetails, UserCreate, UserCreateAdmin, UserUpdate;
+    show
+        UserDetails,
+        UserCreate,
+        UserCreateAdmin,
+        UserUpdate,
+        PaginatedResult,
+        UserRepository;
 
 import '../database/user_database.dart';
-import 'user_repository.dart';
 
 // part 'user_repository_impl.g.dart'; // Removido pois não usaramos mais o mixin do accessor
 
-class UserRepositoryImpl implements UserRepository {
+class UserRepositoryServer implements UserRepository {
   final UserDatabase db;
 
-  UserRepositoryImpl(this.db);
+  UserRepositoryServer(this.db);
 
   @override
   Future<Result<UserDetails>> findById(String id) async {
@@ -67,41 +72,72 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<Result<List<UserDetails>>> findAll({
-    int? limit,
-    int? offset,
+  Future<Result<PaginatedResult<UserDetails>>> findAll({
+    required int limit,
+    required int offset,
     String? roleFilter,
     String? search,
   }) async {
     try {
+      // Query base para dados
       final query = db.select(db.users);
 
-      if (roleFilter != null) {
-        try {
-          // O campo 'role' no banco é UserRole graças ao converter
-          final roleEnum = UserRole.values.byName(roleFilter);
-          query.where((t) => t.role.equals(roleEnum.name));
-        } catch (_) {
-          // Se a role não existir no enum, não retorna nada
-          return Success([]);
+      // Query base para count (sem limit/offset)
+      final countQuery = db.selectOnly(db.users)
+        ..addColumns([db.users.id.count()]);
+
+      // Aplicar mesmos filtros em ambas as queries
+      void applyFilters(dynamic q) {
+        if (roleFilter != null) {
+          try {
+            final roleEnum = UserRole.values.byName(roleFilter);
+            q.where((t) => t.role.equals(roleEnum.name));
+          } catch (_) {
+            // Se a role não existir no enum, filtro inválido
+          }
+        }
+
+        if (search != null && search.isNotEmpty) {
+          q.where(
+            (t) =>
+                t.name.contains(search) |
+                t.email.contains(search) |
+                t.username.contains(search),
+          );
         }
       }
 
-      if (search != null) {
-        query.where(
-          (t) =>
-              t.name.contains(search) |
-              t.email.contains(search) |
-              t.username.contains(search),
+      applyFilters(query);
+      applyFilters(countQuery);
+
+      // Executar count
+      final countResult = await countQuery.getSingle();
+      final total = countResult.read(db.users.id.count()) ?? 0;
+
+      // Se total é 0, retorna resultado vazio
+      if (total == 0) {
+        return Success(
+          PaginatedResult<UserDetails>(
+            items: [],
+            total: 0,
+            page: (offset ~/ limit) + 1,
+            limit: limit,
+          ),
         );
       }
 
-      if (limit != null) {
-        query.limit(limit, offset: offset);
-      }
+      // Aplicar paginação e buscar dados
+      query.limit(limit, offset: offset);
+      final items = await query.get();
 
-      final result = await query.get();
-      return Success(result);
+      return Success(
+        PaginatedResult<UserDetails>(
+          items: items,
+          total: total,
+          page: (offset ~/ limit) + 1,
+          limit: limit,
+        ),
+      );
     } catch (e, s) {
       return Failure(StorageException('Error listing users', stackTrace: s));
     }

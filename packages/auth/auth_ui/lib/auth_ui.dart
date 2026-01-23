@@ -5,4 +5,5 @@ export 'pages/forgot_password_page.dart';
 export 'pages/reset_password_page.dart';
 export 'pages/auth_flow_page.dart';
 export 'widgets/auth_guard.dart';
+export 'widgets/role_guard.dart';
 export 'auth_module.dart';

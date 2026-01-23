@@ -39,6 +39,8 @@ dependencies:
     path: ../user_client
   auth_client:
     path: ../../auth/auth_client
+  auth_ui:
+    path: ../../auth/auth_ui
 
 dev_dependencies:
   flutter_test:

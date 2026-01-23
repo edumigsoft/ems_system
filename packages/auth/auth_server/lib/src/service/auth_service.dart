@@ -20,8 +20,8 @@ import 'package:core_shared/core_shared.dart'
         Success,
         CoreValidationError,
         UnauthorizedException;
-import 'package:user_server/user_server.dart' show UserRepository;
-import 'package:user_shared/user_shared.dart' show UserCreate, UserDetails;
+import 'package:user_shared/user_shared.dart'
+    show UserCreate, UserDetails, UserRepository;
 
 import '../database/auth_database.dart';
 import '../repository/auth_repository.dart';

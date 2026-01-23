@@ -2,9 +2,9 @@ import 'package:auth_server/auth_server.dart' show AuthMiddleware;
 import 'package:core_server/core_server.dart'
     show InitServerModule, DatabaseProvider, addRoutes;
 import 'package:core_shared/core_shared.dart' show DependencyInjector;
+import 'package:user_shared/user_shared.dart' show UserRepository;
 
-import '../repository/user_repository.dart';
-import '../repository/user_repository_impl.dart';
+import '../repository/user_repository_server.dart';
 import '../database/user_database.dart';
 import '../routes/user_routes.dart';
 
@@ -36,7 +36,9 @@ class InitUserModuleToServer implements InitServerModule {
     di.registerSingleton<UserDatabase>(userDb);
 
     // 2. Repository
-    di.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(userDb));
+    di.registerLazySingleton<UserRepository>(
+      () => UserRepositoryServer(userDb),
+    );
 
     // 3. Routes
     di.registerLazySingleton<UserRoutes>(

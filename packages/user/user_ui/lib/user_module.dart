@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
 import 'package:user_client/user_client.dart' show UserService, SettingsStorage;
 import 'package:auth_client/auth_client.dart' show AuthService;
+import 'package:auth_ui/auth_ui.dart' show AuthViewModel, RoleGuard;
 
 import 'pages/manage_users_page.dart';
 import 'pages/profile_page.dart';
@@ -68,7 +69,11 @@ class UserModule extends AppModule with Loggable {
   Map<String, Widget> get routes => {
     routeName: di.get<ProfilePage>(),
     '$routeName/settings': di.get<SettingsPage>(),
-    '$routeName/manage': di.get<ManageUsersPage>(),
+    '$routeName/manage': RoleGuard(
+      allowedRoles: const [UserRole.admin, UserRole.owner],
+      authViewModel: di.get<AuthViewModel>(),
+      child: di.get<ManageUsersPage>(),
+    ),
   };
 
   @override
