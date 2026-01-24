@@ -70,7 +70,7 @@ workspace:
   - packages/notebook/notebook_client
   - packages/notebook/notebook_server
   - packages/notebook/notebook_shared
-  # - packages/notebook/notebook_ui
+  - packages/notebook/notebook_ui
 
   # # Tag
   - packages/tag/tag_client

@@ -33,6 +33,8 @@ dependencies:
     path: ../../../packages/user/user_server
   tag_server:
     path: ../../../packages/tag/tag_server
+  notebook_server:
+    path: ../../../packages/notebook/notebook_server
 
 dev_dependencies:
   lints: ^6.0.0

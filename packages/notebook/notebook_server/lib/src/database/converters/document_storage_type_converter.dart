@@ -10,7 +10,10 @@ class DocumentStorageTypeConverter
   const DocumentStorageTypeConverter();
 
   @override
-  DocumentStorageType fromSql(String fromDb) {
+  DocumentStorageType fromSql(String? fromDb) {
+    if (fromDb == null) {
+      return DocumentStorageType.server;
+    }
     try {
       return DocumentStorageType.values.firstWhere(
         (e) => e.name == fromDb,

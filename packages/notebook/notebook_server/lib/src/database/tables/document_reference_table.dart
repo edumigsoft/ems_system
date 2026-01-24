@@ -3,7 +3,7 @@ import 'package:core_server/core_server.dart';
 import 'package:notebook_shared/notebook_shared.dart'
     show DocumentReferenceDetails;
 
-import '../converters/storage_type_converter.dart';
+import '../converters/document_storage_type_converter.dart';
 import 'notebook_table.dart';
 
 /// Drift table for document references with PostgreSQL backend.

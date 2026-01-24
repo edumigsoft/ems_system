@@ -1,5 +1,16 @@
+import 'package:core_server/core_server.dart'
+    show BooleanConverter, DateTimeConverterNonNull;
 import 'package:drift/drift.dart';
+import 'package:notebook_shared/notebook_shared.dart'
+    show
+        DocumentStorageType,
+        NotebookDetails,
+        NotebookType,
+        DocumentReferenceDetails;
 
+import 'converters/notebook_type_converter.dart';
+import 'converters/string_list_converter.dart';
+import 'converters/document_storage_type_converter.dart';
 import 'tables/document_reference_table.dart';
 import 'tables/notebook_table.dart';
 import 'tables/notebook_tag_table.dart';

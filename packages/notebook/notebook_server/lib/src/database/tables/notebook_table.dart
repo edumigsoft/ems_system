@@ -45,9 +45,7 @@ class NotebookTable extends Table with DriftTableMixinPostgres {
   TextColumn get tags => text().nullable().map(const StringListConverter())();
 
   /// Type of notebook: quick, organized, or reminder.
-  TextColumn get type => text()
-      .map(NullAwareTypeConverter.wrap(const NotebookTypeConverter()))
-      .nullable()();
+  TextColumn get type => text().map(const NotebookTypeConverter()).nullable()();
 
   /// Optional reminder date/time for reminder-type notebooks.
   @JsonKey('reminder_date')

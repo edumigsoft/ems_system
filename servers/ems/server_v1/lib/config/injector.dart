@@ -18,6 +18,8 @@ import 'package:core_server/core_server.dart'
 import 'package:core_shared/core_shared.dart'
     show DependencyInjector, GetItInjector, LogService;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart' show JWT;
+import 'package:notebook_server/notebook_server.dart'
+    show InitNotebookModuleToServer;
 import 'package:open_api_server/open_api_server.dart';
 import 'package:tag_server/tag_server.dart' show InitTagModuleToServer;
 import 'package:user_server/user_server.dart';
@@ -107,6 +109,12 @@ Future<DependencyInjector> registryInjectors() async {
   );
 
   await InitTagModuleToServer.init(
+    di: di,
+    backendBaseApi: Env.backendPathApi,
+    security: false,
+  );
+
+  await InitNotebookModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,
     security: false,
