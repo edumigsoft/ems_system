@@ -66,8 +66,8 @@ workspace:
   # - packages/project/project_shared
   # - packages/project/project_ui
 
-  # # Notebook
-  # - packages/notebook/notebook_client
+  # Notebook
+  - packages/notebook/notebook_client
   # - packages/notebook/notebook_server
   - packages/notebook/notebook_shared
   # - packages/notebook/notebook_ui

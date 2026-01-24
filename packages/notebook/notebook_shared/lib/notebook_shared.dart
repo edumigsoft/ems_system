@@ -15,6 +15,18 @@ export 'src/domain/dtos/notebook_update.dart';
 export 'src/domain/dtos/document_reference_create.dart';
 export 'src/domain/dtos/document_reference_update.dart';
 
+// Domain - Repositories
+export 'src/domain/repositories/notebook_repository.dart';
+export 'src/domain/repositories/document_reference_repository.dart';
+
+// Data - Models
+export 'src/data/models/notebook_details_model.dart';
+export 'src/data/models/notebook_create_model.dart';
+export 'src/data/models/notebook_update_model.dart';
+export 'src/data/models/document_reference_details_model.dart';
+export 'src/data/models/document_reference_create_model.dart';
+export 'src/data/models/document_reference_update_model.dart';
+
 // Enums
 export 'src/domain/enums/notebook_type.dart';
 export 'src/domain/enums/document_storage_type.dart';
