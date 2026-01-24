@@ -29,7 +29,7 @@ class NotebookRepositoryServer implements NotebookRepository {
         parentId: Value(data.parentId),
         tags: Value(data.tags),
         type: Value(data.type),
-        reminderDate: Value(data.reminderDate),
+        reminderDate: Value(data.reminderDate!),
         notifyOnReminder: Value(data.notifyOnReminder),
         documentIds: const Value(null), // Inicialmente vazio
       );
@@ -107,7 +107,7 @@ class NotebookRepositoryServer implements NotebookRepository {
         final now = DateTime.now();
         query.where(
           (t) =>
-              t.reminderDate.isSmallerThanValue(now) &
+              t.reminderDate.isSmallerThanValue(now.toIso8601String()) &
               t.reminderDate.isNotNull(),
         );
       }
@@ -142,7 +142,7 @@ class NotebookRepositoryServer implements NotebookRepository {
         tags: data.tags != null ? Value(data.tags) : const Value.absent(),
         type: data.type != null ? Value(data.type) : const Value.absent(),
         reminderDate: data.reminderDate != null
-            ? Value(data.reminderDate)
+            ? Value(data.reminderDate!)
             : const Value.absent(),
         notifyOnReminder: data.notifyOnReminder != null
             ? Value(data.notifyOnReminder)

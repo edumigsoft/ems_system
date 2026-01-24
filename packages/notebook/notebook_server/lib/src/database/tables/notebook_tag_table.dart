@@ -1,3 +1,4 @@
+import 'package:core_server/core_server.dart' show DateTimeConverterNonNull;
 import 'package:drift/drift.dart';
 
 import 'notebook_table.dart';
@@ -35,6 +36,7 @@ class NotebookTagTable extends Table {
   ///
   /// Useful for auditing and tracking when tags were added.
   @JsonKey('associated_at')
-  DateTimeColumn get associatedAt =>
-      dateTime().withDefault(currentDateAndTime)();
+  TextColumn get associatedAt => text()
+      .map(const DateTimeConverterNonNull())
+      .withDefault(const CustomExpression('CURRENT_TIMESTAMP'))();
 }

@@ -12,8 +12,6 @@ import 'package:user_shared/user_shared.dart'
 
 import '../database/user_database.dart';
 
-// part 'user_repository_impl.g.dart'; // Removido pois não usaramos mais o mixin do accessor
-
 class UserRepositoryServer implements UserRepository {
   final UserDatabase db;
 
