@@ -19,6 +19,7 @@ import 'package:core_shared/core_shared.dart'
     show DependencyInjector, GetItInjector, LogService;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart' show JWT;
 import 'package:open_api_server/open_api_server.dart';
+import 'package:tag_server/tag_server.dart' show InitTagModuleToServer;
 import 'package:user_server/user_server.dart';
 import 'env/env.dart';
 
@@ -100,6 +101,12 @@ Future<DependencyInjector> registryInjectors() async {
 
   // Fase 2: Inicializar Auth completo (agora UserRepository está disponível)
   await InitAuthModuleToServer.init(
+    di: di,
+    backendBaseApi: Env.backendPathApi,
+    security: false,
+  );
+
+  await InitTagModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,
     security: false,

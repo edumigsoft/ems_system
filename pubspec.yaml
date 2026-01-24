@@ -74,9 +74,9 @@ workspace:
 
   # # Tag
   - packages/project/tag/tag_client
-  # - packages/project/tag/tag_server
-  # - packages/project/tag/tag_shared
-  # - packages/project/tag/tag_ui
+  - packages/project/tag/tag_server
+  - packages/project/tag/tag_shared
+  - packages/project/tag/tag_ui
 
   # # Task
   # - packages/task/task_client

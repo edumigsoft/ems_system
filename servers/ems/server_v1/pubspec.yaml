@@ -31,6 +31,8 @@ dependencies:
     path: ../../../packages/auth/auth_server
   user_server:
     path: ../../../packages/user/user_server
+  tag_server:
+    path: ../../../packages/project/tag/tag_server
 
 dev_dependencies:
   lints: ^6.0.0

@@ -34,6 +34,10 @@ dependencies:
     path: ../../../packages/user/user_ui
   user_client:
     path: ../../../packages/user/user_client
+  tag_ui:
+    path: ../../../packages/project/tag/tag_ui
+  tag_client:
+    path: ../../../packages/project/tag/tag_client
 
 dev_dependencies:
   flutter_test:

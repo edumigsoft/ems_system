@@ -1,10 +1,14 @@
 name: tag_ui
 description: Flutter UI implementation for tag management feature
-version: 0.1.0
 publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.10.7
 
 dependencies:
   flutter:
@@ -21,6 +25,7 @@ dependencies:
     path: ../../../design_system/design_system_ui
   localizations_ui:
     path: ../../../localizations/localizations_ui
+  dio: ^5.9.0
 
 dev_dependencies:
   flutter_test:
