@@ -14,13 +14,13 @@ dependencies:
   tag_shared:
     path: ../tag_shared
   core_shared:
-    path: ../../../core/core_shared
+    path: ../../core/core_shared
   core_server:
-    path: ../../../core/core_server
+    path: ../../core/core_server
   auth_server:
-    path: ../../../auth/auth_server
+    path: ../../auth/auth_server
   auth_shared:
-    path: ../../../auth/auth_shared
+    path: ../../auth/auth_shared
   drift: ^2.23.0
   shelf: ^1.4.2
   shelf_router: ^1.1.4

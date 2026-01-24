@@ -17,9 +17,9 @@ dependencies:
   tag_shared:
     path: ../tag_shared
   core_shared:
-    path: ../../../core/core_shared
+    path: ../../core/core_shared
   core_client:
-    path: ../../../core/core_client
+    path: ../../core/core_client
 
 dev_dependencies:
   lints: ^6.0.0

@@ -19,13 +19,13 @@ dependencies:
   tag_client:
     path: ../tag_client
   core_shared:
-    path: ../../../core/core_shared
+    path: ../../core/core_shared
   core_ui:
-    path: ../../../core/core_ui
+    path: ../../core/core_ui
   design_system_ui:
-    path: ../../../design_system/design_system_ui
+    path: ../../design_system/design_system_ui
   localizations_ui:
-    path: ../../../localizations/localizations_ui
+    path: ../../localizations/localizations_ui
 
 dev_dependencies:
   flutter_test:
