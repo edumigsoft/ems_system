@@ -26,7 +26,20 @@ class DocumentReferenceDetails implements BaseDetails {
   // Campos adicionais de relacionamento
   final String? notebookId; // ID do notebook ao qual este documento pertence
 
-  DocumentReferenceDetails({
+  const DocumentReferenceDetails({
+    required this.id,
+    this.isDeleted = false,
+    this.isActive = true,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.data,
+    this.notebookId,
+  });
+
+  /// Construtor nomeado 'create' para compatibilidade com @UseRowClass do Drift.
+  ///
+  /// Este construtor é usado pelo Drift ao mapear dados da tabela para a entity.
+  DocumentReferenceDetails.create({
     required this.id,
     this.isDeleted = false,
     this.isActive = true,
@@ -39,12 +52,12 @@ class DocumentReferenceDetails implements BaseDetails {
     int? sizeBytes,
     this.notebookId,
   }) : data = DocumentReference(
-          name: name,
-          path: path,
-          storageType: storageType,
-          mimeType: mimeType,
-          sizeBytes: sizeBytes,
-        );
+         name: name,
+         path: path,
+         storageType: storageType,
+         mimeType: mimeType,
+         sizeBytes: sizeBytes,
+       );
 
   // Getters de conveniência para campos da Entity
   String get name => data.name;

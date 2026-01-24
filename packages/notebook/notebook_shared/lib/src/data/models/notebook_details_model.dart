@@ -14,7 +14,7 @@ class NotebookDetailsModel {
   /// Deserializes from JSON.
   factory NotebookDetailsModel.fromJson(Map<String, dynamic> json) {
     return NotebookDetailsModel(
-      NotebookDetails(
+      NotebookDetails.create(
         id: json['id'] as String,
         isDeleted: json['is_deleted'] as bool? ?? false,
         isActive: json['is_active'] as bool? ?? true,
@@ -39,21 +39,21 @@ class NotebookDetailsModel {
 
   /// Serializes to JSON.
   Map<String, dynamic> toJson() => {
-        'id': entity.id,
-        'is_deleted': entity.isDeleted,
-        'is_active': entity.isActive,
-        'created_at': entity.createdAt.toIso8601String(),
-        'updated_at': entity.updatedAt.toIso8601String(),
-        'title': entity.title,
-        'content': entity.content,
-        'project_id': entity.projectId,
-        'parent_id': entity.parentId,
-        'tags': entity.tags,
-        'type': entity.type?.name,
-        'reminder_date': entity.reminderDate?.toIso8601String(),
-        'notify_on_reminder': entity.notifyOnReminder,
-        'document_ids': entity.documentIds,
-      };
+    'id': entity.id,
+    'is_deleted': entity.isDeleted,
+    'is_active': entity.isActive,
+    'created_at': entity.createdAt.toIso8601String(),
+    'updated_at': entity.updatedAt.toIso8601String(),
+    'title': entity.title,
+    'content': entity.content,
+    'project_id': entity.projectId,
+    'parent_id': entity.parentId,
+    'tags': entity.tags,
+    'type': entity.type?.name,
+    'reminder_date': entity.reminderDate?.toIso8601String(),
+    'notify_on_reminder': entity.notifyOnReminder,
+    'document_ids': entity.documentIds,
+  };
 
   /// Converts to domain entity.
   NotebookDetails toDomain() => entity;

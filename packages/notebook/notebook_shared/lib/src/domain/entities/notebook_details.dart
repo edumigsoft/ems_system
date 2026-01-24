@@ -26,7 +26,20 @@ class NotebookDetails implements BaseDetails {
   // Lista de IDs de documentos anexados (relacionamento)
   final List<String>? documentIds;
 
-  NotebookDetails({
+  const NotebookDetails({
+    required this.id,
+    this.isDeleted = false,
+    this.isActive = true,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.data,
+    this.documentIds,
+  });
+
+  /// Construtor nomeado 'create' para compatibilidade com @UseRowClass do Drift.
+  ///
+  /// Este construtor é usado pelo Drift ao mapear dados da tabela para a entity.
+  NotebookDetails.create({
     required this.id,
     this.isDeleted = false,
     this.isActive = true,
@@ -42,15 +55,15 @@ class NotebookDetails implements BaseDetails {
     bool? notifyOnReminder,
     this.documentIds,
   }) : data = Notebook(
-          title: title,
-          content: content,
-          projectId: projectId,
-          parentId: parentId,
-          tags: tags,
-          type: type,
-          reminderDate: reminderDate,
-          notifyOnReminder: notifyOnReminder,
-        );
+         title: title,
+         content: content,
+         projectId: projectId,
+         parentId: parentId,
+         tags: tags,
+         type: type,
+         reminderDate: reminderDate,
+         notifyOnReminder: notifyOnReminder,
+       );
 
   // Getters de conveniência para campos da Entity
   String get title => data.title;
