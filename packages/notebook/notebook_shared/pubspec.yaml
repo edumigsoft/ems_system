@@ -12,6 +12,8 @@ environment:
 
 dependencies:
   meta: ^1.17.0
+  core_shared:
+    path: ../../core/core_shared
 
 dev_dependencies:
   lints: ^6.0.0
