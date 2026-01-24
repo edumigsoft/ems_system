@@ -1,3 +1,5 @@
+import '../enums/project_status.dart';
+
 class Project {
   final String id;
   final String name;

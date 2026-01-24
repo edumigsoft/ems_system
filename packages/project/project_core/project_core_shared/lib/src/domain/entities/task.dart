@@ -1,4 +1,6 @@
-import '../enums/recurrence_type.dart';
+import '../enums/task_priority.dart';
+import '../enums/task_status.dart';
+import 'recurrence.dart';
 
 class Task {
   final String id;
@@ -40,19 +42,4 @@ class Task {
 
   /// Verifica se está concluída
   bool get isCompleted => completedAt != null;
-}
-
-// Modelo para recorrência
-class Recurrence {
-  final RecurrenceType type; // daily, weekly, monthly, custom
-  final int interval; // A cada X dias/semanas/meses
-  final TimeOfDay? preferredTime;
-  final DateTime? endDate; // Até quando repetir (opcional)
-
-  const Recurrence({
-    required this.type,
-    this.interval = 1,
-    this.preferredTime,
-    this.endDate,
-  });
 }

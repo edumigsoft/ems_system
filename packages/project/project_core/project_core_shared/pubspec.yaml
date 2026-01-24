@@ -1,4 +1,4 @@
-name: project_core
+name: project_core_shared
 description: ProjectCore entities and logic for Project.
 publish_to: none
 version: 1.0.0

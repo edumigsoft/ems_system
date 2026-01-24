@@ -58,7 +58,7 @@ workspace:
   # - packages/project/project_core/project_core_client
   # - packages/project/project_core/project_core_server
   - packages/project/project_core/project_core_shared
-  # - packages/project/project_core/project_core_ui
+  - packages/project/project_core/project_core_ui
 
   # # Project
   # - packages/project/project_client
