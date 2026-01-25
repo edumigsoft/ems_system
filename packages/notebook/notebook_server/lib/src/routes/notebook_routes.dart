@@ -214,7 +214,7 @@ class NotebookRoutes extends Routes {
               .map((n) => NotebookDetailsModel.fromDomain(n).toJson())
               .toList();
           return Response.ok(
-            jsonEncode({'data': models}),
+            jsonEncode(models),
             headers: {'Content-Type': 'application/json'},
           );
         },
