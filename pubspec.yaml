@@ -85,3 +85,9 @@ workspace:
   # - packages/task/task_server
   # - packages/task/task_shared
   # - packages/task/task_ui
+
+  # School
+  # - packages/school/school_client
+  # - packages/school/school_server
+  - packages/school/school_shared
+  # - packages/school/school_ui

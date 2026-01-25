@@ -1,0 +1,9 @@
+const String schoolsPath = '/schools';
+const String schoolsPathGetAll = '/';
+const String schoolsPathById = '/<id>';
+const String schoolsPathByIdOpenApi = '/{id}';
+const String schoolsPathCreate = '/';
+const String schoolsPathUpdate = '/<id>';
+const String schoolsPathUpdateOpenApi = '/{id}';
+const String schoolsPathDelete = '/<id>';
+const String schoolsPathDeleteOpenApi = '/{id}';
