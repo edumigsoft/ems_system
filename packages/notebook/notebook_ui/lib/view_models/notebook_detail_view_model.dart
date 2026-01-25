@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:core_client/core_client.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 import 'package:notebook_client/notebook_client.dart';
+import 'package:tag_client/tag_client.dart';
+import 'package:tag_shared/tag_shared.dart';
 
 /// ViewModel para gerenciar detalhes e edição de um caderno.
 ///
@@ -11,12 +13,15 @@ class NotebookDetailViewModel extends ChangeNotifier
     with Loggable, DioErrorHandler {
   final NotebookApiService _notebookService;
   final DocumentReferenceApiService _documentService;
+  final TagApiService _tagService;
 
   NotebookDetailViewModel({
     required NotebookApiService notebookService,
     required DocumentReferenceApiService documentService,
+    required TagApiService tagService,
   }) : _notebookService = notebookService,
-       _documentService = documentService;
+       _documentService = documentService,
+       _tagService = tagService;
 
   NotebookDetails? _notebook;
   NotebookDetails? get notebook => _notebook;
@@ -31,9 +36,39 @@ class NotebookDetailViewModel extends ChangeNotifier
   String? get error => _error;
 
   /// Lista de tags disponíveis.
-  ///
-  /// TODO: Implementar busca de tags globais ou do projeto.
-  List<String> get availableTags => [];
+  List<String> _availableTags = [];
+  List<String> get availableTags => _availableTags;
+
+  /// Carrega lista de tags disponíveis para autocomplete.
+  Future<void> loadAvailableTags({String? searchTerm}) async {
+    final result = await _executeLoadTags(searchTerm: searchTerm);
+
+    if (result case Success(value: final data)) {
+      _availableTags = data.map((model) => model.toDomain().name).toList();
+      notifyListeners();
+    } else if (result case Failure(error: final error)) {
+      logger.warning('Erro ao carregar tags: $error');
+      _availableTags = [];
+      notifyListeners();
+    }
+  }
+
+  Future<Result<List<TagDetailsModel>>> _executeLoadTags({
+    String? searchTerm,
+  }) async {
+    try {
+      final models = await _tagService.getAll(
+        activeOnly: true,
+        search: searchTerm,
+      );
+      return Success(models);
+    } on DioException catch (e) {
+      return handleDioError<List<TagDetailsModel>>(
+        e,
+        context: 'loadAvailableTags',
+      );
+    }
+  }
 
   /// Carrega detalhes de um caderno.
   Future<void> loadNotebook(String id) async {

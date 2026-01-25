@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:notebook_client/notebook_client.dart'
     show NotebookApiService, DocumentReferenceApiService;
 
+import 'package:tag_client/tag_client.dart' show TagApiService;
+
 import 'package:dio/dio.dart';
 
 import 'pages/notebook_list_page.dart';
@@ -46,6 +48,7 @@ class NotebookModule extends AppModule with Loggable {
       () => NotebookDetailViewModel(
         notebookService: di.get<NotebookApiService>(),
         documentService: di.get<DocumentReferenceApiService>(),
+        tagService: di.get<TagApiService>(),
       ),
     );
 

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart';
+import 'dart:io';
+import 'pdf_viewer_page.dart';
 
 /// Widget para exibir lista de documentos anexados.
 class DocumentListWidget extends StatelessWidget {
@@ -220,18 +225,125 @@ class _DocumentItem extends StatelessWidget {
     }
   }
 
-  void _viewDocument(BuildContext context) {
-    // TODO: Implementar visualização inline de PDF
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Visualizando: ${document.name}')),
-    );
+  Future<void> _viewDocument(BuildContext context) async {
+    // Check if it's a PDF
+    final isPdf = document.mimeType?.contains('pdf') ?? false;
+
+    if (!isPdf) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Visualização disponível apenas para arquivos PDF'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute<void>(
+          builder: (context) => PdfViewerPage(
+            url: document.path,
+            documentName: document.name,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir PDF: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 
-  void _downloadDocument(BuildContext context) {
-    // TODO: Implementar download para pasta Downloads
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Baixando: ${document.name}')),
-    );
+  Future<void> _downloadDocument(BuildContext context) async {
+    try {
+      // Show loading indicator
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                const SizedBox(width: 12),
+                Text('Baixando ${document.name}...'),
+              ],
+            ),
+            duration: const Duration(minutes: 5),
+          ),
+        );
+      }
+
+      // Get downloads directory
+      final Directory? downloadsDir = await getDownloadsDirectory();
+      if (downloadsDir == null) {
+        throw Exception('Não foi possível acessar a pasta de Downloads');
+      }
+
+      // Create file path
+      final filePath = '${downloadsDir.path}/${document.name}';
+
+      // Download file
+      final dio = Dio();
+      await dio.download(
+        document.path,
+        filePath,
+        onReceiveProgress: (received, total) {
+          // Progress updates could be shown in a dialog if needed
+          // Current progress: (received / total * 100)
+        },
+      );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Download concluído: ${document.name}'),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            action: SnackBarAction(
+              label: 'Abrir pasta',
+              onPressed: () {
+                // Open file manager at downloads folder
+                _openFileLocation(downloadsDir.path);
+              },
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao baixar arquivo: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _openFileLocation(String path) async {
+    // Try to open the file manager at the specified location
+    // This is platform-dependent and may not work on all systems
+    try {
+      if (Platform.isLinux) {
+        await Process.run('xdg-open', [path]);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [path]);
+      } else if (Platform.isWindows) {
+        await Process.run('explorer', [path]);
+      }
+    } catch (e) {
+      // Silently fail if can't open file manager
+    }
   }
 
   void _openLocal(BuildContext context) {
@@ -272,11 +384,38 @@ class _DocumentItem extends StatelessWidget {
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
-  void _openUrl(BuildContext context, String url) {
-    // TODO: Implementar abertura de URL com url_launcher
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Abrindo: $url')),
-    );
+  Future<void> _openUrl(BuildContext context, String url) async {
+    try {
+      // Validate URL
+      final uri = Uri.tryParse(url);
+      if (uri == null || (!uri.hasScheme)) {
+        throw FormatException('URL inválida: $url');
+      }
+
+      // Check if URL can be launched
+      if (!await canLaunchUrl(uri)) {
+        throw Exception('Não foi possível abrir a URL: $url');
+      }
+
+      // Launch URL in external browser
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        throw Exception('Falha ao abrir o navegador');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir URL: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
   }
 }
 

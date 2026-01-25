@@ -37,11 +37,19 @@ dependencies:
     path: ../notebook_shared
   notebook_client:
     path: ../notebook_client
+  tag_shared:
+    path: ../../tag/tag_shared
+  tag_client:
+    path: ../../tag/tag_client
   auth_client:
     path: ../../auth/auth_client
   auth_ui:
     path: ../../auth/auth_ui
   file_picker: ^6.1.1
+  url_launcher: ^6.2.5
+  path_provider: ^2.1.2
+  pdfx: ^2.7.0
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:
