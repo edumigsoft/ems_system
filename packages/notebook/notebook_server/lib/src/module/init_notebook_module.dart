@@ -55,6 +55,7 @@ class InitNotebookModuleToServer implements InitServerModule {
         di.get<AuthMiddleware>(),
         di, // Passa DI para lazy resolution de AuthService
         backendBaseApi: backendBaseApi,
+        uploadsPath: uploadsPath,
       ),
     );
 

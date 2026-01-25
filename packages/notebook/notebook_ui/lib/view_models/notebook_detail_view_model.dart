@@ -308,8 +308,6 @@ class NotebookDetailViewModel extends ChangeNotifier
   }
 
   /// Upload de arquivo para o servidor.
-  ///
-  /// Nota: Requer implementação de multipart/form-data no backend.
   Future<bool> uploadDocument({
     required String filePath,
     required String fileName,
@@ -320,48 +318,47 @@ class NotebookDetailViewModel extends ChangeNotifier
 
     _isUploadingDocument = true;
     _uploadProgress = 0.0;
+    _error = null;
     notifyListeners();
 
-    // TODO: Implementar upload real quando backend suportar
-    // Por enquanto, simula upload
-    _error = 'Upload de arquivos ainda não implementado no backend';
-    _isUploadingDocument = false;
-    notifyListeners();
-    return false;
-
-    /* Implementação futura:
     try {
       final formData = FormData.fromMap({
         'file': await MultipartFile.fromFile(
           filePath,
           filename: fileName,
         ),
-        'notebookId': _notebook!.id,
       });
 
-      final response = await _dio.post(
-        '/documents/upload',
+      final dio = Dio();
+      final response = await dio.post<Map<String, dynamic>>(
+        '/notebooks/${_notebook!.id}/documents/upload',
         data: formData,
         onSendProgress: (sent, total) {
-          _uploadProgress = sent / total;
-          if (onProgress != null) onProgress(_uploadProgress);
-          notifyListeners();
+          if (total > 0) {
+            _uploadProgress = sent / total;
+            if (onProgress != null) onProgress(_uploadProgress);
+            notifyListeners();
+          }
         },
       );
 
-      final model = DocumentReferenceDetailsModel.fromJson(response.data);
+      final model = DocumentReferenceDetailsModel.fromJson(
+        response.data as Map<String, dynamic>,
+      );
       _documents ??= [];
       _documents!.add(model.toDomain());
       _isUploadingDocument = false;
+      _uploadProgress = 0.0;
       notifyListeners();
       return true;
     } catch (e) {
+      logger.severe('Erro ao fazer upload de documento', e);
       _error = 'Erro ao fazer upload: $e';
       _isUploadingDocument = false;
+      _uploadProgress = 0.0;
       notifyListeners();
       return false;
     }
-    */
   }
 
   /// Limpa erro atual.

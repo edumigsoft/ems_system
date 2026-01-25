@@ -6,6 +6,7 @@ import 'package:core_shared/core_shared.dart'
     show DependencyInjector, DataException;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'dart:io';
 import 'package:notebook_shared/notebook_shared.dart'
     show
         NotebookDetailsModel,
@@ -14,8 +15,12 @@ import 'package:notebook_shared/notebook_shared.dart'
         NotebookRepository,
         DocumentReferenceRepository,
         DocumentReferenceDetailsModel,
+        DocumentReferenceCreate,
         DocumentStorageType,
         NotebookType;
+import 'package:shelf_multipart/form_data.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 
 /// Rotas de gerenciamento de notebooks.
 ///
@@ -36,6 +41,7 @@ class NotebookRoutes extends Routes {
   final AuthMiddleware authMiddleware;
   final DependencyInjector di;
   final String _backendBaseApi;
+  final String _uploadsPath;
 
   NotebookRoutes(
     this.notebookRepository,
@@ -43,7 +49,9 @@ class NotebookRoutes extends Routes {
     this.authMiddleware,
     this.di, {
     required String backendBaseApi,
+    required String uploadsPath,
   }) : _backendBaseApi = backendBaseApi,
+       _uploadsPath = uploadsPath,
        super(security: true);
 
   @override
@@ -509,9 +517,8 @@ class NotebookRoutes extends Routes {
 
   /// POST /notebooks/:id/documents/upload - Upload de arquivo.
   ///
-  /// TODO: Implementar upload de arquivo com biblioteca multipart.
-  /// Por enquanto, retorna 501 Not Implemented.
-  /// Bibliotecas sugeridas: shelf_multipart, mime_multipart
+  /// Recebe um arquivo via multipart/form-data, salva no diretório de uploads
+  /// e cria uma referência no banco de dados.
   Future<Response> _uploadDocument(Request request, String id) async {
     final authContext = request.context['authContext'] as AuthContext?;
 
@@ -522,15 +529,114 @@ class NotebookRoutes extends Routes {
       );
     }
 
-    // TODO: Implementar multipart/form-data parsing e upload de arquivo
-    return Response(
-      501,
-      body: jsonEncode({
-        'error': 'File upload not yet implemented',
-        'message':
-            'Please add document references manually or wait for upload implementation',
-      }),
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      // Verificar se é multipart/form-data
+      if (!request.isMultipartForm) {
+        return Response(
+          400,
+          body: jsonEncode({
+            'error': 'Content-Type must be multipart/form-data',
+          }),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // Criar diretório de uploads se não existir
+      final uploadsDir = Directory(_uploadsPath);
+      if (!await uploadsDir.exists()) {
+        await uploadsDir.create(recursive: true);
+      }
+
+      String? fileName;
+      String? savedFilePath;
+      int? fileSize;
+      String? mimeType;
+
+      // Processar partes do multipart
+      await for (final formData in request.multipartFormData) {
+        // Procurar pela parte 'file'
+        if (formData.name == 'file') {
+          // Extrair nome do arquivo
+          fileName = formData.filename ?? 'unnamed_file';
+
+          // Gerar nome único para evitar colisões
+          final timestamp = DateTime.now().millisecondsSinceEpoch;
+          final extension = p.extension(fileName);
+          final baseName = p.basenameWithoutExtension(fileName);
+          final uniqueFileName = '${baseName}_$timestamp$extension';
+
+          // Caminho completo do arquivo
+          final filePath = p.join(_uploadsPath, uniqueFileName);
+          final file = File(filePath);
+
+          // Ler bytes do stream e salvar
+          final bytes = await formData.part.readBytes();
+          await file.writeAsBytes(bytes);
+
+          savedFilePath = filePath;
+          fileSize = bytes.length;
+
+          // Detectar MIME type
+          mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
+
+          break; // Processar apenas o primeiro arquivo
+        }
+      }
+
+      // Verificar se arquivo foi recebido
+      if (fileName == null || savedFilePath == null) {
+        return Response(
+          400,
+          body: jsonEncode({'error': 'No file provided in upload'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
+
+      // Criar referência no banco de dados
+      final createDto = DocumentReferenceCreate(
+        name: fileName,
+        path: savedFilePath,
+        storageType: DocumentStorageType.server,
+        mimeType: mimeType,
+        sizeBytes: fileSize,
+        notebookId: id,
+      );
+
+      final result = await documentRepository.create(createDto);
+
+      return result.when(
+        success: (document) {
+          final model = DocumentReferenceDetailsModel.fromDomain(document);
+          return Response(
+            201,
+            body: jsonEncode(model.toJson()),
+            headers: {'Content-Type': 'application/json'},
+          );
+        },
+        failure: (exception) {
+          // Limpar arquivo em caso de erro ao criar referência
+          try {
+            File(savedFilePath!).deleteSync();
+          } catch (_) {
+            // Ignorar erro ao deletar arquivo
+          }
+
+          return Response.internalServerError(
+            body: jsonEncode({
+              'error': 'Failed to create document reference: ${exception.toString()}',
+            }),
+            headers: {'Content-Type': 'application/json'},
+          );
+        },
+      );
+    } catch (e, stackTrace) {
+      return Response.internalServerError(
+        body: jsonEncode({
+          'error': 'Upload failed: ${e.toString()}',
+          'details': stackTrace.toString(),
+        }),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
   }
 }
