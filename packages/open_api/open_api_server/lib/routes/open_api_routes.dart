@@ -47,7 +47,7 @@ class OpenApiRoutes extends Routes with Loggable {
     final possiblePaths = [
       '$_staticPath/swagger.html',
       'packages/open_api/open_api_server/$_staticPath/swagger.html',
-      '../../packages/open_api/open_api_server/$_staticPath/swagger.html',
+      '../../../packages/open_api/open_api_server/$_staticPath/swagger.html',
     ];
 
     File? swaggerFile;
