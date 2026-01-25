@@ -75,6 +75,40 @@ class NotebookCreateViewModel extends ChangeNotifier
     return await createNotebook(data);
   }
 
+  /// Cria um caderno organizado (com tags e projeto opcional).
+  Future<bool> createOrganized({
+    required String title,
+    required String content,
+    List<String>? tags,
+    String? projectId,
+  }) async {
+    final data = NotebookCreate(
+      title: title,
+      content: content,
+      type: NotebookType.organized,
+      tags: tags,
+      projectId: projectId,
+    );
+    return await createNotebook(data);
+  }
+
+  /// Cria um lembrete (com data/hora programada).
+  Future<bool> createReminder({
+    required String title,
+    required String content,
+    required DateTime reminderDate,
+    bool notifyOnReminder = true,
+  }) async {
+    final data = NotebookCreate(
+      title: title,
+      content: content,
+      type: NotebookType.reminder,
+      reminderDate: reminderDate,
+      notifyOnReminder: notifyOnReminder,
+    );
+    return await createNotebook(data);
+  }
+
   /// Limpa erro atual.
   void clearError() {
     _error = null;

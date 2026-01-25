@@ -62,53 +62,181 @@ class _DocumentItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isImage = document.mimeType?.startsWith('image/') ?? false;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primaryContainer,
-          child: Icon(
-            _getIconForDocument(document),
-            color: theme.colorScheme.onPrimaryContainer,
-            size: 20,
-          ),
-        ),
-        title: Text(
-          document.name,
-          style: theme.textTheme.bodyLarge,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(_getStorageTypeLabel(document.storageType)),
-            if (document.sizeBytes != null)
-              Text(_formatSize(document.sizeBytes!)),
-          ],
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (document.storageType == DocumentStorageType.url)
-              IconButton(
-                icon: const Icon(Icons.open_in_new),
-                onPressed: () => _openUrl(context, document.path),
-                tooltip: 'Abrir link',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: theme.colorScheme.primaryContainer,
+              child: Icon(
+                _getIconForDocument(document),
+                color: theme.colorScheme.onPrimaryContainer,
+                size: 20,
               ),
-            if (onDelete != null)
-              IconButton(
-                icon: Icon(
-                  Icons.delete_outline,
-                  color: theme.colorScheme.error,
+            ),
+            title: Text(
+              document.name,
+              style: theme.textTheme.bodyLarge,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _StorageTypeChip(type: document.storageType),
+                    if (document.sizeBytes != null) ...[
+                      const SizedBox(width: 8),
+                      Text(_formatSize(document.sizeBytes!)),
+                    ],
+                  ],
                 ),
-                onPressed: onDelete,
-                tooltip: 'Excluir',
+              ],
+            ),
+            trailing: PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              onSelected: (value) => _handleAction(context, value),
+              itemBuilder: (context) => [
+                if (document.storageType == DocumentStorageType.server) ...[
+                  const PopupMenuItem(
+                    value: 'view',
+                    child: Row(
+                      children: [
+                        Icon(Icons.visibility),
+                        SizedBox(width: 8),
+                        Text('Visualizar'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'download',
+                    child: Row(
+                      children: [
+                        Icon(Icons.download),
+                        SizedBox(width: 8),
+                        Text('Baixar'),
+                      ],
+                    ),
+                  ),
+                ],
+                if (document.storageType == DocumentStorageType.url)
+                  const PopupMenuItem(
+                    value: 'open_url',
+                    child: Row(
+                      children: [
+                        Icon(Icons.open_in_new),
+                        SizedBox(width: 8),
+                        Text('Abrir link'),
+                      ],
+                    ),
+                  ),
+                if (document.storageType == DocumentStorageType.local)
+                  const PopupMenuItem(
+                    value: 'open_local',
+                    child: Row(
+                      children: [
+                        Icon(Icons.folder_open),
+                        SizedBox(width: 8),
+                        Text('Abrir local'),
+                      ],
+                    ),
+                  ),
+                if (onDelete != null) ...[
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text('Excluir', style: TextStyle(color: Colors.red)),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // Preview inline para imagens (apenas servidor)
+          if (isImage && document.storageType == DocumentStorageType.server)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  document.path,
+                  fit: BoxFit.cover,
+                  height: 150,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 150,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: const Center(
+                        child: Icon(Icons.broken_image),
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      height: 150,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
+                ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
+    );
+  }
+
+  void _handleAction(BuildContext context, String action) {
+    switch (action) {
+      case 'view':
+        _viewDocument(context);
+        break;
+      case 'download':
+        _downloadDocument(context);
+        break;
+      case 'open_url':
+        _openUrl(context, document.path);
+        break;
+      case 'open_local':
+        _openLocal(context);
+        break;
+      case 'delete':
+        onDelete?.call();
+        break;
+    }
+  }
+
+  void _viewDocument(BuildContext context) {
+    // TODO: Implementar visualização inline de PDF
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Visualizando: ${document.name}')),
+    );
+  }
+
+  void _downloadDocument(BuildContext context) {
+    // TODO: Implementar download para pasta Downloads
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Baixando: ${document.name}')),
+    );
+  }
+
+  void _openLocal(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Abrindo local: ${document.path}')),
     );
   }
 
@@ -136,14 +264,6 @@ class _DocumentItem extends StatelessWidget {
     }
   }
 
-  String _getStorageTypeLabel(DocumentStorageType type) {
-    return switch (type) {
-      DocumentStorageType.server => 'Servidor',
-      DocumentStorageType.local => 'Arquivo local',
-      DocumentStorageType.url => 'Link externo',
-    };
-  }
-
   String _formatSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) {
@@ -153,9 +273,48 @@ class _DocumentItem extends StatelessWidget {
   }
 
   void _openUrl(BuildContext context, String url) {
-    // Implementar abertura de URL
+    // TODO: Implementar abertura de URL com url_launcher
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Abrindo: $url')),
+    );
+  }
+}
+
+class _StorageTypeChip extends StatelessWidget {
+  final DocumentStorageType type;
+
+  const _StorageTypeChip({required this.type});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final (icon, label, color) = switch (type) {
+      DocumentStorageType.server => (
+        Icons.cloud_done,
+        'Servidor',
+        theme.colorScheme.primary,
+      ),
+      DocumentStorageType.local => (
+        Icons.computer,
+        'Local',
+        theme.colorScheme.tertiary,
+      ),
+      DocumentStorageType.url => (
+        Icons.link,
+        'Link',
+        theme.colorScheme.secondary,
+      ),
+    };
+
+    return Chip(
+      avatar: Icon(icon, size: 16, color: color),
+      label: Text(label),
+      labelStyle: theme.textTheme.labelSmall,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      side: BorderSide(color: color.withAlpha(77)),
+      backgroundColor: color.withAlpha(26),
     );
   }
 }

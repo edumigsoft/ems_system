@@ -86,9 +86,135 @@ class NotebookListViewModel extends ChangeNotifier
     }
   }
 
+  // === Filtros e Busca ===
+
+  String _searchQuery = '';
+  String get searchQuery => _searchQuery;
+
+  final Set<NotebookType> _selectedTypes = {};
+  Set<NotebookType> get selectedTypes => _selectedTypes;
+
+  final Set<String> _selectedTags = {};
+  Set<String> get selectedTags => _selectedTags;
+
+  NotebookSortOrder _sortOrder = NotebookSortOrder.recentFirst;
+  NotebookSortOrder get sortOrder => _sortOrder;
+
+  /// Lista filtrada de cadernos baseado nos critérios ativos.
+  List<NotebookDetails> get filteredNotebooks {
+    if (_notebooks == null) return [];
+
+    var filtered = _notebooks!;
+
+    // Filtro por busca (título ou conteúdo)
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      filtered = filtered.where((notebook) {
+        final matchesTitle = notebook.title.toLowerCase().contains(query);
+        final matchesContent = notebook.content.toLowerCase().contains(query);
+        return matchesTitle || matchesContent;
+      }).toList();
+    }
+
+    // Filtro por tipo
+    if (_selectedTypes.isNotEmpty) {
+      filtered = filtered.where((notebook) {
+        return notebook.type != null && _selectedTypes.contains(notebook.type);
+      }).toList();
+    }
+
+    // Filtro por tags
+    if (_selectedTags.isNotEmpty) {
+      filtered = filtered.where((notebook) {
+        if (notebook.tags == null || notebook.tags!.isEmpty) return false;
+        return _selectedTags.any((tag) => notebook.tags!.contains(tag));
+      }).toList();
+    }
+
+    // Ordenação
+    switch (_sortOrder) {
+      case NotebookSortOrder.recentFirst:
+        filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+      case NotebookSortOrder.oldestFirst:
+        filtered.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+        break;
+      case NotebookSortOrder.alphabetical:
+        filtered.sort((a, b) => a.title.compareTo(b.title));
+        break;
+      case NotebookSortOrder.reverseAlphabetical:
+        filtered.sort((a, b) => b.title.compareTo(a.title));
+        break;
+    }
+
+    return filtered;
+  }
+
+  /// Define critério de busca por texto.
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    notifyListeners();
+  }
+
+  /// Toggle de filtro por tipo.
+  void toggleTypeFilter(NotebookType type) {
+    if (_selectedTypes.contains(type)) {
+      _selectedTypes.remove(type);
+    } else {
+      _selectedTypes.add(type);
+    }
+    notifyListeners();
+  }
+
+  /// Toggle de filtro por tag.
+  void toggleTagFilter(String tag) {
+    if (_selectedTags.contains(tag)) {
+      _selectedTags.remove(tag);
+    } else {
+      _selectedTags.add(tag);
+    }
+    notifyListeners();
+  }
+
+  /// Define critério de ordenação.
+  void setSortOrder(NotebookSortOrder order) {
+    _sortOrder = order;
+    notifyListeners();
+  }
+
+  /// Limpa todos os filtros.
+  void clearFilters() {
+    _searchQuery = '';
+    _selectedTypes.clear();
+    _selectedTags.clear();
+    _sortOrder = NotebookSortOrder.recentFirst;
+    notifyListeners();
+  }
+
+  /// Obtém todas as tags únicas dos cadernos.
+  Set<String> get availableTags {
+    if (_notebooks == null) return {};
+
+    final tags = <String>{};
+    for (final notebook in _notebooks!) {
+      if (notebook.tags != null) {
+        tags.addAll(notebook.tags!);
+      }
+    }
+    return tags;
+  }
+
   /// Limpa erro atual.
   void clearError() {
     _error = null;
     notifyListeners();
   }
+}
+
+/// Critérios de ordenação de cadernos.
+enum NotebookSortOrder {
+  recentFirst,
+  oldestFirst,
+  alphabetical,
+  reverseAlphabetical,
 }

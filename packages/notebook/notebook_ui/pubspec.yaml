@@ -41,6 +41,7 @@ dependencies:
     path: ../../auth/auth_client
   auth_ui:
     path: ../../auth/auth_ui
+  file_picker: ^6.1.1
 
 dev_dependencies:
   flutter_test:

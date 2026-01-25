@@ -38,6 +38,79 @@ class _NotebookListPageState extends State<NotebookListPage> {
       appBar: AppBar(
         title: const Text('Cadernos'),
         actions: [
+          // Menu de ordenação
+          PopupMenuButton<NotebookSortOrder>(
+            icon: const Icon(Icons.sort),
+            tooltip: 'Ordenar',
+            onSelected: (order) => widget.viewModel.setSortOrder(order),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: NotebookSortOrder.recentFirst,
+                child: Row(
+                  children: [
+                    Icon(
+                      widget.viewModel.sortOrder ==
+                              NotebookSortOrder.recentFirst
+                          ? Icons.check
+                          : Icons.calendar_today,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Mais Recentes'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: NotebookSortOrder.oldestFirst,
+                child: Row(
+                  children: [
+                    Icon(
+                      widget.viewModel.sortOrder ==
+                              NotebookSortOrder.oldestFirst
+                          ? Icons.check
+                          : Icons.history,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Mais Antigas'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem(
+                value: NotebookSortOrder.alphabetical,
+                child: Row(
+                  children: [
+                    Icon(
+                      widget.viewModel.sortOrder ==
+                              NotebookSortOrder.alphabetical
+                          ? Icons.check
+                          : Icons.sort_by_alpha,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('A → Z'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: NotebookSortOrder.reverseAlphabetical,
+                child: Row(
+                  children: [
+                    Icon(
+                      widget.viewModel.sortOrder ==
+                              NotebookSortOrder.reverseAlphabetical
+                          ? Icons.check
+                          : Icons.sort_by_alpha,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    const Text('Z → A'),
+                  ],
+                ),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => widget.viewModel.loadNotebooks(),
@@ -100,10 +173,17 @@ class _NotebookListPageState extends State<NotebookListPage> {
       );
     }
 
-    final notebooks = widget.viewModel.notebooks ?? [];
+    final hasData =
+        widget.viewModel.notebooks != null &&
+        widget.viewModel.notebooks!.isNotEmpty;
+    final filteredNotebooks = widget.viewModel.filteredNotebooks;
+    final hasActiveFilters =
+        widget.viewModel.searchQuery.isNotEmpty ||
+        widget.viewModel.selectedTypes.isNotEmpty ||
+        widget.viewModel.selectedTags.isNotEmpty;
 
-    // Estado vazio
-    if (notebooks.isEmpty) {
+    // Estado vazio (sem dados originais)
+    if (!hasData) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -129,20 +209,147 @@ class _NotebookListPageState extends State<NotebookListPage> {
       );
     }
 
-    // Lista de cadernos
+    // Lista de cadernos com busca e filtros
     return RefreshIndicator(
       onRefresh: () => widget.viewModel.loadNotebooks(),
-      child: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: notebooks.length,
-        itemBuilder: (context, index) {
-          final notebook = notebooks[index];
-          return NotebookCard(
-            notebook: notebook,
-            onTap: () => _navigateToDetail(context, notebook.id),
-            onDelete: () => _handleDelete(context, notebook),
-          );
-        },
+      child: Column(
+        children: [
+          // Barra de busca
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Buscar cadernos...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: widget.viewModel.searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => widget.viewModel.setSearchQuery(''),
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: widget.viewModel.setSearchQuery,
+            ),
+          ),
+
+          // Filtros por tipo
+          if (NotebookType.values.isNotEmpty)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: NotebookType.values.map((type) {
+                  final isSelected = widget.viewModel.selectedTypes.contains(
+                    type,
+                  );
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(_getTypeLabel(type)),
+                      selected: isSelected,
+                      onSelected: (_) =>
+                          widget.viewModel.toggleTypeFilter(type),
+                      avatar: Icon(
+                        _getTypeIcon(type),
+                        size: 18,
+                        color: isSelected
+                            ? theme.colorScheme.onSecondaryContainer
+                            : null,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+
+          const SizedBox(height: 8),
+
+          // Filtros por tags
+          if (widget.viewModel.availableTags.isNotEmpty)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  const Icon(Icons.label_outline, size: 18),
+                  const SizedBox(width: 8),
+                  ...widget.viewModel.availableTags.map((tag) {
+                    final isSelected = widget.viewModel.selectedTags.contains(
+                      tag,
+                    );
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: FilterChip(
+                        label: Text(tag),
+                        selected: isSelected,
+                        onSelected: (_) =>
+                            widget.viewModel.toggleTagFilter(tag),
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+
+          // Botão limpar filtros (se houver filtros ativos)
+          if (hasActiveFilters)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: TextButton.icon(
+                onPressed: widget.viewModel.clearFilters,
+                icon: const Icon(Icons.clear_all),
+                label: const Text('Limpar filtros'),
+              ),
+            ),
+
+          const Divider(),
+
+          // Lista filtrada
+          Expanded(
+            child: filteredNotebooks.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.filter_list_off,
+                          size: 64,
+                          color: theme.colorScheme.onSurface.withAlpha(64),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Nenhum resultado encontrado',
+                          style: theme.textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tente ajustar os filtros',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 16),
+                        OutlinedButton.icon(
+                          onPressed: widget.viewModel.clearFilters,
+                          icon: const Icon(Icons.clear_all),
+                          label: const Text('Limpar filtros'),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: filteredNotebooks.length,
+                    itemBuilder: (context, index) {
+                      final notebook = filteredNotebooks[index];
+                      return NotebookCard(
+                        notebook: notebook,
+                        onTap: () => _navigateToDetail(context, notebook.id),
+                        onDelete: () => _handleDelete(context, notebook),
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -210,6 +417,22 @@ class _NotebookListPageState extends State<NotebookListPage> {
         );
       }
     }
+  }
+
+  String _getTypeLabel(NotebookType type) {
+    return switch (type) {
+      NotebookType.quick => 'Rápida',
+      NotebookType.organized => 'Organizada',
+      NotebookType.reminder => 'Lembrete',
+    };
+  }
+
+  IconData _getTypeIcon(NotebookType type) {
+    return switch (type) {
+      NotebookType.quick => Icons.notes,
+      NotebookType.organized => Icons.menu_book,
+      NotebookType.reminder => Icons.bookmark,
+    };
   }
 
   Future<void> _showCreateDialog(BuildContext context) async {

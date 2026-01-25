@@ -3,6 +3,11 @@ import 'package:notebook_shared/notebook_shared.dart';
 
 import '../view_models/notebook_detail_view_model.dart';
 import '../widgets/document_list_widget.dart';
+import '../widgets/expansion_card_widget.dart';
+import '../widgets/notebook_hierarchy_widget.dart';
+import '../widgets/document_upload_widget.dart';
+import '../widgets/notebook_edit_dialog.dart';
+// O DocumentUploadWidget usa DocumentAddResult que deve estar acessível.
 
 /// Página de detalhes de um caderno.
 ///
@@ -22,12 +27,18 @@ class NotebookDetailPage extends StatefulWidget {
 }
 
 class _NotebookDetailPageState extends State<NotebookDetailPage> {
+  bool _isMissingFieldsDismissed = false;
+
   @override
   void initState() {
     super.initState();
     // Carrega caderno ao inicializar
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.viewModel.loadNotebook(widget.notebookId);
+      widget.viewModel.loadNotebook(widget.notebookId).then((_) {
+        // Carrega hierarquia após carregar o caderno
+        widget.viewModel.loadParent();
+        widget.viewModel.loadChildren();
+      });
     });
   }
 
@@ -41,12 +52,12 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () => _navigateToEdit(context),
+            onPressed: _navigateToEdit,
             tooltip: 'Editar',
           ),
           IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () => _handleDelete(context),
+            onPressed: _handleDelete,
             tooltip: 'Excluir',
           ),
         ],
@@ -146,6 +157,23 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           ),
           const SizedBox(height: 16),
 
+          // Card de Expansão (Campos faltantes)
+          if (_getMissingFields(notebook).isNotEmpty &&
+              !_isMissingFieldsDismissed) ...[
+            const SizedBox(height: 8),
+            ExpansionCardWidget(
+              missingFields: _getMissingFields(notebook),
+              onExpand: _navigateToEdit,
+              onDismiss: () {
+                setState(() {
+                  _isMissingFieldsDismissed = true;
+                });
+              },
+              dismissible: true,
+            ),
+            const SizedBox(height: 8),
+          ],
+
           // Tags
           if (notebook.tags != null && notebook.tags!.isNotEmpty) ...[
             Text(
@@ -158,6 +186,85 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
               children: notebook.tags!.map((tag) {
                 return Chip(label: Text('#$tag'));
               }).toList(),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Lembrete Destacado
+          if (notebook.type == NotebookType.reminder &&
+              notebook.reminderDate != null) ...[
+            Card(
+              color: notebook.isReminderOverdue
+                  ? theme.colorScheme.errorContainer
+                  : theme.colorScheme.primaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Icon(
+                      notebook.isReminderOverdue
+                          ? Icons.warning_amber
+                          : Icons.notifications_active,
+                      color: notebook.isReminderOverdue
+                          ? theme.colorScheme.onErrorContainer
+                          : theme.colorScheme.onPrimaryContainer,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            notebook.isReminderOverdue
+                                ? 'Lembrete Atrasado'
+                                : 'Lembrete',
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: notebook.isReminderOverdue
+                                  ? theme.colorScheme.onErrorContainer
+                                  : theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                          Text(
+                            _formatDateTime(notebook.reminderDate!),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: notebook.isReminderOverdue
+                                  ? theme.colorScheme.onErrorContainer
+                                  : theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
+          // Hierarquia
+          if (widget.viewModel.parentNotebook != null ||
+              (widget.viewModel.childNotebooks?.isNotEmpty ?? false)) ...[
+            Text('Hierarquia', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            NotebookHierarchyWidget(
+              notebooks: _buildHierarchyList(),
+              currentNotebookId: notebook.id,
+              onNotebookTap: (id) {
+                if (id != notebook.id) {
+                  // Navega para o outro caderno
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute<void>(
+                      builder: (context) => NotebookDetailPage(
+                        viewModel: widget
+                            .viewModel, // Ideal seria nova instancia ou reset, mas ok por agora
+                        notebookId: id,
+                      ),
+                    ),
+                  );
+                }
+              },
+              maxDepth: 3,
             ),
             const SizedBox(height: 16),
           ],
@@ -185,9 +292,27 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             style: theme.textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
+
+          // Upload de Documentos
+          DocumentUploadWidget(
+            onDocumentAdded: _handleDocumentAdded,
+            maxSizeMB: 50,
+            allowedExtensions: const [
+              'pdf',
+              'doc',
+              'docx',
+              'jpg',
+              'png',
+              'jpeg',
+            ],
+            enabled: !widget.viewModel.isUploadingDocument,
+          ),
+
+          const SizedBox(height: 16),
+
           DocumentListWidget(
             documents: widget.viewModel.documents ?? [],
-            onDelete: (docId) => _handleDeleteDocument(context, docId),
+            onDelete: _handleDeleteDocument,
           ),
         ],
       ),
@@ -216,24 +341,24 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
-  Future<void> _navigateToEdit(BuildContext context) async {
-    // Implementar navegação para edição
-    // Quando a página de edição for implementada, seguir o mesmo padrão:
-    // final formViewModel = GetItInjector().get<NotebookFormViewModel>();
-    // await Navigator.of(context).push<void>(
-    //   MaterialPageRoute<void>(
-    //     builder: (context) => NotebookFormPage(
-    //       viewModel: formViewModel,
-    //       notebookId: widget.notebookId,
-    //     ),
-    //   ),
-    // );
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Função de edição ainda não implementada')),
+  Future<void> _navigateToEdit() async {
+    final updated = await showDialog<bool>(
+      context: context,
+      builder: (context) => NotebookEditDialog(
+        notebook: widget.viewModel.notebook!,
+        viewModel: widget.viewModel,
+      ),
     );
+
+    if (updated == true && mounted) {
+      widget.viewModel.loadNotebook(widget.notebookId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Caderno atualizado')),
+      );
+    }
   }
 
-  Future<void> _handleDelete(BuildContext context) async {
+  Future<void> _handleDelete() async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -257,14 +382,13 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
       ),
     );
 
-    if (confirmed == true && context.mounted) {
+    if (confirmed == true && mounted) {
       // Navega de volta antes de deletar
       Navigator.of(context).pop();
     }
   }
 
   Future<void> _handleDeleteDocument(
-    BuildContext context,
     String documentId,
   ) async {
     final confirmed = await showDialog<bool>(
@@ -288,13 +412,13 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
       ),
     );
 
-    if (confirmed == true && context.mounted) {
+    if (confirmed == true && mounted) {
       final success = await widget.viewModel.deleteDocument(documentId);
-      if (success && context.mounted) {
+      if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Documento excluído com sucesso')),
         );
-      } else if (context.mounted) {
+      } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -304,6 +428,100 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           ),
         );
       }
+    }
+  }
+
+  List<String> _getMissingFields(NotebookDetails notebook) {
+    final missing = <String>[];
+
+    if (notebook.tags == null || notebook.tags!.isEmpty) {
+      missing.add('Tags');
+    }
+    if (notebook.projectId == null) {
+      missing.add('Projeto');
+    }
+    if (notebook.parentId == null) {
+      missing.add('Caderno Pai');
+    }
+    if (notebook.reminderDate == null &&
+        notebook.type == NotebookType.reminder) {
+      missing.add('Data do Lembrete');
+    }
+
+    return missing;
+  }
+
+  List<NotebookDetails> _buildHierarchyList() {
+    final list = <NotebookDetails>[];
+
+    if (widget.viewModel.parentNotebook != null) {
+      list.add(widget.viewModel.parentNotebook!);
+    }
+
+    if (widget.viewModel.notebook != null) {
+      list.add(widget.viewModel.notebook!);
+    }
+
+    if (widget.viewModel.childNotebooks != null) {
+      list.addAll(widget.viewModel.childNotebooks!);
+    }
+
+    return list;
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final date = _formatDate(dateTime);
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$date às $hour:$minute';
+  }
+
+  Future<void> _handleDocumentAdded(
+    DocumentAddResult result,
+  ) async {
+    bool success = false;
+
+    if (result.type == DocumentAddType.upload) {
+      // Upload de arquivo
+      final file = result.file!.files.single;
+      success = await widget.viewModel.uploadDocument(
+        filePath: file.path!,
+        fileName: result.name,
+        mimeType: file.extension != null
+            ? 'application/${file.extension}'
+            : null,
+      );
+    } else if (result.type == DocumentAddType.url) {
+      // Link externo
+      success = await widget.viewModel.addDocumentReference(
+        name: result.name,
+        path: result.url!,
+        storageType: DocumentStorageType.url,
+      );
+    } else if (result.type == DocumentAddType.localPath) {
+      // Caminho local
+      success = await widget.viewModel.addDocumentReference(
+        name: result.name,
+        path: result.path!,
+        storageType: DocumentStorageType.local,
+      );
+    }
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Documento adicionado com sucesso')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            widget.viewModel.error ?? 'Erro ao adicionar documento',
+          ),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 }
