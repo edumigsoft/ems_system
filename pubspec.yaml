@@ -7,7 +7,6 @@ environment:
 workspace:
   # Servers
   - servers/ems/server_v1
-  - servers/sms/server_v1
 
   # Apps
   - apps/ems/app_v1
