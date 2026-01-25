@@ -84,8 +84,6 @@ Future<DependencyInjector> registryInjectors() async {
   di.registerLazySingleton<OpenApiRoutes>(
     () => OpenApiRoutes(backendBaseApi: Env.backendPathApi),
   );
-  addRoutes(di, di.get<OpenApiRoutes>(), security: false);
-
   // 4. Inicialização dos Módulos (Orquestração)
   // IMPORTANTE: Resolvendo dependência circular Auth ↔ User:
   // - UserRoutes precisa de AuthMiddleware
