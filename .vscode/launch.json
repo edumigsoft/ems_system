@@ -5,32 +5,38 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "App Design Draft (debug mode)",
+            "name": "EMS App Design Draft (debug mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
             "program": "apps/ems/app_design_draft/lib/main.dart"
         },
         {
-            "name": "Server V1",
+            "name": "EMS Server V1",
             "request": "launch",
             "type": "dart",
             "program": "servers/ems/server_v1/bin/server.dart"
         },
         {
-            "name": "App V1 (debug mode)",
+            "name": "EMS App V1 (debug mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
             "program": "apps/ems/app_v1/lib/main.dart"
         },
+        {
+            "name": "SMS Server V1",
+            "request": "launch",
+            "type": "dart",
+            "program": "servers/sms/server_v1/bin/server.dart"
+        }
     ],
     "compounds": [
         {
-            "name": "App & Servidor",
+            "name": "EMS App & Server",
             "configurations": [
-                "App V1 (debug mode)",
-                "Server V1"
+                "EMS App V1 (debug mode)",
+                "EMS Server V1"
             ]
         }
     ]
