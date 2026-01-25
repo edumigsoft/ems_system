@@ -11,6 +11,7 @@ export 'src/database/converters/string_list_converter.dart';
 
 // Repositories
 export 'src/repository/notebook_repository_server.dart';
+export 'src/repository/document_reference_repository_server.dart';
 
 // Routes
 export 'src/routes/notebook_routes.dart';

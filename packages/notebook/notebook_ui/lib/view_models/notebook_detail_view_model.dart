@@ -223,10 +223,32 @@ class NotebookDetailViewModel extends ChangeNotifier
   Future<void> loadChildren() async {
     if (_notebook == null) return;
 
-    // TODO: Implementar endpoint no backend para buscar filhos por parentId
-    // Por enquanto, não faz nada
-    _childNotebooks = [];
-    notifyListeners();
+    final result = await _executeLoadChildren(_notebook!.id);
+
+    if (result case Success(value: final data)) {
+      _childNotebooks = data.map((model) => model.toDomain()).toList();
+      notifyListeners();
+    } else if (result case Failure(error: final error)) {
+      logger.warning('Erro ao carregar cadernos filhos: $error');
+      _childNotebooks = [];
+      notifyListeners();
+    }
+  }
+
+  Future<Result<List<NotebookDetailsModel>>> _executeLoadChildren(
+    String parentId,
+  ) async {
+    try {
+      final models = await _notebookService.getAll(
+        parentId: parentId,
+      );
+      return Success(models);
+    } on DioException catch (e) {
+      return handleDioError<List<NotebookDetailsModel>>(
+        e,
+        context: 'loadChildren',
+      );
+    }
   }
 
   // === Upload de Documentos ===

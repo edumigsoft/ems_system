@@ -2,9 +2,18 @@
 
 ## Overview
 
-Successfully implemented **4 out of 6 TODOs** from the Notebook UI package. Phase 1 (Quick Wins) and Phase 2 (Tag System Integration) are complete. Phase 3 remains blocked by backend requirements.
+Successfully implemented **5 out of 6 TODOs** from the Notebook UI package. Phase 1 (Quick Wins), Phase 2 (Tag System Integration), and partial Phase 3 are complete. Only file upload remains blocked by multipart library.
 
 **Status**: ✅ All code passes `flutter analyze` with no issues.
+
+## ✅ Progresso Final
+
+- ✅ **TODO #1**: PDF Viewer inline (Completo)
+- ✅ **TODO #2**: Download de documentos (Completo)
+- ✅ **TODO #3**: Abrir URLs externas (Completo)
+- ✅ **TODO #4**: Sistema de tags (Completo)
+- ✅ **TODO #5**: Cadernos hierárquicos (Completo - backend já existia!)
+- ⏸️ **TODO #6**: Upload de arquivos (Aguardando biblioteca multipart)
 
 ---
 
@@ -111,21 +120,25 @@ Successfully implemented **4 out of 6 TODOs** from the Notebook UI package. Phas
 
 ---
 
-## Phase 3: Backend-Dependent Features ⏸️ BLOCKED
+## Phase 3: Backend-Dependent Features ✅ PARCIALMENTE COMPLETO
 
-### 5. Hierarchical Notebooks (TODO #5) ⏸️
+### 5. Hierarchical Notebooks (TODO #5) ✅ COMPLETO
 **File**: `lib/view_models/notebook_detail_view_model.dart:191`
 
-**Status**: Blocked - Requires backend endpoint
+**Status**: ✅ Implementado
 
-**Required Backend Work**:
-- Endpoint: `GET /notebooks?parentId={id}`
-- Response: List of child notebooks
+**Backend**: Endpoint `GET /notebooks?parent_id={id}` já existia desde o início!
 
-**Frontend Work (when ready)**:
-- Uncomment and implement `loadChildren()` method
-- Call endpoint in ViewModel
-- UI already exists: `notebook_hierarchy_widget.dart`
+**Frontend**:
+- ✅ Implementado `loadChildren()` method com chamada ao endpoint
+- ✅ Integra com `NotebookApiService.getAll(parentId: id)`
+- ✅ UI já existe: `notebook_hierarchy_widget.dart`
+- ✅ Passa na análise sem erros
+
+**Testando**:
+1. Criar notebook pai
+2. Criar notebook filho com `parent_id` apontando para o pai
+3. Abrir notebook pai → Deve mostrar filhos na hierarquia
 
 ---
 

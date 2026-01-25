@@ -12,6 +12,9 @@ import 'package:notebook_shared/notebook_shared.dart'
         NotebookCreateModel,
         NotebookUpdateModel,
         NotebookRepository,
+        DocumentReferenceRepository,
+        DocumentReferenceDetailsModel,
+        DocumentStorageType,
         NotebookType;
 
 /// Rotas de gerenciamento de notebooks.
@@ -29,12 +32,14 @@ import 'package:notebook_shared/notebook_shared.dart'
 /// - Admins e owners podem gerenciar qualquer notebook
 class NotebookRoutes extends Routes {
   final NotebookRepository notebookRepository;
+  final DocumentReferenceRepository documentRepository;
   final AuthMiddleware authMiddleware;
   final DependencyInjector di;
   final String _backendBaseApi;
 
   NotebookRoutes(
     this.notebookRepository,
+    this.documentRepository,
     this.authMiddleware,
     this.di, {
     required String backendBaseApi,
@@ -94,6 +99,26 @@ class NotebookRoutes extends Routes {
           .addMiddleware(authedMiddleware)
           .addHandler(
             (req) => _restoreNotebook(req, req.params['id']!),
+          ),
+    );
+
+    // GET /notebooks/:id/documents - Listar documentos de um notebook
+    router.get(
+      '/<id>/documents',
+      Pipeline()
+          .addMiddleware(authedMiddleware)
+          .addHandler(
+            (req) => _getNotebookDocuments(req, req.params['id']!),
+          ),
+    );
+
+    // POST /notebooks/:id/documents/upload - Upload de arquivo
+    router.post(
+      '/<id>/documents/upload',
+      Pipeline()
+          .addMiddleware(authedMiddleware)
+          .addHandler(
+            (req) => _uploadDocument(req, req.params['id']!),
           ),
     );
 
@@ -419,6 +444,93 @@ class NotebookRoutes extends Routes {
           headers: {'Content-Type': 'application/json'},
         );
       },
+    );
+  }
+
+  /// GET /notebooks/:id/documents - Lista documentos de um notebook.
+  Future<Response> _getNotebookDocuments(Request request, String id) async {
+    final authContext = request.context['authContext'] as AuthContext?;
+
+    if (authContext == null) {
+      return Response.forbidden(
+        jsonEncode({'error': 'Authentication required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    try {
+      final queryParams = request.url.queryParameters;
+
+      // Filtro por tipo de armazenamento
+      DocumentStorageType? storageType;
+      final storageTypeParam = queryParams['storage_type'];
+      if (storageTypeParam != null) {
+        try {
+          storageType = DocumentStorageType.values
+              .firstWhere((t) => t.name == storageTypeParam);
+        } catch (_) {
+          return Response(
+            400,
+            body: jsonEncode({'error': 'Invalid storage_type filter'}),
+            headers: {'Content-Type': 'application/json'},
+          );
+        }
+      }
+
+      final result = await documentRepository.getByNotebookId(
+        id,
+        storageType: storageType,
+      );
+
+      return result.when(
+        success: (documents) {
+          final models = documents
+              .map((d) => DocumentReferenceDetailsModel.fromDomain(d).toJson())
+              .toList();
+          return Response.ok(
+            jsonEncode(models),
+            headers: {'Content-Type': 'application/json'},
+          );
+        },
+        failure: (exception) {
+          return Response.internalServerError(
+            body: jsonEncode({'error': 'Failed to fetch documents'}),
+            headers: {'Content-Type': 'application/json'},
+          );
+        },
+      );
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({'error': 'Internal server error'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+  }
+
+  /// POST /notebooks/:id/documents/upload - Upload de arquivo.
+  ///
+  /// TODO: Implementar upload de arquivo com biblioteca multipart.
+  /// Por enquanto, retorna 501 Not Implemented.
+  /// Bibliotecas sugeridas: shelf_multipart, mime_multipart
+  Future<Response> _uploadDocument(Request request, String id) async {
+    final authContext = request.context['authContext'] as AuthContext?;
+
+    if (authContext == null) {
+      return Response.forbidden(
+        jsonEncode({'error': 'Authentication required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    // TODO: Implementar multipart/form-data parsing e upload de arquivo
+    return Response(
+      501,
+      body: jsonEncode({
+        'error': 'File upload not yet implemented',
+        'message':
+            'Please add document references manually or wait for upload implementation',
+      }),
+      headers: {'Content-Type': 'application/json'},
     );
   }
 }
