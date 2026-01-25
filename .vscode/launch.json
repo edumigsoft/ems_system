@@ -25,6 +25,13 @@
             "program": "apps/ems/app_v1/lib/main.dart"
         },
         {
+            "name": "SMS App V1 (debug mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "program": "apps/sms/app_v1/lib/main.dart"
+        },
+        {
             "name": "SMS Server V1",
             "request": "launch",
             "type": "dart",
@@ -37,6 +44,13 @@
             "configurations": [
                 "EMS App V1 (debug mode)",
                 "EMS Server V1"
+            ]
+        },
+        {
+            "name": "SMS App & Servidor",
+            "configurations": [
+                "SMS App V1 (debug mode)",
+                "SMS Server V1"
             ]
         }
     ]

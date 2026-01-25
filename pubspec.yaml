@@ -12,6 +12,7 @@ workspace:
   # Apps
   - apps/ems/app_v1
   - apps/ems/app_design_draft
+  - apps/sms/app_v1
 
   # Core
   - packages/core/core_client

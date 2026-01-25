@@ -1,4 +1,4 @@
-import 'package:app_design_draft/my_app.dart';
+import 'package:ems_app_design_draft/my_app.dart';
 import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
