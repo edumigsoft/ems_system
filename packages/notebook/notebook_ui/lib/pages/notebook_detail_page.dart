@@ -216,11 +216,20 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
-  void _navigateToEdit(BuildContext context) {
-    Navigator.pushNamed(
-      context,
-      '/notebooks/edit/${widget.notebookId}',
-      arguments: widget.viewModel.notebook,
+  Future<void> _navigateToEdit(BuildContext context) async {
+    // Implementar navegação para edição
+    // Quando a página de edição for implementada, seguir o mesmo padrão:
+    // final formViewModel = GetItInjector().get<NotebookFormViewModel>();
+    // await Navigator.of(context).push<void>(
+    //   MaterialPageRoute<void>(
+    //     builder: (context) => NotebookFormPage(
+    //       viewModel: formViewModel,
+    //       notebookId: widget.notebookId,
+    //     ),
+    //   ),
+    // );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Função de edição ainda não implementada')),
     );
   }
 

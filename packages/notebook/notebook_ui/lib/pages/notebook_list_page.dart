@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 
 import '../view_models/notebook_list_view_model.dart';
+import '../view_models/notebook_detail_view_model.dart';
 import '../widgets/notebook_card.dart';
 import '../widgets/notebook_create_dialog.dart';
+import 'package:core_shared/core_shared.dart' show GetItInjector;
+import 'notebook_detail_page.dart';
 
 /// Página de listagem de cadernos.
 ///
@@ -144,12 +147,25 @@ class _NotebookListPageState extends State<NotebookListPage> {
     );
   }
 
-  void _navigateToDetail(BuildContext context, String notebookId) {
-    Navigator.pushNamed(
-      context,
-      '/notebooks/$notebookId',
-      arguments: notebookId,
+  Future<void> _navigateToDetail(
+    BuildContext context,
+    String notebookId,
+  ) async {
+    final detailViewModel = GetItInjector().get<NotebookDetailViewModel>();
+
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute<void>(
+        builder: (context) => NotebookDetailPage(
+          viewModel: detailViewModel,
+          notebookId: notebookId,
+        ),
+      ),
     );
+
+    // Recarrega lista ao voltar da tela de detalhes
+    if (context.mounted) {
+      widget.viewModel.loadNotebooks();
+    }
   }
 
   Future<void> _handleDelete(
