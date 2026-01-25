@@ -49,9 +49,8 @@ class NotebookTable extends Table with DriftTableMixinPostgres {
 
   /// Optional reminder date/time for reminder-type notebooks.
   @JsonKey('reminder_date')
-  TextColumn get reminderDate => text()
-      .map(const DateTimeConverterNonNull())
-      .withDefault(const CustomExpression('CURRENT_TIMESTAMP'))();
+  TextColumn get reminderDate =>
+      text().map(const DateTimeConverterNonNull()).nullable()();
 
   /// Whether to send a notification when reminder time is reached.
   @JsonKey('notify_on_reminder')

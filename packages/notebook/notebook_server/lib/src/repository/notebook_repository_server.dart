@@ -29,7 +29,7 @@ class NotebookRepositoryServer implements NotebookRepository {
         parentId: Value(data.parentId),
         tags: Value(data.tags),
         type: Value(data.type),
-        reminderDate: Value(data.reminderDate!),
+        reminderDate: Value(data.reminderDate),
         notifyOnReminder: Value(data.notifyOnReminder),
         documentIds: const Value(null), // Inicialmente vazio
       );
