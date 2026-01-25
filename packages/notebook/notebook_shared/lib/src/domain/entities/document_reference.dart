@@ -27,10 +27,9 @@ class DocumentReference {
 
   /// Verifica se é um documento de texto
   bool get isDocument =>
-      mimeType?.contains('document') ??
-      mimeType?.contains('msword') ??
-      mimeType?.contains('text') ??
-      false;
+      mimeType?.contains('document') == true ||
+      mimeType?.contains('msword') == true ||
+      mimeType?.contains('text') == true;
 
   /// Verifica se está no servidor (pode fazer download)
   bool get isOnServer => storageType == DocumentStorageType.server;
@@ -73,12 +72,12 @@ class DocumentReference {
 
   @override
   int get hashCode => Object.hash(
-        name,
-        path,
-        storageType,
-        mimeType,
-        sizeBytes,
-      );
+    name,
+    path,
+    storageType,
+    mimeType,
+    sizeBytes,
+  );
 
   @override
   String toString() => 'DocumentReference(name: $name, type: $storageType)';

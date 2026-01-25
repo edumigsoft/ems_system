@@ -31,9 +31,7 @@ class NotebookCreate {
 
   /// Validação básica de negócio
   bool get isValid =>
-      title.trim().isNotEmpty &&
-      content.isNotEmpty &&
-      _validateReminder();
+      title.trim().isNotEmpty && content.isNotEmpty && _validateReminder();
 
   /// Valida campos relacionados a lembretes
   bool _validateReminder() {
@@ -56,4 +54,42 @@ class NotebookCreate {
 
   @override
   String toString() => 'NotebookCreate(title: $title, type: $type)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotebookCreate &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          content == other.content &&
+          projectId == other.projectId &&
+          parentId == other.parentId &&
+          _listEquals(tags, other.tags) &&
+          type == other.type &&
+          reminderDate == other.reminderDate &&
+          notifyOnReminder == other.notifyOnReminder &&
+          _listEquals(documentIds, other.documentIds);
+
+  @override
+  int get hashCode => Object.hash(
+    title,
+    content,
+    projectId,
+    parentId,
+    Object.hashAll(tags ?? []),
+    type,
+    reminderDate,
+    notifyOnReminder,
+    Object.hashAll(documentIds ?? []),
+  );
+
+  /// Helper para comparação de listas
+  bool _listEquals(List<String>? a, List<String>? b) {
+    if (a == null) return b == null;
+    if (b == null || a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 }

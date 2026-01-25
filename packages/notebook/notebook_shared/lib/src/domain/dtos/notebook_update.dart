@@ -65,4 +65,48 @@ class NotebookUpdate {
 
   @override
   String toString() => 'NotebookUpdate(id: $id, hasChanges: $hasChanges)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotebookUpdate &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          content == other.content &&
+          projectId == other.projectId &&
+          parentId == other.parentId &&
+          _listEquals(tags, other.tags) &&
+          type == other.type &&
+          reminderDate == other.reminderDate &&
+          notifyOnReminder == other.notifyOnReminder &&
+          _listEquals(documentIds, other.documentIds) &&
+          isActive == other.isActive &&
+          isDeleted == other.isDeleted;
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    content,
+    projectId,
+    parentId,
+    Object.hashAll(tags ?? []),
+    type,
+    reminderDate,
+    notifyOnReminder,
+    Object.hashAll(documentIds ?? []),
+    isActive,
+    isDeleted,
+  );
+
+  /// Helper para comparação de listas
+  bool _listEquals(List<String>? a, List<String>? b) {
+    if (a == null) return b == null;
+    if (b == null || a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
+  }
 }
