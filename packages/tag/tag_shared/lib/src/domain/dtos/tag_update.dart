@@ -44,7 +44,7 @@ class TagUpdate {
       isDeleted != null;
 
   /// Business validation.
-  bool get isValid => id.isNotEmpty;
+  bool get isValid => id.trim().isNotEmpty;
 
   @override
   bool operator ==(Object other) =>

@@ -20,7 +20,7 @@ class TagCreate {
   });
 
   /// Business validation - checks if the data is valid for creation.
-  bool get isValid => name.isNotEmpty;
+  bool get isValid => name.trim().isNotEmpty;
 
   @override
   bool operator ==(Object other) =>
