@@ -586,10 +586,10 @@ class _NavFooter extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: dsColors.primary.withValues(alpha: 0.1),
-            backgroundImage: avatarUrl != null
-                ? NetworkImage(avatarUrl!)
-                : null,
-            child: avatarUrl == null
+            // backgroundImage: avatarUrl != null
+            //     ? NetworkImage(avatarUrl!)
+            //     : null,
+            child: avatarUrl == null || avatarUrl!.isEmpty
                 ? Icon(
                     DSIcons.person,
                     color: dsColors.primary,
