@@ -36,6 +36,10 @@ dependencies:
     path: ../../../packages/user/user_ui
   user_client:
     path: ../../../packages/user/user_client
+  school_ui:
+    path: ../../../packages/school/school_ui
+  school_client:
+    path: ../../../packages/school/school_client
 
 dev_dependencies:
   flutter_test:

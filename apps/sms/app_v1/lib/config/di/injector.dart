@@ -6,6 +6,7 @@ import 'package:core_shared/core_shared.dart'
 import 'package:core_ui/core_ui.dart' show AppModule;
 import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:dio/dio.dart';
+import 'package:school_ui/school_ui.dart' show SchoolModule;
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
 
 import '../../app_layout.dart';
@@ -26,7 +27,7 @@ class Injector with Loggable {
     final List<AppModule> appModules = [
       // DashboardModule(di: _diMain),
       // AuraModule(di: _diMain),
-      // SchoolModule(di: _diMain),
+      SchoolModule(di: _diMain),
       UserModule(di: _diMain),
       // AcademicConfigModule(di: _diMain),
       // AcademicStructureModule(di: _diMain),

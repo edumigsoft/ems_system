@@ -14,11 +14,11 @@ export 'src/database/school_database.dart';
 export 'src/tables/school_table.dart';
 
 class InitSchoolModuleToServer implements InitServerModule {
-  InitSchoolModuleToServer({
+  static Future<void> init({
     required DependencyInjector di,
     required String backendBaseApi,
     bool security = true,
-  }) {
+  }) async {
     // Database
     di.registerLazySingleton<SchoolDatabase>(
       () => SchoolDatabase(di.get<DatabaseProvider>().executor),
