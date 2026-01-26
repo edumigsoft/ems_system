@@ -11,15 +11,12 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
-  school_shared:
-    path: ../school_shared
-  core_client:
-    path: ../../core/core_client
-  core_shared:
-    path: ../../core/core_shared
   dio: ^5.9.0
   retrofit: 4.9.1
   logging: ^1.3.0
+  school_shared: ^1.0.0
+  core_client: ^1.0.0
+  core_shared: ^1.0.0
 
 dev_dependencies:
   lints: ^6.0.0

@@ -13,10 +13,8 @@ environment:
 dependencies:
   meta: ^1.11.0
   zard: ^0.0.25
-  core_shared:
-    path: ../../core/core_shared
-  open_api_shared:
-    path: ../../open_api/open_api_shared
+  core_shared: ^1.0.0
+  open_api_shared: ^1.0.0
 
 dev_dependencies:
   lints: ^6.0.0
