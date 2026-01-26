@@ -317,4 +317,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get systemManagement => 'System Management';
+
+  @override
+  String get savedSuccessfully => 'Saved successfully';
+
+  @override
+  String get theNameCannotBeEmpty => 'The name cannot be empty!';
+
+  @override
+  String get cannotBeEmpty => 'Cannot be empty!';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get status => 'Status';
 }

@@ -2,38 +2,70 @@ import 'package:core_shared/core_shared.dart';
 import 'package:zard/zard.dart';
 import '../domain/entities/school_details.dart';
 
+const String schoolNameByField = 'name';
+const String schoolEmailByField = 'email';
+const String schoolAddressByField = 'address';
+const String schoolPhoneByField = 'phone';
+const String schoolCieByField = 'cie';
+
 class SchoolDetailsValidator extends CoreValidator<SchoolDetails> {
   const SchoolDetailsValidator();
 
+  static final schema = z.map({
+    schoolNameByField: z.string().min(
+      1,
+      message: 'O nome não pode ser vazio.',
+    ),
+    schoolEmailByField: z
+        .string()
+        .email(message: 'E-mail inválido.')
+        .min(1, message: 'O e-mail não pode ser vazio.'),
+    schoolAddressByField: z.string().min(
+      1,
+      message: 'O endereço não pode ser vazio.',
+    ),
+    schoolPhoneByField: z
+        .string()
+        .regex(
+          RegExp(r"^\(?[1-9]{2}\)?\s?(?:9\d{4}|\d{4})\-?\d{4}$"),
+          message: 'Telefone inválido - use (XX) XXXXX-XXXX',
+        )
+        .min(1, message: 'O telefone não pode ser vazio.'),
+    schoolCieByField: z.string().min(1, message: 'O cie não pode ser vazio.'),
+  });
+
   @override
   CoreValidationResult validate(SchoolDetails value) {
-    final schema = z.map({
-      'name': z.string().min(1, message: 'O nome não pode ser vazio.'),
-      'email': z
-          .string()
-          .email(message: 'E-mail inválido.')
-          .min(1, message: 'O e-mail não pode ser vazio.'),
-      'address': z.string().min(
-        1,
-        message: 'O endereço não pode ser vazio.',
-      ),
-      'phone': z
-          .string()
-          .regex(
-            RegExp(r"^\(?[1-9]{2}\)?\s?(?:9\d{4}|\d{4})\-?\d{4}$"),
-            message: 'Telefone inválido - use (XX) XXXXX-XXXX',
-          )
-          .min(1, message: 'O telefone não pode ser vazio.'),
-      'cie': z.string().min(1, message: 'O cie não pode ser vazio.'),
-    });
+    // final schema = z.map({
+    //   schoolNameByField: z.string().min(
+    //     1,
+    //     message: 'O nome não pode ser vazio.',
+    //   ),
+    //   schoolEmailByField: z
+    //       .string()
+    //       .email(message: 'E-mail inválido.')
+    //       .min(1, message: 'O e-mail não pode ser vazio.'),
+    //   schoolAddressByField: z.string().min(
+    //     1,
+    //     message: 'O endereço não pode ser vazio.',
+    //   ),
+    //   schoolPhoneByField: z
+    //       .string()
+    //       .regex(
+    //         RegExp(r"^\(?[1-9]{2}\)?\s?(?:9\d{4}|\d{4})\-?\d{4}$"),
+    //         message: 'Telefone inválido - use (XX) XXXXX-XXXX',
+    //       )
+    //       .min(1, message: 'O telefone não pode ser vazio.'),
+    //   schoolCieByField: z.string().min(1, message: 'O cie não pode ser vazio.'),
+    // });
 
     // Extrair dados do DTO para validação
     final data = {
-      'name': value.name,
-      'email': value.email,
-      'address': value.address,
-      'phone': value.phone,
-      'cie': value.cie,
+      schoolNameByField: value.name,
+      schoolEmailByField: value.email,
+      schoolAddressByField: value.address,
+      schoolPhoneByField: value.phone,
+      schoolCieByField: value.cie,
     };
 
     final result = schema.safeParse(data);

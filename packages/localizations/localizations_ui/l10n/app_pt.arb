@@ -338,5 +338,29 @@
     "systemManagement": "Gestão do Sistema",
     "@systemManagement": {
         "description": "Gestão do Sistema"
+    },
+    "savedSuccessfully": "Salvo com sucesso",
+    "@savedSuccessfully": {
+        "description": "Salvo com sucesso"
+    },
+    "theNameCannotBeEmpty": "O nome não pode ser vazio!",
+    "@theNameCannotBeEmpty": {
+        "description": "O nome não pode ser vazio!"
+    },
+    "cannotBeEmpty": "Não pode ser vazio!",
+    "@cannotBeEmpty": {
+        "description": "Não pode ser vazio!"
+    },
+    "address": "Endereço",
+    "@address": {
+        "description": "Endereço"
+    },
+    "phone": "Telefone",
+    "@phone": {
+        "description": "Telefone"
+    },
+    "status": "Status",
+    "@status": {
+        "description": "Status"
     }
 }

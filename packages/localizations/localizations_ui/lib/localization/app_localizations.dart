@@ -669,6 +669,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System Management'**
   String get systemManagement;
+
+  /// Saved successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Saved successfully'**
+  String get savedSuccessfully;
+
+  /// The name cannot be empty!
+  ///
+  /// In en, this message translates to:
+  /// **'The name cannot be empty!'**
+  String get theNameCannotBeEmpty;
+
+  /// Cannot be empty!
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot be empty!'**
+  String get cannotBeEmpty;
+
+  /// Address
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// Phone
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// Status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
 }
 
 class _AppLocalizationsDelegate

@@ -320,4 +320,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get systemManagement => 'Gestão do Sistema';
+
+  @override
+  String get savedSuccessfully => 'Salvo com sucesso';
+
+  @override
+  String get theNameCannotBeEmpty => 'O nome não pode ser vazio!';
+
+  @override
+  String get cannotBeEmpty => 'Não pode ser vazio!';
+
+  @override
+  String get address => 'Endereço';
+
+  @override
+  String get phone => 'Telefone';
+
+  @override
+  String get status => 'Status';
 }

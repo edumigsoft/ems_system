@@ -376,5 +376,29 @@
     "systemManagement": "System Management",
     "@systemManagement": {
         "description": "System Management"
+    },
+    "savedSuccessfully": "Saved successfully",
+    "@savedSuccessfully": {
+        "description": "Saved successfully"
+    },
+    "theNameCannotBeEmpty": "The name cannot be empty!",
+    "@theNameCannotBeEmpty": {
+        "description": "The name cannot be empty!"
+    },
+    "cannotBeEmpty": "Cannot be empty!",
+    "@cannotBeEmpty": {
+        "description": "Cannot be empty!"
+    },
+    "address": "Address",
+    "@address": {
+        "description": "Address"
+    },
+    "phone": "Phone",
+    "@phone": {
+        "description": "Phone"
+    },
+    "status": "Status",
+    "@status": {
+        "description": "Status"
     }
 }

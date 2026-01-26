@@ -320,4 +320,22 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get systemManagement => 'Gestión del Sistema';
+
+  @override
+  String get savedSuccessfully => 'Guardado exitosamente';
+
+  @override
+  String get theNameCannotBeEmpty => 'El nombre no puede estar vacío!';
+
+  @override
+  String get cannotBeEmpty => 'No puede estar vacío!';
+
+  @override
+  String get address => 'Dirección';
+
+  @override
+  String get phone => 'Teléfono';
+
+  @override
+  String get status => 'Estado';
 }
