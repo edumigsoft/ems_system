@@ -11,7 +11,7 @@ export 'src/routes/school_routes.dart';
 export 'src/repositories/school_repository_server.dart';
 export 'src/queries/school_queries.dart';
 export 'src/database/school_database.dart';
-export 'src/tables/school_table.dart';
+export 'src/database/tables/school_table.dart';
 
 class InitSchoolModuleToServer implements InitServerModule {
   static Future<void> init({
@@ -20,9 +20,14 @@ class InitSchoolModuleToServer implements InitServerModule {
     bool security = true,
   }) async {
     // Database
-    di.registerLazySingleton<SchoolDatabase>(
-      () => SchoolDatabase(di.get<DatabaseProvider>().executor),
-    );
+
+    final dbProvider = di.get<DatabaseProvider>();
+    final schoolDb = SchoolDatabase(dbProvider.executor);
+
+    // Inicializa tabelas se necessário
+    await schoolDb.init();
+
+    di.registerSingleton<SchoolDatabase>(schoolDb);
 
     // Queries
     di.registerLazySingleton<SchoolQueries>(

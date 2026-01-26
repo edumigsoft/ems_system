@@ -1,7 +1,7 @@
 import 'package:core_shared/core_shared.dart' show EntityMapper;
 import 'package:drift/drift.dart';
 import 'package:school_shared/school_shared.dart';
-import '../tables/school_table.dart';
+import '../database/tables/school_table.dart';
 import '../database/school_database.dart';
 
 part 'school_queries.g.dart';
