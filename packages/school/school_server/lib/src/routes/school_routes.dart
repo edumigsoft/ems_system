@@ -213,7 +213,11 @@ class SchoolRoutes extends Routes with Loggable {
         address: schoolRequest.address,
         phone: schoolRequest.phone,
         email: schoolRequest.email,
-        cie: schoolRequest.cie,
+        code: schoolRequest.code,
+        locationCity: schoolRequest.locationCity,
+        locationDistrict: schoolRequest.locationDistrict,
+        director: schoolRequest.director,
+        status: schoolRequest.status,
         updatedAt: schoolRequest.updatedAt,
       );
 

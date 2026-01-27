@@ -1,5 +1,6 @@
 import 'package:core_shared/core_shared.dart' show BaseDetails;
-import 'school_data.dart';
+import '../enums/school_enum.dart';
+import 'school.dart';
 
 class SchoolDetails implements BaseDetails {
   @override
@@ -12,7 +13,7 @@ class SchoolDetails implements BaseDetails {
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
-  final SchoolData data;
+  final School data;
 
   SchoolDetails({
     required this.id,
@@ -24,13 +25,21 @@ class SchoolDetails implements BaseDetails {
     required String address,
     required String phone,
     required String email,
-    required String cie,
-  }) : data = SchoolData(
+    required String code,
+    required String locationCity,
+    required String locationDistrict,
+    required String director,
+    required SchoolStatus status,
+  }) : data = School(
          name: name,
          address: address,
          phone: phone,
          email: email,
-         cie: cie,
+         code: code,
+         locationCity: locationCity,
+         locationDistrict: locationDistrict,
+         director: director,
+         status: status,
        );
 
   // Factory constructor para criar a partir de dados brutos
@@ -40,7 +49,7 @@ class SchoolDetails implements BaseDetails {
     bool isActive = true,
     DateTime? createdAt,
     DateTime? updatedAt,
-    required SchoolData data,
+    required School data,
   }) {
     final now = DateTime.now();
     return SchoolDetails(
@@ -53,7 +62,11 @@ class SchoolDetails implements BaseDetails {
       address: data.address,
       phone: data.phone,
       email: data.email,
-      cie: data.cie,
+      code: data.code,
+      locationCity: data.locationCity,
+      locationDistrict: data.locationDistrict,
+      director: data.director,
+      status: data.status,
     );
   }
 
@@ -70,7 +83,11 @@ class SchoolDetails implements BaseDetails {
       address: '',
       phone: '',
       email: '',
-      cie: '',
+      code: '',
+      locationCity: '',
+      locationDistrict: '',
+      director: '',
+      status: SchoolStatus.active,
     );
   }
 
@@ -85,7 +102,11 @@ class SchoolDetails implements BaseDetails {
     String? address,
     String? phone,
     String? email,
-    String? cie,
+    String? code,
+    String? locationCity,
+    String? locationDistrict,
+    String? director,
+    SchoolStatus? status,
   }) {
     return SchoolDetails(
       id: id ?? this.id,
@@ -97,7 +118,11 @@ class SchoolDetails implements BaseDetails {
       address: address ?? this.address,
       phone: phone ?? this.phone,
       email: email ?? this.email,
-      cie: cie ?? this.cie,
+      code: code ?? this.code,
+      locationCity: locationCity ?? this.locationCity,
+      locationDistrict: locationDistrict ?? this.locationDistrict,
+      director: director ?? this.director,
+      status: status ?? this.status,
     );
   }
 
@@ -106,7 +131,46 @@ class SchoolDetails implements BaseDetails {
   String get address => data.address;
   String get phone => data.phone;
   String get email => data.email;
-  String get cie => data.cie;
+  String get code => data.code;
+  String get locationCity => data.locationCity;
+  String get locationDistrict => data.locationDistrict;
+  String get director => data.director;
+  SchoolStatus get status => data.status;
+
+  // Factory constructor para Drift (ORM)
+  factory SchoolDetails.create({
+    required String id,
+    required bool isDeleted,
+    required bool isActive,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    required String name,
+    required String address,
+    required String phone,
+    required String email,
+    required String code,
+    required String locationCity,
+    required String locationDistrict,
+    required String director,
+    required SchoolStatus status,
+  }) {
+    return SchoolDetails(
+      id: id,
+      isDeleted: isDeleted,
+      isActive: isActive,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      name: name,
+      address: address,
+      phone: phone,
+      email: email,
+      code: code,
+      locationCity: locationCity,
+      locationDistrict: locationDistrict,
+      director: director,
+      status: status,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

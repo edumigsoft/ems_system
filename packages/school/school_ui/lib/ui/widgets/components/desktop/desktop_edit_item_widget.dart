@@ -13,7 +13,8 @@ import 'package:school_shared/school_shared.dart'
         schoolEmailByField,
         schoolAddressByField,
         schoolPhoneByField,
-        schoolCieByField;
+        schoolCieByField,
+        SchoolStatus;
 import '../../../../school_ui.dart';
 import 'package:zard_form/zard_form.dart';
 
@@ -43,7 +44,11 @@ class _DesktopEditItemWidgetState extends State<DesktopEditItemWidget> {
         'email': school.email,
         'address': school.address,
         'phone': school.phone,
-        'cie': school.cie,
+        'code': school.code,
+        'location_city': school.locationCity,
+        'location_district': school.locationDistrict,
+        'director': school.director,
+        'status': school.status,
       },
     );
 
@@ -81,7 +86,11 @@ class _DesktopEditItemWidgetState extends State<DesktopEditItemWidget> {
       address: data['address'] as String?,
       phone: data['phone'] as String?,
       email: data['email'] as String?,
-      cie: data['cie'] as String?,
+      code: data['code'] as String?,
+      locationCity: data['location_city'] as String?,
+      locationDistrict: data['location_district'] as String?,
+      director: data['director'] as String?,
+      status: data['status'] as SchoolStatus?,
     );
 
     _lastSubmittedData = Map<String, dynamic>.from(data as Map);

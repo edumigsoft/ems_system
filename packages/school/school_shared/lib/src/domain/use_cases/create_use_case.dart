@@ -15,7 +15,11 @@ class CreateUseCase {
       address: school.address,
       phone: school.phone,
       email: school.email,
-      cie: school.cie,
+      code: school.code,
+      locationCity: school.locationCity,
+      locationDistrict: school.locationDistrict,
+      director: school.director,
+      status: school.status,
     );
 
     return await _repository.create(create);

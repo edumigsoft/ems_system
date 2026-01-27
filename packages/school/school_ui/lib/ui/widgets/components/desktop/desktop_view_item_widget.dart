@@ -27,7 +27,7 @@ class DesktopViewItemWidget extends StatelessWidget {
               _email(context, width),
               _address(context, width),
               _phone(context, width),
-              _cie(context, width),
+              _code(context, width),
             ],
           ),
         ),
@@ -110,10 +110,10 @@ class DesktopViewItemWidget extends StatelessWidget {
     );
   }
 
-  Widget _cie(BuildContext context, double? width) {
+  Widget _code(BuildContext context, double? width) {
     return _card(
       context,
-      data.cie,
+      data.code,
       /*AppLocalizations.of(context)!.cie*/ 'CIE',
       width,
     );

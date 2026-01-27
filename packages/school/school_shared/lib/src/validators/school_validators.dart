@@ -65,7 +65,7 @@ class SchoolDetailsValidator extends CoreValidator<SchoolDetails> {
       schoolEmailByField: value.email,
       schoolAddressByField: value.address,
       schoolPhoneByField: value.phone,
-      schoolCieByField: value.cie,
+      schoolCieByField: value.code,
     };
 
     final result = schema.safeParse(data);

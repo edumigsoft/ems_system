@@ -1,7 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:core_server/core_server.dart';
-import 'package:school_shared/school_shared.dart' show SchoolDetails;
+import 'package:school_shared/school_shared.dart'
+    show SchoolDetails, SchoolStatus;
 import 'tables/school_table.dart';
+import 'converters/school_status_converter.dart';
 
 part 'school_database.g.dart';
 

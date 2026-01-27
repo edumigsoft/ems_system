@@ -1,6 +1,7 @@
 import 'package:core_shared/core_shared.dart' show EntityMapper;
 import 'package:drift/drift.dart';
-import 'package:school_shared/school_shared.dart';
+import 'package:school_shared/school_shared.dart'
+    show SchoolCreate, SchoolDetails;
 import '../database/tables/school_table.dart';
 import '../database/school_database.dart';
 
@@ -28,7 +29,11 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
             address: result.address,
             phone: result.phone,
             email: result.email,
-            cie: result.cie,
+            code: result.code,
+            locationCity: result.locationCity,
+            locationDistrict: result.locationDistrict,
+            director: result.director,
+            status: result.status,
           );
 
     return schoolDetails;
@@ -51,16 +56,20 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
             address: result.address,
             phone: result.phone,
             email: result.email,
-            cie: result.cie,
+            code: result.code,
+            locationCity: result.locationCity,
+            locationDistrict: result.locationDistrict,
+            director: result.director,
+            status: result.status,
           );
 
     return schoolDetails;
   }
 
-  Future<SchoolDetails?> getByCie(String cie) async {
+  Future<SchoolDetails?> getByCode(String code) async {
     final result = await (select(
       schoolTable,
-    )..where((s) => s.cie.equals(cie))).getSingleOrNull();
+    )..where((s) => s.code.equals(code))).getSingleOrNull();
 
     final schoolDetails = result == null
         ? null
@@ -74,7 +83,11 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
             address: result.address,
             phone: result.phone,
             email: result.email,
-            cie: result.cie,
+            code: result.code,
+            locationCity: result.locationCity,
+            locationDistrict: result.locationDistrict,
+            director: result.director,
+            status: result.status,
           );
 
     return schoolDetails;
@@ -101,7 +114,11 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
           address: row.address,
           phone: row.phone,
           email: row.email,
-          cie: row.cie,
+          code: row.code,
+          locationCity: row.locationCity,
+          locationDistrict: row.locationDistrict,
+          director: row.director,
+          status: row.status,
         );
       },
     );
@@ -115,14 +132,18 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
       address: school.address,
       phone: school.phone,
       email: school.email,
-      cie: school.cie,
+      code: school.code,
+      locationCity: school.locationCity,
+      locationDistrict: school.locationDistrict,
+      director: school.director,
+      status: Value(school.status),
       isActive: const Value(true),
       isDeleted: const Value(false),
     );
 
     await into(schoolTable).insert(companion);
 
-    return getByCie(school.cie);
+    return getByCode(school.code);
   }
 
   Future<void> updateSchool(String id, SchoolDetails school) {
@@ -134,7 +155,11 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
         address: Value(school.address),
         phone: Value(school.phone),
         email: Value(school.email),
-        cie: Value(school.cie),
+        code: Value(school.code),
+        locationCity: Value(school.locationCity),
+        locationDistrict: Value(school.locationDistrict),
+        director: Value(school.director),
+        status: Value(school.status),
       ),
     );
   }

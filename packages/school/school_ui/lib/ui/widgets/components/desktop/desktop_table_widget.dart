@@ -1,33 +1,6 @@
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
-
-// Modelo de dados para a escola
-class School {
-  final String name;
-  final String code;
-  final String locationCity;
-  final String locationDistrict;
-  final String phone;
-  final String email;
-  final String director;
-  final SchoolStatus status;
-  final IconData icon;
-
-  School({
-    required this.name,
-    required this.code,
-    required this.locationCity,
-    required this.locationDistrict,
-    required this.phone,
-    required this.email,
-    required this.director,
-    required this.status,
-    required this.icon,
-  });
-}
-
-// Enum para status da escola
-enum SchoolStatus { active, maintenance }
+import 'package:school_shared/school_shared.dart' show School, SchoolStatus;
 
 // Widget que combina tabela com todas as funcionalidades do Design System
 class DesktopTableWidget extends StatefulWidget {
@@ -58,46 +31,46 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
       School(
         name: 'Escola Est. Santos Dumont',
         code: '2024-001',
-        locationCity: 'São Paulo, SP',
-        locationDistrict: 'Centro',
+        address: 'Rua Santos Dumont, 123',
         phone: '(11) 3322-1100',
         email: 'contato@santosdumont...',
         director: 'Marcos Oliveira',
+        locationCity: 'São Paulo, SP',
+        locationDistrict: 'Centro Cívico',
         status: SchoolStatus.active,
-        icon: Icons.school,
       ),
       School(
         name: 'Colégio Futuro Brilhante',
         code: '2024-002',
+        address: 'Rua Santos Dumont, 123',
         locationCity: 'Rio de Janeiro, RJ',
         locationDistrict: 'Barra da Tijuca',
         phone: '(21) 2244-5588',
         email: 'adm@futuro.com.br',
         director: 'Fernanda Lima',
         status: SchoolStatus.active,
-        icon: Icons.book,
       ),
       School(
         name: 'Escola Técnica Inovação',
         code: '2024-005',
+        address: 'Rua Santos Dumont, 123',
         locationCity: 'Curitiba, PR',
         locationDistrict: 'Centro Cívico',
         phone: '(41) 3333-9999',
         email: 'tec@inovacao.edu.br',
         director: 'Roberto Almeida',
         status: SchoolStatus.maintenance,
-        icon: Icons.science,
       ),
       School(
         name: 'Jardim de Infância Alegria',
         code: '2024-008',
+        address: 'Rua Santos Dumont, 123',
         locationCity: 'Belo Horizonte, MG',
         locationDistrict: 'Savassi',
         phone: '(31) 3210-5050',
         email: 'contato@alegria.com',
         director: 'Ana Clara',
         status: SchoolStatus.active,
-        icon: Icons.child_care,
       ),
       // Adicionando mais dados para demonstrar paginação
       ...List.generate(
@@ -105,6 +78,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
         (index) => School(
           name: 'Escola ${index + 5}',
           code: '2024-${(index + 5).toString().padLeft(3, '0')}',
+          address: 'Rua Santos Dumont, 123',
           locationCity: 'Cidade ${index + 5}, UF',
           locationDistrict: 'Bairro ${index + 5}',
           phone: '(99) 9999-${(index + 5000).toString()}',
@@ -113,13 +87,6 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
           status: index % 3 == 0
               ? SchoolStatus.maintenance
               : SchoolStatus.active,
-          icon: index % 4 == 0
-              ? Icons.school
-              : index % 4 == 1
-              ? Icons.book
-              : index % 4 == 2
-              ? Icons.science
-              : Icons.child_care,
         ),
       ),
     ];
@@ -246,21 +213,14 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     }
   }
 
-  String _getStatusLabel(SchoolStatus status) {
-    switch (status) {
-      case SchoolStatus.active:
-        return 'Ativa';
-      case SchoolStatus.maintenance:
-        return 'Manutenção';
-    }
-  }
-
   Color _getStatusColor(SchoolStatus status) {
     switch (status) {
       case SchoolStatus.active:
         return Colors.green;
       case SchoolStatus.maintenance:
         return Colors.yellow;
+      case SchoolStatus.inactive:
+        return Colors.red;
     }
   }
 
@@ -369,9 +329,9 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
           DSDataTableColumn<School>(
             label: 'ESCOLA',
             builder: (school) => DSTableCellWithIcon(
-              icon: school.icon,
+              icon: Icons.school,
               iconBackgroundColor: _getIconBackgroundColor(
-                school.icon,
+                Icons.school,
               ),
               title: school.name,
               subtitle: 'Cod: ${school.code}',
@@ -412,7 +372,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
           DSDataTableColumn<School>(
             label: 'STATUS',
             builder: (school) => DSTableStatusIndicator(
-              label: _getStatusLabel(school.status),
+              label: school.status.name,
               color: _getStatusColor(school.status),
             ),
           ),

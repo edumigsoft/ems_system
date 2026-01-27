@@ -51,7 +51,7 @@ class SchoolRepositoryServer implements SchoolRepository {
   @override
   Future<Result<SchoolDetails>> getByCie(String cie) async {
     try {
-      final result = await _schoolQueries.getByCie(cie);
+      final result = await _schoolQueries.getByCode(cie);
 
       if (result == null) {
         return Failure(DataException('Escola não encontrada pelo CIE: $cie'));

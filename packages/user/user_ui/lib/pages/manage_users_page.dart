@@ -243,10 +243,10 @@ class _ManageUsersPageState extends State<ManageUsersPage> {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: theme.colorScheme.primary,
-          backgroundImage: user.avatarUrl != null
+          backgroundImage: user.avatarUrl != null && user.avatarUrl!.isNotEmpty
               ? NetworkImage(user.avatarUrl!)
               : null,
-          child: user.avatarUrl == null
+          child: user.avatarUrl == null || user.avatarUrl!.isEmpty
               ? Text(
                   user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
                   style: theme.textTheme.titleLarge?.copyWith(

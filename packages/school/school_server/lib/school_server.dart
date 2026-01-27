@@ -2,16 +2,18 @@ library;
 
 import 'package:core_server/core_server.dart';
 import 'package:school_shared/school_shared.dart' show SchoolRepository;
-import 'src/repositories/school_repository_server.dart';
-import 'src/queries/school_queries.dart';
-import 'src/routes/school_routes.dart';
-import 'src/database/school_database.dart';
 
-export 'src/routes/school_routes.dart';
-export 'src/repositories/school_repository_server.dart';
-export 'src/queries/school_queries.dart';
+import 'src/database/school_database.dart';
+import 'src/queries/school_queries.dart';
+import 'src/repositories/school_repository_server.dart';
+import 'src/routes/school_routes.dart';
+
+export 'src/database/converters/school_status_converter.dart';
 export 'src/database/school_database.dart';
 export 'src/database/tables/school_table.dart';
+export 'src/queries/school_queries.dart';
+export 'src/repositories/school_repository_server.dart';
+export 'src/routes/school_routes.dart';
 
 class InitSchoolModuleToServer implements InitServerModule {
   static Future<void> init({
