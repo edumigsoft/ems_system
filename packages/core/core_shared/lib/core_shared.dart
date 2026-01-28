@@ -12,3 +12,4 @@ export 'src/validators/validators.dart';
 // Domain
 export 'src/domain/enums/user_role.dart';
 export 'src/domain/entity/user.dart';
+export 'src/domain/paginated_result.dart';

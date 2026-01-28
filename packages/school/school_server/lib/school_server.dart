@@ -1,5 +1,6 @@
 library;
 
+import 'package:auth_server/auth_server.dart' show AuthMiddleware;
 import 'package:core_server/core_server.dart';
 import 'package:school_shared/school_shared.dart' show SchoolRepository;
 
@@ -46,6 +47,7 @@ class InitSchoolModuleToServer implements InitServerModule {
       () => SchoolRoutes(
         backendBaseApi: backendBaseApi,
         repository: di.get<SchoolRepository>(),
+        authMiddleware: di.get<AuthMiddleware>(),
         security: security,
       ),
     );

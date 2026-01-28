@@ -23,24 +23,42 @@ import 'package:user_shared/user_shared.dart'
 /// - GET /users/me - Perfil do usuário autenticado
 /// - PUT /users/me - Atualizar perfil próprio
 ///
-/// **Endpoints Administrativos (admin ou owner):**
+/// **Endpoints de Visualização (Manager+):**
 /// - GET /users - Listar usuários
 /// - GET /users/:id - Buscar usuário por ID
-/// - PUT /users/:id - Atualizar usuário (com restrições de hierarquia)
 ///
-/// **Endpoints Restritos (apenas owner):**
+/// **Endpoints Administrativos (Admin+):**
+/// - POST /users - Criar novo usuário
+/// - PUT /users/:id - Atualizar usuário
+/// - POST /users/:id/force-password-change - Forçar mudança de senha
+/// - POST /users/:id/reset-password - Resetar senha via email
+///
+/// **Endpoints Críticos (apenas Owner):**
 /// - DELETE /users/:id - Soft delete de usuário
 ///
-/// **Hierarquia de Permissões:**
-/// - Owner (nível 4): Acesso total, incluindo:
-///   - Conceder role de owner a outros usuários
-///   - Modificar outros owners
-///   - Deletar qualquer usuário (incluindo outros owners)
+/// **Hierarquia de Permissões (Owner > Admin > Manager > User):**
+/// - Owner (nível 4): Acesso total
+///   - ✅ Listar e visualizar usuários
+///   - ✅ Criar e atualizar usuários
+///   - ✅ Deletar usuários (soft delete)
+///   - ✅ Gerenciar senhas (force change, reset)
+///   - ✅ Conceder role de owner a outros usuários
 ///
-/// - Admin (nível 3): Acesso administrativo, exceto:
-///   - NÃO pode conceder role de owner
-///   - NÃO pode modificar owners
-///   - NÃO pode deletar nenhum usuário
+/// - Admin (nível 3): Gerenciamento completo exceto delete
+///   - ✅ Listar e visualizar usuários
+///   - ✅ Criar e atualizar usuários
+///   - ✅ Gerenciar senhas (force change, reset)
+///   - ❌ NÃO pode deletar usuários
+///
+/// - Manager (nível 2): Acesso read-only
+///   - ✅ Listar usuários
+///   - ✅ Visualizar detalhes de usuários
+///   - ❌ NÃO pode criar/editar/deletar usuários
+///   - ❌ NÃO pode gerenciar senhas
+///
+/// - User (nível 1): Apenas próprio perfil
+///   - ✅ Ver e editar próprio perfil
+///   - ❌ NÃO pode acessar outros usuários
 class UserRoutes extends Routes {
   final UserRepository userRepository;
   final AuthMiddleware authMiddleware;
@@ -79,21 +97,36 @@ class UserRoutes extends Routes {
       Pipeline().addMiddleware(authMiddleware.verifyJwt).addHandler(_updateMe),
     );
 
-    // Administração de usuários (apenas admin)
+    // Middleware para visualização (Manager+: manager, admin, owner)
+    final managerMiddleware = authMiddleware.requireRole(UserRole.manager);
+
+    // Middleware para administração (Admin+: admin, owner)
     final adminMiddleware = authMiddleware.requireRole(UserRole.admin);
 
+    // Middleware para operações críticas (Owner apenas)
+    final ownerMiddleware = authMiddleware.requireRole(UserRole.owner);
+
+    // Listar usuários - Manager+ (visualização)
     router.get(
       '/',
-      Pipeline().addMiddleware(adminMiddleware).addHandler(_listUsers),
+      Pipeline().addMiddleware(managerMiddleware).addHandler(_listUsers),
     );
 
+    // Ver detalhes de usuário - Manager+ (visualização)
     router.get(
       '/<id>',
       Pipeline()
-          .addMiddleware(adminMiddleware)
+          .addMiddleware(managerMiddleware)
           .addHandler((req) => _getUserById(req, req.params['id']!)),
     );
 
+    // Criar usuário - Admin+
+    router.post(
+      '/',
+      Pipeline().addMiddleware(adminMiddleware).addHandler(_createUser),
+    );
+
+    // Atualizar usuário - Admin+
     router.put(
       '/<id>',
       Pipeline()
@@ -101,22 +134,15 @@ class UserRoutes extends Routes {
           .addHandler((req) => _updateUser(req, req.params['id']!)),
     );
 
+    // Deletar usuário - Owner apenas (soft delete)
     router.delete(
       '/<id>',
       Pipeline()
-          .addMiddleware(adminMiddleware)
+          .addMiddleware(ownerMiddleware)
           .addHandler((req) => _deleteUser(req, req.params['id']!)),
     );
 
-    // Criação de usuários (apenas owner)
-    final ownerMiddleware = authMiddleware.requireRole(UserRole.owner);
-
-    router.post(
-      '/',
-      Pipeline().addMiddleware(ownerMiddleware).addHandler(_createUser),
-    );
-
-    // Gerenciamento de senha (admin+)
+    // Forçar mudança de senha - Admin+
     router.post(
       '/<id>/force-password-change',
       Pipeline()
@@ -124,6 +150,7 @@ class UserRoutes extends Routes {
           .addHandler((req) => _forcePasswordChange(req, req.params['id']!)),
     );
 
+    // Reset de senha - Admin+
     router.post(
       '/<id>/reset-password',
       Pipeline()
