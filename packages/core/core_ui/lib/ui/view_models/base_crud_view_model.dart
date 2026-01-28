@@ -79,7 +79,7 @@ abstract class BaseCRUDViewModel<T> extends ChangeNotifier with Loggable {
   }
 
   /// Comando para buscar todas as entidades.
-  late final Command0<List<T>> fetchAllCommand;
+  Command0<List<T>> get fetchAllCommand;
 
   /// Comando para cancelar a edição/criação atual.
   late final Command0<Unit> cancelCommand = Command0(_cancel);

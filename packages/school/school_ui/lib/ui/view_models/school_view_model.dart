@@ -27,9 +27,12 @@ class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
   }) : _getAllUseCase = getAllUseCase,
        _createUseCase = createUseCase,
        _updateUseCase = updateUseCase,
-       _deleteUseCase = deleteUseCase {
-    fetchAllCommand = Command0(_getAllUseCase.execute);
-  }
+       _deleteUseCase = deleteUseCase;
+
+  @override
+  late final Command0<List<SchoolDetails>> fetchAllCommand = Command0(
+    _getAllUseCase.execute,
+  );
 
   @override
   Future<void> init() async {
