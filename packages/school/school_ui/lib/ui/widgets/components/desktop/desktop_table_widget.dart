@@ -1,104 +1,46 @@
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
-import 'package:school_shared/school_shared.dart' show School, SchoolStatus;
+import 'package:school_shared/school_shared.dart'
+    show SchoolDetails, SchoolStatus;
+import '../../../view_models/school_view_model.dart';
 
 // Widget que combina tabela com todas as funcionalidades do Design System
 class DesktopTableWidget extends StatefulWidget {
-  const DesktopTableWidget({super.key});
+  final SchoolViewModel viewModel;
+
+  const DesktopTableWidget({super.key, required this.viewModel});
 
   @override
   State<DesktopTableWidget> createState() => _DesktopTableWidgetState();
 }
 
 class _DesktopTableWidgetState extends State<DesktopTableWidget> {
-  late List<School> allSchools;
-  late List<School> filteredSchools;
-  late DSPaginationController<School> paginationController;
+  late List<SchoolDetails> allSchools;
+  late List<SchoolDetails> filteredSchools;
+  late DSPaginationController<SchoolDetails> paginationController;
   late DSDataTableSortState sortState;
-  late DSTableSelectionState<School> selectionState;
+  late DSTableSelectionState<SchoolDetails> selectionState;
 
   // Estado de filtros
   String searchQuery = '';
-  List<DSTableFilter<School>> activeFilters = [];
-  List<DSTableFilter<School>> availableFilters = [];
+  List<DSTableFilter<SchoolDetails>> activeFilters = [];
+  List<DSTableFilter<SchoolDetails>> availableFilters = [];
 
   @override
   void initState() {
     super.initState();
 
-    // Dados mockados
-    allSchools = [
-      School(
-        name: 'Escola Est. Santos Dumont',
-        code: '2024-001',
-        address: 'Rua Santos Dumont, 123',
-        phone: '(11) 3322-1100',
-        email: 'contato@santosdumont...',
-        director: 'Marcos Oliveira',
-        locationCity: 'São Paulo, SP',
-        locationDistrict: 'Centro Cívico',
-        status: SchoolStatus.active,
-      ),
-      School(
-        name: 'Colégio Futuro Brilhante',
-        code: '2024-002',
-        address: 'Rua Santos Dumont, 123',
-        locationCity: 'Rio de Janeiro, RJ',
-        locationDistrict: 'Barra da Tijuca',
-        phone: '(21) 2244-5588',
-        email: 'adm@futuro.com.br',
-        director: 'Fernanda Lima',
-        status: SchoolStatus.active,
-      ),
-      School(
-        name: 'Escola Técnica Inovação',
-        code: '2024-005',
-        address: 'Rua Santos Dumont, 123',
-        locationCity: 'Curitiba, PR',
-        locationDistrict: 'Centro Cívico',
-        phone: '(41) 3333-9999',
-        email: 'tec@inovacao.edu.br',
-        director: 'Roberto Almeida',
-        status: SchoolStatus.maintenance,
-      ),
-      School(
-        name: 'Jardim de Infância Alegria',
-        code: '2024-008',
-        address: 'Rua Santos Dumont, 123',
-        locationCity: 'Belo Horizonte, MG',
-        locationDistrict: 'Savassi',
-        phone: '(31) 3210-5050',
-        email: 'contato@alegria.com',
-        director: 'Ana Clara',
-        status: SchoolStatus.active,
-      ),
-      // Adicionando mais dados para demonstrar paginação
-      ...List.generate(
-        38,
-        (index) => School(
-          name: 'Escola ${index + 5}',
-          code: '2024-${(index + 5).toString().padLeft(3, '0')}',
-          address: 'Rua Santos Dumont, 123',
-          locationCity: 'Cidade ${index + 5}, UF',
-          locationDistrict: 'Bairro ${index + 5}',
-          phone: '(99) 9999-${(index + 5000).toString()}',
-          email: 'escola${index + 5}@exemplo.com',
-          director: 'Diretor ${index + 5}',
-          status: index % 3 == 0
-              ? SchoolStatus.maintenance
-              : SchoolStatus.active,
-        ),
-      ),
-    ];
+    // Carregar dados iniciais
+    _updateData();
 
     // Filtros disponíveis
     availableFilters = [
-      DSTableFilter<School>(
+      DSTableFilter<SchoolDetails>(
         id: 'status_active',
         label: 'Ativas',
         predicate: (school) => school.status == SchoolStatus.active,
       ),
-      DSTableFilter<School>(
+      DSTableFilter<SchoolDetails>(
         id: 'status_maintenance',
         label: 'Em Manutenção',
         predicate: (school) => school.status == SchoolStatus.maintenance,
@@ -107,7 +49,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
 
     filteredSchools = allSchools;
     sortState = DSDataTableSortState();
-    selectionState = DSTableSelectionState<School>();
+    selectionState = DSTableSelectionState<SchoolDetails>();
     paginationController = DSPaginationController(
       allItems: filteredSchools,
       itemsPerPage: 5,
@@ -116,6 +58,18 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     // Listeners
     sortState.addListener(_applySorting);
     selectionState.addListener(() => setState(() {}));
+    widget.viewModel.addListener(_onViewModelChanged);
+  }
+
+  void _onViewModelChanged() {
+    if (mounted) {
+      _updateData();
+      _applyFilters();
+    }
+  }
+
+  void _updateData() {
+    allSchools = widget.viewModel.fetchAllCommand.result?.valueOrNull ?? [];
   }
 
   @override
@@ -123,6 +77,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     sortState.dispose();
     selectionState.dispose();
     paginationController.dispose();
+    widget.viewModel.removeListener(_onViewModelChanged);
     super.dispose();
   }
 
@@ -174,7 +129,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
   }
 
   /// Aplica ordenação à lista
-  void _applySortingToList(List<School> list) {
+  void _applySortingToList(List<SchoolDetails> list) {
     final columnIndex = sortState.sortColumnIndex!;
     final ascending = sortState.sortAscending;
 
@@ -224,16 +179,22 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     }
   }
 
-  void _editSchool(School school) {
-    debugPrint('Editar escola: ${school.name}');
+  void _editSchool(SchoolDetails school) {
+    widget.viewModel.detailsCommand.execute(school);
+    widget.viewModel.editCommand.execute();
   }
 
-  void _deleteSchool(School school) {
-    debugPrint('Excluir escola: ${school.name}');
+  void _deleteSchool(SchoolDetails school) {
+    widget.viewModel.detailsCommand.execute(school);
+    widget.viewModel.deleteCommand.execute();
   }
 
   void _deleteSelected() {
-    debugPrint('Excluir ${selectionState.selectedCount} escolas selecionadas');
+    // Implementação simplificada: deleta um por um ou via comando específico se existisse
+    for (final school in selectionState.selectedItems) {
+      widget.viewModel.detailsCommand.execute(school);
+      widget.viewModel.deleteCommand.execute();
+    }
     selectionState.clearSelection();
   }
 
@@ -256,7 +217,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
         },
       ),
       // Barra de filtros
-      filterBar: DSTableFilterBar<School>(
+      filterBar: DSTableFilterBar<SchoolDetails>(
         filters: activeFilters,
         onFilterChanged: (filter) {
           setState(() {
@@ -314,7 +275,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
             )
           : null,
       // Tabela de dados
-      dataTable: DSDataTable<School>(
+      dataTable: DSDataTable<SchoolDetails>(
         data: paginationController.currentItems,
         sortColumnIndex: sortState.sortColumnIndex,
         sortAscending: sortState.sortAscending,
@@ -326,7 +287,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
           selectionState.toggle(school);
         },
         columns: [
-          DSDataTableColumn<School>(
+          DSDataTableColumn<SchoolDetails>(
             label: 'ESCOLA',
             builder: (school) => DSTableCellWithIcon(
               icon: Icons.school,
@@ -337,21 +298,21 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
               subtitle: 'Cod: ${school.code}',
             ),
           ),
-          DSDataTableColumn<School>(
+          DSDataTableColumn<SchoolDetails>(
             label: 'LOCALIZAÇÃO',
             builder: (school) => DSTableCellTwoLines(
               primary: school.locationCity,
               secondary: school.locationDistrict,
             ),
           ),
-          DSDataTableColumn<School>(
+          DSDataTableColumn<SchoolDetails>(
             label: 'CONTATO',
             builder: (school) => DSTableCellTwoLines(
               primary: school.phone,
               secondary: school.email,
             ),
           ),
-          DSDataTableColumn<School>(
+          DSDataTableColumn<SchoolDetails>(
             label: 'DIREÇÃO',
             builder: (school) {
               final dsTheme = Theme.of(
@@ -369,14 +330,14 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
               );
             },
           ),
-          DSDataTableColumn<School>(
+          DSDataTableColumn<SchoolDetails>(
             label: 'STATUS',
             builder: (school) => DSTableStatusIndicator(
               label: school.status.name,
               color: _getStatusColor(school.status),
             ),
           ),
-          DSDataTableColumn<School>(
+          DSDataTableColumn<SchoolDetails>(
             label: 'AÇÕES',
             builder: (school) => DSTableActions(
               actions: [

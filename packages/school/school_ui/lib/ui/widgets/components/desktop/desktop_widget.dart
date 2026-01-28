@@ -24,7 +24,7 @@ class _DesktopWidgetState extends State<DesktopWidget> {
         //             : DesktopViewItemWidget(data: widget.viewModel.details!))
         //       : _listSchools(),
         // );
-        return const DesktopTableWidget();
+        return DesktopTableWidget(viewModel: widget.viewModel);
       },
     );
   }
