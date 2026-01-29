@@ -204,17 +204,31 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
 
     return DSDataTableContainer(
       width: width,
-      // Campo de busca
-      searchField: DSTableSearchField(
-        hintText: 'Buscar escolas por nome, código ou cidade...',
-        onChanged: (value) {
-          searchQuery = value;
-          _applyFilters();
-        },
-        onClear: () {
-          searchQuery = '';
-          _applyFilters();
-        },
+      // Campo de busca com botão de refresh
+      searchField: Row(
+        children: [
+          Expanded(
+            child: DSTableSearchField(
+              hintText: 'Buscar escolas por nome, código ou cidade...',
+              onChanged: (value) {
+                searchQuery = value;
+                _applyFilters();
+              },
+              onClear: () {
+                searchQuery = '';
+                _applyFilters();
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: widget.viewModel.fetchAllCommand.running
+                ? null
+                : () => widget.viewModel.refreshCommand.execute(),
+            tooltip: 'Atualizar lista',
+          ),
+        ],
       ),
       // Barra de filtros
       filterBar: DSTableFilterBar<SchoolDetails>(

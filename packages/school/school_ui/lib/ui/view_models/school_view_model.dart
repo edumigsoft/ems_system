@@ -34,10 +34,19 @@ class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
     _fetchAll,
   );
 
+  /// Comando para refresh (pull-to-refresh).
+  late final Command0<Unit> refreshCommand = Command0(_refresh);
+
   /// Wrapper para extrair items do PaginatedResult.
   Future<Result<List<SchoolDetails>>> _fetchAll() async {
     final result = await _getAllUseCase.execute();
     return result.map((paginatedResult) => paginatedResult.items);
+  }
+
+  /// Atualiza a lista de escolas (usado por pull-to-refresh).
+  Future<Result<Unit>> _refresh() async {
+    await fetchAllCommand.execute();
+    return successOfUnit();
   }
 
   @override
