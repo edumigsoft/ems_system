@@ -1,13 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:core_shared/core_shared.dart'
-    show Failure, StorageException, Result, UserRole, Success;
+    show Failure, StorageException, Result, UserRole, Success, PaginatedResult;
 import 'package:user_shared/user_shared.dart'
     show
         UserDetails,
         UserCreate,
         UserCreateAdmin,
         UserUpdate,
-        PaginatedResult,
         UserRepository;
 
 import '../database/user_database.dart';
