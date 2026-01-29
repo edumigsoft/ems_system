@@ -5,7 +5,19 @@ import 'package:core_ui/core_ui.dart'
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
-import 'package:user_client/user_client.dart' show UserService, SettingsStorage;
+import 'package:user_client/user_client.dart'
+    show UserService, SettingsStorage, UserRepositoryClient;
+import 'package:user_shared/user_shared.dart'
+    show
+        UserRepository,
+        GetProfileUseCase,
+        UpdateProfileUseCase,
+        GetAllUsersUseCase,
+        CreateUserUseCase,
+        UpdateUserUseCase,
+        DeleteUserUseCase,
+        UpdateUserRoleUseCase,
+        ResetPasswordUseCase;
 import 'package:auth_client/auth_client.dart' show AuthService;
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel, RoleGuard;
 
@@ -27,14 +39,54 @@ class UserModule extends AppModule with Loggable {
   void registerDependencies(DependencyInjector di) {
     logger.info('registerDependencies');
 
+    // Services
     di.registerLazySingleton<UserService>(() => UserService(di.get()));
 
     // Register SettingsStorage
     di.registerLazySingleton<SettingsStorage>(() => SettingsStorage());
 
+    // Repository
+    di.registerLazySingleton<UserRepository>(
+      () => UserRepositoryClient(service: di.get<UserService>()),
+    );
+
+    // Use Cases
+    di.registerLazySingleton<GetProfileUseCase>(
+      () => GetProfileUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<UpdateProfileUseCase>(
+      () => UpdateProfileUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<GetAllUsersUseCase>(
+      () => GetAllUsersUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<CreateUserUseCase>(
+      () => CreateUserUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<UpdateUserUseCase>(
+      () => UpdateUserUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<DeleteUserUseCase>(
+      () => DeleteUserUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<UpdateUserRoleUseCase>(
+      () => UpdateUserRoleUseCase(repository: di.get<UserRepository>()),
+    );
+    di.registerLazySingleton<ResetPasswordUseCase>(
+      () => ResetPasswordUseCase(repository: di.get<UserRepository>()),
+    );
+
     // ViewModels e Pages
     di.registerLazySingleton<ProfileViewModel>(
-      () => ProfileViewModel(userService: di.get<UserService>()),
+      () {
+        final authService = di.get<AuthService>();
+        final currentUserId = authService.currentUser?.id ?? '';
+        return ProfileViewModel(
+          getProfileUseCase: di.get<GetProfileUseCase>(),
+          updateProfileUseCase: di.get<UpdateProfileUseCase>(),
+          currentUserId: currentUserId,
+        );
+      },
     );
     di.registerLazySingleton<ProfilePage>(
       () => ProfilePage(viewModel: di.get<ProfileViewModel>()),
@@ -52,7 +104,12 @@ class UserModule extends AppModule with Loggable {
 
     di.registerLazySingleton<ManageUsersViewModel>(
       () => ManageUsersViewModel(
-        userService: di.get<UserService>(),
+        getAllUsersUseCase: di.get<GetAllUsersUseCase>(),
+        createUserUseCase: di.get<CreateUserUseCase>(),
+        updateUserUseCase: di.get<UpdateUserUseCase>(),
+        deleteUserUseCase: di.get<DeleteUserUseCase>(),
+        updateUserRoleUseCase: di.get<UpdateUserRoleUseCase>(),
+        resetPasswordUseCase: di.get<ResetPasswordUseCase>(),
         authService: di.get<AuthService>(),
       ),
     );
