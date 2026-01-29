@@ -105,11 +105,25 @@ class SchoolRoutes extends Routes with Loggable {
         ? int.tryParse(queryParams['offset']!)
         : null;
     final search = queryParams['search'];
+    final statusStr = queryParams['status'];
+    final city = queryParams['city'];
+    final district = queryParams['district'];
+
+    // Parse status enum
+    final status = statusStr != null
+        ? SchoolStatus.values.cast<SchoolStatus?>().firstWhere(
+            (e) => e?.name == statusStr,
+            orElse: () => null,
+          )
+        : null;
 
     final result = await _repository.getAll(
       limit: limit,
       offset: offset,
       search: search,
+      status: status,
+      city: city,
+      district: district,
     );
 
     return HttpResponseHelper.toResponse(

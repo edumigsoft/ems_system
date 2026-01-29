@@ -13,6 +13,10 @@ abstract class SchoolService {
   Future<List<SchoolDetailsModel>> getAll(
     @Query('limit') int? limit,
     @Query('offset') int? offset,
+    @Query('search') String? search,
+    @Query('status') String? status,
+    @Query('city') String? city,
+    @Query('district') String? district,
   );
 
   @GET('/schools/{id}')

@@ -1,7 +1,7 @@
 import 'package:core_shared/core_shared.dart' show EntityMapper;
 import 'package:drift/drift.dart';
 import 'package:school_shared/school_shared.dart'
-    show SchoolCreate, SchoolDetails;
+    show SchoolCreate, SchoolDetails, SchoolStatus;
 import '../database/tables/school_table.dart';
 import '../database/school_database.dart';
 
@@ -97,21 +97,43 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
     int? limit,
     int? offset,
     String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
   }) async {
     final query = select(schoolTable);
 
-    // Filtrar deletados
+    // Sempre excluir deletados
     query.where((t) => t.isDeleted.equals(0));
 
-    // Aplicar busca
+    // Filtro de busca textual (nome, código, diretor)
     if (search != null && search.isNotEmpty) {
       query.where(
         (t) =>
             t.name.contains(search) |
             t.code.contains(search) |
+            t.director.contains(search) |
             t.locationCity.contains(search),
       );
     }
+
+    // Filtro por status
+    if (status != null) {
+      query.where((t) => t.status.equals(status.name));
+    }
+
+    // Filtro por cidade
+    if (city != null && city.isNotEmpty) {
+      query.where((t) => t.locationCity.contains(city));
+    }
+
+    // Filtro por distrito
+    if (district != null && district.isNotEmpty) {
+      query.where((t) => t.locationDistrict.contains(district));
+    }
+
+    // Ordenação por nome
+    query.orderBy([(t) => OrderingTerm.asc(t.name)]);
 
     // Aplicar paginação
     if (limit != null) {
@@ -146,19 +168,40 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
   }
 
   /// Conta o total de escolas com filtros aplicados.
-  Future<int> getTotalCount({String? search}) async {
+  Future<int> getTotalCount({
+    String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
+  }) async {
     final query = selectOnly(schoolTable);
 
-    // Filtrar deletados
+    // Sempre excluir deletados
     query.where(schoolTable.isDeleted.equals(0));
 
-    // Aplicar busca
+    // Filtro de busca textual
     if (search != null && search.isNotEmpty) {
       query.where(
         schoolTable.name.contains(search) |
             schoolTable.code.contains(search) |
+            schoolTable.director.contains(search) |
             schoolTable.locationCity.contains(search),
       );
+    }
+
+    // Filtro por status
+    if (status != null) {
+      query.where(schoolTable.status.equals(status.name));
+    }
+
+    // Filtro por cidade
+    if (city != null && city.isNotEmpty) {
+      query.where(schoolTable.locationCity.contains(city));
+    }
+
+    // Filtro por distrito
+    if (district != null && district.isNotEmpty) {
+      query.where(schoolTable.locationDistrict.contains(district));
     }
 
     query.addColumns([schoolTable.id.count()]);

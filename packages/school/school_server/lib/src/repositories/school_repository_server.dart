@@ -50,6 +50,9 @@ class SchoolRepositoryServer implements SchoolRepository {
     int? limit,
     int? offset,
     String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
   }) async {
     try {
       final effectiveLimit = limit ?? 50;
@@ -60,10 +63,18 @@ class SchoolRepositoryServer implements SchoolRepository {
         limit: effectiveLimit,
         offset: effectiveOffset,
         search: search,
+        status: status,
+        city: city,
+        district: district,
       );
 
       // Buscar total count
-      final total = await _schoolQueries.getTotalCount(search: search);
+      final total = await _schoolQueries.getTotalCount(
+        search: search,
+        status: status,
+        city: city,
+        district: district,
+      );
 
       // Criar resultado paginado
       final result = PaginatedResult.fromOffset(

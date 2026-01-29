@@ -7,7 +7,8 @@ import 'package:school_shared/school_shared.dart'
         SchoolCreate,
         SchoolDetails,
         SchoolCreateModel,
-        SchoolDetailsModel;
+        SchoolDetailsModel,
+        SchoolStatus;
 
 import '../services/school_service.dart';
 
@@ -41,9 +42,19 @@ class SchoolRepositoryClient extends BaseRepositoryLocal
     int? limit,
     int? offset,
     String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
   }) async {
     final result = await executeRequest(
-      request: () => _schoolService.getAll(limit, offset),
+      request: () => _schoolService.getAll(
+        limit,
+        offset,
+        search,
+        status?.name,
+        city,
+        district,
+      ),
       context: 'fetching schools',
       mapper: (models) => models,
     );
