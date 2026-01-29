@@ -1,32 +1,23 @@
-import 'package:drift/drift.dart';
 import 'package:core_shared/core_shared.dart'
     show Failure, StorageException, Result, UserRole, Success, PaginatedResult;
 import 'package:user_shared/user_shared.dart'
-    show
-        UserDetails,
-        UserCreate,
-        UserCreateAdmin,
-        UserUpdate,
-        UserRepository;
+    show UserDetails, UserCreate, UserCreateAdmin, UserUpdate, UserRepository;
 
-import '../database/user_database.dart';
+import '../queries/user_queries.dart';
 
 class UserRepositoryServer implements UserRepository {
-  final UserDatabase db;
+  final UserQueries _queries;
 
-  UserRepositoryServer(this.db);
+  const UserRepositoryServer(this._queries);
 
   @override
   Future<Result<UserDetails>> findById(String id) async {
     try {
-      final result = await (db.select(
-        db.users,
-      )..where((t) => t.id.equals(id))).getSingleOrNull();
-
-      if (result == null) {
+      final user = await _queries.getById(id);
+      if (user == null) {
         return Failure(StorageException('User not found'));
       }
-      return Success(result);
+      return Success(user);
     } catch (e, s) {
       return Failure(StorageException('Error finding user', stackTrace: s));
     }
@@ -35,14 +26,11 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<UserDetails>> findByEmail(String email) async {
     try {
-      final result = await (db.select(
-        db.users,
-      )..where((t) => t.email.equals(email))).getSingleOrNull();
-
-      if (result == null) {
+      final user = await _queries.getByEmail(email);
+      if (user == null) {
         return Failure(StorageException('User not found'));
       }
-      return Success(result);
+      return Success(user);
     } catch (e, s) {
       return Failure(
         StorageException('Error finding user by email', stackTrace: s),
@@ -53,14 +41,11 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<UserDetails>> findByUsername(String username) async {
     try {
-      final result = await (db.select(
-        db.users,
-      )..where((t) => t.username.equals(username))).getSingleOrNull();
-
-      if (result == null) {
+      final user = await _queries.getByUsername(username);
+      if (user == null) {
         return Failure(StorageException('User not found'));
       }
-      return Success(result);
+      return Success(user);
     } catch (e, s) {
       return Failure(
         StorageException('Error finding user by username', stackTrace: s),
@@ -76,71 +61,25 @@ class UserRepositoryServer implements UserRepository {
     String? search,
   }) async {
     try {
-      // Validar role se fornecida
-      UserRole? roleEnum;
-      if (roleFilter != null) {
-        try {
-          roleEnum = UserRole.values.byName(roleFilter);
-        } catch (_) {
-          // Role inválida, retorna vazio
-          return Success(
-            PaginatedResult<UserDetails>(
-              items: [],
-              total: 0,
-              page: (offset ~/ limit) + 1,
-              limit: limit,
-            ),
-          );
-        }
-      }
+      // Buscar items da página atual
+      final items = await _queries.getAll(
+        limit: limit,
+        offset: offset,
+        roleFilter: roleFilter,
+        search: search,
+      );
 
-      // Query base para buscar dados
-      final baseQuery = db.select(db.users);
-
-      // Aplicar filtros
-      if (roleEnum != null) {
-        baseQuery.where((t) => t.role.equals(roleEnum!.name));
-      }
-
-      if (search != null && search.isNotEmpty) {
-        baseQuery.where(
-          (t) =>
-              t.name.contains(search) |
-              t.email.contains(search) |
-              t.username.contains(search),
-        );
-      }
-
-      // Buscar todos os resultados para contar
-      // NOTA: Para otimização futura, considere usar customStatement com COUNT(*)
-      final allResults = await baseQuery.get();
-      final totalCount = allResults.length;
-
-      // Se total é 0, retorna vazio
-      if (totalCount == 0) {
-        return Success(
-          PaginatedResult<UserDetails>(
-            items: [],
-            total: 0,
-            page: (offset ~/ limit) + 1,
-            limit: limit,
-          ),
-        );
-      }
-
-      // Aplicar paginação manualmente nos resultados
-      final startIndex = offset;
-      final endIndex = (offset + limit).clamp(0, totalCount);
-      final items = allResults.sublist(
-        startIndex.clamp(0, totalCount),
-        endIndex,
+      // Buscar total count
+      final totalCount = await _queries.getTotalCount(
+        roleFilter: roleFilter,
+        search: search,
       );
 
       return Success(
-        PaginatedResult<UserDetails>(
+        PaginatedResult.fromOffset(
           items: items,
           total: totalCount,
-          page: (offset ~/ limit) + 1,
+          offset: offset,
           limit: limit,
         ),
       );
@@ -152,14 +91,11 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<UserDetails>> create(UserCreate dto) async {
     try {
-      final companion = UsersCompanion.insert(
-        email: dto.email,
-        name: dto.name,
-        username: dto.username,
-      );
-
-      final row = await db.into(db.users).insertReturning(companion);
-      return Success(row);
+      final user = await _queries.insertUser(dto);
+      if (user == null) {
+        return Failure(StorageException('Error creating user'));
+      }
+      return Success(user);
     } catch (e, s) {
       return Failure(StorageException('Error creating user', stackTrace: s));
     }
@@ -168,17 +104,11 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<UserDetails>> createByAdmin(UserCreateAdmin dto) async {
     try {
-      final companion = UsersCompanion.insert(
-        email: dto.email,
-        name: dto.name,
-        username: dto.username,
-        role: Value(dto.role),
-        phone: Value(dto.phone),
-        mustChangePassword: const Value(true),
-      );
-
-      final row = await db.into(db.users).insertReturning(companion);
-      return Success(row);
+      final user = await _queries.insertUserByAdmin(dto);
+      if (user == null) {
+        return Failure(StorageException('Error creating user'));
+      }
+      return Success(user);
     } catch (e, s) {
       return Failure(StorageException('Error creating user', stackTrace: s));
     }
@@ -187,21 +117,11 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<UserDetails>> update(String id, UserUpdate dto) async {
     try {
-      final companion = UsersCompanion(
-        name: dto.name != null ? Value(dto.name!) : const Value.absent(),
-        avatarUrl: dto.avatarUrl != null
-            ? Value(dto.avatarUrl)
-            : const Value.absent(),
-        phone: dto.phone != null ? Value(dto.phone) : const Value.absent(),
-      );
-
-      final query = db.update(db.users)..where((t) => t.id.equals(id));
-      final rows = await query.writeReturning(companion);
-
-      if (rows.isEmpty) {
+      final user = await _queries.updateUser(id, dto);
+      if (user == null) {
         return Failure(StorageException('User not found'));
       }
-      return Success(rows.first);
+      return Success(user);
     } catch (e, s) {
       return Failure(StorageException('Error updating user', stackTrace: s));
     }
@@ -215,21 +135,16 @@ class UserRepositoryServer implements UserRepository {
     bool? isActive,
   }) async {
     try {
-      final companion = UsersCompanion(
-        role: role != null ? Value(role) : const Value.absent(),
-        emailVerified: emailVerified != null
-            ? Value(emailVerified)
-            : const Value.absent(),
-        isActive: isActive != null ? Value(isActive) : const Value.absent(),
+      final user = await _queries.updateUserByAdmin(
+        id,
+        role: role,
+        emailVerified: emailVerified,
+        isActive: isActive,
       );
-
-      final query = db.update(db.users)..where((t) => t.id.equals(id));
-      final rows = await query.writeReturning(companion);
-
-      if (rows.isEmpty) {
+      if (user == null) {
         return Failure(StorageException('User not found'));
       }
-      return Success(rows.first);
+      return Success(user);
     } catch (e, s) {
       return Failure(
         StorageException('Error updating user by admin', stackTrace: s),
@@ -240,8 +155,7 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<void>> softDelete(String id) async {
     try {
-      final query = db.update(db.users)..where((t) => t.id.equals(id));
-      await query.write(const UsersCompanion(isDeleted: Value(true)));
+      await _queries.deleteUser(id);
       return Success(null);
     } catch (e, s) {
       return Failure(StorageException('Error deleting user', stackTrace: s));
@@ -251,8 +165,7 @@ class UserRepositoryServer implements UserRepository {
   @override
   Future<Result<void>> setMustChangePassword(String userId, bool value) async {
     try {
-      final query = db.update(db.users)..where((t) => t.id.equals(userId));
-      await query.write(UsersCompanion(mustChangePassword: Value(value)));
+      await _queries.setMustChangePassword(userId, value);
       return Success(null);
     } catch (e, s) {
       return Failure(
@@ -263,16 +176,11 @@ class UserRepositoryServer implements UserRepository {
 
   @override
   Future<bool> emailExists(String email) async {
-    final query = db.select(db.users)..where((t) => t.email.equals(email));
-    final result = await query.getSingleOrNull();
-    return result != null;
+    return await _queries.emailExists(email);
   }
 
   @override
   Future<bool> usernameExists(String username) async {
-    final query = db.select(db.users)
-      ..where((t) => t.username.equals(username));
-    final result = await query.getSingleOrNull();
-    return result != null;
+    return await _queries.usernameExists(username);
   }
 }
