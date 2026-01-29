@@ -24,3 +24,4 @@ export 'src/domain/use_cases/update_user_use_case.dart';
 export 'src/domain/use_cases/delete_user_use_case.dart';
 export 'src/domain/use_cases/update_user_role_use_case.dart';
 export 'src/domain/use_cases/reset_password_use_case.dart';
+export 'src/constants/user_constants.dart';

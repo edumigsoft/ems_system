@@ -15,7 +15,8 @@ import 'package:user_shared/user_shared.dart'
         UserUpdate,
         UserCreateAdminModel,
         UserCreateAdminValidator,
-        UserRepository;
+        UserRepository,
+        UserConstants;
 
 /// Rotas de gerenciamento de usuários.
 ///
@@ -89,11 +90,11 @@ class UserRoutes extends Routes {
     // Perfil do usuário autenticado (qualquer usuário autenticado)
     // Aplica middleware de autenticação JWT
     router.get(
-      '/me',
+      UserConstants.profilePath,
       Pipeline().addMiddleware(authMiddleware.verifyJwt).addHandler(_getMe),
     );
     router.put(
-      '/me',
+      UserConstants.profilePath,
       Pipeline().addMiddleware(authMiddleware.verifyJwt).addHandler(_updateMe),
     );
 
@@ -108,13 +109,13 @@ class UserRoutes extends Routes {
 
     // Listar usuários - Manager+ (visualização)
     router.get(
-      '/',
+      UserConstants.listUsersPath,
       Pipeline().addMiddleware(managerMiddleware).addHandler(_listUsers),
     );
 
     // Ver detalhes de usuário - Manager+ (visualização)
     router.get(
-      '/<id>',
+      UserConstants.userByIdPath,
       Pipeline()
           .addMiddleware(managerMiddleware)
           .addHandler((req) => _getUserById(req, req.params['id']!)),
@@ -122,13 +123,13 @@ class UserRoutes extends Routes {
 
     // Criar usuário - Admin+
     router.post(
-      '/',
+      UserConstants.listUsersPath,
       Pipeline().addMiddleware(adminMiddleware).addHandler(_createUser),
     );
 
     // Atualizar usuário - Admin+
     router.put(
-      '/<id>',
+      UserConstants.userByIdPath,
       Pipeline()
           .addMiddleware(adminMiddleware)
           .addHandler((req) => _updateUser(req, req.params['id']!)),
@@ -136,7 +137,7 @@ class UserRoutes extends Routes {
 
     // Deletar usuário - Owner apenas (soft delete)
     router.delete(
-      '/<id>',
+      UserConstants.userByIdPath,
       Pipeline()
           .addMiddleware(ownerMiddleware)
           .addHandler((req) => _deleteUser(req, req.params['id']!)),
@@ -144,7 +145,7 @@ class UserRoutes extends Routes {
 
     // Forçar mudança de senha - Admin+
     router.post(
-      '/<id>/force-password-change',
+      UserConstants.forcePasswordChangePath,
       Pipeline()
           .addMiddleware(adminMiddleware)
           .addHandler((req) => _forcePasswordChange(req, req.params['id']!)),
@@ -152,7 +153,7 @@ class UserRoutes extends Routes {
 
     // Reset de senha - Admin+
     router.post(
-      '/<id>/reset-password',
+      UserConstants.resetPasswordPath,
       Pipeline()
           .addMiddleware(adminMiddleware)
           .addHandler((req) => _adminResetPassword(req, req.params['id']!)),

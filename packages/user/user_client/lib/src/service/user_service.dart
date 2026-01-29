@@ -10,11 +10,11 @@ abstract class UserService {
   factory UserService(Dio dio, {String baseUrl}) = _UserService;
 
   /// Obtém o perfil do usuário atual.
-  @GET('/users/me')
+  @GET(UserConstants.profile)
   Future<UserDetailsModel> getProfile();
 
   /// Atualiza o perfil do usuário atual.
-  @PUT('/users/me')
+  @PUT(UserConstants.profile)
   Future<UserDetailsModel> updateProfile(@Body() UserUpdateModel data);
 
   /// Lista todos os usuários (admin only).
@@ -25,7 +25,7 @@ abstract class UserService {
   /// - [limit]: Itens por página (padrão: 50, máximo: 100)
   /// - [role]: Filtro por role (user, admin, owner)
   /// - [search]: Busca por nome, email ou username
-  @GET('/users')
+  @GET(UserConstants.listUsers)
   Future<UsersListResponse> listUsers({
     @Query('page') int? page,
     @Query('limit') int? limit,
@@ -34,33 +34,33 @@ abstract class UserService {
   });
 
   /// Obtém um usuário por ID (admin only).
-  @GET('/users/{id}')
+  @GET(UserConstants.getUserById)
   Future<UserDetailsModel> getUserById(@Path('id') String id);
 
   /// Atualiza role de um usuário (admin only).
   /// Nota: O backend atualmente usa PUT /users/{id} para atualizações administrativas.
-  @PUT('/users/{id}')
+  @PUT(UserConstants.updateUser)
   Future<UserDetailsModel> updateUserRole(
     @Path('id') String id,
     @Body() Map<String, dynamic> data,
   );
 
   /// Desativa um usuário (admin only).
-  @DELETE('/users/{id}')
+  @DELETE(UserConstants.deleteUser)
   Future<void> deactivateUser(@Path('id') String id);
 
   /// Cria um usuário administrativamente (owner only).
   /// O usuário receberá email para definir senha no primeiro acesso.
-  @POST('/users')
+  @POST(UserConstants.createUser)
   Future<UserDetailsModel> createUser(@Body() UserCreateAdminModel data);
 
   /// Força mudança de senha no próximo login (admin+).
   /// Admin não pode forçar em owners ou outros admins.
-  @POST('/users/{id}/force-password-change')
+  @POST(UserConstants.forcePasswordChange)
   Future<void> forcePasswordChange(@Path('id') String id);
 
   /// Inicia reset de senha (envia email com token) (admin+).
   /// Admin não pode resetar senha de owners.
-  @POST('/users/{id}/reset-password')
+  @POST(UserConstants.resetPassword)
   Future<void> resetPassword(@Path('id') String id);
 }
