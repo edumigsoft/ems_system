@@ -1,5 +1,12 @@
 import 'package:core_shared/core_shared.dart'
-    show Result, Unit, DataException, Failure, Success, successOfUnit;
+    show
+        Result,
+        Unit,
+        DataException,
+        Failure,
+        Success,
+        successOfUnit,
+        PaginatedResult;
 import 'package:school_shared/school_shared.dart';
 import '../queries/school_queries.dart';
 
@@ -39,9 +46,33 @@ class SchoolRepositoryServer implements SchoolRepository {
   }
 
   @override
-  Future<Result<List<SchoolDetails>>> getAll({int? limit, int? offset}) async {
+  Future<Result<PaginatedResult<SchoolDetails>>> getAll({
+    int? limit,
+    int? offset,
+    String? search,
+  }) async {
     try {
-      final result = await _schoolQueries.getAll(limit: limit, offset: offset);
+      final effectiveLimit = limit ?? 50;
+      final effectiveOffset = offset ?? 0;
+
+      // Buscar items da página atual
+      final items = await _schoolQueries.getAll(
+        limit: effectiveLimit,
+        offset: effectiveOffset,
+        search: search,
+      );
+
+      // Buscar total count
+      final total = await _schoolQueries.getTotalCount(search: search);
+
+      // Criar resultado paginado
+      final result = PaginatedResult.fromOffset(
+        items: items,
+        total: total,
+        offset: effectiveOffset,
+        limit: effectiveLimit,
+      );
+
       return Success(result);
     } on Exception catch (e) {
       return Failure(DataException(e.toString()));

@@ -31,8 +31,14 @@ class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
 
   @override
   late final Command0<List<SchoolDetails>> fetchAllCommand = Command0(
-    _getAllUseCase.execute,
+    _fetchAll,
   );
+
+  /// Wrapper para extrair items do PaginatedResult.
+  Future<Result<List<SchoolDetails>>> _fetchAll() async {
+    final result = await _getAllUseCase.execute();
+    return result.map((paginatedResult) => paginatedResult.items);
+  }
 
   @override
   Future<void> init() async {

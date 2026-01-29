@@ -1,4 +1,5 @@
-import 'package:core_shared/core_shared.dart' show Result, Unit;
+import 'package:core_shared/core_shared.dart'
+    show Result, Unit, PaginatedResult;
 import '../dtos/school_create.dart';
 import '../entities/school_details.dart';
 
@@ -26,9 +27,14 @@ abstract class SchoolRepository {
   ///
   /// [limit] - O número máximo de escolas a serem retornadas.
   /// [offset] - O número de escolas a serem ignoradas.
+  /// [search] - Termo de busca para filtrar por nome, código ou cidade.
   ///
-  /// Retorna um [Result] contendo a lista de [SchoolDetails].
-  Future<Result<List<SchoolDetails>>> getAll({int? limit, int? offset});
+  /// Retorna um [Result] contendo [PaginatedResult] com lista de [SchoolDetails] e metadados.
+  Future<Result<PaginatedResult<SchoolDetails>>> getAll({
+    int? limit,
+    int? offset,
+    String? search,
+  });
 
   /// Cria uma nova escola.
   ///

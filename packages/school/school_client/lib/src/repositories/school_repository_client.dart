@@ -1,5 +1,6 @@
 import 'package:core_client/core_client.dart'
     show BaseRepositoryLocal, Result, Unit;
+import 'package:core_shared/core_shared.dart' show PaginatedResult;
 import 'package:school_shared/school_shared.dart'
     show
         SchoolRepository,
@@ -36,21 +37,28 @@ class SchoolRepositoryClient extends BaseRepositoryLocal
   }
 
   @override
-  Future<Result<List<SchoolDetails>>> getAll({int? limit, int? offset}) async {
+  Future<Result<PaginatedResult<SchoolDetails>>> getAll({
+    int? limit,
+    int? offset,
+    String? search,
+  }) async {
     final result = await executeRequest(
       request: () => _schoolService.getAll(limit, offset),
       context: 'fetching schools',
-      mapper: (models) => models, // Temporary, will map below
+      mapper: (models) => models,
     );
 
-    // Manual mapping since executeRequest expects single T -> T
-    // But mapList logic is often handled inside executeRequest if generic T is List.
-    // However, BaseRepositoryLocal usually has T, and mapper T -> T.
-    // If T is List<SchoolDetails>, mapper must convert List<Model> to List<Entity>.
-
-    return result.map(
-      (models) => models.map((m) => m.toDomain()).toList(),
-    );
+    // Como o service ainda retorna List, vamos criar um PaginatedResult simples
+    // TODO: Atualizar SchoolService para retornar dados paginados do backend
+    return result.map((models) {
+      final items = models.map((m) => m.toDomain()).toList();
+      return PaginatedResult.fromOffset(
+        items: items,
+        total: items.length, // Temporário: não temos total do servidor
+        offset: offset ?? 0,
+        limit: limit ?? 50,
+      );
+    });
   }
 
   @override

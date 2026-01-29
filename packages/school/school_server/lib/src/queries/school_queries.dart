@@ -93,8 +93,27 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
     return schoolDetails;
   }
 
-  Future<List<SchoolDetails>> getAll({int? limit, int? offset}) async {
+  Future<List<SchoolDetails>> getAll({
+    int? limit,
+    int? offset,
+    String? search,
+  }) async {
     final query = select(schoolTable);
+
+    // Filtrar deletados
+    query.where((t) => t.isDeleted.equals(0));
+
+    // Aplicar busca
+    if (search != null && search.isNotEmpty) {
+      query.where(
+        (t) =>
+            t.name.contains(search) |
+            t.code.contains(search) |
+            t.locationCity.contains(search),
+      );
+    }
+
+    // Aplicar paginação
     if (limit != null) {
       query.limit(limit, offset: offset);
     }
@@ -124,6 +143,28 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
     );
 
     return list;
+  }
+
+  /// Conta o total de escolas com filtros aplicados.
+  Future<int> getTotalCount({String? search}) async {
+    final query = selectOnly(schoolTable);
+
+    // Filtrar deletados
+    query.where(schoolTable.isDeleted.equals(0));
+
+    // Aplicar busca
+    if (search != null && search.isNotEmpty) {
+      query.where(
+        schoolTable.name.contains(search) |
+            schoolTable.code.contains(search) |
+            schoolTable.locationCity.contains(search),
+      );
+    }
+
+    query.addColumns([schoolTable.id.count()]);
+
+    final result = await query.getSingle();
+    return result.read(schoolTable.id.count()) ?? 0;
   }
 
   Future<SchoolDetails?> insertSchool(SchoolCreate school) async {

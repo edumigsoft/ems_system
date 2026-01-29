@@ -8,7 +8,15 @@ class GetAllUseCase {
   GetAllUseCase({required SchoolRepository repository})
     : _repository = repository;
 
-  Future<Result<List<SchoolDetails>>> execute({int? limit, int? offset}) async {
-    return await _repository.getAll(limit: limit, offset: offset);
+  Future<Result<PaginatedResult<SchoolDetails>>> execute({
+    int? limit,
+    int? offset,
+    String? search,
+  }) {
+    return _repository.getAll(
+      limit: limit,
+      offset: offset,
+      search: search,
+    );
   }
 }

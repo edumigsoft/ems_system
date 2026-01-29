@@ -24,9 +24,9 @@ class SchoolRoutes extends Routes with Loggable {
     required SchoolRepository repository,
     required AuthMiddleware authMiddleware,
     required super.security,
-  })  : _backendBaseApi = backendBaseApi,
-        _repository = repository,
-        _authMiddleware = authMiddleware;
+  }) : _backendBaseApi = backendBaseApi,
+       _repository = repository,
+       _authMiddleware = authMiddleware;
 
   @override
   String get path => '$_backendBaseApi$schoolsPath';
@@ -86,7 +86,8 @@ class SchoolRoutes extends Routes with Loggable {
   @open.Get(
     path: schoolsPathGetAll,
     summary: 'Obter lista de todas as escolas',
-    description: 'Retorna uma lista com todas as escolas cadastradas. Requer autenticação (qualquer usuário).',
+    description:
+        'Retorna uma lista com todas as escolas cadastradas. Requer autenticação (qualquer usuário).',
   )
   @open.Response(
     statusCode: 200,
@@ -103,22 +104,36 @@ class SchoolRoutes extends Routes with Loggable {
     final offset = queryParams.containsKey('offset')
         ? int.tryParse(queryParams['offset']!)
         : null;
+    final search = queryParams['search'];
 
-    final result = await _repository.getAll(limit: limit, offset: offset);
+    final result = await _repository.getAll(
+      limit: limit,
+      offset: offset,
+      search: search,
+    );
 
     return HttpResponseHelper.toResponse(
       result,
-      onSuccess: (list) => EntityMapper.mapList(
-        models: list,
-        mapper: (a) => SchoolDetailsModel.fromDomain(a).toJson(),
-      ),
+      onSuccess: (paginatedResult) => {
+        'data': EntityMapper.mapList(
+          models: paginatedResult.items,
+          mapper: (a) => SchoolDetailsModel.fromDomain(a).toJson(),
+        ),
+        'total': paginatedResult.total,
+        'page': paginatedResult.page,
+        'limit': paginatedResult.limit,
+        'totalPages': paginatedResult.totalPages,
+        'hasNextPage': paginatedResult.hasNextPage,
+        'hasPreviousPage': paginatedResult.hasPreviousPage,
+      },
     );
   }
 
   @open.Get(
     path: schoolsPathByIdOpenApi,
     summary: 'Obter School pelo id',
-    description: 'Retorna uma School pelo id. Requer autenticação (qualquer usuário).',
+    description:
+        'Retorna uma School pelo id. Requer autenticação (qualquer usuário).',
   )
   @open.PathParam(name: 'id')
   @open.Response(statusCode: 200, description: 'School', returns: SchoolDetails)
@@ -136,7 +151,8 @@ class SchoolRoutes extends Routes with Loggable {
   @open.Post(
     path: schoolsPathCreate,
     summary: 'Criar uma nova escola',
-    description: 'Cria uma nova escola no sistema. Requer permissão de Admin ou superior.',
+    description:
+        'Cria uma nova escola no sistema. Requer permissão de Admin ou superior.',
   )
   @open.Response(
     statusCode: 201,
@@ -176,7 +192,9 @@ class SchoolRoutes extends Routes with Loggable {
       // Validação server-side
       final validation = _validator.validate(tempSchool);
       if (!validation.isValid) {
-        logger.warning('Validação falhou ao criar escola: ${validation.errors}');
+        logger.warning(
+          'Validação falhou ao criar escola: ${validation.errors}',
+        );
         return Response(
           400,
           body: json.encode({
@@ -215,7 +233,8 @@ class SchoolRoutes extends Routes with Loggable {
   @open.Put(
     path: schoolsPathUpdateOpenApi,
     summary: 'Atualizar uma escola existente',
-    description: 'Atualiza os dados de uma escola pelo ID. Requer permissão de Admin ou superior.',
+    description:
+        'Atualiza os dados de uma escola pelo ID. Requer permissão de Admin ou superior.',
   )
   @open.PathParam(name: 'id')
   @open.Body()
@@ -263,7 +282,9 @@ class SchoolRoutes extends Routes with Loggable {
       // Validação server-side
       final validation = _validator.validate(schoolDetails);
       if (!validation.isValid) {
-        logger.warning('Validação falhou ao atualizar escola: ${validation.errors}');
+        logger.warning(
+          'Validação falhou ao atualizar escola: ${validation.errors}',
+        );
         return Response(
           400,
           body: json.encode({
@@ -301,7 +322,8 @@ class SchoolRoutes extends Routes with Loggable {
   @open.Delete(
     path: schoolsPathDeleteOpenApi,
     summary: 'Deleta uma escola existente',
-    description: 'Deleta os dados de uma escola pelo ID (soft delete). Requer permissão de Owner.',
+    description:
+        'Deleta os dados de uma escola pelo ID (soft delete). Requer permissão de Owner.',
   )
   @open.PathParam(name: 'id')
   @open.Body()
