@@ -65,6 +65,9 @@ final class Env {
   @EnviedField()
   static const int ipBlockMinutes = _Env.ipBlockMinutes;
 
+  @EnviedField()
+  static const String verificationLinkBaseUrl = _Env.verificationLinkBaseUrl;
+
   // Email Service
   @EnviedField()
   static const String emailServiceHost = _Env.emailServiceHost;

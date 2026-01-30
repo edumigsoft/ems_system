@@ -1,12 +1,10 @@
 # Progresso do Projeto EMS System
 
-**Última atualização**: 2026-01-29
+**Última atualização**: 2026-01-30
 
 ## 📋 Status Geral
 
-- **Tasks Completadas**: 11/15
-- **Em Progresso**: Nenhuma
-- **Pendentes**: 4 tasks
+- **Tasks Completadas**: 17/17 🎉
 
 ---
 
@@ -38,8 +36,32 @@
 - ✅ Paths absolutos (Retrofit) e relativos (Shelf Router)
 - ✅ UserService e UserRoutes atualizados
 
-### Task 6 - Design responsivo em user_ui
-- ⏭️ **PULADA** - Muito grande, deixar para depois
+### Task 6 - Design Responsivo em user_ui
+- ✅ **Componentes Reutilizáveis Criados**:
+  - UserCard - Card para lista mobile
+  - UserGridCard - Card para grid tablet
+  - UserRoleBadge - Badge de role com cores (Owner, Admin, Manager, User)
+  - UserSearchField - Campo de busca com clear
+  - UserFiltersBar - Barra de filtros por role e status
+  - UserDetailsBottomSheet - Bottom sheet completo de detalhes
+  - shared.dart - Barrel file para componentes
+- ✅ **Mobile Widget Completo**:
+  - ListView com UserCard
+  - Bottom sheet de detalhes com todas informações
+  - Busca e filtros funcionais
+  - Pull-to-refresh
+  - Ações: editar, deletar, resetar senha
+  - Estados vazios e de erro
+- ✅ **Tablet Widget Completo**:
+  - GridView 2 colunas com UserGridCard
+  - Bottom sheet de detalhes compartilhado
+  - Busca e filtros funcionais
+  - Pull-to-refresh
+  - Layout otimizado para tela maior
+- ✅ **ManageUsersPage Refatorado**:
+  - Usa ResponsiveLayout (core_ui)
+  - MobileWidget, TabletWidget separados
+  - Código simplificado, mantém apenas _showCreateUserDialog
 
 ### Task 7 - RBAC em school_server
 - ✅ Middleware de autenticação implementado
@@ -66,46 +88,80 @@
 - ✅ refreshCommand adicionado ao SchoolViewModel
 - ✅ Feedback visual e tratamento de erros
 
----
-
-## ⏳ Tasks Pendentes
-
-### Task 10 - UI responsiva Mobile/Tablet em school_ui
-**Complexidade**: Alta
-**Descrição**: Implementar MobileWidget e TabletWidget completos
-- Mobile: ListView com SchoolCard, bottom sheet de detalhes
-- Tablet: GridView 2 colunas com SchoolGridCard
-- Componentes: SchoolCard, SchoolStatusBadge, SchoolFiltersBar, SchoolSearchField
-- **Status**: 30% concluído (pull-to-refresh implementado, falta completar componentes)
-
 ### Task 12 - UI de Soft Delete em school
-**Complexidade**: Média
-**Descrição**: Permitir visualizar e restaurar escolas deletadas
-- Backend: GetDeletedUseCase, RestoreUseCase, rota de restauração
-- Frontend: Toggle "Mostrar deletados", botão restaurar
-- Role guards: admin+ vê deletados, owner restaura
-- **Status**: Parcial (método restore() já existe no ViewModel)
-
-### Task 14 - OPCIONAL: Migrar validators para Zard
-**Complexidade**: Média
-**Descrição**: Migrar validações de user para schema-based com Zard
-- **Status**: Não iniciada (opcional)
+- ✅ **Backend**: GetDeletedUseCase, RestoreUseCase, rotas dedicadas
+- ✅ **Frontend**: Toggle "Mostrar deletados", botão restaurar em Mobile/Tablet/Desktop
+- ✅ **RBAC**: admin+ vê deletados, owner deleta, admin+ restaura
+- ✅ **UX**: Confirmação de restauração, mensagens de sucesso, indicadores visuais
+- ✅ **Endpoint Dedicado**: POST /schools/{id}/restore
+- ✅ **Auditoria**: Logs de todas operações (delete, restore, view deleted)
 
 ### Task 15 - Documentar padrões arquiteturais
-**Complexidade**: Baixa
-**Descrição**: Criar/atualizar ARCHITECTURE.md
-- Documentar Clean Architecture, Use Cases, Repository pattern
-- Padrões de paginação, filtros, MVVM
-- **Status**: Não iniciada
+- ✅ Criado ARCHITECTURE.md completo (4000+ linhas)
+- ✅ Documentado: Clean Architecture, MVVM, Multi-Variant Pattern
+- ✅ Documentado: Paginação, Filtros, Soft Delete, RBAC
+- ✅ Documentado: Dependency Injection, Validação, UI Patterns
+- ✅ Exemplos de código completos para todos os padrões
+
+### Task 10 - UI responsiva Mobile/Tablet em school_ui
+- ✅ **Componentes Reutilizáveis Criados**:
+  - SchoolCard - Card para lista mobile
+  - SchoolGridCard - Card para grid tablet
+  - SchoolStatusBadge - Badge de status com cores
+  - SchoolFiltersBar - Barra de filtros reutilizável
+  - SchoolSearchField - Campo de busca com clear
+  - SchoolDetailsBottomSheet - Bottom sheet completo de detalhes
+- ✅ **Mobile Widget Completo**:
+  - ListView com SchoolCard
+  - Bottom sheet de detalhes com todas informações
+  - Busca e filtros funcionais
+  - Pull-to-refresh
+  - Ações: editar, deletar, restaurar
+  - Estados vazios e de erro
+- ✅ **Tablet Widget Completo**:
+  - GridView 2 colunas com SchoolGridCard
+  - Bottom sheet de detalhes compartilhado
+  - Busca e filtros funcionais
+  - Pull-to-refresh
+  - Layout otimizado para tela maior
+
+### Task 14 - Migrar validators para Zard
+- ✅ **Validators Zard Criados**:
+  - UserCreateValidatorZard - Validação schema-based para criação
+  - UserUpdateValidatorZard - Validação schema-based para atualização
+  - UserCreateAdminValidatorZard - Validação schema-based para criação admin
+- ✅ **Schemas Declarativos**:
+  - Nome: min 2 caracteres
+  - Email: validação com `.email()`
+  - Username: min 3 caracteres, regex sem espaços
+  - Password: min 8 caracteres
+  - Phone: min 10 dígitos (opcional)
+  - AvatarUrl: regex URL válida (opcional)
+- ✅ **Mantido Retrocompatibilidade**: Validators antigos preservados
+- ✅ **Dependência Zard**: Adicionada ao user_shared (^0.0.25)
+- ✅ **Exports**: Adicionados ao barrel file
+
+### Task 16 - Análise de Maturidade do Core
+- ✅ Relatório completo em `docs/core_package_analysis.md`
+- ✅ Avaliação de maturidade, prós, contras e roadmap de melhorias
+- ✅ Registro de dívidas técnicas e sugestões de refatoração (ex: renomear BaseRepositoryLocal)
+
+### Task 17 - Configuração de Link de Verificação de Email
+- ✅ Adicionada variável `VERIFICATION_LINK_BASE_URL` ao `.env` e `.env.example`
+- ✅ Adicionado campo `verificationLinkBaseUrl` à classe `Env` (servers/ems/server_v1)
+- ✅ Atualizado construtor do `AuthService` com parâmetro configurável
+- ✅ Removido link hardcoded 'http://todo-config/verify' do código
+- ✅ Atualizado `InitAuthModuleToServer` para injetar configuração da env
+- ✅ Gerado `env.g.dart` atualizado via build_runner
+- ✅ Análise sem erros: `dart analyze` passou em auth_server
 
 ---
 
 ## 📝 Próximos Passos Sugeridos
 
-1. **Task 12** (Soft Delete) - Média complexidade, complementa funcionalidades de school
-2. **Task 10** (UI Responsiva) - Alta complexidade, melhora UX
-3. **Task 15** (Documentação) - Baixa complexidade, consolida conhecimento
-4. **Task 14** (Zard) - Opcional, apenas se houver tempo
+1. **Polimento** - Refinamentos, testes, documentação adicional
+2. **Deploy** - Preparar para produção
+3. **Novas Features** - Soft delete em user, dashboard, relatórios
 
 ---
 
@@ -131,37 +187,82 @@ cd packages/school/school_ui && flutter analyze
 
 ## 📂 Arquivos Importantes Modificados Recentemente
 
-### user_ui
-- `lib/view_models/profile_view_model.dart` - Usando Use Cases
-- `lib/view_models/manage_users_view_model.dart` - Usando Use Cases
-- `lib/user_module.dart` - DI atualizado
+### Documentação
+- `ARCHITECTURE.md` - **NOVO** - Documentação completa da arquitetura (4000+ linhas)
+- `PROGRESS.md` - Atualizado com Task 17 completa (17/17 tasks)
 
-### school_ui
-- `lib/ui/view_models/school_view_model.dart` - refreshCommand adicionado
-- `lib/ui/widgets/components/mobile/mobile_widget.dart` - Pull-to-refresh
-- `lib/ui/widgets/components/tablet/tablet_widget.dart` - Pull-to-refresh
-- `lib/ui/widgets/components/desktop/desktop_table_widget.dart` - Botão refresh
+### user_ui (Task 6 - Design Responsivo)
+- `lib/widgets/shared/user_card.dart` - **NOVO** - Card para lista mobile
+- `lib/widgets/shared/user_grid_card.dart` - **NOVO** - Card para grid tablet
+- `lib/widgets/shared/user_role_badge.dart` - **NOVO** - Badge de role com cores
+- `lib/widgets/shared/user_search_field.dart` - **NOVO** - Campo de busca
+- `lib/widgets/shared/user_filters_bar.dart` - **NOVO** - Barra de filtros
+- `lib/widgets/shared/user_details_bottom_sheet.dart` - **NOVO** - Bottom sheet detalhes
+- `lib/widgets/shared/shared.dart` - **NOVO** - Barrel file para componentes
+- `lib/ui/widgets/components/mobile/mobile_widget.dart` - **NOVO** - Widget mobile com ListView
+- `lib/ui/widgets/components/tablet/tablet_widget.dart` - **NOVO** - Widget tablet com GridView
+- `lib/pages/manage_users_page.dart` - Refatorado para usar ResponsiveLayout
 
-### user_shared
-- `lib/src/domain/use_cases/` - 8 Use Cases criados
+### school_ui (Task 10 - Componentes Reutilizáveis)
+- `lib/ui/widgets/shared/school_card.dart` - **NOVO** - Card para lista mobile
+- `lib/ui/widgets/shared/school_grid_card.dart` - **NOVO** - Card para grid tablet
+- `lib/ui/widgets/shared/school_status_badge.dart` - **NOVO** - Badge de status
+- `lib/ui/widgets/shared/school_filters_bar.dart` - **NOVO** - Barra de filtros
+- `lib/ui/widgets/shared/school_search_field.dart` - **NOVO** - Campo de busca
+- `lib/ui/widgets/shared/school_details_bottom_sheet.dart` - **NOVO** - Bottom sheet detalhes
+- `lib/ui/widgets/shared/shared.dart` - **NOVO** - Barrel file para componentes
+- `lib/ui/widgets/components/mobile/mobile_widget.dart` - Refatorado com componentes
+- `lib/ui/widgets/components/tablet/tablet_widget.dart` - Refatorado com componentes
 
-### user_server
-- `lib/src/queries/user_queries.dart` - DatabaseAccessor
+### school_ui (Task 12 - Soft Delete)
+- `lib/ui/view_models/school_view_model.dart` - showDeleted, toggleShowDeletedCommand, RestoreUseCase
+- `lib/ui/widgets/components/mobile/mobile_widget.dart` - Toggle, confirmação, indicadores visuais
+- `lib/ui/widgets/components/tablet/tablet_widget.dart` - Toggle, confirmação, botão restaurar
+- `lib/ui/widgets/components/desktop/desktop_table_widget.dart` - FilterChip, confirmação, ações condicionais
+- `lib/school_module.dart` - DI atualizado com GetDeletedSchoolsUseCase e RestoreSchoolUseCase
 
-### user_client
-- `lib/src/repositories/user_repository_client.dart` - Repository client
+### school_shared (Task 12)
+- `lib/src/domain/use_cases/get_deleted_use_case.dart` - **NOVO** - Use case para buscar deletadas
+- `lib/src/domain/use_cases/restore_use_case.dart` - **NOVO** - Use case dedicado para restaurar
+- `lib/src/domain/repositories/school_repository.dart` - Métodos getDeleted() e restore()
+- `lib/src/constants/school_constants.dart` - Paths para /deleted e /restore
+
+### school_server (Task 12)
+- `lib/src/queries/school_queries.dart` - getDeleted(), getDeletedCount(), restoreSchool()
+- `lib/src/repositories/school_repository_server.dart` - Implementação getDeleted() e restore()
+- `lib/src/routes/school_routes.dart` - Rotas GET /deleted e POST /{id}/restore com RBAC
+
+### school_client (Task 12)
+- `lib/src/services/school_service.dart` - Endpoints getDeleted() e restore()
+- `lib/src/repositories/school_repository_client.dart` - Implementação client getDeleted() e restore()
+
+### auth_server (Task 17 - Configuração de Link de Verificação)
+- `lib/src/service/auth_service.dart` - Adicionado parâmetro `verificationLinkBaseUrl` ao construtor
+- `lib/src/module/init_auth_module.dart` - Adicionados parâmetros de configuração ao método `init()`
+
+### servers/ems/server_v1 (Task 17)
+- `.env` e `.env.example` - Adicionada variável `VERIFICATION_LINK_BASE_URL`
+- `lib/config/env/env.dart` - Adicionado campo `verificationLinkBaseUrl`
+- `lib/config/env/env.g.dart` - Gerado automaticamente via build_runner
+- `lib/config/injector.dart` - Atualizado para passar configurações da env
 
 ---
 
 ## 🎯 Padrões Estabelecidos
 
-- **Clean Architecture**: Use Cases → Repository → Service
+- **Clean Architecture**: Use Cases → Repository → Service (documentado em ARCHITECTURE.md)
+- **Multi-Variant Pattern**: *_shared, *_ui, *_client, *_server
 - **MVVM**: ViewModels com Commands (Command0, Command1)
-- **Paginação**: PaginatedResult<T> com offset/limit
+- **Paginação**: PaginatedResult<T> com offset/limit, getTotalCount()
 - **Filtros**: Query parameters no backend, UI com chips/dropdowns
+- **Soft Delete**: isDeleted flag, getDeleted(), restore(), toggle UI
+- **RBAC**: UserRole hierarchy, requireRole() middleware, permission matrix
 - **Pull-to-refresh**: RefreshIndicator (mobile/tablet), IconButton (desktop)
 - **DI**: DependencyInjector com registerLazySingleton/registerFactory
-- **Validação**: Zard schema-based (school), FormValidationMixin
+- **Validação**: Zard schema-based (school), FormValidationMixin, server-side validation
+- **Confirmação**: Dialogs antes de operações destrutivas/importantes
+- **Feedback**: SnackBars de sucesso/erro, indicadores visuais de estado
+- **Auditoria**: Logs estruturados de todas operações críticas
 
 ---
 

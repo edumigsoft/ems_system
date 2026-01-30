@@ -12,6 +12,7 @@ environment:
 
 dependencies:
   meta: 1.17.0
+  zard: ^0.0.25
   core_shared:
     path: ../../core/core_shared
   open_api_shared:

@@ -34,13 +34,13 @@ class ManageUsersViewModel extends ChangeNotifier with Loggable {
     required UpdateUserRoleUseCase updateUserRoleUseCase,
     required ResetPasswordUseCase resetPasswordUseCase,
     required AuthService authService,
-  })  : _getAllUsersUseCase = getAllUsersUseCase,
-        _createUserUseCase = createUserUseCase,
-        _updateUserUseCase = updateUserUseCase,
-        _deleteUserUseCase = deleteUserUseCase,
-        _updateUserRoleUseCase = updateUserRoleUseCase,
-        _resetPasswordUseCase = resetPasswordUseCase,
-        _authService = authService;
+  }) : _getAllUsersUseCase = getAllUsersUseCase,
+       _createUserUseCase = createUserUseCase,
+       _updateUserUseCase = updateUserUseCase,
+       _deleteUserUseCase = deleteUserUseCase,
+       _updateUserRoleUseCase = updateUserRoleUseCase,
+       _resetPasswordUseCase = resetPasswordUseCase,
+       _authService = authService;
 
   /// Usuário atualmente autenticado.
   UserDetails? _currentUser;

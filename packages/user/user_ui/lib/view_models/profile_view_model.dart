@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:core_shared/core_shared.dart' show Loggable, Success, Failure;
 import 'package:user_shared/user_shared.dart'
-    show
-        UserDetails,
-        UserUpdate,
-        GetProfileUseCase,
-        UpdateProfileUseCase;
+    show UserDetails, UserUpdate, GetProfileUseCase, UpdateProfileUseCase;
 
 /// ViewModel para gerenciar perfil do usuário.
 ///
@@ -19,9 +15,9 @@ class ProfileViewModel extends ChangeNotifier with Loggable {
     required GetProfileUseCase getProfileUseCase,
     required UpdateProfileUseCase updateProfileUseCase,
     required String currentUserId,
-  })  : _getProfileUseCase = getProfileUseCase,
-        _updateProfileUseCase = updateProfileUseCase,
-        _currentUserId = currentUserId;
+  }) : _getProfileUseCase = getProfileUseCase,
+       _updateProfileUseCase = updateProfileUseCase,
+       _currentUserId = currentUserId;
 
   UserDetails? _profile;
   UserDetails? get profile => _profile;

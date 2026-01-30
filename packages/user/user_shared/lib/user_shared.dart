@@ -15,6 +15,7 @@ export 'src/data/models/user_update_model.dart';
 export 'src/data/models/users_list_response.dart';
 export 'src/validators/user_validators.dart';
 export 'src/validators/user_create_admin_validator.dart';
+export 'src/validators/user_validators_zard.dart';
 export 'src/domain/repositories/user_repository.dart';
 export 'src/domain/use_cases/get_profile_use_case.dart';
 export 'src/domain/use_cases/update_profile_use_case.dart';

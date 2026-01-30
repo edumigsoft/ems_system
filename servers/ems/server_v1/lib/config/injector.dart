@@ -108,6 +108,9 @@ Future<DependencyInjector> registryInjectors() async {
     di: di,
     backendBaseApi: Env.backendPathApi,
     security: false,
+    accessTokenExpiresMinutes: Env.accessTokenExpiresMinutes,
+    refreshTokenExpiresDays: Env.refreshTokenExpiresDays,
+    verificationLinkBaseUrl: Env.verificationLinkBaseUrl,
   );
 
   await InitTagModuleToServer.init(
