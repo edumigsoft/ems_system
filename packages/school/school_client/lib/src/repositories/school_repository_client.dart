@@ -144,4 +144,12 @@ class SchoolRepositoryClient extends BaseRepositoryLocal
       );
     });
   }
+
+  @override
+  Future<Result<Unit>> restore(String id) async {
+    return executeVoidRequest(
+      request: () => _schoolService.restore(id),
+      context: 'restoring school',
+    );
+  }
 }

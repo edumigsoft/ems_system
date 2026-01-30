@@ -16,4 +16,5 @@ export 'src/domain/use_cases/get_deleted_use_case.dart';
 export 'src/domain/use_cases/create_use_case.dart';
 export 'src/domain/use_cases/update_use_case.dart';
 export 'src/domain/use_cases/delete_use_case.dart';
+export 'src/domain/use_cases/restore_use_case.dart';
 export 'src/domain/enums/school_enum.dart';

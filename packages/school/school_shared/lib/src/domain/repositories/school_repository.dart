@@ -106,4 +106,14 @@ abstract class SchoolRepository {
     String? city,
     String? district,
   });
+
+  /// Restaura uma escola deletada (soft delete).
+  ///
+  /// Este método marca uma escola previamente deletada como ativa novamente,
+  /// permitindo que ela seja visualizada e gerenciada normalmente.
+  ///
+  /// [id] - O identificador único da escola a ser restaurada.
+  ///
+  /// Retorna um [Result] com [Unit] indicando sucesso ou falha.
+  Future<Result<Unit>> restore(String id);
 }

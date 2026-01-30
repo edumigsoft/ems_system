@@ -254,6 +254,13 @@ class SchoolQueries extends DatabaseAccessor<SchoolDatabase>
     );
   }
 
+  /// Restaura uma escola deletada (marca isDeleted = false).
+  Future<void> restoreSchool(String id) {
+    return (update(schoolTable)..where((s) => s.id.equals(id))).write(
+      const SchoolTableCompanion(isDeleted: Value(false)),
+    );
+  }
+
   /// Busca todas as escolas deletadas (soft delete).
   ///
   /// Retorna apenas escolas com `isDeleted = true`.

@@ -49,4 +49,7 @@ abstract class SchoolService {
 
   @DELETE('/schools/{id}')
   Future<void> delete(@Path('id') String id);
+
+  @POST('/schools/{id}/restore')
+  Future<void> restore(@Path('id') String id);
 }

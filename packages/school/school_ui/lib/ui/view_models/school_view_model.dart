@@ -8,26 +8,38 @@ import 'package:school_shared/school_shared.dart'
         SchoolDetailsModel,
         SchoolDetailsValidator,
         GetAllUseCase,
+        GetDeletedSchoolsUseCase,
         CreateUseCase,
         UpdateUseCase,
-        DeleteUseCase;
+        DeleteUseCase,
+        RestoreSchoolUseCase;
 
 class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
     with FormValidationMixin {
   final GetAllUseCase _getAllUseCase;
+  final GetDeletedSchoolsUseCase _getDeletedUseCase;
   final CreateUseCase _createUseCase;
   final UpdateUseCase _updateUseCase;
   final DeleteUseCase _deleteUseCase;
+  final RestoreSchoolUseCase _restoreUseCase;
+
+  /// Indica se deve mostrar escolas deletadas ao invés das ativas.
+  bool _showDeleted = false;
+  bool get showDeleted => _showDeleted;
 
   SchoolViewModel({
     required GetAllUseCase getAllUseCase,
+    required GetDeletedSchoolsUseCase getDeletedUseCase,
     required CreateUseCase createUseCase,
     required UpdateUseCase updateUseCase,
     required DeleteUseCase deleteUseCase,
+    required RestoreSchoolUseCase restoreUseCase,
   }) : _getAllUseCase = getAllUseCase,
+       _getDeletedUseCase = getDeletedUseCase,
        _createUseCase = createUseCase,
        _updateUseCase = updateUseCase,
-       _deleteUseCase = deleteUseCase;
+       _deleteUseCase = deleteUseCase,
+       _restoreUseCase = restoreUseCase;
 
   @override
   late final Command0<List<SchoolDetails>> fetchAllCommand = Command0(
@@ -37,10 +49,26 @@ class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
   /// Comando para refresh (pull-to-refresh).
   late final Command0<Unit> refreshCommand = Command0(_refresh);
 
+  /// Comando para alternar entre mostrar escolas ativas ou deletadas.
+  late final Command0<Unit> toggleShowDeletedCommand = Command0(
+    _toggleShowDeleted,
+  );
+
   /// Wrapper para extrair items do PaginatedResult.
+  /// Busca escolas ativas ou deletadas conforme estado de [showDeleted].
   Future<Result<List<SchoolDetails>>> _fetchAll() async {
-    final result = await _getAllUseCase.execute();
+    final result = _showDeleted
+        ? await _getDeletedUseCase.execute()
+        : await _getAllUseCase.execute();
     return result.map((paginatedResult) => paginatedResult.items);
+  }
+
+  /// Alterna entre visualização de escolas ativas e deletadas.
+  Future<Result<Unit>> _toggleShowDeleted() async {
+    _showDeleted = !_showDeleted;
+    await fetchAllCommand.execute();
+    notifyListeners();
+    return successOfUnit();
   }
 
   /// Atualiza a lista de escolas (usado por pull-to-refresh).
@@ -120,15 +148,15 @@ class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
       return Failure(Exception('Não há detalhes para restaurar.'));
     }
 
-    final updatedDetails = details!.copyWith(isDeleted: false);
-    final result = await _updateUseCase.execute(updatedDetails);
+    final result = await _restoreUseCase.execute(details!.id);
 
     if (result case Failure(error: final error)) {
       logger.severe('Error occurred while restoring school: $error');
       return Failure(error);
     }
 
-    details = result.valueOrThrow;
+    // Atualizar detalhes localmente
+    details = details!.copyWith(isDeleted: false);
     await fetchAllCommand.execute();
     notifyListeners();
     return successOfUnit();

@@ -86,6 +86,14 @@ class SchoolRoutes extends Routes with Loggable {
           .addHandler((req) => delete(req, req.params['id']!)),
     );
 
+    // Restaurar escola deletada - Admin+
+    router.post(
+      schoolsPathRestore,
+      Pipeline()
+          .addMiddleware(adminMiddleware)
+          .addHandler((req) => restoreSchool(req, req.params['id']!)),
+    );
+
     return router;
   }
 
@@ -448,5 +456,50 @@ class SchoolRoutes extends Routes with Loggable {
         'hasPreviousPage': paginatedResult.hasPreviousPage,
       },
     );
+  }
+
+  @open.Post(
+    path: schoolsPathRestoreOpenApi,
+    summary: 'Restaurar uma escola deletada',
+    description:
+        'Restaura uma escola previamente deletada (soft delete), '
+        'marcando-a como ativa novamente. '
+        'Requer permissão de Admin ou superior.',
+  )
+  @open.PathParam(name: 'id')
+  @open.Response(
+    statusCode: 200,
+    description: 'School restaurada com sucesso',
+    returns: String,
+  )
+  @open.Response(
+    statusCode: 404,
+    description: 'School não encontrada',
+    returns: String,
+  )
+  Future<Response> restoreSchool(Request request, String id) async {
+    logger.info('POST /schools/$id/restore - Restaurando escola (admin+)');
+
+    try {
+      final result = await _repository.restore(id);
+
+      return HttpResponseHelper.toResponse(
+        result,
+        onSuccess: (_) {
+          logger.info('Escola restaurada com sucesso: $id');
+          return {'message': 'Restored School $id'};
+        },
+      );
+    } catch (e) {
+      logger.severe('Erro ao processar requisição de restauração', e);
+      return Response(
+        400,
+        body: json.encode({
+          'error': 'Invalid request',
+          'details': e.toString(),
+        }),
+        headers: {'content-type': 'application/json'},
+      );
+    }
   }
 }

@@ -11,9 +11,11 @@ import 'package:school_shared/school_shared.dart'
     show
         SchoolRepository,
         GetAllUseCase,
+        GetDeletedSchoolsUseCase,
         CreateUseCase,
         UpdateUseCase,
-        DeleteUseCase;
+        DeleteUseCase,
+        RestoreSchoolUseCase;
 import 'ui/view_models/school_view_model.dart';
 import 'ui/pages/school_page.dart';
 
@@ -41,6 +43,9 @@ class SchoolModule extends AppModule with Loggable {
     di.registerLazySingleton<GetAllUseCase>(
       () => GetAllUseCase(repository: di.get<SchoolRepository>()),
     );
+    di.registerLazySingleton<GetDeletedSchoolsUseCase>(
+      () => GetDeletedSchoolsUseCase(repository: di.get<SchoolRepository>()),
+    );
     di.registerLazySingleton<CreateUseCase>(
       () => CreateUseCase(repository: di.get<SchoolRepository>()),
     );
@@ -50,12 +55,17 @@ class SchoolModule extends AppModule with Loggable {
     di.registerLazySingleton<DeleteUseCase>(
       () => DeleteUseCase(repository: di.get<SchoolRepository>()),
     );
+    di.registerLazySingleton<RestoreSchoolUseCase>(
+      () => RestoreSchoolUseCase(repository: di.get<SchoolRepository>()),
+    );
     di.registerLazySingleton<SchoolViewModel>(
       () => SchoolViewModel(
         getAllUseCase: di.get<GetAllUseCase>(),
+        getDeletedUseCase: di.get<GetDeletedSchoolsUseCase>(),
         createUseCase: di.get<CreateUseCase>(),
         updateUseCase: di.get<UpdateUseCase>(),
         deleteUseCase: di.get<DeleteUseCase>(),
+        restoreUseCase: di.get<RestoreSchoolUseCase>(),
       ),
     );
     di.registerLazySingleton<SchoolPage>(

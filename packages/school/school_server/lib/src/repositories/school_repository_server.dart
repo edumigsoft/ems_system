@@ -190,4 +190,15 @@ class SchoolRepositoryServer implements SchoolRepository {
       return Failure(DataException(e.toString()));
     }
   }
+
+  @override
+  Future<Result<Unit>> restore(String id) async {
+    try {
+      await _schoolQueries.restoreSchool(id);
+
+      return successOfUnit();
+    } on Exception catch (e) {
+      return Failure(DataException(e.toString()));
+    }
+  }
 }

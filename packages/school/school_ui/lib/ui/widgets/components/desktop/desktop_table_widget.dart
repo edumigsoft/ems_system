@@ -189,6 +189,36 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     widget.viewModel.deleteCommand.execute();
   }
 
+  void _restoreSchool(SchoolDetails school) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Restaurar Escola'),
+        content: Text('Deseja restaurar a escola "${school.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              widget.viewModel.detailsCommand.execute(school);
+              widget.viewModel.restoreCommand.execute();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Escola "${school.name}" restaurada com sucesso!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            },
+            child: const Text('Restaurar'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _deleteSelected() {
     // Implementação simplificada: deleta um por um ou via comando específico se existisse
     for (final school in selectionState.selectedItems) {
@@ -204,7 +234,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
 
     return DSDataTableContainer(
       width: width,
-      // Campo de busca com botão de refresh
+      // Campo de busca com botão de refresh e toggle de deletados
       searchField: Row(
         children: [
           Expanded(
@@ -218,6 +248,28 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
                 searchQuery = '';
                 _applyFilters();
               },
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Toggle para mostrar/ocultar deletados
+          Tooltip(
+            message: widget.viewModel.showDeleted
+                ? 'Mostrar escolas ativas'
+                : 'Mostrar escolas deletadas',
+            child: FilterChip(
+              label: Text(
+                widget.viewModel.showDeleted ? 'Deletadas' : 'Ativas',
+              ),
+              selected: widget.viewModel.showDeleted,
+              onSelected: (selected) {
+                widget.viewModel.toggleShowDeletedCommand.execute();
+              },
+              avatar: Icon(
+                widget.viewModel.showDeleted
+                    ? Icons.delete_outline
+                    : Icons.check_circle_outline,
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -303,13 +355,30 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
         columns: [
           DSDataTableColumn<SchoolDetails>(
             label: 'ESCOLA',
-            builder: (school) => DSTableCellWithIcon(
-              icon: Icons.school,
-              iconBackgroundColor: _getIconBackgroundColor(
-                Icons.school,
-              ),
-              title: school.name,
-              subtitle: 'Cod: ${school.code}',
+            builder: (school) => Row(
+              children: [
+                DSTableCellWithIcon(
+                  icon: Icons.school,
+                  iconBackgroundColor: school.isDeleted
+                      ? Colors.grey
+                      : _getIconBackgroundColor(Icons.school),
+                  title: school.name,
+                  subtitle: school.isDeleted
+                      ? 'Cod: ${school.code} (Deletada)'
+                      : 'Cod: ${school.code}',
+                ),
+                if (school.isDeleted) ...[
+                  const SizedBox(width: 8),
+                  Tooltip(
+                    message: 'Esta escola foi deletada',
+                    child: Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           DSDataTableColumn<SchoolDetails>(
@@ -354,18 +423,28 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
           DSDataTableColumn<SchoolDetails>(
             label: 'AÇÕES',
             builder: (school) => DSTableActions(
-              actions: [
-                DSTableAction(
-                  icon: Icons.edit,
-                  onPressed: () => _editSchool(school),
-                  tooltip: 'Editar',
-                ),
-                DSTableAction(
-                  icon: Icons.delete_outline,
-                  onPressed: () => _deleteSchool(school),
-                  tooltip: 'Excluir',
-                ),
-              ],
+              actions: school.isDeleted
+                  ? [
+                      // Ações para escolas deletadas
+                      DSTableAction(
+                        icon: Icons.restore_from_trash,
+                        onPressed: () => _restoreSchool(school),
+                        tooltip: 'Restaurar',
+                      ),
+                    ]
+                  : [
+                      // Ações para escolas ativas
+                      DSTableAction(
+                        icon: Icons.edit,
+                        onPressed: () => _editSchool(school),
+                        tooltip: 'Editar',
+                      ),
+                      DSTableAction(
+                        icon: Icons.delete_outline,
+                        onPressed: () => _deleteSchool(school),
+                        tooltip: 'Excluir',
+                      ),
+                    ],
             ),
           ),
         ],
