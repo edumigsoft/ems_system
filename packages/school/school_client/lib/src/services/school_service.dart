@@ -19,6 +19,16 @@ abstract class SchoolService {
     @Query('district') String? district,
   );
 
+  @GET('/schools/deleted')
+  Future<List<SchoolDetailsModel>> getDeleted(
+    @Query('limit') int? limit,
+    @Query('offset') int? offset,
+    @Query('search') String? search,
+    @Query('status') String? status,
+    @Query('city') String? city,
+    @Query('district') String? district,
+  );
+
   @GET('/schools/{id}')
   Future<SchoolDetailsModel> getById(@Path('id') String id);
 

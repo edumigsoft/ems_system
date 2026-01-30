@@ -7,3 +7,5 @@ const String schoolsPathUpdate = '/<id>';
 const String schoolsPathUpdateOpenApi = '/{id}';
 const String schoolsPathDelete = '/<id>';
 const String schoolsPathDeleteOpenApi = '/{id}';
+const String schoolsPathGetDeleted = '/deleted';
+const String schoolsPathGetDeletedOpenApi = '/deleted';

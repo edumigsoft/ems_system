@@ -145,4 +145,49 @@ class SchoolRepositoryServer implements SchoolRepository {
       return Failure(DataException(e.toString()));
     }
   }
+
+  @override
+  Future<Result<PaginatedResult<SchoolDetails>>> getDeleted({
+    int? limit,
+    int? offset,
+    String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
+  }) async {
+    try {
+      final effectiveLimit = limit ?? 50;
+      final effectiveOffset = offset ?? 0;
+
+      // Buscar items da página atual (deletados)
+      final items = await _schoolQueries.getDeleted(
+        limit: effectiveLimit,
+        offset: effectiveOffset,
+        search: search,
+        status: status,
+        city: city,
+        district: district,
+      );
+
+      // Buscar total count de deletados
+      final total = await _schoolQueries.getDeletedCount(
+        search: search,
+        status: status,
+        city: city,
+        district: district,
+      );
+
+      // Criar resultado paginado
+      final result = PaginatedResult.fromOffset(
+        items: items,
+        total: total,
+        offset: effectiveOffset,
+        limit: effectiveLimit,
+      );
+
+      return Success(result);
+    } on Exception catch (e) {
+      return Failure(DataException(e.toString()));
+    }
+  }
 }

@@ -110,4 +110,38 @@ class SchoolRepositoryClient extends BaseRepositoryLocal
       mapper: (e) => e.toDomain(),
     );
   }
+
+  @override
+  Future<Result<PaginatedResult<SchoolDetails>>> getDeleted({
+    int? limit,
+    int? offset,
+    String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
+  }) async {
+    final result = await executeRequest(
+      request: () => _schoolService.getDeleted(
+        limit,
+        offset,
+        search,
+        status?.name,
+        city,
+        district,
+      ),
+      context: 'fetching deleted schools',
+      mapper: (models) => models,
+    );
+
+    // Criar PaginatedResult a partir da resposta
+    return result.map((models) {
+      final items = models.map((m) => m.toDomain()).toList();
+      return PaginatedResult.fromOffset(
+        items: items,
+        total: items.length, // Temporário: não temos total do servidor
+        offset: offset ?? 0,
+        limit: limit ?? 50,
+      );
+    });
+  }
 }

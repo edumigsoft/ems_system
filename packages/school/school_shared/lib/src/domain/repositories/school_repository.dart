@@ -84,4 +84,26 @@ abstract class SchoolRepository {
   ///
   /// Retorna um [Result] contendo [SchoolDetails].
   Future<Result<SchoolDetails>> getByCie(String cie);
+
+  /// Retorna uma lista paginada de escolas deletadas (soft delete).
+  ///
+  /// Este método permite que administradores visualizem escolas que foram
+  /// marcadas como deletadas (isDeleted = true) para possível restauração.
+  ///
+  /// [limit] - O número máximo de escolas a serem retornadas.
+  /// [offset] - O número de escolas a serem ignoradas.
+  /// [search] - Termo de busca para filtrar por nome, código, diretor ou cidade.
+  /// [status] - Filtro por status da escola (active, inactive, maintenance).
+  /// [city] - Filtro por cidade.
+  /// [district] - Filtro por distrito.
+  ///
+  /// Retorna um [Result] contendo [PaginatedResult] com lista de [SchoolDetails] deletadas.
+  Future<Result<PaginatedResult<SchoolDetails>>> getDeleted({
+    int? limit,
+    int? offset,
+    String? search,
+    SchoolStatus? status,
+    String? city,
+    String? district,
+  });
 }

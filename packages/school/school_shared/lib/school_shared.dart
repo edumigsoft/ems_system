@@ -12,6 +12,7 @@ export 'src/data/models/school_details_model.dart';
 export 'src/domain/repositories/school_repository.dart';
 export 'src/validators/school_validators.dart';
 export 'src/domain/use_cases/get_all_use_case.dart';
+export 'src/domain/use_cases/get_deleted_use_case.dart';
 export 'src/domain/use_cases/create_use_case.dart';
 export 'src/domain/use_cases/update_use_case.dart';
 export 'src/domain/use_cases/delete_use_case.dart';

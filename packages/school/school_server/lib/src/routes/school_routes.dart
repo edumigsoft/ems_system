@@ -50,6 +50,12 @@ class SchoolRoutes extends Routes with Loggable {
       Pipeline().addMiddleware(authMiddleware).addHandler(getAll),
     );
 
+    // Listar escolas deletadas - Admin+ (gestão de dados)
+    router.get(
+      schoolsPathGetDeleted,
+      Pipeline().addMiddleware(adminMiddleware).addHandler(getDeleted),
+    );
+
     // Buscar escola por ID - Qualquer usuário autenticado (read-only)
     router.get(
       schoolsPathById,
@@ -380,5 +386,67 @@ class SchoolRoutes extends Routes with Loggable {
         headers: {'content-type': 'application/json'},
       );
     }
+  }
+
+  @open.Get(
+    path: schoolsPathGetDeletedOpenApi,
+    summary: 'Obter lista de escolas deletadas',
+    description:
+        'Retorna uma lista paginada de escolas deletadas (soft delete). '
+        'Permite que administradores visualizem e restaurem escolas deletadas. '
+        'Requer permissão de Admin ou superior.',
+  )
+  @open.Response(
+    statusCode: 200,
+    description: 'Lista de Schools deletadas',
+    returns: SchoolDetails,
+  )
+  Future<Response> getDeleted(Request request) async {
+    logger.info('GET /schools/deleted - Listando escolas deletadas (admin+)');
+
+    final queryParams = request.url.queryParameters;
+    final limit = queryParams.containsKey('limit')
+        ? int.tryParse(queryParams['limit']!)
+        : null;
+    final offset = queryParams.containsKey('offset')
+        ? int.tryParse(queryParams['offset']!)
+        : null;
+    final search = queryParams['search'];
+    final statusStr = queryParams['status'];
+    final city = queryParams['city'];
+    final district = queryParams['district'];
+
+    // Parse status enum
+    final status = statusStr != null
+        ? SchoolStatus.values.cast<SchoolStatus?>().firstWhere(
+            (e) => e?.name == statusStr,
+            orElse: () => null,
+          )
+        : null;
+
+    final result = await _repository.getDeleted(
+      limit: limit,
+      offset: offset,
+      search: search,
+      status: status,
+      city: city,
+      district: district,
+    );
+
+    return HttpResponseHelper.toResponse(
+      result,
+      onSuccess: (paginatedResult) => {
+        'data': EntityMapper.mapList(
+          models: paginatedResult.items,
+          mapper: (a) => SchoolDetailsModel.fromDomain(a).toJson(),
+        ),
+        'total': paginatedResult.total,
+        'page': paginatedResult.page,
+        'limit': paginatedResult.limit,
+        'totalPages': paginatedResult.totalPages,
+        'hasNextPage': paginatedResult.hasNextPage,
+        'hasPreviousPage': paginatedResult.hasPreviousPage,
+      },
+    );
   }
 }
