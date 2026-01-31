@@ -152,7 +152,7 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
               child: TextField(
                 controller: _form.register(schoolCieByField),
                 decoration: InputDecoration(
-                  labelText: 'CIE', // TODO: adicionar em localizations
+                  labelText: l10n.cie,
                   errorText: state.errors[schoolCieByField],
                   hintText: l10n.cannotBeEmpty,
                   border: const OutlineInputBorder(),
@@ -161,7 +161,7 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
               ),
             ),
 
-            SizedBox(height: DSSpacing.medium),
+            const SizedBox(height: DSSpacing.medium),
 
             // Botões de ação
             Row(
@@ -172,7 +172,7 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
                     onPressed: widget.onCancel,
                     child: Text(l10n.cancel),
                   ),
-                  SizedBox(width: DSSpacing.small),
+                  const SizedBox(width: DSSpacing.small),
                 ],
                 ElevatedButton(
                   onPressed: _isFormValid && _hasChanges ? _handleSubmit : null,

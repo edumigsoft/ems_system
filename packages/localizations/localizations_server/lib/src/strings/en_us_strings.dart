@@ -58,4 +58,19 @@ class EnUsStrings implements I18nStrings {
 
   @override
   String get validationRequired => 'This field is required';
+
+  @override
+  String get school => 'School';
+
+  @override
+  String get schools => 'Schools';
+
+  @override
+  String get editSchool => 'Edit School';
+
+  @override
+  String get createSchool => 'Create School';
+
+  @override
+  String get cie => 'CIE';
 }

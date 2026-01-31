@@ -234,7 +234,7 @@ class _MobileWidgetState extends State<MobileWidget> {
                     // Role (apenas para owners)
                     if (widget.viewModel.isOwner)
                       DropdownButtonFormField<UserRole>(
-                        value: selectedRole,
+                        initialValue: selectedRole,
                         decoration: const InputDecoration(
                           labelText: 'Função',
                           border: OutlineInputBorder(),
@@ -277,6 +277,9 @@ class _MobileWidgetState extends State<MobileWidget> {
               FilledButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
+                    // Capturar ScaffoldMessenger antes de operações async
+                    final scaffold = ScaffoldMessenger.of(context);
+
                     // Atualizar informações básicas se mudaram
                     if (nameController.text != user.name ||
                         phoneController.text != user.phone) {
@@ -307,14 +310,12 @@ class _MobileWidgetState extends State<MobileWidget> {
                       Navigator.of(dialogContext).pop();
                     }
 
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Usuário atualizado com sucesso'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
+                    scaffold.showSnackBar(
+                      const SnackBar(
+                        content: Text('Usuário atualizado com sucesso'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
                   }
                 },
                 child: const Text('Salvar'),

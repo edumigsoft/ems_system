@@ -65,6 +65,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get edit => 'Editar';
 
   @override
+  String get school => 'Escola';
+
+  @override
+  String get schools => 'Escolas';
+
+  @override
+  String get editSchool => 'Editar Escola';
+
+  @override
+  String get createSchool => 'Criar Escola';
+
+  @override
+  String get cie => 'CIE';
+
+  @override
   String get registeredPleaseLoginAgain =>
       'Registrado! Faça o Login novamente.';
 

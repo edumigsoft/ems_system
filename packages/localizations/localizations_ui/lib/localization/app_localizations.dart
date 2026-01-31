@@ -208,6 +208,36 @@ abstract class AppLocalizations {
   /// **'Edit'**
   String get edit;
 
+  /// Label for a school
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get school;
+
+  /// Label for multiple schools
+  ///
+  /// In en, this message translates to:
+  /// **'Schools'**
+  String get schools;
+
+  /// Button to edit a school
+  ///
+  /// In en, this message translates to:
+  /// **'Edit School'**
+  String get editSchool;
+
+  /// Button to create a new school
+  ///
+  /// In en, this message translates to:
+  /// **'Create School'**
+  String get createSchool;
+
+  /// CIE (School Identification Code)
+  ///
+  /// In en, this message translates to:
+  /// **'CIE'**
+  String get cie;
+
   /// Registered! Please login again.
   ///
   /// In en, this message translates to:

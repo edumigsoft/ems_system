@@ -65,6 +65,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit => 'Edit';
 
   @override
+  String get school => 'School';
+
+  @override
+  String get schools => 'Schools';
+
+  @override
+  String get editSchool => 'Edit School';
+
+  @override
+  String get createSchool => 'Create School';
+
+  @override
+  String get cie => 'CIE';
+
+  @override
   String get registeredPleaseLoginAgain => 'Registered! Please login again.';
 
   @override

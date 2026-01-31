@@ -243,7 +243,7 @@ class _TabletWidgetState extends State<TabletWidget> {
                     // Role (apenas para owners)
                     if (widget.viewModel.isOwner)
                       DropdownButtonFormField<UserRole>(
-                        value: selectedRole,
+                        initialValue: selectedRole,
                         decoration: const InputDecoration(
                           labelText: 'Função',
                           border: OutlineInputBorder(),
@@ -286,6 +286,9 @@ class _TabletWidgetState extends State<TabletWidget> {
               FilledButton(
                 onPressed: () async {
                   if (formKey.currentState!.validate()) {
+                    // Capturar ScaffoldMessenger antes de operações async
+                    final scaffold = ScaffoldMessenger.of(context);
+
                     // Atualizar informações básicas se mudaram
                     if (nameController.text != user.name ||
                         phoneController.text != user.phone) {
@@ -316,14 +319,12 @@ class _TabletWidgetState extends State<TabletWidget> {
                       Navigator.of(dialogContext).pop();
                     }
 
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Usuário atualizado com sucesso'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    }
+                    scaffold.showSnackBar(
+                      const SnackBar(
+                        content: Text('Usuário atualizado com sucesso'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
                   }
                 },
                 child: const Text('Salvar'),

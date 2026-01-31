@@ -72,6 +72,26 @@
     "@edit": {
         "description": "Edit"
     },
+    "school": "School",
+    "@school": {
+        "description": "Label for a school"
+    },
+    "schools": "Schools",
+    "@schools": {
+        "description": "Label for multiple schools"
+    },
+    "editSchool": "Edit School",
+    "@editSchool": {
+        "description": "Button to edit a school"
+    },
+    "createSchool": "Create School",
+    "@createSchool": {
+        "description": "Button to create a new school"
+    },
+    "cie": "CIE",
+    "@cie": {
+        "description": "CIE (School Identification Code)"
+    },
     "registeredPleaseLoginAgain": "Registered! Please login again.",
     "@registeredPleaseLoginAgain": {
         "description": "Registered! Please login again."

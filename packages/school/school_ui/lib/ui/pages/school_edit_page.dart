@@ -26,7 +26,7 @@ class SchoolEditPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.edit), // TODO: adicionar editSchool em localizations
+        title: Text(l10n.editSchool),
         elevation: 0,
       ),
       body: SingleChildScrollView(

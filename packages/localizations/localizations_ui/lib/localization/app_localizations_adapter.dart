@@ -64,4 +64,19 @@ class AppLocalizationsAdapter implements I18nStrings {
 
   @override
   String get validationRequired => _delegate.validationRequired;
+
+  @override
+  String get school => _delegate.school;
+
+  @override
+  String get schools => _delegate.schools;
+
+  @override
+  String get editSchool => _delegate.editSchool;
+
+  @override
+  String get createSchool => _delegate.createSchool;
+
+  @override
+  String get cie => _delegate.cie;
 }
