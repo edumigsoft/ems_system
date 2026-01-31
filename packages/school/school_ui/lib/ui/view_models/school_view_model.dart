@@ -27,6 +27,12 @@ class SchoolViewModel extends BaseCRUDViewModel<SchoolDetails>
   bool _showDeleted = false;
   bool get showDeleted => _showDeleted;
 
+  /// Expõe CreateUseCase para uso em formulários
+  CreateUseCase get createUseCase => _createUseCase;
+
+  /// Expõe UpdateUseCase para uso em formulários
+  UpdateUseCase get updateUseCase => _updateUseCase;
+
   SchoolViewModel({
     required GetAllUseCase getAllUseCase,
     required GetDeletedSchoolsUseCase getDeletedUseCase,

@@ -1,19 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:zard_form/zard_form.dart';
+import 'package:core_shared/core_shared.dart' show Success, Failure;
 import 'package:school_shared/school_shared.dart';
 import 'package:design_system_shared/design_system_shared.dart';
 import 'package:localizations_ui/localizations_ui.dart';
+import '../../view_models/school_form_view_model.dart';
 
-/// Widget de formulário compartilhado para criação e edição de escolas.
+/// Widget de formulário para criação e edição de escolas.
 ///
-/// Pode ser usado em diferentes contextos (desktop, mobile, tablet)
-/// com personalização via callbacks e flags.
+/// Utiliza [SchoolFormViewModel] internamente para gerenciamento de estado
+/// e validação de formulários.
+///
+/// **BREAKING CHANGE (v2.0.0):**
+/// - Agora recebe `CreateUseCase` e `UpdateUseCase` ao invés de callback `onSubmit`
+/// - Callbacks mudaram de `onSubmit(Map)` para `onSuccess(SchoolDetails)` e `onError(Exception)`
+///
+/// **Migração:**
+/// ```dart
+/// // Antes
+/// SchoolFormWidget(
+///   onSubmit: (data) {
+///     // processar data
+///   },
+/// )
+///
+/// // Depois
+/// SchoolFormWidget(
+///   createUseCase: createUseCase,
+///   updateUseCase: updateUseCase,
+///   onSuccess: (school) {
+///     // school já é SchoolDetails validado
+///   },
+/// )
+/// ```
 class SchoolFormWidget extends StatefulWidget {
+  /// UseCase para criação de escolas
+  final CreateUseCase createUseCase;
+
+  /// UseCase para atualização de escolas
+  final UpdateUseCase updateUseCase;
+
   /// Dados iniciais da escola para edição (null para criação)
   final SchoolDetails? initialData;
 
-  /// Callback chamado quando o formulário é submetido com dados válidos
-  final void Function(Map<String, dynamic> data) onSubmit;
+  /// Callback chamado quando a operação é bem-sucedida
+  final void Function(SchoolDetails school)? onSuccess;
+
+  /// Callback chamado quando ocorre um erro
+  final void Function(Exception error)? onError;
 
   /// Callback opcional chamado quando o usuário cancela
   final VoidCallback? onCancel;
@@ -26,8 +59,11 @@ class SchoolFormWidget extends StatefulWidget {
 
   const SchoolFormWidget({
     super.key,
+    required this.createUseCase,
+    required this.updateUseCase,
     this.initialData,
-    required this.onSubmit,
+    this.onSuccess,
+    this.onError,
     this.onCancel,
     this.showCancelButton = true,
     this.submitButtonText,
@@ -38,48 +74,43 @@ class SchoolFormWidget extends StatefulWidget {
 }
 
 class _SchoolFormWidgetState extends State<SchoolFormWidget> {
-  late ZForm<Map<String, dynamic>> _form;
-  bool _isFormValid = false;
-  bool _hasChanges = false;
+  late SchoolFormViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _form = useForm(
-      resolver: zardResolver(SchoolDetailsValidator.schema),
-      mode: ValidationMode.onChange,
-      defaultValues: {
-        schoolNameByField: widget.initialData?.name ?? '',
-        schoolEmailByField: widget.initialData?.email ?? '',
-        schoolAddressByField: widget.initialData?.address ?? '',
-        schoolPhoneByField: widget.initialData?.phone ?? '',
-        schoolCieByField: widget.initialData?.code ?? '',
-      },
+    _viewModel = SchoolFormViewModel(
+      createUseCase: widget.createUseCase,
+      updateUseCase: widget.updateUseCase,
+      initialData: widget.initialData,
     );
   }
 
   @override
   void dispose() {
-    _form.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
-  void _handleSubmit() {
-    _form.handleSubmit((data) async {
-      widget.onSubmit(data);
-    });
+  Future<void> _handleSubmit() async {
+    final result = await _viewModel.submit();
+
+    if (!mounted) return;
+
+    if (result case Success(:final value)) {
+      widget.onSuccess?.call(value);
+    } else if (result case Failure(:final error)) {
+      widget.onError?.call(error);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    return ZFormBuilder(
-      form: _form,
-      builder: (context, state) {
-        _isFormValid = state.isValid;
-        _hasChanges = state.isDirty;
-
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -88,10 +119,10 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
-                controller: _form.register(schoolNameByField),
+                controller: _viewModel.registerField(schoolNameByField),
                 decoration: InputDecoration(
                   labelText: l10n.name,
-                  errorText: state.errors[schoolNameByField],
+                  errorText: _viewModel.getFieldError(schoolNameByField),
                   hintText: l10n.theNameCannotBeEmpty,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.school),
@@ -103,10 +134,10 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
-                controller: _form.register(schoolEmailByField),
+                controller: _viewModel.registerField(schoolEmailByField),
                 decoration: InputDecoration(
                   labelText: l10n.email,
-                  errorText: state.errors[schoolEmailByField],
+                  errorText: _viewModel.getFieldError(schoolEmailByField),
                   hintText: l10n.cannotBeEmpty,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.email),
@@ -119,10 +150,10 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
-                controller: _form.register(schoolAddressByField),
+                controller: _viewModel.registerField(schoolAddressByField),
                 decoration: InputDecoration(
                   labelText: l10n.address,
-                  errorText: state.errors[schoolAddressByField],
+                  errorText: _viewModel.getFieldError(schoolAddressByField),
                   hintText: l10n.cannotBeEmpty,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.location_on),
@@ -134,10 +165,10 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
-                controller: _form.register(schoolPhoneByField),
+                controller: _viewModel.registerField(schoolPhoneByField),
                 decoration: InputDecoration(
                   labelText: l10n.phone,
-                  errorText: state.errors[schoolPhoneByField],
+                  errorText: _viewModel.getFieldError(schoolPhoneByField),
                   hintText: l10n.cannotBeEmpty,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.phone),
@@ -150,10 +181,10 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: TextField(
-                controller: _form.register(schoolCieByField),
+                controller: _viewModel.registerField(schoolCieByField),
                 decoration: InputDecoration(
                   labelText: l10n.cie,
-                  errorText: state.errors[schoolCieByField],
+                  errorText: _viewModel.getFieldError(schoolCieByField),
                   hintText: l10n.cannotBeEmpty,
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.business),
@@ -175,8 +206,18 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
                   const SizedBox(width: DSSpacing.small),
                 ],
                 ElevatedButton(
-                  onPressed: _isFormValid && _hasChanges ? _handleSubmit : null,
-                  child: Text(widget.submitButtonText ?? l10n.save),
+                  onPressed: _viewModel.isSubmitting
+                      ? null
+                      : (_viewModel.isFormValid && _viewModel.isFormDirty
+                          ? _handleSubmit
+                          : null),
+                  child: _viewModel.isSubmitting
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(widget.submitButtonText ?? l10n.save),
                 ),
               ],
             ),

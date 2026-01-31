@@ -32,35 +32,21 @@ class SchoolEditPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(DSPaddings.large),
         child: SchoolFormWidget(
+          createUseCase: viewModel.createUseCase,
+          updateUseCase: viewModel.updateUseCase,
           initialData: school,
           showCancelButton: false,
-          onSubmit: (data) async {
-            final updated = school.copyWith(
-              name: data[schoolNameByField] as String,
-              email: data[schoolEmailByField] as String,
-              address: data[schoolAddressByField] as String,
-              phone: data[schoolPhoneByField] as String,
-              code: data[schoolCieByField] as String,
+          onSuccess: (updatedSchool) {
+            DSAlert.success(
+              context,
+              message: l10n.savedSuccessfully,
             );
-
-            final result = await viewModel.updateEntity(updated);
-
-            if (!context.mounted) return;
-
-            result.when(
-              success: (_) {
-                DSAlert.success(
-                  context,
-                  message: l10n.savedSuccessfully,
-                );
-                Navigator.of(context).pop(true);
-              },
-              failure: (error) {
-                DSAlert.error(
-                  context,
-                  message: error.toString(),
-                );
-              },
+            Navigator.of(context).pop(true);
+          },
+          onError: (error) {
+            DSAlert.error(
+              context,
+              message: error.toString(),
             );
           },
         ),

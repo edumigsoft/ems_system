@@ -143,22 +143,55 @@ core_ui (Abstração)
 - [x] Documentação completa
 - [ ] Testes unitários (pendente)
 
-### ⏳ Etapa 3: Migrar SchoolFormWidget
-**Status:** Pendente
-**Arquivo:** `packages/school/school_ui/lib/ui/widgets/forms/school_form_widget.dart`
+### ✅ Etapa 3: Migrar SchoolFormWidget
+**Status:** Concluída
+**Arquivos:**
+- `packages/school/school_ui/lib/ui/widgets/forms/school_form_widget.dart`
+- `packages/school/school_ui/lib/ui/pages/school_edit_page.dart`
+- `packages/school/school_ui/lib/ui/view_models/school_view_model.dart`
 
-**Alterações:**
-1. Remover dependência de `zard_form`
-2. Usar `SchoolFormViewModel`
-3. Usar `ListenableBuilder` ao invés de `ZFormBuilder`
-4. Usar `viewModel.registerField()` ao invés de `form.register()`
-5. Usar `viewModel.getFieldError()` ao invés de `state.errors`
+**Alterações Implementadas:**
+
+1. ✅ **SchoolFormWidget** - Migração completa:
+   - Removida dependência de `zard_form`
+   - Usa `SchoolFormViewModel` internamente
+   - `ListenableBuilder` ao invés de `ZFormBuilder`
+   - `viewModel.registerField()` ao invés de `form.register()`
+   - `viewModel.getFieldError()` ao invés de `state.errors`
+   - Loading indicator durante submit
+
+2. ✅ **BREAKING CHANGE** - Interface do widget:
+   ```dart
+   // Antes
+   SchoolFormWidget(
+     onSubmit: (Map<String, dynamic> data) { },
+   )
+
+   // Depois
+   SchoolFormWidget(
+     createUseCase: createUseCase,
+     updateUseCase: updateUseCase,
+     onSuccess: (SchoolDetails school) { },
+     onError: (Exception error) { },
+   )
+   ```
+
+3. ✅ **SchoolEditPage** atualizado:
+   - Adaptado para nova interface do widget
+   - Usa `viewModel.createUseCase` e `viewModel.updateUseCase`
+   - Callbacks adaptados para `onSuccess` e `onError`
+
+4. ✅ **SchoolViewModel** estendido:
+   - Getters públicos para `createUseCase` e `updateUseCase`
+   - Permite reutilização em formulários
 
 **Critérios de Aceitação:**
-- [ ] Widget funcional
-- [ ] Não importa zard_form
-- [ ] UX equivalente ou melhor
-- [ ] Testes de widget
+- [x] Widget funcional (criação e edição)
+- [x] Não importa zard_form
+- [x] UX equivalente ou melhor (loading indicator adicionado)
+- [x] Zero avisos de análise
+- [x] Documentação com guia de migração
+- [ ] Testes de widget (pendente)
 
 ### ⏳ Etapa 4: Migrar NotebookFormPage
 **Status:** Pendente
@@ -243,7 +276,7 @@ core_ui (Abstração)
 ### Implementação
 - [x] **Etapa 1: Expandir FormValidationMixin** ✅
 - [x] **Etapa 2: Criar ViewModel de exemplo** ✅
-- [ ] Etapa 3: Migrar SchoolFormWidget
+- [x] **Etapa 3: Migrar SchoolFormWidget** ✅
 - [ ] Etapa 4: Migrar NotebookFormPage
 - [ ] Etapa 5: Atualizar documentação
 - [ ] Etapa 6: Validação e testes
@@ -325,7 +358,15 @@ Durante migração, zard_form e FormValidationMixin coexistem. Apenas após vali
   - ✅ Documentação inline completa
   - ✅ Zero avisos de análise
 
-- 🔄 **Próximo:** Etapa 3 - Migrar SchoolFormWidget para usar SchoolFormViewModel
+- ✅ **Etapa 3 CONCLUÍDA:** Migrar SchoolFormWidget
+  - ✅ Removida dependência de zard_form
+  - ✅ Integração com SchoolFormViewModel
+  - ✅ SchoolEditPage atualizado
+  - ✅ SchoolViewModel estendido com getters
+  - ✅ BREAKING CHANGE documentado
+  - ✅ Zero avisos de análise
+
+- 🔄 **Próximo:** Etapa 4 - Migrar NotebookFormPage
 
 ---
 
