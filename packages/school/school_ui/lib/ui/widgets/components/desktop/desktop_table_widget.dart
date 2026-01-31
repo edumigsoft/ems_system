@@ -207,7 +207,9 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
               widget.viewModel.restoreCommand.execute();
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Escola "${school.name}" restaurada com sucesso!'),
+                  content: Text(
+                    'Escola "${school.name}" restaurada com sucesso!',
+                  ),
                   backgroundColor: Colors.green,
                 ),
               );

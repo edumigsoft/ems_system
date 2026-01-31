@@ -6,6 +6,7 @@ export 'src/domain/entities/school_details.dart';
 export 'src/domain/dtos/school_create.dart';
 export 'src/domain/dtos/school_update.dart';
 export 'src/extensions/school_extensions.dart';
+export 'src/data/models/paginated_response.dart';
 export 'src/data/models/school_create_model.dart';
 export 'src/data/models/school_model.dart';
 export 'src/data/models/school_details_model.dart';

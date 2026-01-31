@@ -1,4 +1,5 @@
-import 'package:core_shared/core_shared.dart' show Result, UserRole, PaginatedResult;
+import 'package:core_shared/core_shared.dart'
+    show Result, UserRole, PaginatedResult;
 import '../../../user_shared.dart'
     show UserDetails, UserCreate, UserCreateAdmin, UserUpdate;
 

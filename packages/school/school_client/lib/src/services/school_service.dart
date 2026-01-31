@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:school_shared/school_shared.dart'
-    show SchoolDetailsModel, SchoolCreateModel;
+    show SchoolDetailsModel, SchoolCreateModel, PaginatedResponse;
 
 part 'school_service.g.dart';
 
@@ -10,7 +10,7 @@ abstract class SchoolService {
   factory SchoolService(Dio dio, {String baseUrl}) = _SchoolService;
 
   @GET('/schools')
-  Future<List<SchoolDetailsModel>> getAll(
+  Future<PaginatedResponse<SchoolDetailsModel>> getAll(
     @Query('limit') int? limit,
     @Query('offset') int? offset,
     @Query('search') String? search,
@@ -20,7 +20,7 @@ abstract class SchoolService {
   );
 
   @GET('/schools/deleted')
-  Future<List<SchoolDetailsModel>> getDeleted(
+  Future<PaginatedResponse<SchoolDetailsModel>> getDeleted(
     @Query('limit') int? limit,
     @Query('offset') int? offset,
     @Query('search') String? search,

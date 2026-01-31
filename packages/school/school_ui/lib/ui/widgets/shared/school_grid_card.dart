@@ -46,10 +46,8 @@ class SchoolGridCard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: school.isDeleted
                                     ? Colors.grey.shade300
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .primary
-                                        .withValues(alpha: 0.1),
+                                    : Theme.of(context).colorScheme.primary
+                                          .withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Icon(

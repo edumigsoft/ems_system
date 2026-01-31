@@ -8,7 +8,8 @@ import 'package:school_shared/school_shared.dart'
         SchoolDetails,
         SchoolCreateModel,
         SchoolDetailsModel,
-        SchoolStatus;
+        SchoolStatus,
+        PaginatedResponse;
 
 import '../services/school_service.dart';
 
@@ -46,30 +47,34 @@ class SchoolRepositoryClient extends BaseRepositoryLocal
     String? city,
     String? district,
   }) async {
-    final result = await executeRequest(
-      request: () => _schoolService.getAll(
-        limit,
-        offset,
-        search,
-        status?.name,
-        city,
-        district,
-      ),
-      context: 'fetching schools',
-      mapper: (models) => models,
-    );
+    final result =
+        await executeRequest<
+          PaginatedResponse<SchoolDetailsModel>,
+          PaginatedResult<SchoolDetails>
+        >(
+          request: () => _schoolService.getAll(
+            limit,
+            offset,
+            search,
+            status?.name,
+            city,
+            district,
+          ),
+          context: 'fetching schools',
+          mapper: (response) {
+            final items = response.data.map((m) => m.toDomain()).toList();
+            // Converter page para offset-based result
+            final page = (offset ?? 0) ~/ (limit ?? 50) + 1;
+            return PaginatedResult<SchoolDetails>(
+              items: items,
+              total: response.total,
+              page: page,
+              limit: response.limit,
+            );
+          },
+        );
 
-    // Como o service ainda retorna List, vamos criar um PaginatedResult simples
-    // TODO: Atualizar SchoolService para retornar dados paginados do backend
-    return result.map((models) {
-      final items = models.map((m) => m.toDomain()).toList();
-      return PaginatedResult.fromOffset(
-        items: items,
-        total: items.length, // Temporário: não temos total do servidor
-        offset: offset ?? 0,
-        limit: limit ?? 50,
-      );
-    });
+    return result;
   }
 
   @override
@@ -120,29 +125,33 @@ class SchoolRepositoryClient extends BaseRepositoryLocal
     String? city,
     String? district,
   }) async {
-    final result = await executeRequest(
-      request: () => _schoolService.getDeleted(
-        limit,
-        offset,
-        search,
-        status?.name,
-        city,
-        district,
-      ),
-      context: 'fetching deleted schools',
-      mapper: (models) => models,
-    );
+    final result =
+        await executeRequest<
+          PaginatedResponse<SchoolDetailsModel>,
+          PaginatedResult<SchoolDetails>
+        >(
+          request: () => _schoolService.getDeleted(
+            limit,
+            offset,
+            search,
+            status?.name,
+            city,
+            district,
+          ),
+          context: 'fetching deleted schools',
+          mapper: (response) {
+            final items = response.data.map((m) => m.toDomain()).toList();
+            final page = (offset ?? 0) ~/ (limit ?? 50) + 1;
+            return PaginatedResult<SchoolDetails>(
+              items: items,
+              total: response.total,
+              page: page,
+              limit: response.limit,
+            );
+          },
+        );
 
-    // Criar PaginatedResult a partir da resposta
-    return result.map((models) {
-      final items = models.map((m) => m.toDomain()).toList();
-      return PaginatedResult.fromOffset(
-        items: items,
-        total: items.length, // Temporário: não temos total do servidor
-        offset: offset ?? 0,
-        limit: limit ?? 50,
-      );
-    });
+    return result;
   }
 
   @override

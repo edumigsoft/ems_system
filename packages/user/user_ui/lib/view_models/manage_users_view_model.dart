@@ -171,6 +171,45 @@ class ManageUsersViewModel extends ChangeNotifier with Loggable {
     return false;
   }
 
+  /// Atualiza informações básicas de um usuário (nome, telefone).
+  Future<bool> updateUserBasicInfo({
+    required String userId,
+    String? name,
+    String? phone,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    // Criar DTO de atualização com nome e/ou telefone
+    final userUpdate = UserUpdate(
+      id: userId,
+      name: name,
+      phone: phone,
+    );
+
+    final result = await _updateUserUseCase.execute(userId, userUpdate);
+
+    if (result case Success(value: final savedUser)) {
+      // Atualizar usuário na lista local
+      final index = _users.indexWhere((u) => u.id == userId);
+      if (index != -1) {
+        _users[index] = savedUser;
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } else if (result case Failure(error: final error)) {
+      _error = error.toString();
+      _isLoading = false;
+      notifyListeners();
+      logger.severe('Error updating user basic info: $error');
+      return false;
+    }
+
+    return false;
+  }
+
   /// Ativa/desativa um usuário (admin).
   Future<bool> toggleUserStatus(String userId, bool isActive) async {
     _isLoading = true;

@@ -98,10 +98,13 @@ class UserUpdateValidatorZard extends CoreValidator<UserUpdate> {
   const UserUpdateValidatorZard();
 
   static final schema = z.map({
-    userNameField: z.string().min(
-      2,
-      message: 'Nome deve ter no mínimo 2 caracteres',
-    ).optional(),
+    userNameField: z
+        .string()
+        .min(
+          2,
+          message: 'Nome deve ter no mínimo 2 caracteres',
+        )
+        .optional(),
     userPhoneField: z
         .string()
         .min(10, message: 'Telefone deve ter no mínimo 10 dígitos')

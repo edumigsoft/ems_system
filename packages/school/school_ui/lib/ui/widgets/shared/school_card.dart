@@ -32,9 +32,7 @@ class SchoolCard extends StatelessWidget {
           child: Text(
             school.name[0].toUpperCase(),
             style: TextStyle(
-              color: school.isDeleted
-                  ? Colors.grey.shade700
-                  : Colors.white,
+              color: school.isDeleted ? Colors.grey.shade700 : Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -89,12 +87,12 @@ class SchoolCard extends StatelessWidget {
         ),
         trailing: school.isDeleted
             ? (onRestore != null
-                ? IconButton(
-                    icon: const Icon(Icons.restore_from_trash),
-                    tooltip: 'Restaurar',
-                    onPressed: onRestore,
-                  )
-                : null)
+                  ? IconButton(
+                      icon: const Icon(Icons.restore_from_trash),
+                      tooltip: 'Restaurar',
+                      onPressed: onRestore,
+                    )
+                  : null)
             : SchoolStatusBadge(status: school.status),
         onTap: school.isDeleted ? null : onTap,
       ),

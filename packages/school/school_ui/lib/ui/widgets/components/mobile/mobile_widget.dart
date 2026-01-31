@@ -103,6 +103,22 @@ class _MobileWidgetState extends State<MobileWidget> {
     }).toList();
   }
 
+  Future<void> _navigateToEdit(
+    BuildContext context,
+    SchoolDetails school,
+  ) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => SchoolEditPage(school: school),
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      // Recarregar lista após edição
+      widget.viewModel.refreshCommand.execute();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,102 +166,108 @@ class _MobileWidgetState extends State<MobileWidget> {
               child: widget.viewModel.fetchAllCommand.running
                   ? const Center(child: CircularProgressIndicator())
                   : widget.viewModel.fetchAllCommand.result?.when(
-                        success: (schools) {
-                          final filteredSchools = _filterSchools(schools);
+                          success: (schools) {
+                            final filteredSchools = _filterSchools(schools);
 
-                          if (filteredSchools.isEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    widget.viewModel.showDeleted
-                                        ? Icons.delete_outline
-                                        : Icons.school_outlined,
-                                    size: 64,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    widget.viewModel.showDeleted
-                                        ? 'Nenhuma escola deletada'
-                                        : 'Nenhuma escola encontrada',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey[600],
+                            if (filteredSchools.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      widget.viewModel.showDeleted
+                                          ? Icons.delete_outline
+                                          : Icons.school_outlined,
+                                      size: 64,
+                                      color: Colors.grey[400],
                                     ),
-                                  ),
-                                  if (_searchQuery.isNotEmpty ||
-                                      _selectedStatus != null) ...[
-                                    const SizedBox(height: 8),
-                                    TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _searchQuery = '';
-                                          _selectedStatus = null;
-                                        });
-                                      },
-                                      child: const Text('Limpar filtros'),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      widget.viewModel.showDeleted
+                                          ? 'Nenhuma escola deletada'
+                                          : 'Nenhuma escola encontrada',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
+                                    if (_searchQuery.isNotEmpty ||
+                                        _selectedStatus != null) ...[
+                                      const SizedBox(height: 8),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _searchQuery = '';
+                                            _selectedStatus = null;
+                                          });
+                                        },
+                                        child: const Text('Limpar filtros'),
+                                      ),
+                                    ],
                                   ],
-                                ],
-                              ),
-                            );
-                          }
-
-                          return ListView.builder(
-                            itemCount: filteredSchools.length,
-                            padding: const EdgeInsets.all(16),
-                            itemBuilder: (context, index) {
-                              final school = filteredSchools[index];
-                              return SchoolCard(
-                                school: school,
-                                onTap: () {
-                                  widget.viewModel.detailsCommand.execute(school);
-                                  SchoolDetailsBottomSheet.show(
-                                    context: context,
-                                    school: school,
-                                    onEdit: () {
-                                      widget.viewModel.editCommand.execute();
-                                      // TODO: Navigate to edit page
-                                    },
-                                    onDelete: () {
-                                      _showDeleteConfirmation(
-                                        context,
-                                        school.name,
-                                      );
-                                    },
-                                  );
-                                },
-                                onRestore: () {
-                                  widget.viewModel.detailsCommand.execute(school);
-                                  _showRestoreConfirmation(
-                                    context,
-                                    school.name,
-                                  );
-                                },
+                                ),
                               );
-                            },
-                          );
-                        },
-                        failure: (error) => Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.error_outline, size: 48),
-                              const SizedBox(height: 16),
-                              Text('Erro: ${error.toString()}'),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () =>
-                                    widget.viewModel.refreshCommand.execute(),
-                                child: const Text('Tentar novamente'),
-                              ),
-                            ],
+                            }
+
+                            return ListView.builder(
+                              itemCount: filteredSchools.length,
+                              padding: const EdgeInsets.all(16),
+                              itemBuilder: (context, index) {
+                                final school = filteredSchools[index];
+                                return SchoolCard(
+                                  school: school,
+                                  onTap: () {
+                                    widget.viewModel.detailsCommand.execute(
+                                      school,
+                                    );
+                                    SchoolDetailsBottomSheet.show(
+                                      context: context,
+                                      school: school,
+                                      onEdit: () {
+                                        Navigator.of(
+                                          context,
+                                        ).pop(); // Fechar bottom sheet
+                                        _navigateToEdit(context, school);
+                                      },
+                                      onDelete: () {
+                                        _showDeleteConfirmation(
+                                          context,
+                                          school.name,
+                                        );
+                                      },
+                                    );
+                                  },
+                                  onRestore: () {
+                                    widget.viewModel.detailsCommand.execute(
+                                      school,
+                                    );
+                                    _showRestoreConfirmation(
+                                      context,
+                                      school.name,
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                          failure: (error) => Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.error_outline, size: 48),
+                                const SizedBox(height: 16),
+                                Text('Erro: ${error.toString()}'),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () =>
+                                      widget.viewModel.refreshCommand.execute(),
+                                  child: const Text('Tentar novamente'),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ) ??
-                      const Center(child: Text('Sem dados')),
+                        ) ??
+                        const Center(child: Text('Sem dados')),
             ),
           ),
         ],

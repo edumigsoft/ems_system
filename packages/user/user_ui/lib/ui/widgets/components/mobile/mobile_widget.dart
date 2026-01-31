@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:core_shared/core_shared.dart';
+import 'package:core_ui/core_ui.dart' show UserRoleExtension;
 import 'package:user_shared/user_shared.dart';
 import '../../../../view_models/manage_users_view_model.dart';
 import '../../../../widgets/shared/shared.dart';
@@ -177,9 +178,151 @@ class _MobileWidgetState extends State<MobileWidget> {
   }
 
   void _showEditDialog(UserDetails user) {
-    // TODO: Implementar dialog de edição
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edição em desenvolvimento')),
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: user.name);
+    final phoneController = TextEditingController(text: user.phone ?? '');
+    UserRole selectedRole = user.role;
+    bool isActive = user.isActive;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            title: const Text('Editar Usuário'),
+            content: SingleChildScrollView(
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Nome
+                    TextFormField(
+                      controller: nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nome',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().length < 2) {
+                          return 'Nome deve ter no mínimo 2 caracteres';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Telefone
+                    TextFormField(
+                      controller: phoneController,
+                      decoration: const InputDecoration(
+                        labelText: 'Telefone',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value != null &&
+                            value.isNotEmpty &&
+                            value.length < 10) {
+                          return 'Telefone inválido (mínimo 10 dígitos)';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Role (apenas para owners)
+                    if (widget.viewModel.isOwner)
+                      DropdownButtonFormField<UserRole>(
+                        value: selectedRole,
+                        decoration: const InputDecoration(
+                          labelText: 'Função',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: UserRole.values.map((role) {
+                          return DropdownMenuItem(
+                            value: role,
+                            child: Text(role.label),
+                          );
+                        }).toList(),
+                        onChanged: (newRole) {
+                          if (newRole != null) {
+                            setDialogState(() {
+                              selectedRole = newRole;
+                            });
+                          }
+                        },
+                      ),
+                    if (widget.viewModel.isOwner) const SizedBox(height: 12),
+
+                    // Status Ativo
+                    SwitchListTile(
+                      title: const Text('Usuário Ativo'),
+                      value: isActive,
+                      onChanged: (value) {
+                        setDialogState(() {
+                          isActive = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Cancelar'),
+              ),
+              FilledButton(
+                onPressed: () async {
+                  if (formKey.currentState!.validate()) {
+                    // Atualizar informações básicas se mudaram
+                    if (nameController.text != user.name ||
+                        phoneController.text != user.phone) {
+                      await widget.viewModel.updateUserBasicInfo(
+                        userId: user.id,
+                        name: nameController.text.trim(),
+                        phone: phoneController.text.trim(),
+                      );
+                    }
+
+                    // Atualizar role se mudou
+                    if (selectedRole != user.role && widget.viewModel.isOwner) {
+                      await widget.viewModel.updateUserRole(
+                        user.id,
+                        selectedRole,
+                      );
+                    }
+
+                    // Atualizar status se mudou
+                    if (isActive != user.isActive) {
+                      await widget.viewModel.toggleUserStatus(
+                        user.id,
+                        isActive,
+                      );
+                    }
+
+                    if (dialogContext.mounted) {
+                      Navigator.of(dialogContext).pop();
+                    }
+
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Usuário atualizado com sucesso'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Salvar'),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 
