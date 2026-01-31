@@ -30,3 +30,6 @@ export 'src/data/models/document_reference_update_model.dart';
 // Enums
 export 'src/domain/enums/notebook_type.dart';
 export 'src/domain/enums/document_storage_type.dart';
+
+// Validators
+export 'src/validators/notebook_validator.dart';

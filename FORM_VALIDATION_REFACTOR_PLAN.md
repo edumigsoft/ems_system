@@ -193,19 +193,47 @@ core_ui (Abstração)
 - [x] Documentação com guia de migração
 - [ ] Testes de widget (pendente)
 
-### ⏳ Etapa 4: Migrar NotebookFormPage
-**Status:** Pendente
-**Arquivo:** `packages/notebook/notebook_ui/lib/pages/notebook_form_page.dart`
+### ✅ Etapa 4: Migrar NotebookFormPage
+**Status:** Concluída
+**Arquivos:**
+- `packages/notebook/notebook_shared/lib/src/validators/notebook_validator.dart` (criado)
+- `packages/notebook/notebook_ui/lib/ui/view_models/notebook_form_view_model.dart` (criado)
+- `packages/notebook/notebook_ui/lib/pages/notebook_form_page.dart` (migrado)
 
-**Alterações:**
-1. Criar `NotebookFormViewModel with FormValidationMixin`
-2. Migrar de `GlobalKey<FormState>` para ViewModel
-3. Usar padrão consistente com SchoolFormWidget
+**Alterações Implementadas:**
+
+1. ✅ **NotebookValidator** criado:
+   - Schema Zard para validação de título e conteúdo
+   - Exportado em `notebook_shared`
+   - Adicionada dependência `zard: ^0.0.25` ao pubspec
+
+2. ✅ **NotebookFormViewModel** criado:
+   - Usa `FormValidationMixin` para gerenciamento de estado
+   - Suporta modo criação e edição
+   - Gerencia campo de tipo (NotebookType) via setter reativo
+   - Métodos `createNotebookCreate()` e `createNotebookUpdate()`
+   - Validação integrada com `validateAndGetData()`
+
+3. ✅ **NotebookFormPage** migrado:
+   - Removido `GlobalKey<FormState>` e controllers manuais
+   - Usa `NotebookFormViewModel` internamente
+   - `ListenableBuilder` para reatividade
+   - `TextField` com validação via ViewModel
+   - Loading indicator durante submit
+   - Interface mantida compatível (callbacks não mudaram)
+
+**Diferenças vs SchoolFormWidget:**
+- Mantém callbacks `onCreate`/`onUpdate` (sem UseCases ainda)
+- ViewModel apenas gerencia formulário, não executa lógica de negócio
+- Mais simples, focado apenas em validação e estado
 
 **Critérios de Aceitação:**
-- [ ] Formulário funcional
-- [ ] Usa FormValidationMixin
-- [ ] Consistente com novo padrão
+- [x] Formulário funcional (criação e edição)
+- [x] Usa FormValidationMixin
+- [x] Consistente com novo padrão
+- [x] Zero avisos de análise
+- [x] Interface compatível (sem breaking changes)
+- [ ] Testes (pendente)
 
 ### ⏳ Etapa 5: Atualizar Documentação
 **Status:** Pendente
@@ -277,7 +305,7 @@ core_ui (Abstração)
 - [x] **Etapa 1: Expandir FormValidationMixin** ✅
 - [x] **Etapa 2: Criar ViewModel de exemplo** ✅
 - [x] **Etapa 3: Migrar SchoolFormWidget** ✅
-- [ ] Etapa 4: Migrar NotebookFormPage
+- [x] **Etapa 4: Migrar NotebookFormPage** ✅
 - [ ] Etapa 5: Atualizar documentação
 - [ ] Etapa 6: Validação e testes
 
@@ -366,7 +394,14 @@ Durante migração, zard_form e FormValidationMixin coexistem. Apenas após vali
   - ✅ BREAKING CHANGE documentado
   - ✅ Zero avisos de análise
 
-- 🔄 **Próximo:** Etapa 4 - Migrar NotebookFormPage
+- ✅ **Etapa 4 CONCLUÍDA:** Migrar NotebookFormPage
+  - ✅ NotebookValidator criado
+  - ✅ NotebookFormViewModel criado
+  - ✅ Migrado de GlobalKey<FormState> para ViewModel
+  - ✅ Interface compatível mantida
+  - ✅ Zero avisos de análise
+
+- 🔄 **Próximo:** Etapa 5 - Atualizar documentação
 
 ---
 
