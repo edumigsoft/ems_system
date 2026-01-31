@@ -1,45 +1,45 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Este arquivo fornece orientações para o Claude Code (claude.ai/code) ao trabalhar com código neste repositório.
 
-## Project Overview
+## Visão Geral do Projeto
 
-EMS System (EduMigSoft System) is a Flutter/Dart monorepo for managing users, tasks (Aura), projects, and finances. The architecture uses a consistent multi-variant package structure that enables code sharing between Flutter apps and Dart/Shelf backend servers.
+EMS System (EduMigSoft System) é um monorepo Flutter/Dart para gerenciar usuários, tarefas (Aura), projetos e finanças. A arquitetura usa uma estrutura de pacotes multi-variante consistente que permite compartilhamento de código entre aplicativos Flutter e servidores backend Dart/Shelf.
 
-## Common Commands
+## Comandos Comuns
 
-### Package Management
+### Gerenciamento de Pacotes
 
 ```bash
-# Install dependencies for all packages
+# Instalar dependências para todos os pacotes
 ./scripts/pub_get_all.sh
 
-# Clean all packages (removes .dart_tool, build artifacts)
+# Limpar todos os pacotes (remove .dart_tool, artefatos de build)
 ./scripts/clean_all.sh
 
-# Run build_runner on all packages that use it
+# Executar build_runner em todos os pacotes que o usam
 ./scripts/build_runner_all.sh
 
-# Apply dart fix to all packages
+# Aplicar dart fix em todos os pacotes
 ./scripts/dart_fix_all.sh
 ```
 
-### Testing & Analysis
+### Testes e Análise
 
 ```bash
-# Run tests in a specific package
+# Executar testes em um pacote específico
 cd packages/design_system/design_system_ui
 flutter test
 
-# Run analysis on a specific package
+# Executar análise em um pacote específico
 cd packages/design_system/design_system_shared
 dart analyze
 
-# Format code
+# Formatar código
 dart format .
 ```
 
-### Running the Demo App
+### Executando o App de Demonstração
 
 ```bash
 cd apps/app_design_draft
@@ -47,55 +47,55 @@ flutter pub get
 flutter run
 ```
 
-## High-Level Architecture
+## Arquitetura de Alto Nível
 
-### Multi-Variant Package Pattern
+### Padrão de Pacotes Multi-Variante
 
-The monorepo uses a **4-variant package structure** where each package is split into platform-specific layers:
+O monorepo usa uma **estrutura de pacotes com 4 variantes** onde cada pacote é dividido em camadas específicas de plataforma:
 
 ```
 packages/{package_name}/
-├── {package}_shared/    # Pure Dart, zero Flutter dependencies
-├── {package}_ui/        # Flutter widgets and UI components
-├── {package}_client/    # Client-side logic (currently minimal)
-└── {package}_server/    # Server-side logic for Dart/Shelf backend
+├── {package}_shared/    # Dart puro, zero dependências Flutter
+├── {package}_ui/        # Widgets Flutter e componentes de UI
+├── {package}_client/    # Lógica do lado do cliente (atualmente mínima)
+└── {package}_server/    # Lógica do lado do servidor para backend Dart/Shelf
 ```
 
-**Key Architectural Principles:**
+**Princípios Arquiteturais Principais:**
 
-1. **Shared Layer is Pure Dart**: `*_shared` packages contain ZERO Flutter dependencies. They use only `meta: ^1.17.0` and define domain models, value objects, and configuration as Plain Old Dart Objects (PODOs).
+1. **Camada Compartilhada é Dart Puro**: Pacotes `*_shared` contêm ZERO dependências Flutter. Eles usam apenas `meta: ^1.17.0` e definem modelos de domínio, objetos de valor e configuração como Plain Old Dart Objects (PODOs).
 
-2. **Dependency Direction (Layered)**:
+2. **Direção de Dependências (Em Camadas)**:
    ```
    *_ui     → *_shared
    *_client → *_shared
    *_server → *_shared
    ```
-   No horizontal dependencies between variants.
+   Sem dependências horizontais entre variantes.
 
-3. **Configuration as Data**: Domain concepts like themes are represented as serializable data classes (not singletons), enabling:
-   - API transmission between backend and frontend
-   - Persistence in databases or local storage
-   - Server-driven UI patterns
-   - Dynamic configuration without code changes
+3. **Configuração como Dados**: Conceitos de domínio como temas são representados como classes de dados serializáveis (não singletons), permitindo:
+   - Transmissão via API entre backend e frontend
+   - Persistência em bancos de dados ou armazenamento local
+   - Padrões de UI dirigida por servidor
+   - Configuração dinâmica sem alterações de código
 
-### Design System Architecture
+### Arquitetura do Design System
 
-The `design_system` package demonstrates the mature implementation of this pattern:
+O pacote `design_system` demonstra a implementação madura deste padrão:
 
-**design_system_shared** (Pure Dart):
-- `ColorValue`: Framework-agnostic color value object (ARGB int32)
-  - Supports `fromHex()`, `fromARGB()`, `toHex()`, `toCSSRGBA()`
-  - Serializable via `toMap()` / `fromMap()`
+**design_system_shared** (Dart Puro):
+- `ColorValue`: Objeto de valor de cor agnóstico a framework (ARGB int32)
+  - Suporta `fromHex()`, `fromARGB()`, `toHex()`, `toCSSRGBA()`
+  - Serializável via `toMap()` / `fromMap()`
 
-- `DSThemeConfig`: Immutable theme configuration data class
-  - Contains `seedColor`, `cardBackground`, `cardBorder`, typography settings
-  - Supports `copyWith()` pattern for variations
-  - Can be sent via API or persisted
+- `DSThemeConfig`: Classe de dados de configuração de tema imutável
+  - Contém `seedColor`, `cardBackground`, `cardBorder`, configurações de tipografia
+  - Suporta padrão `copyWith()` para variações
+  - Pode ser enviado via API ou persistido
 
-- Theme Presets: Static configurations (`DefaultPreset`, `BlueGrayPreset`, `AcquaPreset`, `LoloPreset`, `TealPreset`)
+- Presets de Tema: Configurações estáticas (`DefaultPreset`, `BlueGrayPreset`, `AcquaPreset`, `LoloPreset`, `TealPreset`)
 
-- Design Tokens: Constants for spacing, radius, paddings, shadows
+- Design Tokens: Constantes para espaçamento, raio, paddings, sombras
   ```dart
   DSSpacing.xs, DSSpacing.small, DSSpacing.medium
   DSRadius.small, DSRadius.medium, DSRadius.large
@@ -103,141 +103,141 @@ The `design_system` package demonstrates the mature implementation of this patte
   ```
 
 **design_system_ui** (Flutter):
-- `DSTheme`: Converts `DSThemeConfig` to Material 3 `ThemeData`
+- `DSTheme`: Converte `DSThemeConfig` para `ThemeData` do Material 3
   - `DSTheme.fromConfig(config, brightness)` → `ThemeData`
   - `DSTheme.forPreset(DSThemeEnum.lolo, brightness)` → `ThemeData`
 
-- Extensions:
+- Extensões:
   - `ColorValue.toColor()` ↔ `Color.toColorValue()`
   - `context.dsTheme`, `context.dsColors`, `context.dsTextStyles`
 
-- Components: `DSCard`, `DSInfoCard`, `DSActionCard`
+- Componentes: `DSCard`, `DSInfoCard`, `DSActionCard`
 
-**Data Flow Example**:
+**Exemplo de Fluxo de Dados**:
 ```
 Backend (design_system_server)
-  → Generates DSThemeConfig
-  → Sends via API as JSON
+  → Gera DSThemeConfig
+  → Envia via API como JSON
 
-Flutter App (design_system_ui)
-  → Receives JSON
-  → Deserializes to DSThemeConfig (fromMap)
-  → Converts to ThemeData via DSTheme.fromConfig()
-  → Renders UI with theme
+App Flutter (design_system_ui)
+  → Recebe JSON
+  → Deserializa para DSThemeConfig (fromMap)
+  → Converte para ThemeData via DSTheme.fromConfig()
+  → Renderiza UI com tema
 ```
 
-### Analysis Options
+### Opções de Análise
 
-The project uses two analysis configurations:
+O projeto usa duas configurações de análise:
 
-- **`analysis_options_dart.yaml`**: For pure Dart packages (`*_shared`, `*_client`, `*_server`)
-  - Uses `package:lints/recommended.yaml`
-  - Enforces strict typing: `strict-casts`, `strict-inference`, `strict-raw-types`
-  - Server/API specific rules: `avoid_dynamic_calls`, `cancel_subscriptions`, `close_sinks`
+- **`analysis_options_dart.yaml`**: Para pacotes Dart puro (`*_shared`, `*_client`, `*_server`)
+  - Usa `package:lints/recommended.yaml`
+  - Aplica tipagem estrita: `strict-casts`, `strict-inference`, `strict-raw-types`
+  - Regras específicas de servidor/API: `avoid_dynamic_calls`, `cancel_subscriptions`, `close_sinks`
 
-- **`analysis_options_flutter.yaml`**: For Flutter packages (`*_ui`, apps)
-  - Uses `package:flutter_lints/flutter.yaml`
-  - Flutter-specific rules: `use_key_in_widget_constructors`, `avoid_unnecessary_containers`
-  - Performance rules: `prefer_const_constructors_in_immutables`
+- **`analysis_options_flutter.yaml`**: Para pacotes Flutter (`*_ui`, apps)
+  - Usa `package:flutter_lints/flutter.yaml`
+  - Regras específicas do Flutter: `use_key_in_widget_constructors`, `avoid_unnecessary_containers`
+  - Regras de performance: `prefer_const_constructors_in_immutables`
 
-Both exclude generated files: `**/*.g.dart`, `**/*.freezed.dart`, `**/*.mocks.dart`
+Ambos excluem arquivos gerados: `**/*.g.dart`, `**/*.freezed.dart`, `**/*.mocks.dart`
 
-## Package Organization
+## Organização de Pacotes
 
-**Active Packages:**
-- `design_system/` - Design system with theme configs, color values, constants, and UI components
-- `localizations/` - i18n with platform-agnostic string definitions and Flutter/server implementations
+**Pacotes Ativos:**
+- `design_system/` - Design system com configurações de tema, valores de cor, constantes e componentes de UI
+- `localizations/` - i18n com definições de strings agnósticas à plataforma e implementações Flutter/servidor
 
-**Skeleton Packages (ready for implementation):**
-- `core/` - Shared core functionality
-- `images/` - Image assets and management
-- `open_api/` - API client/server code generation
+**Pacotes Esqueleto (prontos para implementação):**
+- `core/` - Funcionalidade central compartilhada
+- `images/` - Ativos de imagem e gerenciamento
+- `open_api/` - Geração de código cliente/servidor de API
 
 **Apps:**
-- `apps/app_design_draft/` - Demo Flutter app showcasing design system with dynamic theme switching
+- `apps/app_design_draft/` - App Flutter de demonstração mostrando o design system com troca dinâmica de tema
 
-## Development Guidelines
+## Diretrizes de Desenvolvimento
 
-### Adding New Packages
+### Adicionando Novos Pacotes
 
-Follow the 4-variant pattern:
+Siga o padrão de 4 variantes:
 
-1. Create package directory structure:
+1. Criar estrutura de diretórios do pacote:
    ```
    packages/{feature}/
-   ├── {feature}_shared/    # Pure Dart only
-   ├── {feature}_ui/        # Flutter widgets
-   ├── {feature}_client/    # Client logic
-   └── {feature}_server/    # Server logic
+   ├── {feature}_shared/    # Apenas Dart puro
+   ├── {feature}_ui/        # Widgets Flutter
+   ├── {feature}_client/    # Lógica do cliente
+   └── {feature}_server/    # Lógica do servidor
    ```
 
-2. **In `*_shared`**: Only use `meta` dependency. Define:
-   - Domain models as immutable data classes
-   - Value objects with serialization (`toMap`/`fromMap`)
-   - Abstract interfaces
-   - Constants and enums
+2. **Em `*_shared`**: Use apenas dependência `meta`. Defina:
+   - Modelos de domínio como classes de dados imutáveis
+   - Objetos de valor com serialização (`toMap`/`fromMap`)
+   - Interfaces abstratas
+   - Constantes e enums
 
-3. **In `*_ui`**: Depend on `{feature}_shared`. Add:
-   - Flutter widgets
-   - Theme extensions
-   - UI-specific logic
+3. **Em `*_ui`**: Dependa de `{feature}_shared`. Adicione:
+   - Widgets Flutter
+   - Extensões de tema
+   - Lógica específica de UI
 
-4. **In `*_client`/`*_server`**: Depend on `{feature}_shared` for platform-specific implementations.
+4. **Em `*_client`/`*_server`**: Dependa de `{feature}_shared` para implementações específicas de plataforma.
 
-### Coding Standards
+### Padrões de Codificação
 
-From CONTRIBUTING.md:
+Do CONTRIBUTING.md:
 
-- Follow [Effective Dart Guidelines](https://dart.dev/guides/language/effective-dart)
-- Use Conventional Commits format:
-  - `feat:` - New functionality
-  - `fix:` - Bug correction
-  - `docs:` - Documentation
-  - `refactor:` - Code refactoring
-  - `test:` - Tests
-  - `chore:` - Maintenance
+- Siga as [Diretrizes Effective Dart](https://dart.dev/guides/language/effective-dart)
+- Use formato Conventional Commits:
+  - `feat:` - Nova funcionalidade
+  - `fix:` - Correção de bug
+  - `docs:` - Documentação
+  - `refactor:` - Refatoração de código
+  - `test:` - Testes
+  - `chore:` - Manutenção
 
-- Format before committing: `dart format`
-- Run analysis: `dart analyze` or `flutter analyze`
-- Maintain test coverage above 80%
-- Tests in `test/` should mirror `lib/` structure
+- Formate antes de fazer commit: `dart format`
+- Execute análise: `dart analyze` ou `flutter analyze`
+- Mantenha cobertura de testes acima de 80%
+- Testes em `test/` devem espelhar a estrutura de `lib/`
 
-### Working with Design Tokens
+### Trabalhando com Design Tokens
 
-When creating UI components, use design tokens from `design_system_shared`:
+Ao criar componentes de UI, use design tokens de `design_system_shared`:
 
 ```dart
-// Use spacing constants
+// Use constantes de espaçamento
 padding: EdgeInsets.all(DSSpacing.medium)
 
-// Use radius constants
+// Use constantes de raio
 borderRadius: BorderRadius.circular(DSRadius.medium)
 
-// Use padding presets
+// Use presets de padding
 padding: DSPaddings.medium
 ```
 
-### Working with Themes
+### Trabalhando com Temas
 
-To add a new theme preset:
+Para adicionar um novo preset de tema:
 
-1. Define in `design_system_shared/lib/src/theme/presets/`:
+1. Defina em `design_system_shared/lib/src/theme/presets/`:
    ```dart
    class NewPreset {
      static final DSThemeConfig config = DSThemeConfig(
        seedColor: ColorValue.fromHex('#HEXCODE'),
-       // ... other settings
+       // ... outras configurações
      );
    }
    ```
 
-2. Add to `DSThemeEnum` in `design_system_shared`
+2. Adicione ao `DSThemeEnum` em `design_system_shared`
 
-3. Update `DSTheme.forPreset()` in `design_system_ui`
+3. Atualize `DSTheme.forPreset()` em `design_system_ui`
 
-### Value Object Pattern
+### Padrão de Objeto de Valor
 
-When creating domain concepts (colors, currencies, etc.), follow the `ColorValue` pattern:
+Ao criar conceitos de domínio (cores, moedas, etc.), siga o padrão `ColorValue`:
 
 ```dart
 class YourValue {
@@ -263,51 +263,51 @@ class YourValue {
 }
 ```
 
-## Project Structure
+## Estrutura do Projeto
 
 ```
 ems_system/
-├── apps/                    # Flutter applications
-│   └── app_design_draft/   # Design system demo app
-├── servers/                 # Dart/Shelf backend servers (planned)
-├── packages/               # Shared packages
-│   ├── core/              # Core functionality (skeleton)
-│   ├── design_system/     # Design system (active)
-│   ├── images/            # Image assets (skeleton)
-│   ├── localizations/     # i18n (active)
-│   └── open_api/          # API definitions (skeleton)
-├── scripts/               # Development automation scripts
-├── docs/                  # Documentation
-├── analysis_options_dart.yaml     # Linting for pure Dart
-├── analysis_options_flutter.yaml  # Linting for Flutter
-└── CONTRIBUTING.md        # Contribution guidelines
+├── apps/                    # Aplicações Flutter
+│   └── app_design_draft/   # App de demonstração do design system
+├── servers/                 # Servidores backend Dart/Shelf (planejado)
+├── packages/               # Pacotes compartilhados
+│   ├── core/              # Funcionalidade central (esqueleto)
+│   ├── design_system/     # Design system (ativo)
+│   ├── images/            # Ativos de imagem (esqueleto)
+│   ├── localizations/     # i18n (ativo)
+│   └── open_api/          # Definições de API (esqueleto)
+├── scripts/               # Scripts de automação de desenvolvimento
+├── docs/                  # Documentação
+├── analysis_options_dart.yaml     # Linting para Dart puro
+├── analysis_options_flutter.yaml  # Linting para Flutter
+└── CONTRIBUTING.md        # Diretrizes de contribuição
 ```
 
-## Important Files
+## Arquivos Importantes
 
-**Architecture Reference:**
-- `packages/design_system/design_system_shared/lib/src/theme/ds_theme_config.dart` - Theme configuration model
-- `packages/design_system/design_system_ui/lib/theme/ds_theme.dart` - Flutter theme provider
-- `packages/design_system/design_system_shared/lib/src/colors/color_value.dart` - Value object pattern
+**Referência de Arquitetura:**
+- `packages/design_system/design_system_shared/lib/src/theme/ds_theme_config.dart` - Modelo de configuração de tema
+- `packages/design_system/design_system_ui/lib/theme/ds_theme.dart` - Provedor de tema Flutter
+- `packages/design_system/design_system_shared/lib/src/colors/color_value.dart` - Padrão de objeto de valor
 
-**Demo Integration:**
-- `apps/app_design_draft/lib/main.dart` - Theme switching implementation
+**Integração de Demonstração:**
+- `apps/app_design_draft/lib/main.dart` - Implementação de troca de tema
 
 <!-- OPENSPEC:START -->
-# OpenSpec Instructions
+# Instruções OpenSpec
 
-These instructions are for AI assistants working in this project.
+Estas instruções são para assistentes de IA trabalhando neste projeto.
 
-Always open `@/openspec/AGENTS.md` when the request:
-- Mentions planning or proposals (words like proposal, spec, change, plan)
-- Introduces new capabilities, breaking changes, architecture shifts, or big performance/security work
-- Sounds ambiguous and you need the authoritative spec before coding
+Sempre abra `@/openspec/AGENTS.md` quando a solicitação:
+- Mencionar planejamento ou propostas (palavras como proposta, especificação, mudança, plano)
+- Introduzir novas capacidades, mudanças disruptivas, mudanças arquiteturais ou grande trabalho de performance/segurança
+- Parecer ambígua e você precisar da especificação autoritativa antes de codificar
 
-Use `@/openspec/AGENTS.md` to learn:
-- How to create and apply change proposals
-- Spec format and conventions
-- Project structure and guidelines
+Use `@/openspec/AGENTS.md` para aprender:
+- Como criar e aplicar propostas de mudança
+- Formato e convenções de especificação
+- Estrutura e diretrizes do projeto
 
-Keep this managed block so 'openspec update' can refresh the instructions.
+Mantenha este bloco gerenciado para que 'openspec update' possa atualizar as instruções.
 
 <!-- OPENSPEC:END -->
