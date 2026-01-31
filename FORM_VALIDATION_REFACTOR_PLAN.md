@@ -115,21 +115,33 @@ core_ui (Abstração)
 - [x] CHANGELOG atualizado
 - [x] README atualizado com exemplos completos
 
-### ⏳ Etapa 2: Criar ViewModel de Exemplo
-**Status:** Pendente
+### ✅ Etapa 2: Criar ViewModel de Exemplo
+**Status:** Concluída
 **Arquivo:** `packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart`
 
-**Alterações:**
-1. Criar `SchoolFormViewModel extends ChangeNotifier with FormValidationMixin`
-2. Registrar campos no construtor
-3. Implementar método `submit()`
-4. Implementar dispose com `disposeFormResources()`
+**Alterações Implementadas:**
+1. ✅ Criado `SchoolFormViewModel extends ChangeNotifier with FormValidationMixin`
+2. ✅ Registra 5 campos do schema no construtor (`_initializeFields()`)
+3. ✅ Suporta modo criação E edição (via `initialData` opcional)
+4. ✅ Método `submit()` com validação integrada usando `submitForm()`
+5. ✅ Método `reset()` para voltar a valores iniciais
+6. ✅ Dispose correto com `disposeFormResources()`
+7. ✅ Documentação inline completa (DartDoc com exemplos)
+
+**Funcionalidades:**
+- Criação de nova escola via `CreateUseCase`
+- Edição de escola existente via `UpdateUseCase`
+- Validação usando `SchoolDetailsValidator.schema`
+- Gerenciamento automático de estado (dirty, errors, submitting)
+- Conversão de dados do formulário para `SchoolDetails`
 
 **Critérios de Aceitação:**
-- [ ] ViewModel funcional
-- [ ] Não importa zard_form
-- [ ] Usa apenas FormValidationMixin
-- [ ] Testes unitários
+- [x] ViewModel funcional para criação e edição
+- [x] Não importa zard_form (usa apenas core_ui)
+- [x] Usa apenas FormValidationMixin
+- [x] Zero avisos de análise
+- [x] Documentação completa
+- [ ] Testes unitários (pendente)
 
 ### ⏳ Etapa 3: Migrar SchoolFormWidget
 **Status:** Pendente
@@ -230,7 +242,7 @@ core_ui (Abstração)
 
 ### Implementação
 - [x] **Etapa 1: Expandir FormValidationMixin** ✅
-- [ ] Etapa 2: Criar ViewModel de exemplo
+- [x] **Etapa 2: Criar ViewModel de exemplo** ✅
 - [ ] Etapa 3: Migrar SchoolFormWidget
 - [ ] Etapa 4: Migrar NotebookFormPage
 - [ ] Etapa 5: Atualizar documentação
@@ -304,7 +316,16 @@ Durante migração, zard_form e FormValidationMixin coexistem. Apenas após vali
   - ✅ Zero avisos de análise (flutter analyze)
   - ✅ CHANGELOG atualizado (v1.1.0)
   - ✅ README atualizado com exemplos completos
-- 🔄 **Próximo:** Etapa 2 - Criar ViewModel de exemplo (SchoolFormViewModel)
+
+- ✅ **Etapa 2 CONCLUÍDA:** Criar SchoolFormViewModel
+  - ✅ ViewModel completo para criação/edição de escolas
+  - ✅ Integração com CreateUseCase e UpdateUseCase
+  - ✅ Validação usando SchoolDetailsValidator.schema
+  - ✅ Suporte a modo criação e edição
+  - ✅ Documentação inline completa
+  - ✅ Zero avisos de análise
+
+- 🔄 **Próximo:** Etapa 3 - Migrar SchoolFormWidget para usar SchoolFormViewModel
 
 ---
 
