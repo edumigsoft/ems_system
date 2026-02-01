@@ -180,9 +180,25 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     }
   }
 
-  void _editSchool(SchoolDetails school) {
-    widget.viewModel.detailsCommand.execute(school);
-    widget.viewModel.editCommand.execute();
+  Future<void> _editSchool(SchoolDetails school) async {
+    final result = await showDialog<SchoolDetails>(
+      context: context,
+      builder: (context) => SchoolFormDialog(
+        createUseCase: widget.viewModel.createUseCase,
+        updateUseCase: widget.viewModel.updateUseCase,
+        initialData: school,
+      ),
+    );
+
+    if (result != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Escola atualizada com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      widget.viewModel.fetchAllCommand.execute();
+    }
   }
 
   void _deleteSchool(SchoolDetails school) {
