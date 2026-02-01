@@ -18,23 +18,23 @@ class UserConstants {
   /// GET /users - Lista todos os usuários (paginado)
   static const String listUsers = '/users';
 
-  /// GET /users/:id - Busca usuário por ID (Retrofit format)
+  /// GET /users/{id} - Busca usuário por ID (Retrofit format)
   static const String getUserById = '/users/{id}';
 
   /// POST /users - Cria novo usuário (admin)
   static const String createUser = '/users';
 
-  /// PUT /users/:id - Atualiza usuário (admin, Retrofit format)
+  /// PUT /users/{id} - Atualiza usuário (admin, Retrofit format)
   static const String updateUser = '/users/{id}';
 
-  /// DELETE /users/:id - Soft delete de usuário (Retrofit format)
+  /// DELETE /users/{id} - Soft delete de usuário (Retrofit format)
   static const String deleteUser = '/users/{id}';
 
   // Password management
-  /// POST /users/:id/force-password-change - Força mudança de senha (Retrofit)
+  /// POST /users/{id}/force-password-change - Força mudança de senha (Retrofit)
   static const String forcePasswordChange = '/users/{id}/force-password-change';
 
-  /// POST /users/:id/reset-password - Inicia reset de senha (Retrofit)
+  /// POST /users/{id}/reset-password - Inicia reset de senha (Retrofit)
   static const String resetPassword = '/users/{id}/reset-password';
 
   // ========== Relative Paths (para Shelf Router) ==========

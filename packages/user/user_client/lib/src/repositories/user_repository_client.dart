@@ -20,6 +20,15 @@ class UserRepositoryClient extends BaseRepositoryLocal
   UserRepositoryClient({required UserService service}) : _service = service;
 
   @override
+  Future<Result<UserDetails>> getCurrentProfile() async {
+    return executeRequest(
+      request: _service.getProfile,
+      context: 'fetching current user profile',
+      mapper: (model) => model.toDomain(),
+    );
+  }
+
+  @override
   Future<Result<UserDetails>> findById(String id) async {
     return executeRequest(
       request: () => _service.getUserById(id),

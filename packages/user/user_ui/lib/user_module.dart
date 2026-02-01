@@ -78,15 +78,10 @@ class UserModule extends AppModule with Loggable {
 
     // ViewModels e Pages
     di.registerLazySingleton<ProfileViewModel>(
-      () {
-        final authService = di.get<AuthService>();
-        final currentUserId = authService.currentUser?.id ?? '';
-        return ProfileViewModel(
-          getProfileUseCase: di.get<GetProfileUseCase>(),
-          updateProfileUseCase: di.get<UpdateProfileUseCase>(),
-          currentUserId: currentUserId,
-        );
-      },
+      () => ProfileViewModel(
+        getProfileUseCase: di.get<GetProfileUseCase>(),
+        updateProfileUseCase: di.get<UpdateProfileUseCase>(),
+      ),
     );
     di.registerLazySingleton<ProfilePage>(
       () => ProfilePage(viewModel: di.get<ProfileViewModel>()),

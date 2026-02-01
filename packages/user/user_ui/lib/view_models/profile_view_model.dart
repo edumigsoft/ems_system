@@ -9,15 +9,12 @@ import 'package:user_shared/user_shared.dart'
 class ProfileViewModel extends ChangeNotifier with Loggable {
   final GetProfileUseCase _getProfileUseCase;
   final UpdateProfileUseCase _updateProfileUseCase;
-  final String _currentUserId;
 
   ProfileViewModel({
     required GetProfileUseCase getProfileUseCase,
     required UpdateProfileUseCase updateProfileUseCase,
-    required String currentUserId,
   }) : _getProfileUseCase = getProfileUseCase,
-       _updateProfileUseCase = updateProfileUseCase,
-       _currentUserId = currentUserId;
+       _updateProfileUseCase = updateProfileUseCase;
 
   UserDetails? _profile;
   UserDetails? get profile => _profile;
@@ -34,7 +31,7 @@ class ProfileViewModel extends ChangeNotifier with Loggable {
     _error = null;
     notifyListeners();
 
-    final result = await _getProfileUseCase.execute(_currentUserId);
+    final result = await _getProfileUseCase.execute();
 
     if (result case Success(value: final profile)) {
       _profile = profile;
@@ -50,11 +47,17 @@ class ProfileViewModel extends ChangeNotifier with Loggable {
 
   /// Atualiza perfil do usuário.
   Future<bool> updateProfile(UserUpdate update) async {
+    if (_profile == null) {
+      _error = 'Perfil não carregado';
+      notifyListeners();
+      return false;
+    }
+
     _isLoading = true;
     _error = null;
     notifyListeners();
 
-    final result = await _updateProfileUseCase.execute(_currentUserId, update);
+    final result = await _updateProfileUseCase.execute(_profile!.id, update);
 
     if (result case Success(value: final profile)) {
       _profile = profile;

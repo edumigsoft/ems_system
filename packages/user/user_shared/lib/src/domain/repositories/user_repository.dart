@@ -7,6 +7,12 @@ import '../../../user_shared.dart'
 ///
 /// Abstrai o acesso ao banco de dados Drift para a tabela `users`.
 abstract class UserRepository {
+  /// Busca o perfil do usuário autenticado atual.
+  ///
+  /// No client, usa o endpoint `/users/me` que identifica o usuário
+  /// através do token JWT. No server, requer o ID do usuário atual.
+  Future<Result<UserDetails>> getCurrentProfile();
+
   /// Busca usuário por ID.
   Future<Result<UserDetails>> findById(String id);
 

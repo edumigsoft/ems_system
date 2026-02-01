@@ -8,7 +8,10 @@ class GetProfileUseCase {
   GetProfileUseCase({required UserRepository repository})
     : _repository = repository;
 
-  Future<Result<UserDetails>> execute(String currentUserId) {
-    return _repository.findById(currentUserId);
+  /// Busca o perfil do usuário autenticado atual.
+  ///
+  /// Não requer passar ID pois usa o token JWT para identificar o usuário.
+  Future<Result<UserDetails>> execute() {
+    return _repository.getCurrentProfile();
   }
 }

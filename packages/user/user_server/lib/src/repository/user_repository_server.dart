@@ -11,6 +11,17 @@ class UserRepositoryServer implements UserRepository {
   const UserRepositoryServer(this._queries);
 
   @override
+  Future<Result<UserDetails>> getCurrentProfile() async {
+    // No servidor, não há conceito de "usuário atual" pois não há sessão.
+    // Use findById() com o ID do usuário obtido do token JWT.
+    return Failure(
+      StorageException(
+        'getCurrentProfile() not applicable on server. Use findById() instead.',
+      ),
+    );
+  }
+
+  @override
   Future<Result<UserDetails>> findById(String id) async {
     try {
       final user = await _queries.getById(id);
