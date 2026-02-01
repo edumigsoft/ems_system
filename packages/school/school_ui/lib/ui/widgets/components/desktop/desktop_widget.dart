@@ -16,14 +16,6 @@ class _DesktopWidgetState extends State<DesktopWidget> {
     return ListenableBuilder(
       listenable: widget.viewModel,
       builder: (context, _) {
-        // return Scaffold(
-        //   body: widget.viewModel.details != null
-        //       ? ((widget.viewModel.editing != null ||
-        //                 widget.viewModel.details!.id.isEmpty)
-        //             ? DesktopEditItemWidget(viewModel: widget.viewModel)
-        //             : DesktopViewItemWidget(data: widget.viewModel.details!))
-        //       : _listSchools(),
-        // );
         return DesktopTableWidget(viewModel: widget.viewModel);
       },
     );

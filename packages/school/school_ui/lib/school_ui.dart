@@ -1,5 +1,4 @@
 export 'ui/view_models/school_view_model.dart';
-export 'ui/widgets/components/desktop/desktop_edit_item_widget.dart';
 export 'ui/widgets/components/desktop/desktop_view_item_widget.dart';
 export 'ui/widgets/components/desktop/desktop_widget.dart';
 export 'ui/widgets/components/mobile/mobile_widget.dart';
