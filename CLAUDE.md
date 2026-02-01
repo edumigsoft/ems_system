@@ -237,10 +237,10 @@ packages/project/
 ```
 
 ### Pacotes Especiais
-- `zard_form/` - Biblioteca standalone de validação de formulários
-  - Não segue o padrão de 4 variantes
-  - Usado em todo o sistema para validação de formulários
-  - Depende de `zard: ^0.0.23`
+- `zard_form/` - **DESCONTINUADO** - Biblioteca standalone de validação de formulários
+  - Sendo substituído por `FormValidationMixin` em `core_ui`
+  - Mantido temporariamente para referência, será removido após validação completa
+  - Use `FormValidationMixin` para novos formulários (veja ADR-0004)
 
 ### Aplicações
 - `apps/ems/app_design_draft/` - App de demonstração do design system com troca dinâmica de tema
@@ -283,7 +283,7 @@ Para implementar uma nova feature, **consulte o guia completo**:
    │   └── use_cases/     # Casos de uso (retornam Result<T>)
    ├── data/
    │   └── models/        # DTOs com @Schema() para OpenAPI
-   ├── validators/        # Validações Zard
+   ├── validators/        # CoreValidator + schemas Zard (UI e backend)
    └── constants/         # Constantes de domínio
    ```
 
@@ -318,7 +318,7 @@ Para implementar uma nova feature, **consulte o guia completo**:
    - **TypeConverters**: Necessário para enums e tipos customizados no Drift
    - **DateTimeConverter**: Obrigatório para campos `DateTime` em tabelas Drift
    - **Injeção de Dependência**: Use `AppModule` (não mapas de rotas estáticos)
-   - **Validação Zard**: Use `zard_form` para validação de formulários (ADR-0004)
+   - **Validação de Formulários**: Use `FormValidationMixin` (core_ui) + schemas Zard em `*_shared` (ADR-0004)
 
 4. **Documentação Obrigatória:**
    - Nível Feature (`packages/{feature}/`):
@@ -481,39 +481,114 @@ class YourValue {
 }
 ```
 
-### Validação de Formulários (Zard Form)
+### Validação de Formulários (FormValidationMixin)
 
-O projeto usa o pacote `zard_form` para validação de formulários. Este é um pacote **especial** que NÃO segue o padrão de 4 variantes.
+O projeto usa um padrão **Dual Interface** para validação de formulários que isola completamente a biblioteca Zard:
 
-**Localização:** `packages/zard_form/`
+**Arquitetura:**
+```
+*_shared (Dart Puro)
+  → FeatureValidator + schema (Zard isolado)
+    → CoreValidator.validate() para backend/UseCases
+    → Schema estático para FormValidationMixin (UI)
 
-**Uso:**
+core_ui (Camada de Abstração)
+  → FormValidationMixin (gerencia estado completo de formulários)
+
+*_ui (ViewModels + Widgets)
+  → ViewModel com FormValidationMixin
+```
+
+**Localização:**
+- `FormValidationMixin`: `packages/core/core_ui/lib/core/mixins/form_validation_mixin.dart`
+- `CoreValidator`: `packages/core/core_shared/lib/src/validators/validators.dart`
+- Documentado em: `docs/adr/0004-use-form-validation-mixin-and-zard.md`
+
+**Exemplo Completo:**
+
+1. **Criar validador em `*_shared`:**
 ```dart
-// Importar validadores
-import 'package:zard_form/zard_form.dart';
+// packages/school/school_shared/lib/src/validators/school_validators.dart
+class SchoolDetailsValidator extends CoreValidator<SchoolDetails> {
+  const SchoolDetailsValidator();
 
-// Criar validador
-final validator = ZardValidator()
-  .required('Campo obrigatório')
-  .email('Email inválido')
-  .minLength(6, 'Mínimo 6 caracteres');
+  // Schema para FormValidationMixin (UI)
+  static final schema = z.map({
+    schoolNameField: z.string().min(1, message: 'Nome obrigatório'),
+    schoolEmailField: z.string().email(message: 'Email inválido'),
+  });
 
-// Validar
-final result = validator.validate(value);
-if (result.isValid) {
-  // Valor válido
-} else {
-  // Mostrar result.error
+  // Método validate para UseCases/backend
+  @override
+  CoreValidationResult validate(SchoolDetails value) {
+    final result = schema.safeParse({
+      schoolNameField: value.name,
+      schoolEmailField: value.email,
+    });
+    // ... converter para CoreValidationResult
+  }
 }
 ```
 
-**Características:**
-- Depende de `zard: ^0.0.23`
-- Usado em todos os apps (EMS e SMS)
-- Possui sub-projeto de exemplo: `packages/zard_form/example/`
-- Documentado em `docs/adr/0004-form-validation-zard.md`
+2. **Criar ViewModel com FormValidationMixin:**
+```dart
+// packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart
+class SchoolFormViewModel extends ChangeNotifier with FormValidationMixin {
+  SchoolFormViewModel() {
+    registerField(schoolNameField);
+    registerField(schoolEmailField);
+  }
 
-**Não modifique este pacote** sem considerar impacto em todos os formulários do sistema.
+  Future<Result<SchoolDetails>> submit() {
+    return submitForm<SchoolDetails>(
+      data: {
+        schoolNameField: getFieldValue(schoolNameField),
+        schoolEmailField: getFieldValue(schoolEmailField),
+      },
+      schema: SchoolDetailsValidator.schema,
+      onValid: (validatedData) async {
+        return _createUseCase.execute(...);
+      },
+    );
+  }
+}
+```
+
+3. **Usar no Widget:**
+```dart
+class SchoolFormWidget extends StatefulWidget {
+  // ...
+}
+
+class _SchoolFormWidgetState extends State<SchoolFormWidget> {
+  late SchoolFormViewModel _viewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
+        return TextField(
+          controller: _viewModel.registerField(schoolNameField),
+          decoration: InputDecoration(
+            errorText: _viewModel.getFieldError(schoolNameField),
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+**Quando usar cada abordagem:**
+- **CoreValidator.validate()**: UseCases, backend, testes unitários, validação sem UI
+- **FormValidationMixin**: Formulários Flutter, estado reativo, TextEditingControllers
+
+**Referências de Implementação:**
+- School: `packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart`
+- Notebook: `packages/notebook/notebook_ui/lib/ui/view_models/notebook_form_view_model.dart`
+
+**Nota:** O pacote `zard_form` está sendo descontinuado em favor deste padrão.
 
 ## Estrutura do Projeto
 
@@ -558,7 +633,7 @@ ems_system/
 │   ├── school/                        # Gerenciamento escolar (completo 4/4)
 │   ├── tag/                           # Sistema de tags (completo 4/4)
 │   ├── user/                          # Gerenciamento de usuários (completo 4/4)
-│   └── zard_form/                     # Validação de formulários (standalone)
+│   └── zard_form/                     # DESCONTINUADO - Use FormValidationMixin (core_ui)
 │
 ├── scripts/                           # Scripts de automação
 │   ├── pub_get_all.sh                # Instalar dependências
@@ -635,8 +710,9 @@ ems_system/
 
 **Referências de Código (Core):**
 - `packages/core/core_shared/lib/src/result/` - Implementação do Result pattern
+- `packages/core/core_shared/lib/src/validators/` - CoreValidator para validação de domínio
+- `packages/core/core_ui/lib/core/mixins/form_validation_mixin.dart` - FormValidationMixin para formulários Flutter
 - `packages/core/core_client/lib/src/repositories/` - Base repositories
-- `packages/zard_form/` - Sistema de validação de formulários
 
 **Aplicações de Demonstração:**
 - `apps/ems/app_design_draft/lib/main.dart` - Demo de troca dinâmica de tema
@@ -689,10 +765,12 @@ O projeto mantém registros de decisões arquiteturais importantes em `docs/adr/
    - Implementação em `packages/core/core_client/lib/src/repositories/`
    - Todos os novos repositórios devem estender `BaseRepository`
 
-4. **ADR-0004: Form Validation com Zard** (`docs/adr/0004-form-validation-zard.md`)
-   - Escolha do Zard para validação de formulários
-   - Implementação em `packages/zard_form/`
-   - Use este padrão para todos os formulários
+4. **ADR-0004: Validação de Formulários - FormValidationMixin e Zard** (`docs/adr/0004-use-form-validation-mixin-and-zard.md`)
+   - Padrão Dual Interface: CoreValidator (backend) + FormValidationMixin (UI)
+   - Isolamento completo do Zard em camada de abstração
+   - Schema compartilhado em `*_shared` serve UI e backend
+   - Implementação em `packages/core/core_ui/lib/core/mixins/form_validation_mixin.dart`
+   - Use FormValidationMixin para todos os formulários Flutter
 
 5. **ADR-0005: Estrutura Padrão de Pacotes** (`docs/adr/0005-package-structure.md`)
    - Define o padrão de 4 variantes (_shared, _ui, _client, _server)
