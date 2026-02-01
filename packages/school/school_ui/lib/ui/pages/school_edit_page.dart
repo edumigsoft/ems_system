@@ -5,7 +5,7 @@ import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import '../view_models/school_view_model.dart';
-import '../widgets/forms/school_form_widget.dart';
+import '../widgets/school_form_widget.dart';
 
 /// Página de edição de escola para dispositivos móveis e tablet.
 ///
