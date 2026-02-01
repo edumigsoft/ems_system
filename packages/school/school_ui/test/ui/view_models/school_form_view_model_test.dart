@@ -72,7 +72,7 @@ void main() {
             name: 'Escola Test',
             email: 'test@escola.com',
             address: 'Rua Test, 123',
-            phone: '(11) 12345-6789',
+            phone: '(11) 91234-5678',
             code: 'CIE123',
             locationCity: 'Test City',
             locationDistrict: 'Test District',
@@ -101,7 +101,7 @@ void main() {
           );
           expect(
             viewModel.getFieldValue(schoolPhoneByField),
-            equals('(11) 12345-6789'),
+            equals('(11) 91234-5678'),
           );
           expect(viewModel.getFieldValue(schoolCieByField), equals('CIE123'));
 
@@ -225,7 +225,7 @@ void main() {
         viewModel.setFieldValue(schoolNameByField, 'Escola Test');
         viewModel.setFieldValue(schoolEmailByField, 'test@escola.com');
         viewModel.setFieldValue(schoolAddressByField, 'Rua Test, 123');
-        viewModel.setFieldValue(schoolPhoneByField, '1234-5678');
+        viewModel.setFieldValue(schoolPhoneByField, '(11) 91234-5678');
         viewModel.setFieldValue(schoolCieByField, 'CIE123');
 
         expect(viewModel.isFormDirty, isTrue);
@@ -249,7 +249,7 @@ void main() {
           name: 'Escola Original',
           email: 'original@escola.com',
           address: 'Rua Original, 123',
-          phone: '(11) 11111-1111',
+          phone: '(11) 91111-1111',
           code: 'CIE111',
           locationCity: 'City',
           locationDistrict: 'District',
@@ -302,7 +302,7 @@ void main() {
             name: 'Escola Test',
             email: 'test@escola.com',
             address: 'Rua Test, 123',
-            phone: '(11) 12345-6789',
+            phone: '(11) 91234-5678',
             code: 'CIE123',
             locationCity: 'City',
             locationDistrict: 'District',
@@ -363,7 +363,7 @@ void main() {
           name: 'Escola Original',
           email: 'original@escola.com',
           address: 'Rua Original, 123',
-          phone: '(11) 11111-1111',
+          phone: '(11) 91111-1111',
           code: 'CIE111',
           locationCity: 'City',
           locationDistrict: 'District',
