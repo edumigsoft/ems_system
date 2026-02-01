@@ -228,9 +228,18 @@ mixin FormValidationMixin on ChangeNotifier {
     } on ZardError catch (e) {
       // Mapeia erros do Zard para o estado interno
       for (final issue in e.issues) {
-        // ignore: avoid_dynamic_calls
-        final path = issue.path as List?;
-        final fieldName = path?.join('.') ?? 'unknown';
+        // issue.path pode ser String ou List dependendo da estrutura
+        final dynamic pathDynamic = issue.path;
+        final String fieldName;
+
+        if (pathDynamic is String) {
+          fieldName = pathDynamic;
+        } else if (pathDynamic is List) {
+          fieldName = pathDynamic.join('.');
+        } else {
+          fieldName = 'unknown';
+        }
+
         _errors[fieldName] = issue.message;
       }
       notifyListeners();
