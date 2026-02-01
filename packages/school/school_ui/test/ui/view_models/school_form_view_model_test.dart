@@ -420,5 +420,175 @@ void main() {
         expect(() => controller.text = 'test', throwsFlutterError);
       });
     });
+
+    group('Edge Cases', () {
+      test('deve aceitar telefone com todos os dígitos iguais', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        // Preencher com telefone de dígitos repetidos (edge case válido)
+        viewModel.setFieldValue(schoolNameByField, 'Escola Test');
+        viewModel.setFieldValue(schoolEmailByField, 'test@escola.com');
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        viewModel.setFieldValue(schoolPhoneByField, '(11) 91111-1111');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        final result = await viewModel.submit();
+
+        expect(result, isA<Success<SchoolDetails>>());
+
+        viewModel.dispose();
+      });
+
+      test('deve rejeitar telefone com DDD inválido (00)', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        viewModel.setFieldValue(schoolNameByField, 'Escola Test');
+        viewModel.setFieldValue(schoolEmailByField, 'test@escola.com');
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        viewModel.setFieldValue(schoolPhoneByField, '(00) 91234-5678');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        final result = await viewModel.submit();
+
+        // DDD 00 é inválido (regex exige [1-9])
+        expect(result, isA<Failure<SchoolDetails>>());
+
+        viewModel.dispose();
+      });
+
+      test('deve aceitar email com caracteres especiais válidos', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        viewModel.setFieldValue(schoolNameByField, 'Escola Test');
+        viewModel.setFieldValue(
+          schoolEmailByField,
+          'user+tag@sub.domain.com.br',
+        );
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        viewModel.setFieldValue(schoolPhoneByField, '(11) 91234-5678');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        final result = await viewModel.submit();
+
+        expect(result, isA<Success<SchoolDetails>>());
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com nome contendo caracteres unicode', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        // Nome com acentos, cedilha e caracteres especiais
+        viewModel.setFieldValue(
+          schoolNameByField,
+          'Escola São José - Educação & Cultura',
+        );
+        viewModel.setFieldValue(schoolEmailByField, 'contato@escola.com');
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        viewModel.setFieldValue(schoolPhoneByField, '(11) 91234-5678');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        final result = await viewModel.submit();
+
+        expect(result, isA<Success<SchoolDetails>>());
+        final success = result as Success<SchoolDetails>;
+        expect(
+          success.value.name,
+          equals('Escola São José - Educação & Cultura'),
+        );
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com múltiplos submits sequenciais', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        // Preencher dados válidos
+        viewModel.setFieldValue(schoolNameByField, 'Escola Test');
+        viewModel.setFieldValue(schoolEmailByField, 'test@escola.com');
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        viewModel.setFieldValue(schoolPhoneByField, '(11) 91234-5678');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        // Submeter múltiplas vezes
+        final result1 = await viewModel.submit();
+        final result2 = await viewModel.submit();
+        final result3 = await viewModel.submit();
+
+        // Todos devem ter sucesso
+        expect(result1, isA<Success<SchoolDetails>>());
+        expect(result2, isA<Success<SchoolDetails>>());
+        expect(result3, isA<Success<SchoolDetails>>());
+
+        viewModel.dispose();
+      });
+
+      test('deve falhar ao usar controller após dispose', () {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        final controller = viewModel.registerField(schoolNameByField);
+        viewModel.dispose();
+
+        // Controllers não devem funcionar após dispose
+        expect(() => controller.text = 'test', throwsFlutterError);
+      });
+
+      test('deve lidar com telefone no limite mínimo de caracteres', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        viewModel.setFieldValue(schoolNameByField, 'Escola Test');
+        viewModel.setFieldValue(schoolEmailByField, 'test@escola.com');
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        // Telefone fixo com 8 dígitos (formato mínimo válido)
+        viewModel.setFieldValue(schoolPhoneByField, '(11) 1234-5678');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        final result = await viewModel.submit();
+
+        expect(result, isA<Success<SchoolDetails>>());
+
+        viewModel.dispose();
+      });
+
+      test('deve rejeitar telefone muito curto', () async {
+        final viewModel = SchoolFormViewModel(
+          createUseCase: mockCreateUseCase,
+          updateUseCase: mockUpdateUseCase,
+        );
+
+        viewModel.setFieldValue(schoolNameByField, 'Escola Test');
+        viewModel.setFieldValue(schoolEmailByField, 'test@escola.com');
+        viewModel.setFieldValue(schoolAddressByField, 'Rua Test');
+        viewModel.setFieldValue(schoolPhoneByField, '123');
+        viewModel.setFieldValue(schoolCieByField, 'CIE123');
+
+        final result = await viewModel.submit();
+
+        expect(result, isA<Failure<SchoolDetails>>());
+
+        viewModel.dispose();
+      });
+    });
   });
 }

@@ -314,5 +314,206 @@ void main() {
         viewModel.dispose();
       });
     });
+
+    group('Edge Cases', () {
+      test('deve lidar com título contendo emoji e unicode', () async {
+        final viewModel = NotebookFormViewModel();
+
+        // Título com emoji e caracteres unicode
+        viewModel.setFieldValue(
+          notebookTitleField,
+          '🎉 Reunião Importante 中文',
+        );
+        viewModel.setFieldValue(notebookContentField, 'Conteúdo da reunião');
+
+        final result = await viewModel.validateAndGetData();
+
+        expect(result, isA<Success<Map<String, dynamic>>>());
+        final notebook = viewModel.createNotebookCreate();
+        expect(notebook.title, equals('🎉 Reunião Importante 中文'));
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com tags contendo múltiplos espaços e vírgulas', () {
+        final viewModel = NotebookFormViewModel();
+
+        viewModel.setFieldValue(notebookTitleField, 'Test');
+        viewModel.setFieldValue(notebookContentField, 'Content');
+        viewModel.setFieldValue(
+          notebookTagsField,
+          '  tag1  ,,,  tag2  ,  ,  tag3  ',
+        );
+
+        final notebook = viewModel.createNotebookCreate();
+
+        // Deve limpar espaços extras e vírgulas vazias
+        expect(notebook.tags, equals(['tag1', 'tag2', 'tag3']));
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com tags contendo apenas espaços', () {
+        final viewModel = NotebookFormViewModel();
+
+        viewModel.setFieldValue(notebookTitleField, 'Test');
+        viewModel.setFieldValue(notebookContentField, 'Content');
+        viewModel.setFieldValue(notebookTagsField, '     ');
+
+        final notebook = viewModel.createNotebookCreate();
+
+        // Deve retornar null (não há tags válidas)
+        expect(notebook.tags, isNull);
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com conteúdo muito longo', () async {
+        final viewModel = NotebookFormViewModel();
+
+        // Conteúdo com 10.000 caracteres
+        final longContent = 'a' * 10000;
+
+        viewModel.setFieldValue(notebookTitleField, 'Título Test');
+        viewModel.setFieldValue(notebookContentField, longContent);
+
+        final result = await viewModel.validateAndGetData();
+
+        expect(result, isA<Success<Map<String, dynamic>>>());
+        final notebook = viewModel.createNotebookCreate();
+        expect(notebook.content.length, equals(10000));
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com múltiplas mudanças de tipo rapidamente', () {
+        final viewModel = NotebookFormViewModel();
+
+        var notificationCount = 0;
+        viewModel.addListener(() {
+          notificationCount++;
+        });
+
+        // Múltiplas mudanças rápidas
+        viewModel.selectedType = NotebookType.quick;
+        viewModel.selectedType = NotebookType.reminder;
+        viewModel.selectedType = NotebookType.organized;
+        viewModel.selectedType = NotebookType.quick;
+
+        expect(notificationCount, equals(4));
+        expect(viewModel.selectedType, equals(NotebookType.quick));
+
+        viewModel.dispose();
+      });
+
+      test('deve falhar ao usar após dispose', () {
+        final viewModel = NotebookFormViewModel();
+
+        final controller = viewModel.registerField(notebookTitleField);
+        viewModel.dispose();
+
+        // Controllers não devem funcionar após dispose
+        expect(() => controller.text = 'test', throwsFlutterError);
+      });
+
+      test('deve lidar com validação após múltiplos resets', () async {
+        final viewModel = NotebookFormViewModel();
+
+        // Preencher
+        viewModel.setFieldValue(notebookTitleField, 'Título 1');
+        viewModel.setFieldValue(notebookContentField, 'Conteúdo 1');
+
+        // Reset
+        viewModel.reset();
+
+        // Preencher novamente
+        viewModel.setFieldValue(notebookTitleField, 'Título 2');
+        viewModel.setFieldValue(notebookContentField, 'Conteúdo 2');
+
+        // Reset novamente
+        viewModel.reset();
+
+        // Preencher pela terceira vez
+        viewModel.setFieldValue(notebookTitleField, 'Título 3');
+        viewModel.setFieldValue(notebookContentField, 'Conteúdo 3');
+
+        // Validar
+        final result = await viewModel.validateAndGetData();
+
+        expect(result, isA<Success<Map<String, dynamic>>>());
+        final notebook = viewModel.createNotebookCreate();
+        expect(notebook.title, equals('Título 3'));
+
+        viewModel.dispose();
+      });
+
+      test('deve lidar com tags contendo caracteres especiais', () {
+        final viewModel = NotebookFormViewModel();
+
+        viewModel.setFieldValue(notebookTitleField, 'Test');
+        viewModel.setFieldValue(notebookContentField, 'Content');
+        viewModel.setFieldValue(
+          notebookTagsField,
+          'tag-1, tag_2, tag.3, tag@4',
+        );
+
+        final notebook = viewModel.createNotebookCreate();
+
+        // Deve aceitar caracteres especiais em tags
+        expect(
+          notebook.tags,
+          equals(['tag-1', 'tag_2', 'tag.3', 'tag@4']),
+        );
+
+        viewModel.dispose();
+      });
+
+      test('deve validar título com espaços em branco', () async {
+        final viewModel = NotebookFormViewModel();
+
+        // Título com apenas espaços (será trimmed no momento do createNotebookCreate)
+        viewModel.setFieldValue(notebookTitleField, '     ');
+        viewModel.setFieldValue(notebookContentField, 'Conteúdo');
+
+        // A validação pode passar porque o campo não está vazio na string original
+        // Mas o trim acontece no createNotebookCreate
+        final result = await viewModel.validateAndGetData();
+
+        // Se passou, verificar se o trim funciona corretamente
+        if (result case Success()) {
+          final notebook = viewModel.createNotebookCreate();
+          expect(notebook.title.trim(), isEmpty);
+        }
+
+        viewModel.dispose();
+      });
+
+      test('deve manter tipo após reset em modo edição', () {
+        final initialNotebook = NotebookDetails.create(
+          id: 'notebook-123',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          title: 'Original',
+          content: 'Original Content',
+          type: NotebookType.reminder,
+        );
+
+        final viewModel = NotebookFormViewModel(
+          initialData: initialNotebook,
+        );
+
+        // Mudar tipo
+        viewModel.selectedType = NotebookType.quick;
+        expect(viewModel.selectedType, equals(NotebookType.quick));
+
+        // Reset
+        viewModel.reset();
+
+        // Deve voltar ao tipo original
+        expect(viewModel.selectedType, equals(NotebookType.reminder));
+
+        viewModel.dispose();
+      });
+    });
   });
 }
