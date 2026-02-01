@@ -41,7 +41,7 @@ Criar widget de dialog que:
 - Envolve `SchoolFormWidget` em `Dialog` responsivo
 - Suporta modo create (`initialData = null`) e edit (`initialData = school`)
 - Constraints: `maxWidth: 600px`, `maxHeight: 90vh`
-- Inclui título dinâmico ("Criar Escola" vs "Editar Escola")
+- Inclui título dinâmico (`l10n.createSchool` vs `l10n.editSchool`)
 - Scroll automático se conteúdo exceder altura
 - Retorna `SchoolDetails?` ao fechar (null se cancelado)
 
@@ -91,8 +91,9 @@ Future<void> _showCreateDialog() async {
   );
 
   if (result != null && mounted) {
+    final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Escola criada com sucesso!')),
+      SnackBar(content: Text(l10n.schoolCreateSuccess)),
     );
     widget.viewModel.fetchAllCommand.execute();
   }
@@ -124,8 +125,9 @@ Future<void> _editSchool(SchoolDetails school) async {
   );
 
   if (result != null && mounted) {
+    final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Escola atualizada com sucesso!')),
+      SnackBar(content: Text(l10n.schoolUpdateSuccess)),
     );
     widget.viewModel.fetchAllCommand.execute();
   }
@@ -182,7 +184,7 @@ Implementar lógica idêntica ao mobile (FAB + navegação).
 - Tornar parâmetro `school` opcional (`SchoolDetails? school`)
 - Título dinâmico:
   ```dart
-  title: Text(widget.school == null ? 'Criar Escola' : 'Editar Escola')
+  title: Text(widget.school == null ? AppLocalizations.of(context).createSchool : AppLocalizations.of(context).editSchool)
   ```
 - Passar `initialData: widget.school` para `SchoolFormWidget`
 
@@ -216,24 +218,21 @@ grep -r "zard_form" lib/
 
 ---
 
-### **FASE 6: Padronização (Opcional - Nice to Have)** ✨
+Substituir strings hardcoded por `AppLocalizations.of(context)`.
 
-**6.1 - Centralizar mensagens**
+**Novas chaves adicionadas em `packages/localizations/localizations_ui/l10n/`:**
+- `schoolCreateSuccess`: "Escola criada com sucesso!"
+- `schoolUpdateSuccess`: "Escola atualizada com sucesso!"
+- `schoolDeleteSuccess`: "Escola excluída!"
+- `schoolRestoreSuccess`: "Escola restaurada com sucesso!"
+- `schoolDeleteConfirm`: "Deseja realmente excluir a escola?"
+- `schoolRestoreConfirm`: "Deseja restaurar a escola?"
 
-**Arquivo a criar:** `lib/ui/constants/school_messages.dart`
-
-```dart
-class SchoolMessages {
-  static const createSuccess = 'Escola criada com sucesso!';
-  static const updateSuccess = 'Escola atualizada com sucesso!';
-  static const deleteSuccess = 'Escola excluída!';
-  static const restoreSuccess = 'Escola restaurada com sucesso!';
-  static const deleteConfirm = 'Deseja realmente excluir a escola';
-  static const restoreConfirm = 'Deseja restaurar a escola';
-}
+**Comando para girar localização:**
+```bash
+cd packages/localizations/localizations_ui
+flutter gen-l10n
 ```
-
-Substituir strings hardcoded por constantes.
 
 **6.2 - Extrair dialogs de confirmação**
 
@@ -363,7 +362,7 @@ flutter run
 1. **GetIt/DI:** Use `GetIt.I.get<T>()` para obter use cases nos dialogs
 2. **Mounted checks:** Sempre verificar `if (mounted)` antes de `setState`/`SnackBar`
 3. **Refresh:** Chamar `widget.viewModel.fetchAllCommand.execute()` após CUD
-4. **L10n:** Usar `AppLocalizations.of(context)` quando disponível, senão hardcoded
+4. **L10n:** Usar `AppLocalizations.of(context)` para todas as strings de interface e mensagens.
 5. **Result Pattern:** SchoolFormWidget já retorna `Result<SchoolDetails>` via callbacks
 
 ---

@@ -350,4 +350,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get status => 'Status';
+
+  @override
+  String get schoolCreateSuccess => 'School created successfully!';
+
+  @override
+  String get schoolUpdateSuccess => 'School updated successfully!';
+
+  @override
+  String get schoolDeleteSuccess => 'School deleted!';
+
+  @override
+  String get schoolRestoreSuccess => 'School restored successfully!';
+
+  @override
+  String get schoolDeleteConfirm => 'Do you really want to delete the school?';
+
+  @override
+  String get schoolRestoreConfirm => 'Do you want to restore the school?';
 }

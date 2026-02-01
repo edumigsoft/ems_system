@@ -353,4 +353,22 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get status => 'Status';
+
+  @override
+  String get schoolCreateSuccess => 'Escola criada com sucesso!';
+
+  @override
+  String get schoolUpdateSuccess => 'Escola atualizada com sucesso!';
+
+  @override
+  String get schoolDeleteSuccess => 'Escola excluída!';
+
+  @override
+  String get schoolRestoreSuccess => 'Escola restaurada com sucesso!';
+
+  @override
+  String get schoolDeleteConfirm => 'Deseja realmente excluir a escola?';
+
+  @override
+  String get schoolRestoreConfirm => 'Deseja restaurar a escola?';
 }

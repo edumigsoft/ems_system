@@ -382,5 +382,29 @@
     "status": "Status",
     "@status": {
         "description": "Status"
+    },
+    "schoolCreateSuccess": "Escola criada com sucesso!",
+    "@schoolCreateSuccess": {
+        "description": "Mensagem de sucesso ao criar escola"
+    },
+    "schoolUpdateSuccess": "Escola atualizada com sucesso!",
+    "@schoolUpdateSuccess": {
+        "description": "Mensagem de sucesso ao atualizar escola"
+    },
+    "schoolDeleteSuccess": "Escola excluída!",
+    "@schoolDeleteSuccess": {
+        "description": "Mensagem de sucesso ao excluir escola"
+    },
+    "schoolRestoreSuccess": "Escola restaurada com sucesso!",
+    "@schoolRestoreSuccess": {
+        "description": "Mensagem de sucesso ao restaurar escola"
+    },
+    "schoolDeleteConfirm": "Deseja realmente excluir a escola?",
+    "@schoolDeleteConfirm": {
+        "description": "Confirmação de exclusão da escola"
+    },
+    "schoolRestoreConfirm": "Deseja restaurar a escola?",
+    "@schoolRestoreConfirm": {
+        "description": "Confirmação de restauração da escola"
     }
 }

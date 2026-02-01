@@ -735,6 +735,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status'**
   String get status;
+
+  /// Success message when creating school
+  ///
+  /// In en, this message translates to:
+  /// **'School created successfully!'**
+  String get schoolCreateSuccess;
+
+  /// Success message when updating school
+  ///
+  /// In en, this message translates to:
+  /// **'School updated successfully!'**
+  String get schoolUpdateSuccess;
+
+  /// Success message when deleting school
+  ///
+  /// In en, this message translates to:
+  /// **'School deleted!'**
+  String get schoolDeleteSuccess;
+
+  /// Success message when restoring school
+  ///
+  /// In en, this message translates to:
+  /// **'School restored successfully!'**
+  String get schoolRestoreSuccess;
+
+  /// Confirmation of school deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to delete the school?'**
+  String get schoolDeleteConfirm;
+
+  /// Confirmation of school restoration
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to restore the school?'**
+  String get schoolRestoreConfirm;
 }
 
 class _AppLocalizationsDelegate

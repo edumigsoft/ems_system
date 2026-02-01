@@ -420,5 +420,29 @@
     "status": "Status",
     "@status": {
         "description": "Status"
+    },
+    "schoolCreateSuccess": "School created successfully!",
+    "@schoolCreateSuccess": {
+        "description": "Success message when creating school"
+    },
+    "schoolUpdateSuccess": "School updated successfully!",
+    "@schoolUpdateSuccess": {
+        "description": "Success message when updating school"
+    },
+    "schoolDeleteSuccess": "School deleted!",
+    "@schoolDeleteSuccess": {
+        "description": "Success message when deleting school"
+    },
+    "schoolRestoreSuccess": "School restored successfully!",
+    "@schoolRestoreSuccess": {
+        "description": "Success message when restoring school"
+    },
+    "schoolDeleteConfirm": "Do you really want to delete the school?",
+    "@schoolDeleteConfirm": {
+        "description": "Confirmation of school deletion"
+    },
+    "schoolRestoreConfirm": "Do you want to restore the school?",
+    "@schoolRestoreConfirm": {
+        "description": "Confirmation of school restoration"
     }
 }
