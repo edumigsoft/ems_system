@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:school_shared/school_shared.dart'
     show SchoolDetails, SchoolStatus;
 import '../../../view_models/school_view_model.dart';
+import '../../school_form_dialog.dart';
 
 // Widget que combina tabela com todas as funcionalidades do Design System
 class DesktopTableWidget extends StatefulWidget {
@@ -230,6 +231,26 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     selectionState.clearSelection();
   }
 
+  Future<void> _showCreateDialog() async {
+    final result = await showDialog<SchoolDetails>(
+      context: context,
+      builder: (context) => SchoolFormDialog(
+        createUseCase: widget.viewModel.createUseCase,
+        updateUseCase: widget.viewModel.updateUseCase,
+      ),
+    );
+
+    if (result != null && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Escola criada com sucesso!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      widget.viewModel.fetchAllCommand.execute();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width * 0.8;
@@ -281,6 +302,15 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
                 ? null
                 : () => widget.viewModel.refreshCommand.execute(),
             tooltip: 'Atualizar lista',
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton.icon(
+            onPressed: _showCreateDialog,
+            icon: const Icon(Icons.add),
+            label: const Text('Adicionar Escola'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
           ),
         ],
       ),
