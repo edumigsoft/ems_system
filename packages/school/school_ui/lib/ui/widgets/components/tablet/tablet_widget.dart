@@ -103,6 +103,19 @@ class _TabletWidgetState extends State<TabletWidget> {
     }).toList();
   }
 
+  Future<void> _navigateToCreate(BuildContext context) async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => const SchoolEditPage(),
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      // Recarregar lista após criação
+      widget.viewModel.refreshCommand.execute();
+    }
+  }
+
   Future<void> _navigateToEdit(
     BuildContext context,
     SchoolDetails school,
@@ -125,6 +138,10 @@ class _TabletWidgetState extends State<TabletWidget> {
       appBar: AppBar(
         title: const Text('Escolas'),
         elevation: 0,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _navigateToCreate(context),
+        child: const Icon(Icons.add),
       ),
       body: Column(
         children: [

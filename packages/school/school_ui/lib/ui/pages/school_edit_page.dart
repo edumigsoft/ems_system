@@ -12,11 +12,11 @@ import '../widgets/school_form_widget.dart';
 /// Recebe uma [SchoolDetails] e permite editar seus dados.
 /// Retorna `true` se a edição foi bem-sucedida, `false` ou `null` caso contrário.
 class SchoolEditPage extends StatelessWidget {
-  final SchoolDetails school;
+  final SchoolDetails? school;
 
   const SchoolEditPage({
     super.key,
-    required this.school,
+    this.school,
   });
 
   @override
@@ -26,7 +26,7 @@ class SchoolEditPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.editSchool),
+        title: Text(school == null ? 'Criar Escola' : l10n.editSchool),
         elevation: 0,
       ),
       body: SingleChildScrollView(
