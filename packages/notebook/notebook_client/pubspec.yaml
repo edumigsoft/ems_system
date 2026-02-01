@@ -14,12 +14,9 @@ dependencies:
   dio: ^5.0.0
   retrofit: 4.9.1
   json_annotation: ^4.9.0
-  notebook_shared:
-    path: ../notebook_shared
-  core_shared:
-    path: ../../core/core_shared
-  core_client:
-    path: ../../core/core_client
+  notebook_shared: ^1.0.0
+  core_shared: ^1.0.0
+  core_client: ^1.0.0
 
 dev_dependencies:
   lints: ^6.0.0
@@ -28,4 +25,3 @@ dev_dependencies:
   build_runner: ^2.10.5
   retrofit_generator: 10.2.0
   json_serializable: ^6.9.2
-

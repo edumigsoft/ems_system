@@ -1,3 +1,5 @@
+import 'dart:convert' show jsonEncode;
+
 import 'package:drift/drift.dart';
 import 'package:core_shared/core_shared.dart'
     show Failure, StorageException, Result, Success;
@@ -112,9 +114,13 @@ class NotebookRepositoryServer implements NotebookRepository {
         );
       }
 
-      // Filtro por tags (requer busca em array JSON)
-      // Isso requer uma query customizada com operador PostgreSQL @>
-      // Por enquanto, vamos pular este filtro
+      // Filtro por tags usando operador PostgreSQL @> para JSON arrays
+      if (tags != null && tags.isNotEmpty) {
+        final tagsJson = jsonEncode(tags);
+        query.where((t) => CustomExpression<bool>(
+          "(tags::jsonb @> '$tagsJson'::jsonb)",
+        ));
+      }
 
       final results = await query.get();
       return Success(results);

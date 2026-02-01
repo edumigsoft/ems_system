@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:tag_shared/tag_shared.dart' show TagDetails;
 
 import '../view_models/notebook_list_view_model.dart';
 import '../view_models/notebook_detail_view_model.dart';
@@ -274,14 +275,14 @@ class _NotebookListPageState extends State<NotebookListPage> {
                 children: [
                   const Icon(Icons.label_outline, size: 18),
                   const SizedBox(width: 8),
-                  ...widget.viewModel.availableTags.map((tag) {
-                    final isSelected = widget.viewModel.selectedTags.contains(
-                      tag,
+                  ...widget.viewModel.availableTags.map((TagDetails tag) {
+                    final isSelected = widget.viewModel.selectedTags.any(
+                      (t) => t.id == tag.id,
                     );
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
-                        label: Text(tag),
+                        label: Text(tag.name),
                         selected: isSelected,
                         onSelected: (_) =>
                             widget.viewModel.toggleTagFilter(tag),

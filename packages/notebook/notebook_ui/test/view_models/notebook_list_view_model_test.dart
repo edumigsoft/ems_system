@@ -5,19 +5,25 @@ import 'package:dio/dio.dart';
 import 'package:notebook_ui/notebook_ui.dart';
 import 'package:notebook_client/notebook_client.dart';
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:tag_client/tag_client.dart';
 
 import 'notebook_list_view_model_test.mocks.dart';
 
 // Generate mocks: flutter pub run build_runner build
-@GenerateMocks([NotebookApiService])
+@GenerateMocks([NotebookApiService, TagApiService])
 void main() {
   group('NotebookListViewModel', () {
     late MockNotebookApiService mockApiService;
+    late MockTagApiService mockTagService;
     late NotebookListViewModel viewModel;
 
     setUp(() {
       mockApiService = MockNotebookApiService();
-      viewModel = NotebookListViewModel(notebookService: mockApiService);
+      mockTagService = MockTagApiService();
+      viewModel = NotebookListViewModel(
+        notebookService: mockApiService,
+        tagService: mockTagService,
+      );
     });
 
     tearDown(() {

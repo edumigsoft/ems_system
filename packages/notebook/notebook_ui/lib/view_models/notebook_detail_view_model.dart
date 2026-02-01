@@ -36,15 +36,15 @@ class NotebookDetailViewModel extends ChangeNotifier
   String? get error => _error;
 
   /// Lista de tags disponíveis.
-  List<String> _availableTags = [];
-  List<String> get availableTags => _availableTags;
+  List<TagDetails> _availableTags = [];
+  List<TagDetails> get availableTags => _availableTags;
 
   /// Carrega lista de tags disponíveis para autocomplete.
   Future<void> loadAvailableTags({String? searchTerm}) async {
     final result = await _executeLoadTags(searchTerm: searchTerm);
 
     if (result case Success(value: final data)) {
-      _availableTags = data.map((model) => model.toDomain().name).toList();
+      _availableTags = data.map((model) => model.toDomain()).toList();
       notifyListeners();
     } else if (result case Failure(error: final error)) {
       logger.warning('Erro ao carregar tags: $error');
@@ -68,6 +68,60 @@ class NotebookDetailViewModel extends ChangeNotifier
         context: 'loadAvailableTags',
       );
     }
+  }
+
+  /// Resolve tag IDs para entidades TagDetails.
+  List<TagDetails> get notebookTagsWithDetails {
+    if (_notebook?.tags == null || _notebook!.tags!.isEmpty) {
+      return [];
+    }
+    return _availableTags
+        .where((tag) => _notebook!.tags!.contains(tag.id))
+        .toList();
+  }
+
+  /// Adiciona uma tag ao notebook atual.
+  Future<bool> addTagToNotebook(TagDetails tag) async {
+    if (_notebook == null) return false;
+
+    final currentTags = _notebook!.tags ?? [];
+    if (currentTags.contains(tag.id)) return true; // Já existe
+
+    final updatedTags = [...currentTags, tag.id];
+    final update = NotebookUpdate(
+      id: _notebook!.id,
+      tags: updatedTags,
+    );
+
+    final success = await updateNotebook(update);
+    if (success) {
+      // Atualiza estado local
+      _notebook = _notebook!.copyWith(tags: updatedTags);
+      notifyListeners();
+    }
+    return success;
+  }
+
+  /// Remove uma tag do notebook atual.
+  Future<bool> removeTagFromNotebook(String tagId) async {
+    if (_notebook == null) return false;
+
+    final currentTags = _notebook!.tags ?? [];
+    if (!currentTags.contains(tagId)) return true; // Não existe
+
+    final updatedTags = currentTags.where((id) => id != tagId).toList();
+    final update = NotebookUpdate(
+      id: _notebook!.id,
+      tags: updatedTags.isEmpty ? null : updatedTags,
+    );
+
+    final success = await updateNotebook(update);
+    if (success) {
+      // Atualiza estado local
+      _notebook = _notebook!.copyWith(tags: updatedTags.isEmpty ? null : updatedTags);
+      notifyListeners();
+    }
+    return success;
   }
 
   /// Carrega detalhes de um caderno.

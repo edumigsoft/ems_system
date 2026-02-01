@@ -147,11 +147,13 @@ class _NotebookEditDialogState extends State<NotebookEditDialog> {
                             });
                           },
                           onSearchTags: (query) async {
-                            // Retorna lista vazia por enquanto ou simula busca
-                            // Idealmente pegaria do ViewModel
-                            return widget.viewModel.availableTags
+                            // Retorna lista de nomes de tags disponíveis
+                            final availableTagNames = widget.viewModel.availableTags
+                                .map((tag) => tag.name)
+                                .toList();
+                            return availableTagNames
                                 .where(
-                                  (String t) => t.toLowerCase().contains(
+                                  (name) => name.toLowerCase().contains(
                                     query.toLowerCase(),
                                   ),
                                 )

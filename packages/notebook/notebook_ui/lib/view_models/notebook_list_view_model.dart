@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:core_client/core_client.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 import 'package:notebook_client/notebook_client.dart';
+import 'package:tag_shared/tag_shared.dart' show TagDetails;
+import 'package:tag_client/tag_client.dart' show TagApiService;
 
 /// ViewModel para gerenciar lista de cadernos.
 ///
@@ -10,9 +12,13 @@ import 'package:notebook_client/notebook_client.dart';
 class NotebookListViewModel extends ChangeNotifier
     with Loggable, DioErrorHandler {
   final NotebookApiService _notebookService;
+  final TagApiService _tagService;
 
-  NotebookListViewModel({required NotebookApiService notebookService})
-    : _notebookService = notebookService;
+  NotebookListViewModel({
+    required NotebookApiService notebookService,
+    required TagApiService tagService,
+  })  : _notebookService = notebookService,
+        _tagService = tagService;
 
   List<NotebookDetails>? _notebooks;
   List<NotebookDetails>? get notebooks => _notebooks;
@@ -23,7 +29,26 @@ class NotebookListViewModel extends ChangeNotifier
   String? _error;
   String? get error => _error;
 
-  /// Carrega lista de cadernos.
+  /// Tags disponíveis para filtro.
+  List<TagDetails> _allAvailableTags = [];
+  List<TagDetails> get allAvailableTags => _allAvailableTags;
+
+  /// Alias para compatibilidade com páginas existentes.
+  List<TagDetails> get availableTags => _allAvailableTags;
+
+  /// Carrega todas as tags disponíveis.
+  Future<void> loadAvailableTags() async {
+    try {
+      final models = await _tagService.getAll(activeOnly: true);
+      _allAvailableTags = models.map((m) => m.toDomain()).toList();
+      notifyListeners();
+    } catch (e) {
+      logger.warning('Erro ao carregar tags: $e');
+      _allAvailableTags = [];
+    }
+  }
+
+  /// Carrega lista de cadernos com filtros server-side.
   Future<void> loadNotebooks() async {
     _isLoading = true;
     _error = null;
@@ -44,7 +69,20 @@ class NotebookListViewModel extends ChangeNotifier
 
   Future<Result<List<NotebookDetailsModel>>> _executeLoadNotebooks() async {
     try {
-      final models = await _notebookService.getAll();
+      // Passa filtro de tags para o servidor (comma-separated IDs)
+      final tagsParam = _selectedTags.isNotEmpty
+          ? _selectedTags.map((tag) => tag.id).join(',')
+          : null;
+
+      // Passa filtro de tipo (enum name)
+      final typeParam = _selectedTypes.isNotEmpty
+          ? _selectedTypes.first.name
+          : null;
+
+      final models = await _notebookService.getAll(
+        tags: tagsParam,
+        type: typeParam,
+      );
       return Success(models);
     } on DioException catch (e) {
       return handleDioError<List<NotebookDetailsModel>>(
@@ -94,19 +132,22 @@ class NotebookListViewModel extends ChangeNotifier
   final Set<NotebookType> _selectedTypes = {};
   Set<NotebookType> get selectedTypes => _selectedTypes;
 
-  final Set<String> _selectedTags = {};
-  Set<String> get selectedTags => _selectedTags;
+  final Set<TagDetails> _selectedTags = {};
+  Set<TagDetails> get selectedTags => _selectedTags;
 
   NotebookSortOrder _sortOrder = NotebookSortOrder.recentFirst;
   NotebookSortOrder get sortOrder => _sortOrder;
 
   /// Lista filtrada de cadernos baseado nos critérios ativos.
+  ///
+  /// **Nota:** Filtro por tags agora é server-side via `loadNotebooks()`.
+  /// Filtros de busca (texto) e ordenação ainda são client-side.
   List<NotebookDetails> get filteredNotebooks {
     if (_notebooks == null) return [];
 
     var filtered = _notebooks!;
 
-    // Filtro por busca (título ou conteúdo)
+    // Filtro por busca (título ou conteúdo) - CLIENT-SIDE
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       filtered = filtered.where((notebook) {
@@ -116,22 +157,7 @@ class NotebookListViewModel extends ChangeNotifier
       }).toList();
     }
 
-    // Filtro por tipo
-    if (_selectedTypes.isNotEmpty) {
-      filtered = filtered.where((notebook) {
-        return notebook.type != null && _selectedTypes.contains(notebook.type);
-      }).toList();
-    }
-
-    // Filtro por tags
-    if (_selectedTags.isNotEmpty) {
-      filtered = filtered.where((notebook) {
-        if (notebook.tags == null || notebook.tags!.isEmpty) return false;
-        return _selectedTags.any((tag) => notebook.tags!.contains(tag));
-      }).toList();
-    }
-
-    // Ordenação
+    // Ordenação - CLIENT-SIDE
     switch (_sortOrder) {
       case NotebookSortOrder.recentFirst:
         filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -156,24 +182,25 @@ class NotebookListViewModel extends ChangeNotifier
     notifyListeners();
   }
 
-  /// Toggle de filtro por tipo.
+  /// Toggle de filtro por tipo (recarrega dados do servidor).
   void toggleTypeFilter(NotebookType type) {
     if (_selectedTypes.contains(type)) {
       _selectedTypes.remove(type);
     } else {
+      _selectedTypes.clear(); // API suporta apenas 1 tipo
       _selectedTypes.add(type);
     }
-    notifyListeners();
+    loadNotebooks(); // Recarrega com novo filtro
   }
 
-  /// Toggle de filtro por tag.
-  void toggleTagFilter(String tag) {
-    if (_selectedTags.contains(tag)) {
-      _selectedTags.remove(tag);
+  /// Toggle de filtro por tag (recarrega dados do servidor).
+  void toggleTagFilter(TagDetails tag) {
+    if (_selectedTags.any((t) => t.id == tag.id)) {
+      _selectedTags.removeWhere((t) => t.id == tag.id);
     } else {
       _selectedTags.add(tag);
     }
-    notifyListeners();
+    loadNotebooks(); // Recarrega com novo filtro server-side
   }
 
   /// Define critério de ordenação.
@@ -188,20 +215,7 @@ class NotebookListViewModel extends ChangeNotifier
     _selectedTypes.clear();
     _selectedTags.clear();
     _sortOrder = NotebookSortOrder.recentFirst;
-    notifyListeners();
-  }
-
-  /// Obtém todas as tags únicas dos cadernos.
-  Set<String> get availableTags {
-    if (_notebooks == null) return {};
-
-    final tags = <String>{};
-    for (final notebook in _notebooks!) {
-      if (notebook.tags != null) {
-        tags.addAll(notebook.tags!);
-      }
-    }
-    return tags;
+    loadNotebooks(); // Recarrega sem filtros
   }
 
   /// Limpa erro atual.

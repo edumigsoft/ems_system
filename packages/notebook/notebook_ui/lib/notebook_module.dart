@@ -41,6 +41,7 @@ class NotebookModule extends AppModule with Loggable {
     di.registerLazySingleton<NotebookListViewModel>(
       () => NotebookListViewModel(
         notebookService: di.get<NotebookApiService>(),
+        tagService: di.get<TagApiService>(),
       ),
     );
 

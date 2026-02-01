@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:core_shared/core_shared.dart' show Result, Success, Failure;
 import 'package:core_ui/core_ui.dart' show FormValidationMixin;
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:tag_shared/tag_shared.dart' show TagDetails;
+import 'package:tag_client/tag_client.dart' show TagApiService;
 
 /// ViewModel para formulário de criação/edição de notebooks.
 ///
@@ -11,13 +13,27 @@ import 'package:notebook_shared/notebook_shared.dart';
 /// Ele apenas gerencia o estado do formulário e fornece dados validados.
 class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
   final NotebookDetails? _initialData;
+  final TagApiService _tagService;
+
   NotebookType _selectedType = NotebookType.organized;
+  List<TagDetails> _selectedTags = [];
+  List<TagDetails> _availableTags = [];
+  bool _isLoadingTags = false;
 
   /// Indica se é modo de edição (true) ou criação (false).
   bool get isEditing => _initialData != null;
 
   /// Tipo de notebook selecionado
   NotebookType get selectedType => _selectedType;
+
+  /// Tags selecionadas
+  List<TagDetails> get selectedTags => List.unmodifiable(_selectedTags);
+
+  /// Tags disponíveis
+  List<TagDetails> get availableTags => List.unmodifiable(_availableTags);
+
+  /// Indica se está carregando tags
+  bool get isLoadingTags => _isLoadingTags;
 
   set selectedType(NotebookType value) {
     if (_selectedType != value) {
@@ -28,8 +44,11 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
 
   NotebookFormViewModel({
     NotebookDetails? initialData,
-  }) : _initialData = initialData {
+    required TagApiService tagService,
+  })  : _initialData = initialData,
+        _tagService = tagService {
     _initializeFields();
+    loadAvailableTags();
   }
 
   /// Inicializa os campos do formulário.
@@ -45,17 +64,67 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
         notebookContentField,
         initialValue: data.content,
       );
-      registerField(
-        notebookTagsField,
-        initialValue: data.tags?.join(', ') ?? '',
-      );
       _selectedType = data.type ?? NotebookType.organized;
+
+      // Carrega tags de IDs
+      if (data.tags != null && data.tags!.isNotEmpty) {
+        _loadTagDetailsFromIds(data.tags!);
+      }
     } else {
       // Modo criação - campos vazios
       registerField(notebookTitleField);
       registerField(notebookContentField);
-      registerField(notebookTagsField);
     }
+  }
+
+  /// Carrega detalhes das tags a partir de IDs.
+  Future<void> _loadTagDetailsFromIds(List<String> tagIds) async {
+    try {
+      final allTagsModels = await _tagService.getAll();
+      final allTags = allTagsModels.map((model) => model.toDomain()).toList();
+      _selectedTags = allTags
+          .where((tag) => tagIds.contains(tag.id))
+          .toList();
+      notifyListeners();
+    } catch (_) {
+      // Silenciosamente ignora erro (tags não críticas)
+    }
+  }
+
+  /// Carrega todas as tags disponíveis.
+  Future<void> loadAvailableTags() async {
+    _isLoadingTags = true;
+    notifyListeners();
+
+    try {
+      final tagsModels = await _tagService.getAll(activeOnly: true);
+      _availableTags = tagsModels.map((model) => model.toDomain()).toList();
+    } catch (_) {
+      _availableTags = [];
+    } finally {
+      _isLoadingTags = false;
+      notifyListeners();
+    }
+  }
+
+  /// Define as tags selecionadas.
+  void setTags(List<TagDetails> tags) {
+    _selectedTags = tags;
+    notifyListeners();
+  }
+
+  /// Adiciona uma tag à seleção.
+  void addTag(TagDetails tag) {
+    if (!_selectedTags.any((t) => t.id == tag.id)) {
+      _selectedTags.add(tag);
+      notifyListeners();
+    }
+  }
+
+  /// Remove uma tag da seleção.
+  void removeTag(String tagId) {
+    _selectedTags.removeWhere((tag) => tag.id == tagId);
+    notifyListeners();
   }
 
   /// Coleta dados atuais do formulário.
@@ -63,18 +132,7 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
     return {
       notebookTitleField: getFieldValue(notebookTitleField),
       notebookContentField: getFieldValue(notebookContentField),
-      notebookTagsField: getFieldValue(notebookTagsField),
     };
-  }
-
-  /// Converte string de tags separadas por vírgula em lista.
-  List<String>? _parseTags(String tagsText) {
-    if (tagsText.trim().isEmpty) return null;
-    return tagsText
-        .split(',')
-        .map((tag) => tag.trim())
-        .where((tag) => tag.isNotEmpty)
-        .toList();
   }
 
   /// Valida o formulário e retorna os dados.
@@ -100,7 +158,9 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
       title: getFieldValue(notebookTitleField).trim(),
       content: getFieldValue(notebookContentField).trim(),
       type: _selectedType,
-      tags: _parseTags(getFieldValue(notebookTagsField)),
+      tags: _selectedTags.isNotEmpty
+          ? _selectedTags.map((t) => t.id).toList()
+          : null,
     );
   }
 
@@ -118,7 +178,9 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
       title: getFieldValue(notebookTitleField).trim(),
       content: getFieldValue(notebookContentField).trim(),
       type: _selectedType,
-      tags: _parseTags(getFieldValue(notebookTagsField)),
+      tags: _selectedTags.isNotEmpty
+          ? _selectedTags.map((t) => t.id).toList()
+          : null,
     );
   }
 
@@ -129,12 +191,16 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
       resetForm({
         notebookTitleField: data.title,
         notebookContentField: data.content,
-        notebookTagsField: data.tags?.join(', ') ?? '',
       });
       _selectedType = data.type ?? NotebookType.organized;
+      _selectedTags = [];
+      if (data.tags != null && data.tags!.isNotEmpty) {
+        _loadTagDetailsFromIds(data.tags!);
+      }
     } else {
       resetForm();
       _selectedType = NotebookType.organized;
+      _selectedTags = [];
     }
     notifyListeners();
   }

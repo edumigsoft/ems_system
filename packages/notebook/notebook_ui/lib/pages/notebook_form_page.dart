@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:core_shared/core_shared.dart' show Failure;
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:tag_client/tag_client.dart' show TagApiService;
+import 'package:tag_ui/tag_ui.dart' show TagSelector;
 import '../ui/view_models/notebook_form_view_model.dart';
 
 /// Página de formulário para criar/editar caderno.
@@ -28,7 +31,11 @@ class _NotebookFormPageState extends State<NotebookFormPage> {
   @override
   void initState() {
     super.initState();
-    _viewModel = NotebookFormViewModel(initialData: widget.notebook);
+    final tagService = GetIt.I.get<TagApiService>();
+    _viewModel = NotebookFormViewModel(
+      initialData: widget.notebook,
+      tagService: tagService,
+    );
   }
 
   @override
@@ -126,15 +133,32 @@ class _NotebookFormPageState extends State<NotebookFormPage> {
               const SizedBox(height: 16),
 
               // Tags
-              TextField(
-                controller: _viewModel.registerField(notebookTagsField),
-                decoration: const InputDecoration(
-                  labelText: 'Tags (separadas por vírgula)',
-                  hintText: 'Ex: trabalho, importante, pessoal',
-                  border: OutlineInputBorder(),
-                  helperText: 'Separe as tags com vírgulas',
+              if (_viewModel.isLoadingTags)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tags',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TagSelector(
+                      availableTags: _viewModel.availableTags,
+                      selectedTags: _viewModel.selectedTags,
+                      onChanged: (newTags) => _viewModel.setTags(newTags),
+                    ),
+                  ],
                 ),
-              ),
               const SizedBox(height: 24),
 
               // Botões

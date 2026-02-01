@@ -93,6 +93,45 @@ class NotebookDetails implements BaseDetails {
   /// Quantidade de documentos anexados
   int get documentsCount => documentIds?.length ?? 0;
 
+  /// Cria uma cópia de NotebookDetails com campos atualizados.
+  NotebookDetails copyWith({
+    String? id,
+    bool? isDeleted,
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Notebook? data,
+    List<String>? documentIds,
+    // Campos da Entity
+    String? title,
+    String? content,
+    String? projectId,
+    String? parentId,
+    List<String>? tags,
+    NotebookType? type,
+    DateTime? reminderDate,
+    bool? notifyOnReminder,
+  }) {
+    return NotebookDetails(
+      id: id ?? this.id,
+      isDeleted: isDeleted ?? this.isDeleted,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      data: data ?? Notebook(
+        title: title ?? this.title,
+        content: content ?? this.content,
+        projectId: projectId ?? this.projectId,
+        parentId: parentId ?? this.parentId,
+        tags: tags ?? this.tags,
+        type: type ?? this.type,
+        reminderDate: reminderDate ?? this.reminderDate,
+        notifyOnReminder: notifyOnReminder ?? this.notifyOnReminder,
+      ),
+      documentIds: documentIds ?? this.documentIds,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
