@@ -444,5 +444,149 @@
     "schoolRestoreConfirm": "Do you want to restore the school?",
     "@schoolRestoreConfirm": {
         "description": "Confirmation of school restoration"
+    },
+    "actions": "Actions",
+    "@actions": {
+        "description": "Actions"
+    },
+    "success": "Success",
+    "@success": {
+        "description": "Success"
+    },
+    "error": "Error",
+    "@error": {
+        "description": "Error"
+    },
+    "warning": "Warning",
+    "@warning": {
+        "description": "Warning"
+    },
+    "info": "Info",
+    "@info": {
+        "description": "Info"
+    },
+    "loading": "Loading...",
+    "@loading": {
+        "description": "Loading..."
+    },
+    "noData": "No data found",
+    "@noData": {
+        "description": "No data found"
+    },
+    "saveSuccess": "Saved successfully",
+    "@saveSuccess": {
+        "description": "Saved successfully"
+    },
+    "deleteSuccess": "Deleted successfully",
+    "@deleteSuccess": {
+        "description": "Deleted successfully"
+    },
+    "restoreSuccess": "Restored successfully",
+    "@restoreSuccess": {
+        "description": "Restored successfully"
+    },
+    "deleteConfirm": "Do you really want to delete this item?",
+    "@deleteConfirm": {
+        "description": "Do you really want to delete this item?"
+    },
+    "manager": "Manager",
+    "@manager": {
+        "description": "Manager"
+    },
+    "city": "City",
+    "@city": {
+        "description": "City"
+    },
+    "state": "State",
+    "@state": {
+        "description": "State"
+    },
+    "zipCode": "ZIP Code",
+    "@zipCode": {
+        "description": "ZIP Code"
+    },
+    "district": "District",
+    "@district": {
+        "description": "District"
+    },
+    "complement": "Complement",
+    "@complement": {
+        "description": "Complement"
+    },
+    "number": "Number",
+    "@number": {
+        "description": "Number"
+    },
+    "saveError": "Error saving",
+    "@saveError": {
+        "description": "Error saving"
+    },
+    "deleteError": "Error deleting",
+    "@deleteError": {
+        "description": "Error deleting"
+    },
+    "restoreError": "Error restoring",
+    "@restoreError": {
+        "description": "Error restoring"
+    },
+    "searchSchoolsHint": "Search schools by name, code or city...",
+    "@searchSchoolsHint": {
+        "description": "Search schools by name, code or city..."
+    },
+    "updateList": "Update list",
+    "@updateList": {
+        "description": "Update list"
+    },
+    "addSchool": "Add School",
+    "@addSchool": {
+        "description": "Add School"
+    },
+    "schoolColumn": "School",
+    "@schoolColumn": {
+        "description": "School"
+    },
+    "locationColumn": "Location",
+    "@locationColumn": {
+        "description": "Location"
+    },
+    "contactColumn": "Contact",
+    "@contactColumn": {
+        "description": "Contact"
+    },
+    "showActiveSchools": "Show active schools",
+    "@showActiveSchools": {
+        "description": "Show active schools"
+    },
+    "showDeletedSchools": "Show deleted schools",
+    "@showDeletedSchools": {
+        "description": "Show deleted schools"
+    },
+    "activeSchoolsLabel": "Active",
+    "@activeSchoolsLabel": {
+        "description": "Active"
+    },
+    "deletedSchoolsLabel": "Deleted",
+    "@deletedSchoolsLabel": {
+        "description": "Deleted"
+    },
+    "schoolDeletedTooltip": "This school was deleted",
+    "@schoolDeletedTooltip": {
+        "description": "This school was deleted"
+    },
+    "noDetailsToEdit": "There are no details to edit.",
+    "@noDetailsToEdit": {
+        "description": "There are no details to edit."
+    },
+    "noDetailsToSave": "There are no details to save.",
+    "@noDetailsToSave": {
+        "description": "There are no details to save."
+    },
+    "noDetailsToRestore": "There are no details to restore.",
+    "@noDetailsToRestore": {
+        "description": "There are no details to restore."
+    },
+    "retry": "Try again",
+    "@retry": {
+        "description": "Try again"
     }
 }

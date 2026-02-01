@@ -5,7 +5,7 @@ import 'package:design_system_shared/design_system_shared.dart';
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import '../view_models/school_view_model.dart';
-import '../widgets/school_form_widget.dart';
+import '../widgets/dialogs/school_form_widget.dart';
 
 /// Página de edição de escola para dispositivos móveis e tablet.
 ///
@@ -26,7 +26,7 @@ class SchoolEditPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(school == null ? 'Criar Escola' : l10n.editSchool),
+        title: Text(school == null ? l10n.createSchool : l10n.editSchool),
         elevation: 0,
       ),
       body: SingleChildScrollView(

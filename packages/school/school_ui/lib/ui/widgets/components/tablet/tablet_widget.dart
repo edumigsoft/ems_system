@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:localizations_ui/localizations_ui.dart';
 import 'package:school_shared/school_shared.dart';
 import '../../../../school_ui.dart';
+import '../../dialogs/dialogs.dart';
 import '../../shared/shared.dart';
 
 class TabletWidget extends StatefulWidget {
@@ -15,69 +17,52 @@ class _TabletWidgetState extends State<TabletWidget> {
   String _searchQuery = '';
   SchoolStatus? _selectedStatus;
 
-  void _showRestoreConfirmation(BuildContext context, String schoolName) {
-    showDialog<void>(
+  Future<void> _showRestoreConfirmation(
+    BuildContext context,
+    SchoolDetails school,
+  ) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restaurar Escola'),
-        content: Text('Deseja restaurar a escola "$schoolName"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.viewModel.restoreCommand.execute();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Escola "$schoolName" restaurada com sucesso!'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: const Text('Restaurar'),
-          ),
-        ],
-      ),
+      builder: (context) => SchoolRestoreConfirmDialog(schoolName: school.name),
     );
+
+    if (result == true && mounted) {
+      widget.viewModel.detailsCommand.execute(school);
+      await widget.viewModel.restoreCommand.execute();
+
+      if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.schoolRestoreSuccess),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
-  void _showDeleteConfirmation(BuildContext context, String schoolName) {
-    showDialog<void>(
+  Future<void> _showDeleteConfirmation(
+    BuildContext context,
+    SchoolDetails school,
+  ) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Excluir Escola'),
-        content: Text(
-          'Deseja realmente excluir a escola "$schoolName"? '
-          'Esta ação pode ser desfeita posteriormente.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.viewModel.deleteCommand.execute();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Escola "$schoolName" excluída!'),
-                  backgroundColor: Colors.orange,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Excluir'),
-          ),
-        ],
-      ),
+      builder: (context) => SchoolDeleteConfirmDialog(schoolName: school.name),
     );
+
+    if (result == true && mounted) {
+      widget.viewModel.detailsCommand.execute(school);
+      await widget.viewModel.deleteCommand.execute();
+
+      if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.schoolDeleteSuccess),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
   }
 
   List<SchoolDetails> _filterSchools(List<SchoolDetails> schools) {
@@ -134,9 +119,10 @@ class _TabletWidgetState extends State<TabletWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Escolas'),
+        title: Text(l10n.school),
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
@@ -201,8 +187,8 @@ class _TabletWidgetState extends State<TabletWidget> {
                                     const SizedBox(height: 16),
                                     Text(
                                       widget.viewModel.showDeleted
-                                          ? 'Nenhuma escola deletada'
-                                          : 'Nenhuma escola encontrada',
+                                          ? l10n.noData
+                                          : l10n.noData,
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.grey[600],
@@ -218,7 +204,7 @@ class _TabletWidgetState extends State<TabletWidget> {
                                             _selectedStatus = null;
                                           });
                                         },
-                                        child: const Text('Limpar filtros'),
+                                        child: Text(l10n.cancel),
                                       ),
                                     ],
                                   ],
@@ -256,18 +242,15 @@ class _TabletWidgetState extends State<TabletWidget> {
                                       onDelete: () {
                                         _showDeleteConfirmation(
                                           context,
-                                          school.name,
+                                          school,
                                         );
                                       },
                                     );
                                   },
                                   onRestore: () {
-                                    widget.viewModel.detailsCommand.execute(
-                                      school,
-                                    );
                                     _showRestoreConfirmation(
                                       context,
-                                      school.name,
+                                      school,
                                     );
                                   },
                                 );
@@ -280,12 +263,12 @@ class _TabletWidgetState extends State<TabletWidget> {
                               children: [
                                 const Icon(Icons.error_outline, size: 48),
                                 const SizedBox(height: 16),
-                                Text('Erro: ${error.toString()}'),
+                                Text('${l10n.error}: ${error.toString()}'),
                                 const SizedBox(height: 16),
                                 ElevatedButton(
                                   onPressed: () =>
                                       widget.viewModel.refreshCommand.execute(),
-                                  child: const Text('Tentar novamente'),
+                                  child: Text(l10n.retry),
                                 ),
                               ],
                             ),

@@ -368,4 +368,112 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schoolRestoreConfirm => 'Do you want to restore the school?';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get info => 'Info';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get noData => 'No data found';
+
+  @override
+  String get saveSuccess => 'Saved successfully';
+
+  @override
+  String get deleteSuccess => 'Deleted successfully';
+
+  @override
+  String get restoreSuccess => 'Restored successfully';
+
+  @override
+  String get deleteConfirm => 'Do you really want to delete this item?';
+
+  @override
+  String get manager => 'Manager';
+
+  @override
+  String get city => 'City';
+
+  @override
+  String get state => 'State';
+
+  @override
+  String get zipCode => 'ZIP Code';
+
+  @override
+  String get district => 'District';
+
+  @override
+  String get complement => 'Complement';
+
+  @override
+  String get number => 'Number';
+
+  @override
+  String get saveError => 'Error saving';
+
+  @override
+  String get deleteError => 'Error deleting';
+
+  @override
+  String get restoreError => 'Error restoring';
+
+  @override
+  String get searchSchoolsHint => 'Search schools by name, code or city...';
+
+  @override
+  String get updateList => 'Update list';
+
+  @override
+  String get addSchool => 'Add School';
+
+  @override
+  String get schoolColumn => 'School';
+
+  @override
+  String get locationColumn => 'Location';
+
+  @override
+  String get contactColumn => 'Contact';
+
+  @override
+  String get showActiveSchools => 'Show active schools';
+
+  @override
+  String get showDeletedSchools => 'Show deleted schools';
+
+  @override
+  String get activeSchoolsLabel => 'Active';
+
+  @override
+  String get deletedSchoolsLabel => 'Deleted';
+
+  @override
+  String get schoolDeletedTooltip => 'This school was deleted';
+
+  @override
+  String get noDetailsToEdit => 'There are no details to edit.';
+
+  @override
+  String get noDetailsToSave => 'There are no details to save.';
+
+  @override
+  String get noDetailsToRestore => 'There are no details to restore.';
+
+  @override
+  String get retry => 'Try again';
 }

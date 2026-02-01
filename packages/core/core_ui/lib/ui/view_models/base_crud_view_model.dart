@@ -106,7 +106,7 @@ abstract class BaseCRUDViewModel<T> extends ChangeNotifier with Loggable {
   ///
   /// Subclasses devem chamar `super.init()` e então executar comandos específicos.
   Future<void> init() async {
-    logger.info('${runtimeType.toString()} Init');
+    logger.fine('${runtimeType.toString()} Init');
     details = null;
     editing = null;
     _canSave = false;

@@ -3,7 +3,7 @@ import 'package:core_shared/core_shared.dart' show Success, Failure;
 import 'package:school_shared/school_shared.dart';
 import 'package:design_system_shared/design_system_shared.dart';
 import 'package:localizations_ui/localizations_ui.dart';
-import '../view_models/school_form_view_model.dart';
+import '../../view_models/school_form_view_model.dart';
 
 /// Widget de formulário para criação e edição de escolas.
 ///

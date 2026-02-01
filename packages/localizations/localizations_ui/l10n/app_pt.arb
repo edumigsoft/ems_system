@@ -406,5 +406,149 @@
     "schoolRestoreConfirm": "Deseja restaurar a escola?",
     "@schoolRestoreConfirm": {
         "description": "Confirmação de restauração da escola"
+    },
+    "actions": "Ações",
+    "@actions": {
+        "description": "Ações"
+    },
+    "success": "Sucesso",
+    "@success": {
+        "description": "Sucesso"
+    },
+    "error": "Erro",
+    "@error": {
+        "description": "Erro"
+    },
+    "warning": "Aviso",
+    "@warning": {
+        "description": "Aviso"
+    },
+    "info": "Informação",
+    "@info": {
+        "description": "Informação"
+    },
+    "loading": "Carregando...",
+    "@loading": {
+        "description": "Carregando..."
+    },
+    "noData": "Nenhum dado encontrado",
+    "@noData": {
+        "description": "Nenhum dado encontrado"
+    },
+    "saveSuccess": "Salvo com sucesso",
+    "@saveSuccess": {
+        "description": "Salvo com sucesso"
+    },
+    "deleteSuccess": "Excluído com sucesso",
+    "@deleteSuccess": {
+        "description": "Excluído com sucesso"
+    },
+    "restoreSuccess": "Restaurado com sucesso",
+    "@restoreSuccess": {
+        "description": "Restaurado com sucesso"
+    },
+    "deleteConfirm": "Deseja realmente excluir este item?",
+    "@deleteConfirm": {
+        "description": "Deseja realmente excluir este item?"
+    },
+    "manager": "Diretor",
+    "@manager": {
+        "description": "Diretor"
+    },
+    "city": "Cidade",
+    "@city": {
+        "description": "Cidade"
+    },
+    "state": "Estado",
+    "@state": {
+        "description": "Estado"
+    },
+    "zipCode": "CEP",
+    "@zipCode": {
+        "description": "CEP"
+    },
+    "district": "Bairro",
+    "@district": {
+        "description": "Bairro"
+    },
+    "complement": "Complemento",
+    "@complement": {
+        "description": "Complemento"
+    },
+    "number": "Número",
+    "@number": {
+        "description": "Número"
+    },
+    "saveError": "Erro ao salvar",
+    "@saveError": {
+        "description": "Erro ao salvar"
+    },
+    "deleteError": "Erro ao excluir",
+    "@deleteError": {
+        "description": "Erro ao excluir"
+    },
+    "restoreError": "Erro ao restaurar",
+    "@restoreError": {
+        "description": "Erro ao restaurar"
+    },
+    "searchSchoolsHint": "Buscar escolas por nome, código ou cidade...",
+    "@searchSchoolsHint": {
+        "description": "Buscar escolas por nome, código ou cidade..."
+    },
+    "updateList": "Atualizar lista",
+    "@updateList": {
+        "description": "Atualizar lista"
+    },
+    "addSchool": "Adicionar Escola",
+    "@addSchool": {
+        "description": "Adicionar Escola"
+    },
+    "schoolColumn": "Escola",
+    "@schoolColumn": {
+        "description": "Escola"
+    },
+    "locationColumn": "Localização",
+    "@locationColumn": {
+        "description": "Localização"
+    },
+    "contactColumn": "Contato",
+    "@contactColumn": {
+        "description": "Contato"
+    },
+    "showActiveSchools": "Mostrar escolas ativas",
+    "@showActiveSchools": {
+        "description": "Mostrar escolas ativas"
+    },
+    "showDeletedSchools": "Mostrar escolas deletadas",
+    "@showDeletedSchools": {
+        "description": "Mostrar escolas deletadas"
+    },
+    "activeSchoolsLabel": "Ativas",
+    "@activeSchoolsLabel": {
+        "description": "Ativas"
+    },
+    "deletedSchoolsLabel": "Deletadas",
+    "@deletedSchoolsLabel": {
+        "description": "Deletadas"
+    },
+    "schoolDeletedTooltip": "Esta escola foi deletada",
+    "@schoolDeletedTooltip": {
+        "description": "Esta escola foi deletada"
+    },
+    "noDetailsToEdit": "Não há detalhes para editar.",
+    "@noDetailsToEdit": {
+        "description": "Não há detalhes para editar."
+    },
+    "noDetailsToSave": "Não há detalhes para salvar.",
+    "@noDetailsToSave": {
+        "description": "Não há detalhes para salvar."
+    },
+    "noDetailsToRestore": "Não há detalhes para restaurar.",
+    "@noDetailsToRestore": {
+        "description": "Não há detalhes para restaurar."
+    },
+    "retry": "Tentar novamente",
+    "@retry": {
+        "description": "Tentar novamente"
     }
 }

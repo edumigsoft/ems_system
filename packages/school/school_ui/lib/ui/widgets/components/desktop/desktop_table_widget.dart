@@ -1,9 +1,10 @@
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:localizations_ui/localizations_ui.dart';
 import 'package:school_shared/school_shared.dart'
     show SchoolDetails, SchoolStatus;
 import '../../../view_models/school_view_model.dart';
-import '../../school_form_dialog.dart';
+import '../../dialogs/dialogs.dart';
 
 // Widget que combina tabela com todas as funcionalidades do Design System
 class DesktopTableWidget extends StatefulWidget {
@@ -191,9 +192,10 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     );
 
     if (result != null && mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Escola atualizada com sucesso!'),
+        SnackBar(
+          content: Text(l10n.schoolUpdateSuccess),
           backgroundColor: Colors.green,
         ),
       );
@@ -201,41 +203,49 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     }
   }
 
-  void _deleteSchool(SchoolDetails school) {
-    widget.viewModel.detailsCommand.execute(school);
-    widget.viewModel.deleteCommand.execute();
+  Future<void> _deleteSchool(BuildContext context, SchoolDetails school) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => SchoolDeleteConfirmDialog(schoolName: school.name),
+    );
+
+    if (result == true && context.mounted) {
+      widget.viewModel.detailsCommand.execute(school);
+      await widget.viewModel.deleteCommand.execute();
+
+      if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.schoolDeleteSuccess),
+          backgroundColor: Colors.orange,
+        ),
+      );
+    }
   }
 
-  void _restoreSchool(SchoolDetails school) {
-    showDialog<void>(
+  Future<void> _restoreSchool(
+    BuildContext context,
+    SchoolDetails school,
+  ) async {
+    final result = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Restaurar Escola'),
-        content: Text('Deseja restaurar a escola "${school.name}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              widget.viewModel.detailsCommand.execute(school);
-              widget.viewModel.restoreCommand.execute();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Escola "${school.name}" restaurada com sucesso!',
-                  ),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: const Text('Restaurar'),
-          ),
-        ],
-      ),
+      builder: (context) => SchoolRestoreConfirmDialog(schoolName: school.name),
     );
+
+    if (result == true && context.mounted) {
+      widget.viewModel.detailsCommand.execute(school);
+      await widget.viewModel.restoreCommand.execute();
+
+      if (!context.mounted) return;
+      final l10n = AppLocalizations.of(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.schoolRestoreSuccess),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
   }
 
   void _deleteSelected() {
@@ -257,9 +267,10 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
     );
 
     if (result != null && mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Escola criada com sucesso!'),
+        SnackBar(
+          content: Text(l10n.schoolCreateSuccess),
           backgroundColor: Colors.green,
         ),
       );
@@ -269,6 +280,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final width = MediaQuery.of(context).size.width * 0.8;
 
     return DSDataTableContainer(
@@ -278,7 +290,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
         children: [
           Expanded(
             child: DSTableSearchField(
-              hintText: 'Buscar escolas por nome, código ou cidade...',
+              hintText: l10n.searchSchoolsHint,
               onChanged: (value) {
                 searchQuery = value;
                 _applyFilters();
@@ -293,11 +305,13 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
           // Toggle para mostrar/ocultar deletados
           Tooltip(
             message: widget.viewModel.showDeleted
-                ? 'Mostrar escolas ativas'
-                : 'Mostrar escolas deletadas',
+                ? l10n.showActiveSchools
+                : l10n.showDeletedSchools,
             child: FilterChip(
               label: Text(
-                widget.viewModel.showDeleted ? 'Deletadas' : 'Ativas',
+                widget.viewModel.showDeleted
+                    ? l10n.deletedSchoolsLabel
+                    : l10n.activeSchoolsLabel,
               ),
               selected: widget.viewModel.showDeleted,
               onSelected: (selected) {
@@ -317,13 +331,13 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
             onPressed: widget.viewModel.fetchAllCommand.running
                 ? null
                 : () => widget.viewModel.refreshCommand.execute(),
-            tooltip: 'Atualizar lista',
+            tooltip: l10n.updateList,
           ),
           const SizedBox(width: 8),
           ElevatedButton.icon(
             onPressed: _showCreateDialog,
             icon: const Icon(Icons.add),
-            label: const Text('Adicionar Escola'),
+            label: Text(l10n.addSchool),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
@@ -402,7 +416,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
         },
         columns: [
           DSDataTableColumn<SchoolDetails>(
-            label: 'ESCOLA',
+            label: l10n.schoolColumn,
             builder: (school) => Row(
               children: [
                 DSTableCellWithIcon(
@@ -412,13 +426,13 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
                       : _getIconBackgroundColor(Icons.school),
                   title: school.name,
                   subtitle: school.isDeleted
-                      ? 'Cod: ${school.code} (Deletada)'
-                      : 'Cod: ${school.code}',
+                      ? '${l10n.cie}: ${school.code} (${l10n.deletedSchoolsLabel})'
+                      : '${l10n.cie}: ${school.code}',
                 ),
                 if (school.isDeleted) ...[
                   const SizedBox(width: 8),
                   Tooltip(
-                    message: 'Esta escola foi deletada',
+                    message: l10n.schoolDeletedTooltip,
                     child: Icon(
                       Icons.delete_outline,
                       size: 16,
@@ -430,21 +444,21 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
             ),
           ),
           DSDataTableColumn<SchoolDetails>(
-            label: 'LOCALIZAÇÃO',
+            label: l10n.locationColumn,
             builder: (school) => DSTableCellTwoLines(
               primary: school.locationCity,
               secondary: school.locationDistrict,
             ),
           ),
           DSDataTableColumn<SchoolDetails>(
-            label: 'CONTATO',
+            label: l10n.contactColumn,
             builder: (school) => DSTableCellTwoLines(
               primary: school.phone,
               secondary: school.email,
             ),
           ),
           DSDataTableColumn<SchoolDetails>(
-            label: 'DIREÇÃO',
+            label: l10n.manager.toUpperCase(),
             builder: (school) {
               final dsTheme = Theme.of(
                 context,
@@ -462,22 +476,22 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
             },
           ),
           DSDataTableColumn<SchoolDetails>(
-            label: 'STATUS',
+            label: l10n.status.toUpperCase(),
             builder: (school) => DSTableStatusIndicator(
               label: school.status.name,
               color: _getStatusColor(school.status),
             ),
           ),
           DSDataTableColumn<SchoolDetails>(
-            label: 'AÇÕES',
+            label: l10n.actions.toUpperCase(),
             builder: (school) => DSTableActions(
               actions: school.isDeleted
                   ? [
                       // Ações para escolas deletadas
                       DSTableAction(
                         icon: Icons.restore_from_trash,
-                        onPressed: () => _restoreSchool(school),
-                        tooltip: 'Restaurar',
+                        onPressed: () => _restoreSchool(context, school),
+                        tooltip: l10n.restore,
                       ),
                     ]
                   : [
@@ -485,12 +499,12 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
                       DSTableAction(
                         icon: Icons.edit,
                         onPressed: () => _editSchool(school),
-                        tooltip: 'Editar',
+                        tooltip: l10n.edit,
                       ),
                       DSTableAction(
                         icon: Icons.delete_outline,
-                        onPressed: () => _deleteSchool(school),
-                        tooltip: 'Excluir',
+                        onPressed: () => _deleteSchool(context, school),
+                        tooltip: l10n.delete,
                       ),
                     ],
             ),
