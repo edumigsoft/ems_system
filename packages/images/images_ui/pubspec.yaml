@@ -21,13 +21,13 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
-  uses-material-design: true
+  uses-material-design: false
   assets:
     - assets/images/
-  # fonts:
-  #   - family: StudentIcon
-  #     fonts:
-  #       - asset: assets/fonts/StudentIcon.ttf
+  fonts:
+    - family: StudentIcon
+      fonts:
+        - asset: assets/fonts/StudentIcon.ttf
 
 flutter_gen:
   assets:

@@ -202,17 +202,16 @@ class DSSideNavigation extends StatelessWidget {
   /// - `environment` → Gestão de Ambientes
   /// - `system` → Sistema
   String _getSectionTitle(BuildContext context, AppNavigationSection section) {
-    // final l10n = AppLocalizations.of(context);
-    final name = section.toString().split('.').last;
-    switch (name) {
-      // case 'academic':
-      //   return l10n?.academicManagement ?? 'GESTÃO ACADÊMICA';
-      // case 'environment':
-      //   return l10n?.environmentManagement ?? 'GESTÃO DE AMBIENTES';
-      // case 'system':
-      //   return l10n?.systemManagement ?? 'SISTEMA';
-      default:
-        return '';
+    final l10n = AppLocalizations.of(context);
+    switch (section) {
+      case AppNavigationSection.dashboard:
+        return l10n.dashboard;
+      case AppNavigationSection.academic:
+        return ''; //l10n?.academicManagement ?? 'GESTÃO ACADÊMICA';
+      case AppNavigationSection.environment:
+        return ''; //l10n?.environmentManagement ?? 'GESTÃO DE AMBIENTES';
+      case AppNavigationSection.system:
+        return l10n.systemManagement;
     }
   }
 }
@@ -587,10 +586,10 @@ class _NavFooter extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: dsColors.primary.withValues(alpha: 0.1),
-            backgroundImage: avatarUrl != null
-                ? NetworkImage(avatarUrl!)
-                : null,
-            child: avatarUrl == null
+            // backgroundImage: avatarUrl != null
+            //     ? NetworkImage(avatarUrl!)
+            //     : null,
+            child: avatarUrl == null || avatarUrl!.isEmpty
                 ? Icon(
                     DSIcons.person,
                     color: dsColors.primary,

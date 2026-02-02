@@ -1,0 +1,30 @@
+name: notebook_server
+description: Server implementation for Notebook Management.
+publish_to: none
+version: 1.0.0
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  shelf_multipart: ^1.0.0
+  drift: ^2.30.1
+  mime: ^1.0.0
+  path: ^1.9.0
+  core_shared: ^1.0.0
+  core_server: ^1.0.0
+  auth_server: ^1.0.0
+  auth_shared: ^1.0.0
+  tag_shared: ^1.0.0
+  tag_server: ^1.0.0
+  notebook_shared: ^1.0.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0
+  build_runner: ^2.10.5
+  drift_dev: ^2.30.0

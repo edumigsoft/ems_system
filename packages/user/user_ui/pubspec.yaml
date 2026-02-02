@@ -17,6 +17,7 @@ dependencies:
   logging: ^1.3.0
   get_it: ^9.2.0
   dio: ^5.9.0
+  intl: ^0.20.1
   core_shared:
     path: ../../core/core_shared
   core_client:
@@ -39,6 +40,8 @@ dependencies:
     path: ../user_client
   auth_client:
     path: ../../auth/auth_client
+  auth_ui:
+    path: ../../auth/auth_ui
 
 dev_dependencies:
   flutter_test:

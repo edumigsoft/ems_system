@@ -20,8 +20,8 @@ import 'package:core_shared/core_shared.dart'
         Success,
         CoreValidationError,
         UnauthorizedException;
-import 'package:user_server/user_server.dart' show UserRepository;
-import 'package:user_shared/user_shared.dart' show UserCreate, UserDetails;
+import 'package:user_shared/user_shared.dart'
+    show UserCreate, UserDetails, UserRepository;
 
 import '../database/auth_database.dart';
 import '../repository/auth_repository.dart';
@@ -42,6 +42,7 @@ class AuthService {
   // Configurações (injetadas ou env)
   final int accessTokenExpiresMinutes;
   final int refreshTokenExpiresDays;
+  final String verificationLinkBaseUrl;
 
   AuthService({
     required AuthRepository authRepo,
@@ -51,6 +52,7 @@ class AuthService {
     required EmailService emailService,
     this.accessTokenExpiresMinutes = 15,
     this.refreshTokenExpiresDays = 7,
+    this.verificationLinkBaseUrl = 'http://localhost:8181/api/v1/auth/verify',
   }) : _authRepo = authRepo,
        _userRepo = userRepo,
        _securityService = securityService,
@@ -160,7 +162,7 @@ class AuthService {
     _emailService.sendVerificationEmail(
       to: user.email,
       userName: user.name,
-      verificationLink: 'http://todo-config/verify', // Configurar link real
+      verificationLink: verificationLinkBaseUrl,
     );
 
     // 5. Autenticar usuário criado

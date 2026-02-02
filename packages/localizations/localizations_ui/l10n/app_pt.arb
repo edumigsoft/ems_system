@@ -59,6 +59,26 @@
     "@edit": {
         "description": "Editar"
     },
+    "school": "Escola",
+    "@school": {
+        "description": "Label para uma escola"
+    },
+    "schools": "Escolas",
+    "@schools": {
+        "description": "Label para múltiplas escolas"
+    },
+    "editSchool": "Editar Escola",
+    "@editSchool": {
+        "description": "Botão para editar uma escola"
+    },
+    "createSchool": "Criar Escola",
+    "@createSchool": {
+        "description": "Botão para criar uma nova escola"
+    },
+    "cie": "CIE",
+    "@cie": {
+        "description": "CIE (Código de Identificação Escolar)"
+    },
     "registeredPleaseLoginAgain": "Registrado! Faça o Login novamente.",
     "@registeredPleaseLoginAgain": {
         "description": "Registrado! Faça o Login novamente."
@@ -334,5 +354,201 @@
     "manageUsers": "Gerenciar Usuários",
     "@manageUsers": {
         "description": "Gerenciar Usuários"
+    },
+    "systemManagement": "Gestão do Sistema",
+    "@systemManagement": {
+        "description": "Gestão do Sistema"
+    },
+    "savedSuccessfully": "Salvo com sucesso",
+    "@savedSuccessfully": {
+        "description": "Salvo com sucesso"
+    },
+    "theNameCannotBeEmpty": "O nome não pode ser vazio!",
+    "@theNameCannotBeEmpty": {
+        "description": "O nome não pode ser vazio!"
+    },
+    "cannotBeEmpty": "Não pode ser vazio!",
+    "@cannotBeEmpty": {
+        "description": "Não pode ser vazio!"
+    },
+    "address": "Endereço",
+    "@address": {
+        "description": "Endereço"
+    },
+    "phone": "Telefone",
+    "@phone": {
+        "description": "Telefone"
+    },
+    "status": "Status",
+    "@status": {
+        "description": "Status"
+    },
+    "schoolCreateSuccess": "Escola criada com sucesso!",
+    "@schoolCreateSuccess": {
+        "description": "Mensagem de sucesso ao criar escola"
+    },
+    "schoolUpdateSuccess": "Escola atualizada com sucesso!",
+    "@schoolUpdateSuccess": {
+        "description": "Mensagem de sucesso ao atualizar escola"
+    },
+    "schoolDeleteSuccess": "Escola excluída!",
+    "@schoolDeleteSuccess": {
+        "description": "Mensagem de sucesso ao excluir escola"
+    },
+    "schoolRestoreSuccess": "Escola restaurada com sucesso!",
+    "@schoolRestoreSuccess": {
+        "description": "Mensagem de sucesso ao restaurar escola"
+    },
+    "schoolDeleteConfirm": "Deseja realmente excluir a escola?",
+    "@schoolDeleteConfirm": {
+        "description": "Confirmação de exclusão da escola"
+    },
+    "schoolRestoreConfirm": "Deseja restaurar a escola?",
+    "@schoolRestoreConfirm": {
+        "description": "Confirmação de restauração da escola"
+    },
+    "actions": "Ações",
+    "@actions": {
+        "description": "Ações"
+    },
+    "success": "Sucesso",
+    "@success": {
+        "description": "Sucesso"
+    },
+    "error": "Erro",
+    "@error": {
+        "description": "Erro"
+    },
+    "warning": "Aviso",
+    "@warning": {
+        "description": "Aviso"
+    },
+    "info": "Informação",
+    "@info": {
+        "description": "Informação"
+    },
+    "loading": "Carregando...",
+    "@loading": {
+        "description": "Carregando..."
+    },
+    "noData": "Nenhum dado encontrado",
+    "@noData": {
+        "description": "Nenhum dado encontrado"
+    },
+    "saveSuccess": "Salvo com sucesso",
+    "@saveSuccess": {
+        "description": "Salvo com sucesso"
+    },
+    "deleteSuccess": "Excluído com sucesso",
+    "@deleteSuccess": {
+        "description": "Excluído com sucesso"
+    },
+    "restoreSuccess": "Restaurado com sucesso",
+    "@restoreSuccess": {
+        "description": "Restaurado com sucesso"
+    },
+    "deleteConfirm": "Deseja realmente excluir este item?",
+    "@deleteConfirm": {
+        "description": "Deseja realmente excluir este item?"
+    },
+    "manager": "Diretor",
+    "@manager": {
+        "description": "Diretor"
+    },
+    "city": "Cidade",
+    "@city": {
+        "description": "Cidade"
+    },
+    "state": "Estado",
+    "@state": {
+        "description": "Estado"
+    },
+    "zipCode": "CEP",
+    "@zipCode": {
+        "description": "CEP"
+    },
+    "district": "Bairro",
+    "@district": {
+        "description": "Bairro"
+    },
+    "complement": "Complemento",
+    "@complement": {
+        "description": "Complemento"
+    },
+    "number": "Número",
+    "@number": {
+        "description": "Número"
+    },
+    "saveError": "Erro ao salvar",
+    "@saveError": {
+        "description": "Erro ao salvar"
+    },
+    "deleteError": "Erro ao excluir",
+    "@deleteError": {
+        "description": "Erro ao excluir"
+    },
+    "restoreError": "Erro ao restaurar",
+    "@restoreError": {
+        "description": "Erro ao restaurar"
+    },
+    "searchSchoolsHint": "Buscar escolas por nome, código ou cidade...",
+    "@searchSchoolsHint": {
+        "description": "Buscar escolas por nome, código ou cidade..."
+    },
+    "updateList": "Atualizar lista",
+    "@updateList": {
+        "description": "Atualizar lista"
+    },
+    "addSchool": "Adicionar Escola",
+    "@addSchool": {
+        "description": "Adicionar Escola"
+    },
+    "schoolColumn": "Escola",
+    "@schoolColumn": {
+        "description": "Escola"
+    },
+    "locationColumn": "Localização",
+    "@locationColumn": {
+        "description": "Localização"
+    },
+    "contactColumn": "Contato",
+    "@contactColumn": {
+        "description": "Contato"
+    },
+    "showActiveSchools": "Mostrar escolas ativas",
+    "@showActiveSchools": {
+        "description": "Mostrar escolas ativas"
+    },
+    "showDeletedSchools": "Mostrar escolas deletadas",
+    "@showDeletedSchools": {
+        "description": "Mostrar escolas deletadas"
+    },
+    "activeSchoolsLabel": "Ativas",
+    "@activeSchoolsLabel": {
+        "description": "Ativas"
+    },
+    "deletedSchoolsLabel": "Deletadas",
+    "@deletedSchoolsLabel": {
+        "description": "Deletadas"
+    },
+    "schoolDeletedTooltip": "Esta escola foi deletada",
+    "@schoolDeletedTooltip": {
+        "description": "Esta escola foi deletada"
+    },
+    "noDetailsToEdit": "Não há detalhes para editar.",
+    "@noDetailsToEdit": {
+        "description": "Não há detalhes para editar."
+    },
+    "noDetailsToSave": "Não há detalhes para salvar.",
+    "@noDetailsToSave": {
+        "description": "Não há detalhes para salvar."
+    },
+    "noDetailsToRestore": "Não há detalhes para restaurar.",
+    "@noDetailsToRestore": {
+        "description": "Não há detalhes para restaurar."
+    },
+    "retry": "Tentar novamente",
+    "@retry": {
+        "description": "Tentar novamente"
     }
 }

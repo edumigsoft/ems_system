@@ -8,7 +8,7 @@
 PRODUCT_NAME = app_design_draft
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.appDesignDraft
+PRODUCT_BUNDLE_IDENTIFIER = br.com.edumigsoft.appDesignDraft
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 br.com.edumigsoft. All rights reserved.

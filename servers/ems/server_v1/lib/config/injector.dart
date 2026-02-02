@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auth_server/auth_server.dart'
     show InitAuthModuleToServer, AuthMiddleware;
 import 'package:core_server/core_server.dart'
@@ -16,7 +18,10 @@ import 'package:core_server/core_server.dart'
 import 'package:core_shared/core_shared.dart'
     show DependencyInjector, GetItInjector, LogService;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart' show JWT;
+import 'package:notebook_server/notebook_server.dart'
+    show InitNotebookModuleToServer;
 import 'package:open_api_server/open_api_server.dart';
+import 'package:tag_server/tag_server.dart' show InitTagModuleToServer;
 import 'package:user_server/user_server.dart';
 import 'env/env.dart';
 
@@ -30,12 +35,20 @@ Future<DependencyInjector> registryInjectors() async {
   final databaseProvider = DatabaseProvider();
   di.registerSingleton<DatabaseProvider>(databaseProvider);
 
+  final dbHost = Platform.environment['DB_HOST'] ?? 'localhost';
+  final dbPort =
+      int.tryParse(Platform.environment['DB_PORT'] ?? EnvDatabase.dbPort) ??
+      5432;
+  final dbUser = Platform.environment['DB_USER'] ?? EnvDatabase.dbUser;
+  final dbPass = Platform.environment['DB_PASS'] ?? EnvDatabase.dbPass;
+  final dbName = Platform.environment['DB_NAME'] ?? EnvDatabase.dbName;
+
   await databaseProvider.connect(
-    host: Env.serverAddress,
-    port: int.tryParse(Env.dbPort) ?? 5433,
-    name: Env.dbDatabaseName,
-    user: Env.dbUsername,
-    password: Env.dbPassword,
+    host: dbHost,
+    port: dbPort,
+    name: dbName,
+    user: dbUser,
+    password: dbPass,
     useSsl: false,
   );
 
@@ -71,6 +84,8 @@ Future<DependencyInjector> registryInjectors() async {
   di.registerLazySingleton<OpenApiRoutes>(
     () => OpenApiRoutes(backendBaseApi: Env.backendPathApi),
   );
+  addRoutes(di, di.get<OpenApiRoutes>(), security: false);
+
   // 4. Inicialização dos Módulos (Orquestração)
   // IMPORTANTE: Resolvendo dependência circular Auth ↔ User:
   // - UserRoutes precisa de AuthMiddleware
@@ -90,6 +105,21 @@ Future<DependencyInjector> registryInjectors() async {
 
   // Fase 2: Inicializar Auth completo (agora UserRepository está disponível)
   await InitAuthModuleToServer.init(
+    di: di,
+    backendBaseApi: Env.backendPathApi,
+    security: false,
+    accessTokenExpiresMinutes: Env.accessTokenExpiresMinutes,
+    refreshTokenExpiresDays: Env.refreshTokenExpiresDays,
+    verificationLinkBaseUrl: Env.verificationLinkBaseUrl,
+  );
+
+  await InitTagModuleToServer.init(
+    di: di,
+    backendBaseApi: Env.backendPathApi,
+    security: false,
+  );
+
+  await InitNotebookModuleToServer.init(
     di: di,
     backendBaseApi: Env.backendPathApi,
     security: false,

@@ -19,14 +19,26 @@ class UsersListResponse {
   @Property(description: 'Limite de itens por página')
   final int limit;
 
-  @Property(description: 'Total de itens retornados nesta página')
+  @Property(description: 'Total de registros (antes da paginação)')
   final int total;
+
+  @Property(description: 'Total de páginas')
+  final int? totalPages;
+
+  @Property(description: 'Se existe uma próxima página')
+  final bool? hasNextPage;
+
+  @Property(description: 'Se existe uma página anterior')
+  final bool? hasPreviousPage;
 
   const UsersListResponse({
     required this.data,
     required this.page,
     required this.limit,
     required this.total,
+    this.totalPages,
+    this.hasNextPage,
+    this.hasPreviousPage,
   });
 
   /// Deserializa de JSON para UsersListResponse.
@@ -41,6 +53,9 @@ class UsersListResponse {
       page: json['page'] as int,
       limit: json['limit'] as int,
       total: json['total'] as int,
+      totalPages: json['totalPages'] as int?,
+      hasNextPage: json['hasNextPage'] as bool?,
+      hasPreviousPage: json['hasPreviousPage'] as bool?,
     );
   }
 
@@ -50,5 +65,8 @@ class UsersListResponse {
     'page': page,
     'limit': limit,
     'total': total,
+    if (totalPages != null) 'totalPages': totalPages,
+    if (hasNextPage != null) 'hasNextPage': hasNextPage,
+    if (hasPreviousPage != null) 'hasPreviousPage': hasPreviousPage,
   };
 }

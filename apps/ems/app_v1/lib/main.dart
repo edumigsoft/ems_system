@@ -1,4 +1,4 @@
-import 'package:app_v1/app_layout.dart';
+import 'package:ems_app_v1/app_layout.dart';
 
 import 'config/di/injector.dart';
 import 'package:core_shared/core_shared.dart' show GetItInjector;

@@ -1,0 +1,20 @@
+services:
+  ems_server:
+    container_name: ems_server
+    image: ems_server_image:v1
+    build:
+      # Sobe até a raiz do projeto (ems_system)
+      context: ../../../
+      # Aponta para o Dockerfile nesta pasta atual
+      dockerfile: servers/ems/container/Dockerfile
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - ems_system_net
+
+networks:
+  ems_system_net:
+    external: true

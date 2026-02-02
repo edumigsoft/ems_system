@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:core_client/core_client.dart';
-import 'package:user_shared/user_shared.dart';
-import 'package:user_client/user_client.dart';
+import 'package:core_shared/core_shared.dart' show Loggable, Success, Failure;
+import 'package:user_shared/user_shared.dart'
+    show UserDetails, UserUpdate, GetProfileUseCase, UpdateProfileUseCase;
 
 /// ViewModel para gerenciar perfil do usuário.
 ///
-/// Segue padrão MVVM + ADR-0001 (Result) + ADR-0002 (DioErrorHandler).
-class ProfileViewModel extends ChangeNotifier with Loggable, DioErrorHandler {
-  final UserService _userService;
+/// Segue padrão MVVM + Clean Architecture com Use Cases.
+class ProfileViewModel extends ChangeNotifier with Loggable {
+  final GetProfileUseCase _getProfileUseCase;
+  final UpdateProfileUseCase _updateProfileUseCase;
 
-  ProfileViewModel({required UserService userService})
-    : _userService = userService;
+  ProfileViewModel({
+    required GetProfileUseCase getProfileUseCase,
+    required UpdateProfileUseCase updateProfileUseCase,
+  }) : _getProfileUseCase = getProfileUseCase,
+       _updateProfileUseCase = updateProfileUseCase;
 
   UserDetails? _profile;
   UserDetails? get profile => _profile;
@@ -28,38 +31,36 @@ class ProfileViewModel extends ChangeNotifier with Loggable, DioErrorHandler {
     _error = null;
     notifyListeners();
 
-    final result = await _executeGetProfile();
+    final result = await _getProfileUseCase.execute();
 
-    if (result case Success(value: final data)) {
-      _profile = data.toDomain();
+    if (result case Success(value: final profile)) {
+      _profile = profile;
       _isLoading = false;
       notifyListeners();
     } else if (result case Failure(error: final error)) {
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<Result<UserDetailsModel>> _executeGetProfile() async {
-    try {
-      final model = await _userService.getProfile();
-      return Success(model);
-    } on DioException catch (e) {
-      return handleDioError<UserDetailsModel>(e, context: 'loadProfile');
+      logger.severe('Error loading profile: $error');
     }
   }
 
   /// Atualiza perfil do usuário.
   Future<bool> updateProfile(UserUpdate update) async {
+    if (_profile == null) {
+      _error = 'Perfil não carregado';
+      notifyListeners();
+      return false;
+    }
+
     _isLoading = true;
     _error = null;
     notifyListeners();
 
-    final result = await _executeUpdateProfile(update);
+    final result = await _updateProfileUseCase.execute(_profile!.id, update);
 
-    if (result case Success(value: final data)) {
-      _profile = data.toDomain();
+    if (result case Success(value: final profile)) {
+      _profile = profile;
       _isLoading = false;
       notifyListeners();
       return true;
@@ -67,22 +68,11 @@ class ProfileViewModel extends ChangeNotifier with Loggable, DioErrorHandler {
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
+      logger.severe('Error updating profile: $error');
       return false;
     }
 
     return false;
-  }
-
-  Future<Result<UserDetailsModel>> _executeUpdateProfile(
-    UserUpdate update,
-  ) async {
-    try {
-      final updateModel = UserUpdateModel.fromDomain(update);
-      final model = await _userService.updateProfile(updateModel);
-      return Success(model);
-    } on DioException catch (e) {
-      return handleDioError<UserDetailsModel>(e, context: 'updateProfile');
-    }
   }
 
   /// Limpa erro atual.

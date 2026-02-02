@@ -1,0 +1,49 @@
+name: project_core_ui
+description: UI Package for Project Management.
+publish_to: none
+version: 1.0.0
+
+# repository: https://github.com/edumigsoft/ems_system_core
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.7
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # logging: ^1.3.0
+  # get_it: ^9.2.0
+  # dio: ^5.9.0
+  project_core_shared:
+    path: ../project_core_shared
+  # project_core_client:
+  #   path: ../../core/project_core_client
+  # project_core_ui:
+  #   path: ../../core/project_core_ui
+  # design_system_shared:
+  #   path: ../../design_system/design_system_shared
+  # design_system_ui:
+  #   path: ../../design_system/design_system_ui
+  # localizations_ui:
+  #   path: ../../localizations/localizations_ui
+  # localizations_shared:
+  #   path: ../../localizations/localizations_shared
+  # zard_form:
+  #   path: ../../zard_form
+  # user_shared:
+  #   path: ../user_shared
+  # user_client:
+  #   path: ../user_client
+  # auth_client:
+  #   path: ../../auth/auth_client
+  # auth_ui:
+  #   path: ../../auth/auth_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.10.5

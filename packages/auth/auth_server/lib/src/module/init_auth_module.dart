@@ -7,7 +7,7 @@ import 'package:core_server/core_server.dart'
         EmailService,
         addRoutes;
 import 'package:core_shared/core_shared.dart' show DependencyInjector;
-import 'package:user_server/user_server.dart' show UserRepository;
+import 'package:user_shared/user_shared.dart' show UserRepository;
 
 import '../../auth_server.dart';
 
@@ -21,6 +21,9 @@ class InitAuthModuleToServer implements InitServerModule {
     required DependencyInjector di,
     required String backendBaseApi,
     bool security = true,
+    int accessTokenExpiresMinutes = 15,
+    int refreshTokenExpiresDays = 7,
+    String verificationLinkBaseUrl = 'http://localhost:8181/api/v1/auth/verify',
   }) async {
     // 1. Database & Repositories
     final dbProvider = di.get<DatabaseProvider>();
@@ -48,9 +51,10 @@ class InitAuthModuleToServer implements InitServerModule {
             .get<CryptService>(), // Deve ser registrado pelo CoreModule
         emailService: di
             .get<EmailService>(), // Deve ser registrado pelo CoreModule
-        // Obter config de env vars
-        accessTokenExpiresMinutes: 15,
-        refreshTokenExpiresDays: 7,
+        // Configurações injetadas
+        accessTokenExpiresMinutes: accessTokenExpiresMinutes,
+        refreshTokenExpiresDays: refreshTokenExpiresDays,
+        verificationLinkBaseUrl: verificationLinkBaseUrl,
       ),
     );
 

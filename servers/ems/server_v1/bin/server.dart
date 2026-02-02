@@ -14,7 +14,7 @@ import 'server.reflectable.dart';
 @api
 @ApiInfo(
   title: 'EMS System API',
-  version: '0.1.0',
+  version: '1.0.0',
   description: 'API para o EMS System',
 )
 class Document {}

@@ -59,4 +59,19 @@ class EsEsStrings implements I18nStrings {
 
   @override
   String get validationRequired => 'Este campo es obligatorio';
+
+  @override
+  String get school => 'Escuela';
+
+  @override
+  String get schools => 'Escuelas';
+
+  @override
+  String get editSchool => 'Editar Escuela';
+
+  @override
+  String get createSchool => 'Crear Escuela';
+
+  @override
+  String get cie => 'CIE';
 }

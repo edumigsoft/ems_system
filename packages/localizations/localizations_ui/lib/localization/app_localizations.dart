@@ -208,6 +208,36 @@ abstract class AppLocalizations {
   /// **'Edit'**
   String get edit;
 
+  /// Label for a school
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get school;
+
+  /// Label for multiple schools
+  ///
+  /// In en, this message translates to:
+  /// **'Schools'**
+  String get schools;
+
+  /// Button to edit a school
+  ///
+  /// In en, this message translates to:
+  /// **'Edit School'**
+  String get editSchool;
+
+  /// Button to create a new school
+  ///
+  /// In en, this message translates to:
+  /// **'Create School'**
+  String get createSchool;
+
+  /// CIE (School Identification Code)
+  ///
+  /// In en, this message translates to:
+  /// **'CIE'**
+  String get cie;
+
   /// Registered! Please login again.
   ///
   /// In en, this message translates to:
@@ -663,6 +693,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Manage Users'**
   String get manageUsers;
+
+  /// System Management
+  ///
+  /// In en, this message translates to:
+  /// **'System Management'**
+  String get systemManagement;
+
+  /// Saved successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Saved successfully'**
+  String get savedSuccessfully;
+
+  /// The name cannot be empty!
+  ///
+  /// In en, this message translates to:
+  /// **'The name cannot be empty!'**
+  String get theNameCannotBeEmpty;
+
+  /// Cannot be empty!
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot be empty!'**
+  String get cannotBeEmpty;
+
+  /// Address
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// Phone
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// Status
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// Success message when creating school
+  ///
+  /// In en, this message translates to:
+  /// **'School created successfully!'**
+  String get schoolCreateSuccess;
+
+  /// Success message when updating school
+  ///
+  /// In en, this message translates to:
+  /// **'School updated successfully!'**
+  String get schoolUpdateSuccess;
+
+  /// Success message when deleting school
+  ///
+  /// In en, this message translates to:
+  /// **'School deleted!'**
+  String get schoolDeleteSuccess;
+
+  /// Success message when restoring school
+  ///
+  /// In en, this message translates to:
+  /// **'School restored successfully!'**
+  String get schoolRestoreSuccess;
+
+  /// Confirmation of school deletion
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to delete the school?'**
+  String get schoolDeleteConfirm;
+
+  /// Confirmation of school restoration
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to restore the school?'**
+  String get schoolRestoreConfirm;
+
+  /// Actions
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
+
+  /// Success
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get success;
+
+  /// Error
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// Warning
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// Info
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get info;
+
+  /// Loading...
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No data found
+  ///
+  /// In en, this message translates to:
+  /// **'No data found'**
+  String get noData;
+
+  /// Saved successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Saved successfully'**
+  String get saveSuccess;
+
+  /// Deleted successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted successfully'**
+  String get deleteSuccess;
+
+  /// Restored successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Restored successfully'**
+  String get restoreSuccess;
+
+  /// Do you really want to delete this item?
+  ///
+  /// In en, this message translates to:
+  /// **'Do you really want to delete this item?'**
+  String get deleteConfirm;
+
+  /// Manager
+  ///
+  /// In en, this message translates to:
+  /// **'Manager'**
+  String get manager;
+
+  /// City
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get city;
+
+  /// State
+  ///
+  /// In en, this message translates to:
+  /// **'State'**
+  String get state;
+
+  /// ZIP Code
+  ///
+  /// In en, this message translates to:
+  /// **'ZIP Code'**
+  String get zipCode;
+
+  /// District
+  ///
+  /// In en, this message translates to:
+  /// **'District'**
+  String get district;
+
+  /// Complement
+  ///
+  /// In en, this message translates to:
+  /// **'Complement'**
+  String get complement;
+
+  /// Number
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get number;
+
+  /// Error saving
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving'**
+  String get saveError;
+
+  /// Error deleting
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting'**
+  String get deleteError;
+
+  /// Error restoring
+  ///
+  /// In en, this message translates to:
+  /// **'Error restoring'**
+  String get restoreError;
+
+  /// Search schools by name, code or city...
+  ///
+  /// In en, this message translates to:
+  /// **'Search schools by name, code or city...'**
+  String get searchSchoolsHint;
+
+  /// Update list
+  ///
+  /// In en, this message translates to:
+  /// **'Update list'**
+  String get updateList;
+
+  /// Add School
+  ///
+  /// In en, this message translates to:
+  /// **'Add School'**
+  String get addSchool;
+
+  /// School
+  ///
+  /// In en, this message translates to:
+  /// **'School'**
+  String get schoolColumn;
+
+  /// Location
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get locationColumn;
+
+  /// Contact
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contactColumn;
+
+  /// Show active schools
+  ///
+  /// In en, this message translates to:
+  /// **'Show active schools'**
+  String get showActiveSchools;
+
+  /// Show deleted schools
+  ///
+  /// In en, this message translates to:
+  /// **'Show deleted schools'**
+  String get showDeletedSchools;
+
+  /// Active
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get activeSchoolsLabel;
+
+  /// Deleted
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted'**
+  String get deletedSchoolsLabel;
+
+  /// This school was deleted
+  ///
+  /// In en, this message translates to:
+  /// **'This school was deleted'**
+  String get schoolDeletedTooltip;
+
+  /// There are no details to edit.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no details to edit.'**
+  String get noDetailsToEdit;
+
+  /// There are no details to save.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no details to save.'**
+  String get noDetailsToSave;
+
+  /// There are no details to restore.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no details to restore.'**
+  String get noDetailsToRestore;
+
+  /// Try again
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get retry;
 }
 
 class _AppLocalizationsDelegate

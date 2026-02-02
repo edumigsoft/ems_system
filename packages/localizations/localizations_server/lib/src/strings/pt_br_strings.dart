@@ -59,4 +59,19 @@ class PtBrStrings implements I18nStrings {
 
   @override
   String get validationRequired => 'Este campo é obrigatório';
+
+  @override
+  String get school => 'Escola';
+
+  @override
+  String get schools => 'Escolas';
+
+  @override
+  String get editSchool => 'Editar Escola';
+
+  @override
+  String get createSchool => 'Criar Escola';
+
+  @override
+  String get cie => 'CIE';
 }

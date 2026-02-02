@@ -1,30 +1,45 @@
 import 'package:auth_client/auth_client.dart' show AuthService;
 import 'package:core_shared/core_shared.dart'
-    show Loggable, UserRole, Success, Failure, Result;
+    show Loggable, UserRole, Success, Failure;
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:core_client/core_client.dart' show DioErrorHandler;
 import 'package:user_shared/user_shared.dart'
     show
         UserDetails,
-        UsersListResponse,
-        UserDetailsModel,
         UserCreateAdmin,
-        UserCreateAdminModel;
-import 'package:user_client/user_client.dart' show UserService;
+        UserUpdate,
+        GetAllUsersUseCase,
+        CreateUserUseCase,
+        UpdateUserUseCase,
+        DeleteUserUseCase,
+        UpdateUserRoleUseCase,
+        ResetPasswordUseCase;
 
 /// ViewModel para gerenciamento administrativo de usuários.
 ///
-/// Segue padrão MVVM + ADR-0001 (Result) + ADR-0002 (DioErrorHandler).
-class ManageUsersViewModel extends ChangeNotifier
-    with Loggable, DioErrorHandler {
-  final UserService _userService;
+/// Segue padrão MVVM + Clean Architecture com Use Cases.
+class ManageUsersViewModel extends ChangeNotifier with Loggable {
+  final GetAllUsersUseCase _getAllUsersUseCase;
+  final CreateUserUseCase _createUserUseCase;
+  final UpdateUserUseCase _updateUserUseCase;
+  final DeleteUserUseCase _deleteUserUseCase;
+  final UpdateUserRoleUseCase _updateUserRoleUseCase;
+  final ResetPasswordUseCase _resetPasswordUseCase;
   final AuthService _authService;
 
   ManageUsersViewModel({
-    required UserService userService,
+    required GetAllUsersUseCase getAllUsersUseCase,
+    required CreateUserUseCase createUserUseCase,
+    required UpdateUserUseCase updateUserUseCase,
+    required DeleteUserUseCase deleteUserUseCase,
+    required UpdateUserRoleUseCase updateUserRoleUseCase,
+    required ResetPasswordUseCase resetPasswordUseCase,
     required AuthService authService,
-  }) : _userService = userService,
+  }) : _getAllUsersUseCase = getAllUsersUseCase,
+       _createUserUseCase = createUserUseCase,
+       _updateUserUseCase = updateUserUseCase,
+       _deleteUserUseCase = deleteUserUseCase,
+       _updateUserRoleUseCase = updateUserRoleUseCase,
+       _resetPasswordUseCase = resetPasswordUseCase,
        _authService = authService;
 
   /// Usuário atualmente autenticado.
@@ -50,7 +65,10 @@ class ManageUsersViewModel extends ChangeNotifier
   int _totalUsers = 0;
   int get totalUsers => _totalUsers;
 
-  bool get hasMorePages => _users.length >= _pageSize;
+  int _totalPages = 0;
+  int get totalPages => _totalPages;
+
+  bool get hasMorePages => _currentPage < _totalPages;
 
   // Filtros
   String? _searchQuery;
@@ -70,33 +88,31 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
 
-    final result = await _executeLoadUsers();
+    // Calcular offset baseado na página atual
+    final offset = (_currentPage - 1) * _pageSize;
 
-    if (result case Success(value: final response)) {
+    final result = await _getAllUsersUseCase.execute(
+      limit: _pageSize,
+      offset: offset,
+      roleFilter: _roleFilter?.name,
+      search: _searchQuery,
+    );
+
+    if (result case Success(value: final paginatedResult)) {
       if (refresh) {
-        _users = response.data.map((m) => m.toDomain()).toList();
+        _users = paginatedResult.items;
       } else {
-        _users.addAll(response.data.map((m) => m.toDomain()));
+        _users.addAll(paginatedResult.items);
       }
-      _totalUsers = response.total;
+      _totalUsers = paginatedResult.total;
+      _totalPages = paginatedResult.totalPages;
       _isLoading = false;
       notifyListeners();
     } else if (result case Failure(error: final error)) {
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
-    }
-  }
-
-  Future<Result<UsersListResponse>> _executeLoadUsers() async {
-    try {
-      final response = await _userService.listUsers(
-        page: _currentPage,
-        limit: _pageSize,
-      );
-      return Success(response);
-    } on DioException catch (e) {
-      return handleDioError<UsersListResponse>(e, context: 'loadUsers');
+      logger.severe('Error loading users: $error');
     }
   }
 
@@ -133,13 +149,13 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
 
-    final result = await _executeUpdateUserRole(userId, newRole);
+    final result = await _updateUserRoleUseCase.execute(userId, newRole);
 
     if (result case Success(value: final updatedUser)) {
       // Atualizar usuário na lista local
       final index = _users.indexWhere((u) => u.id == userId);
       if (index != -1) {
-        _users[index] = updatedUser.toDomain();
+        _users[index] = updatedUser;
       }
       _isLoading = false;
       notifyListeners();
@@ -148,24 +164,50 @@ class ManageUsersViewModel extends ChangeNotifier
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
+      logger.severe('Error updating user role: $error');
       return false;
     }
 
     return false;
   }
 
-  Future<Result<UserDetailsModel>> _executeUpdateUserRole(
-    String userId,
-    UserRole newRole,
-  ) async {
-    try {
-      final response = await _userService.updateUserRole(userId, {
-        'role': newRole.name,
-      });
-      return Success(response);
-    } on DioException catch (e) {
-      return handleDioError<UserDetailsModel>(e, context: 'updateUserRole');
+  /// Atualiza informações básicas de um usuário (nome, telefone).
+  Future<bool> updateUserBasicInfo({
+    required String userId,
+    String? name,
+    String? phone,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    // Criar DTO de atualização com nome e/ou telefone
+    final userUpdate = UserUpdate(
+      id: userId,
+      name: name,
+      phone: phone,
+    );
+
+    final result = await _updateUserUseCase.execute(userId, userUpdate);
+
+    if (result case Success(value: final savedUser)) {
+      // Atualizar usuário na lista local
+      final index = _users.indexWhere((u) => u.id == userId);
+      if (index != -1) {
+        _users[index] = savedUser;
+      }
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } else if (result case Failure(error: final error)) {
+      _error = error.toString();
+      _isLoading = false;
+      notifyListeners();
+      logger.severe('Error updating user basic info: $error');
+      return false;
     }
+
+    return false;
   }
 
   /// Ativa/desativa um usuário (admin).
@@ -174,13 +216,19 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
 
-    final result = await _executeToggleUserStatus(userId, isActive);
+    // Criar DTO de atualização apenas com status
+    final userUpdate = UserUpdate(
+      id: userId,
+      isActive: isActive,
+    );
 
-    if (result case Success(value: final updatedUser)) {
+    final result = await _updateUserUseCase.execute(userId, userUpdate);
+
+    if (result case Success(value: final savedUser)) {
       // Atualizar usuário na lista local
       final index = _users.indexWhere((u) => u.id == userId);
       if (index != -1) {
-        _users[index] = updatedUser.toDomain();
+        _users[index] = savedUser;
       }
       _isLoading = false;
       notifyListeners();
@@ -189,24 +237,11 @@ class ManageUsersViewModel extends ChangeNotifier
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
+      logger.severe('Error toggling user status: $error');
       return false;
     }
 
     return false;
-  }
-
-  Future<Result<UserDetailsModel>> _executeToggleUserStatus(
-    String userId,
-    bool isActive,
-  ) async {
-    try {
-      final response = await _userService.updateUserRole(userId, {
-        'is_active': isActive,
-      });
-      return Success(response);
-    } on DioException catch (e) {
-      return handleDioError<UserDetailsModel>(e, context: 'toggleUserStatus');
-    }
   }
 
   /// Soft delete de um usuário (admin).
@@ -215,7 +250,7 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
 
-    final result = await _executeDeleteUser(userId);
+    final result = await _deleteUserUseCase.execute(userId);
 
     if (result case Success()) {
       // Remover usuário da lista local
@@ -228,19 +263,11 @@ class ManageUsersViewModel extends ChangeNotifier
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
+      logger.severe('Error deleting user: $error');
       return false;
     }
 
     return false;
-  }
-
-  Future<Result<void>> _executeDeleteUser(String userId) async {
-    try {
-      await _userService.deactivateUser(userId);
-      return const Success(null);
-    } on DioException catch (e) {
-      return handleDioError<void>(e, context: 'deleteUser');
-    }
   }
 
   /// Cria um novo usuário administrativamente (owner only).
@@ -249,11 +276,11 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
 
-    final result = await _executeCreateUser(data);
+    final result = await _createUserUseCase.execute(data);
 
     if (result case Success(value: final newUser)) {
       // Adicionar novo usuário ao topo da lista
-      _users.insert(0, newUser.toDomain());
+      _users.insert(0, newUser);
       _totalUsers++;
       _isLoading = false;
       notifyListeners();
@@ -262,22 +289,11 @@ class ManageUsersViewModel extends ChangeNotifier
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
+      logger.severe('Error creating user: $error');
       return false;
     }
 
     return false;
-  }
-
-  Future<Result<UserDetailsModel>> _executeCreateUser(
-    UserCreateAdmin data,
-  ) async {
-    try {
-      final model = UserCreateAdminModel.fromDomain(data);
-      final response = await _userService.createUser(model);
-      return Success(response);
-    } on DioException catch (e) {
-      return handleDioError<UserDetailsModel>(e, context: 'createUser');
-    }
   }
 
   /// Reseta senha de um usuário (admin+).
@@ -289,7 +305,7 @@ class ManageUsersViewModel extends ChangeNotifier
     _error = null;
     notifyListeners();
 
-    final result = await _executeResetUserPassword(userId);
+    final result = await _resetPasswordUseCase.execute(userId);
 
     if (result case Success()) {
       _isLoading = false;
@@ -299,19 +315,11 @@ class ManageUsersViewModel extends ChangeNotifier
       _error = error.toString();
       _isLoading = false;
       notifyListeners();
+      logger.severe('Error resetting user password: $error');
       return false;
     }
 
     return false;
-  }
-
-  Future<Result<void>> _executeResetUserPassword(String userId) async {
-    try {
-      await _userService.forcePasswordChange(userId);
-      return const Success(null);
-    } on DioException catch (e) {
-      return handleDioError<void>(e, context: 'resetUserPassword');
-    }
   }
 
   /// Limpa erro atual.

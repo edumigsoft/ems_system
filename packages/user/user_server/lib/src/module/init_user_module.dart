@@ -2,10 +2,11 @@ import 'package:auth_server/auth_server.dart' show AuthMiddleware;
 import 'package:core_server/core_server.dart'
     show InitServerModule, DatabaseProvider, addRoutes;
 import 'package:core_shared/core_shared.dart' show DependencyInjector;
+import 'package:user_shared/user_shared.dart' show UserRepository;
 
-import '../repository/user_repository.dart';
-import '../repository/user_repository_impl.dart';
+import '../repository/user_repository_server.dart';
 import '../database/user_database.dart';
+import '../queries/user_queries.dart';
 import '../routes/user_routes.dart';
 
 /// Inicializa o módulo de usuários no servidor.
@@ -35,10 +36,17 @@ class InitUserModuleToServer implements InitServerModule {
 
     di.registerSingleton<UserDatabase>(userDb);
 
-    // 2. Repository
-    di.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(userDb));
+    // 2. Queries
+    di.registerLazySingleton<UserQueries>(
+      () => UserQueries(userDb),
+    );
 
-    // 3. Routes
+    // 3. Repository
+    di.registerLazySingleton<UserRepository>(
+      () => UserRepositoryServer(di.get<UserQueries>()),
+    );
+
+    // 4. Routes
     di.registerLazySingleton<UserRoutes>(
       () => UserRoutes(
         di.get<UserRepository>(),
@@ -48,7 +56,7 @@ class InitUserModuleToServer implements InitServerModule {
       ),
     );
 
-    // 4. Mount Routes
+    // 5. Mount Routes
     // Nota: security=false porque UserRoutes gerencia sua própria autenticação
     // internamente via AuthMiddleware, não dependendo do authRequired global
     addRoutes(di, di.get<UserRoutes>(), security: false);

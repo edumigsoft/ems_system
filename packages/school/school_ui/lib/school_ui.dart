@@ -1,0 +1,10 @@
+export 'ui/view_models/school_view_model.dart';
+export 'ui/widgets/components/desktop/desktop_view_item_widget.dart';
+export 'ui/widgets/components/desktop/desktop_widget.dart';
+export 'ui/widgets/components/mobile/mobile_widget.dart';
+export 'ui/widgets/components/tablet/tablet_widget.dart';
+export 'ui/widgets/dialogs/school_form_widget.dart';
+export 'ui/pages/school_edit_page.dart';
+export 'ui/pages/school_page.dart';
+export 'school_module.dart';
+export 'ui/widgets/dialogs/school_form_dialog.dart';

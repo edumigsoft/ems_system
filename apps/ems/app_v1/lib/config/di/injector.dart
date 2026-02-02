@@ -6,6 +6,8 @@ import 'package:core_shared/core_shared.dart'
 import 'package:core_ui/core_ui.dart' show AppModule;
 import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:dio/dio.dart';
+import 'package:notebook_ui/notebook_ui.dart';
+import 'package:tag_ui/tag_ui.dart' show TagModule;
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
 
 import '../../app_layout.dart';
@@ -32,6 +34,8 @@ class Injector with Loggable {
       // AcademicStructureModule(di: _diMain),
       // SystemModule(di: _diMain),
       AuthModule(di: _diMain),
+      TagModule(di: _diMain),
+      NotebookModule(di: _diMain),
     ];
 
     // Registra as dependências de cada módulo.

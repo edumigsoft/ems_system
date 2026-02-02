@@ -1,0 +1,36 @@
+services:
+  postgres_infra:
+    image: postgres:17-alpine
+    container_name: postgres_ems_system
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_ROOT_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASS}
+      POSTGRES_DB: postgres_admin
+      
+      # --- PASSANDO AS VARIÁVEIS PARA O SCRIPT .SH ---
+      EMS_DB_USER: ${EMS_DB_USER}
+      EMS_DB_PASS: ${EMS_DB_PASS}
+      EMS_DB_NAME: ${EMS_DB_NAME}
+      
+      # SMS_DB_USER: ${SMS_DB_USER}
+      # SMS_DB_PASS: ${SMS_DB_PASS}
+      # SMS_DB_NAME: ${SMS_DB_NAME}
+      
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Note que agora mapeamos o .sh
+      - ./init_users.sh:/docker-entrypoint-initdb.d/init_users.sh
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    networks:
+      - ems_system_net
+
+volumes:
+  postgres_data:
+
+networks:
+  ems_system_net:
+    external: true

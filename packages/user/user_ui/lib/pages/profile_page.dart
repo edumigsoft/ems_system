@@ -170,10 +170,11 @@ class _ProfilePageState extends State<ProfilePage> {
             // Avatar
             CircleAvatar(
               radius: 50,
-              backgroundImage: profile.avatarUrl != null
+              backgroundImage:
+                  profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty
                   ? NetworkImage(profile.avatarUrl!)
                   : null,
-              child: profile.avatarUrl == null
+              child: profile.avatarUrl == null || profile.avatarUrl!.isEmpty
                   ? Text(
                       profile.name.isNotEmpty
                           ? profile.name[0].toUpperCase()

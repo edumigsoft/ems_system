@@ -25,14 +25,18 @@ class UserDetailsModel {
   factory UserDetailsModel.fromJson(Map<String, dynamic> json) {
     return UserDetailsModel(
       UserDetails.create(
-        id: json['id'] as String,
+        id: json['id'] as String? ?? '',
         isDeleted: json['is_deleted'] as bool? ?? false,
         isActive: json['is_active'] as bool? ?? true,
-        createdAt: DateTime.parse(json['created_at'] as String),
-        updatedAt: DateTime.parse(json['updated_at'] as String),
-        name: json['name'] as String,
-        email: json['email'] as String,
-        username: json['username'] as String,
+        createdAt:
+            DateTime.tryParse(json['created_at'] as String? ?? '') ??
+            DateTime.now(),
+        updatedAt:
+            DateTime.tryParse(json['updated_at'] as String? ?? '') ??
+            DateTime.now(),
+        name: json['name'] as String? ?? '',
+        email: json['email'] as String? ?? '',
+        username: json['username'] as String? ?? '',
         role: _parseRole(json['role'] as String?),
         emailVerified: json['email_verified'] as bool? ?? false,
         avatarUrl: json['avatar_url'] as String?,

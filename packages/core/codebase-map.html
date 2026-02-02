@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head>
+  <meta charset="utf-8"><title>Codebase Explorer</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 0; background: #1a1a2e; color: #eee; }
+    .container { display: flex; height: 100vh; }
+    .sidebar { width: 280px; background: #252542; padding: 20px; border-right: 1px solid #3d3d5c; overflow-y: auto; flex-shrink: 0; }
+    .main { flex: 1; padding: 20px; overflow-y: auto; }
+    h1 { margin: 0 0 10px 0; font-size: 18px; }
+    h2 { margin: 20px 0 10px 0; font-size: 14px; color: #888; text-transform: uppercase; }
+    .stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #3d3d5c; }
+    .stat-value { font-weight: bold; }
+    .bar-row { display: flex; align-items: center; margin: 6px 0; }
+    .bar-label { width: 55px; font-size: 12px; color: #aaa; }
+    .bar { height: 18px; border-radius: 3px; }
+    .bar-pct { margin-left: 8px; font-size: 12px; color: #666; }
+    .tree { list-style: none; padding-left: 20px; }
+    details { cursor: pointer; }
+    summary { padding: 4px 8px; border-radius: 4px; }
+    summary:hover { background: #2d2d44; }
+    .folder { color: #ffd700; }
+    .file { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; }
+    .file:hover { background: #2d2d44; }
+    .size { color: #888; margin-left: auto; font-size: 12px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+  </style>
+</head><body>
+  <div class="container">
+    <div class="sidebar">
+      <h1>📊 Summary</h1>
+      <div class="stat"><span>Files</span><span class="stat-value">81</span></div>
+      <div class="stat"><span>Directories</span><span class="stat-value">48</span></div>
+      <div class="stat"><span>Total size</span><span class="stat-value">169.4 KB</span></div>
+      <div class="stat"><span>File types</span><span class="stat-value">4</span></div>
+      <h2>By file type</h2>
+      <div class="bar-row"><span class="bar-label">.dart</span><div class="bar" style="width:70.63602345520276%;background:#6b7280"></div><span class="bar-pct">70.6%</span></div><div class="bar-row"><span class="bar-label">.md</span><div class="bar" style="width:28.27539682997284%;background:#083fa1"></div><span class="bar-pct">28.3%</span></div><div class="bar-row"><span class="bar-label">.yaml</span><div class="bar" style="width:1.077048150048721%;background:#cb171e"></div><span class="bar-pct">1.1%</span></div><div class="bar-row"><span class="bar-label">(no ext)</span><div class="bar" style="width:0.011531564775682237%;background:#6b7280"></div><span class="bar-pct">0.0%</span></div>
+    </div>
+    <div class="main">
+      <h1>📁 core</h1>
+      <ul class="tree" id="root"></ul>
+    </div>
+  </div>
+  <script>
+    const data = {"name": "core", "children": [{"name": "CHANGELOG.md", "size": 1536, "ext": ".md"}, {"name": "CONTRIBUTING.md", "size": 4055, "ext": ".md"}, {"name": "LICENSE.md", "size": 1082, "ext": ".md"}, {"name": "README.md", "size": 4701, "ext": ".md"}, {"name": "analise_sem_uso.md", "size": 5853, "ext": ".md"}, {"name": "core_client", "children": [{"name": "CHANGELOG.md", "size": 453, "ext": ".md"}, {"name": "README.md", "size": 4938, "ext": ".md"}, {"name": "VERSION", "size": 5, "ext": "(no ext)"}, {"name": "analysis_options.yaml", "size": 45, "ext": ".yaml"}, {"name": "lib", "children": [{"name": "core_client.dart", "size": 149, "ext": ".dart"}, {"name": "src", "children": [{"name": "mixins", "children": [{"name": "dio_error_handler.dart", "size": 4201, "ext": ".dart"}], "size": 4201}, {"name": "repositories", "children": [{"name": "base_repository_local.dart", "size": 3507, "ext": ".dart"}], "size": 3507}], "size": 7708}], "size": 7857}, {"name": "pubspec.yaml", "size": 358, "ext": ".yaml"}], "size": 13656}, {"name": "core_server", "children": [{"name": "CHANGELOG.md", "size": 725, "ext": ".md"}, {"name": "README.md", "size": 7155, "ext": ".md"}, {"name": "VERSION", "size": 5, "ext": "(no ext)"}, {"name": "analysis_options.yaml", "size": 45, "ext": ".yaml"}, {"name": "lib", "children": [{"name": "core_server.dart", "size": 1242, "ext": ".dart"}, {"name": "src", "children": [{"name": "commons", "children": [{"name": "init_server_module.dart", "size": 59, "ext": ".dart"}], "size": 59}, {"name": "database", "children": [{"name": "database_provider.dart", "size": 1397, "ext": ".dart"}, {"name": "drift", "children": [{"name": "boolean_converter.dart", "size": 391, "ext": ".dart"}, {"name": "date_time_converter_non_null.dart", "size": 1926, "ext": ".dart"}, {"name": "drift_table_mixin.dart", "size": 978, "ext": ".dart"}], "size": 3295}], "size": 4692}, {"name": "email", "children": [{"name": "email_service.dart", "size": 1037, "ext": ".dart"}, {"name": "email_template.dart", "size": 1525, "ext": ".dart"}, {"name": "implementation", "children": [{"name": "http_email_service.dart", "size": 3824, "ext": ".dart"}], "size": 3824}], "size": 6386}, {"name": "middleware", "children": [{"name": "auth_required.dart", "size": 163, "ext": ".dart"}, {"name": "cors_middleware.dart", "size": 1451, "ext": ".dart"}, {"name": "rate_limit.dart", "size": 1707, "ext": ".dart"}], "size": 3321}, {"name": "routes", "children": [{"name": "add_routes.dart", "size": 2172, "ext": ".dart"}, {"name": "health_routes.dart", "size": 1137, "ext": ".dart"}, {"name": "routes.dart", "size": 647, "ext": ".dart"}], "size": 3956}, {"name": "security", "children": [{"name": "crypt_service.dart", "size": 117, "ext": ".dart"}, {"name": "dtos", "children": [{"name": "generate_tokens_dto.dart", "size": 493, "ext": ".dart"}], "size": 493}, {"name": "implementation", "children": [{"name": "bcrypt_service.dart", "size": 758, "ext": ".dart"}, {"name": "encrypt_decrypt_service.dart", "size": 2632, "ext": ".dart"}, {"name": "generate_keys.dart", "size": 1145, "ext": ".dart"}, {"name": "generate_random_password.dart", "size": 2879, "ext": ".dart"}, {"name": "generate_tokens.dart", "size": 1564, "ext": ".dart"}, {"name": "jwt_security_service.dart", "size": 3066, "ext": ".dart"}], "size": 12044}, {"name": "security_service.dart", "size": 1206, "ext": ".dart"}], "size": 13860}, {"name": "servers", "children": [{"name": "server.dart", "size": 655, "ext": ".dart"}], "size": 655}, {"name": "utils", "children": [{"name": "http_response_helper.dart", "size": 2473, "ext": ".dart"}], "size": 2473}], "size": 35402}], "size": 36644}, {"name": "pubspec.yaml", "size": 528, "ext": ".yaml"}], "size": 45102}, {"name": "core_shared", "children": [{"name": "CHANGELOG.md", "size": 544, "ext": ".md"}, {"name": "README.md", "size": 4974, "ext": ".md"}, {"name": "VERSION", "size": 5, "ext": "(no ext)"}, {"name": "analysis_options.yaml", "size": 45, "ext": ".yaml"}, {"name": "lib", "children": [{"name": "core_shared.dart", "size": 584, "ext": ".dart"}, {"name": "src", "children": [{"name": "commons", "children": [{"name": "base_details.dart", "size": 1228, "ext": ".dart"}], "size": 1228}, {"name": "converters", "children": [{"name": "model_converter.dart", "size": 122, "ext": ".dart"}], "size": 122}, {"name": "dependency_injector", "children": [{"name": "dependency_injector.dart", "size": 1580, "ext": ".dart"}, {"name": "implementations", "children": [{"name": "get_it_injector.dart", "size": 2071, "ext": ".dart"}], "size": 2071}], "size": 3651}, {"name": "domain", "children": [{"name": "entity", "children": [{"name": "user.dart", "size": 2561, "ext": ".dart"}], "size": 2561}, {"name": "enums", "children": [{"name": "user_role.dart", "size": 2963, "ext": ".dart"}], "size": 2963}, {"name": "paginated_result.dart", "size": 3473, "ext": ".dart"}], "size": 8997}, {"name": "exceptions", "children": [{"name": "exceptions.dart", "size": 1329, "ext": ".dart"}], "size": 1329}, {"name": "messages", "children": [{"name": "message_http.dart", "size": 219, "ext": ".dart"}], "size": 219}, {"name": "result", "children": [{"name": "result.dart", "size": 4671, "ext": ".dart"}], "size": 4671}, {"name": "service", "children": [{"name": "log_service.dart", "size": 7253, "ext": ".dart"}], "size": 7253}, {"name": "utils", "children": [{"name": "entity_mapper.dart", "size": 1255, "ext": ".dart"}], "size": 1255}, {"name": "validators", "children": [{"name": "validators.dart", "size": 861, "ext": ".dart"}], "size": 861}], "size": 29586}], "size": 30170}, {"name": "pubspec.yaml", "size": 355, "ext": ".yaml"}], "size": 36093}, {"name": "core_ui", "children": [{"name": "CHANGELOG.md", "size": 1350, "ext": ".md"}, {"name": "README.md", "size": 11674, "ext": ".md"}, {"name": "VERSION", "size": 5, "ext": "(no ext)"}, {"name": "analysis_options.yaml", "size": 48, "ext": ".yaml"}, {"name": "lib", "children": [{"name": "core", "children": [{"name": "commands", "children": [{"name": "command.dart", "size": 1207, "ext": ".dart"}], "size": 1207}, {"name": "commons", "children": [{"name": "app_module.dart", "size": 1041, "ext": ".dart"}], "size": 1041}, {"name": "extensions", "children": [{"name": "user_role_extension.dart", "size": 572, "ext": ".dart"}], "size": 572}, {"name": "mixins", "children": [{"name": "form_validation_mixin.dart", "size": 13821, "ext": ".dart"}], "size": 13821}, {"name": "navigation", "children": [{"name": "app_navigation_item.dart", "size": 3112, "ext": ".dart"}, {"name": "app_navigation_section.dart", "size": 179, "ext": ".dart"}], "size": 3291}], "size": 19932}, {"name": "core_ui.dart", "size": 637, "ext": ".dart"}, {"name": "ui", "children": [{"name": "mixins", "children": [{"name": "secure_page_mixin.dart", "size": 2954, "ext": ".dart"}], "size": 2954}, {"name": "view_models", "children": [{"name": "base_crud_view_model.dart", "size": 6472, "ext": ".dart"}, {"name": "base_navigation_view_model.dart", "size": 5816, "ext": ".dart"}, {"name": "base_paginated_crud_view_model.dart", "size": 11213, "ext": ".dart"}], "size": 23501}, {"name": "widgets", "children": [{"name": "responsive_layout.dart", "size": 760, "ext": ".dart"}, {"name": "responsive_layout_mode.dart", "size": 54, "ext": ".dart"}], "size": 814}], "size": 27269}], "size": 47838}, {"name": "pubspec.yaml", "size": 444, "ext": ".yaml"}], "size": 61359}], "size": 173437};
+    const colors = {".js": "#f7df1e", ".ts": "#3178c6", ".py": "#3776ab", ".go": "#00add8", ".rs": "#dea584", ".rb": "#cc342d", ".css": "#264de4", ".html": "#e34c26", ".json": "#6b7280", ".md": "#083fa1", ".yaml": "#cb171e", ".yml": "#cb171e", ".mdx": "#083fa1", ".tsx": "#3178c6", ".jsx": "#61dafb", ".sh": "#4eaa25"};
+    function fmt(b) { if (b < 1024) return b + ' B'; if (b < 1048576) return (b/1024).toFixed(1) + ' KB'; return (b/1048576).toFixed(1) + ' MB'; }
+    function render(node, parent) {
+      if (node.children) {
+        const det = document.createElement('details');
+        det.open = parent === document.getElementById('root');
+        det.innerHTML = `<summary><span class="folder">📁 ${node.name}</span><span class="size">${fmt(node.size)}</span></summary>`;
+        const ul = document.createElement('ul'); ul.className = 'tree';
+        node.children.sort((a,b) => (b.children?1:0)-(a.children?1:0) || a.name.localeCompare(b.name));
+        node.children.forEach(c => render(c, ul));
+        det.appendChild(ul);
+        const li = document.createElement('li'); li.appendChild(det); parent.appendChild(li);
+      } else {
+        const li = document.createElement('li'); li.className = 'file';
+        li.innerHTML = `<span class="dot" style="background:${colors[node.ext]||'#6b7280'}"></span>${node.name}<span class="size">${fmt(node.size)}</span>`;
+        parent.appendChild(li);
+      }
+    }
+    data.children.forEach(c => render(c, document.getElementById('root')));
+  </script>
+</body></html>

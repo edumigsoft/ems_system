@@ -519,7 +519,7 @@ packages/{{FEATURE_NAME}}/
 
 > **Referência Completa**: `docs/adr/0005-standard-package-structure.md` seção "Arquivos de Documentação"
 
-### 2.6. Nomenclatura de Rotas
+### 2.7. Nomenclatura de Rotas
 
 **Regra Obrigatória**: As rotas de navegação (`routeName`) em módulos **DEVEM** usar apenas o nome do pacote/feature, **NÃO** o path completo da estrutura de diretórios.
 
@@ -573,7 +573,7 @@ static const String routeName = '/packages/user/users';
 
 **Motivo**: A API deve ser agnóstica à estrutura de pastas do projeto.
 
-### 2.7. Estrutura Interna dos Pacotes
+### 2.8. Estrutura Interna dos Pacotes
 
 Siga rigorosamente a estrutura definida no **ADR-0005** (`docs/adr/0005-standard-package-structure.md`).
 
@@ -634,6 +634,365 @@ lib/
 
 > **Referência Completa**: Consulte `docs/adr/0005-standard-package-structure.md` para variações aceitas e exemplos detalhados.
 
+### 2.9. Validação de Formulários (FormValidationMixin)
+
+**IMPORTANTE**: O projeto usa um padrão **Dual Interface** para validação de formulários que isola completamente a biblioteca Zard.
+
+#### Arquitetura de Validação
+
+```
+*_shared (Dart Puro)
+  └─ FeatureValidator extends CoreValidator<T>
+      ├─ schema (static ZMap) ← Para FormValidationMixin (UI)
+      └─ validate(T) → CoreValidationResult ← Para UseCases/backend
+
+core_ui (Camada de Abstração)
+  └─ FormValidationMixin
+      ├─ Gerencia TextEditingControllers
+      ├─ Gerencia erros por campo
+      ├─ Gerencia dirty/touched state
+      └─ submitForm() com validação integrada
+
+*_ui (ViewModels + Widgets)
+  └─ ViewModel with FormValidationMixin
+      └─ NUNCA importa zard diretamente
+```
+
+#### Template de Validador (`*_shared`)
+
+**Localização**: `packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_core/lib/src/validators/{{entity}}_validator.dart`
+
+```dart
+import 'package:core_shared/core_shared.dart';
+import 'package:zard/zard.dart';
+import '../domain/entities/{{entity}}_details.dart';
+
+// Constantes de campos (compartilhadas)
+const String {{entity}}NameField = 'name';
+const String {{entity}}EmailField = 'email';
+// ... outros campos
+
+class {{Entity}}Validator extends CoreValidator<{{Entity}}Details> {
+  const {{Entity}}Validator();
+
+  /// Schema Zard para validação de UI e backend
+  /// Este schema é usado por FormValidationMixin
+  static final schema = z.map({
+    {{entity}}NameField: z.string().min(1, message: 'Nome obrigatório'),
+    {{entity}}EmailField: z.string().email(message: 'Email inválido'),
+    // ... outras validações
+  });
+
+  /// Método validate para UseCases e backend
+  @override
+  CoreValidationResult validate({{Entity}}Details value) {
+    final data = {
+      {{entity}}NameField: value.name,
+      {{entity}}EmailField: value.email,
+      // ... outros campos
+    };
+
+    final result = schema.safeParse(data);
+
+    if (result.success) {
+      return CoreValidationResult.success();
+    } else {
+      final errors = <CoreValidationError>[];
+      for (final issue in (result as dynamic).error.issues) {
+        final path = (issue.path as List?)?.join('.') ?? 'unknown';
+        errors.add(CoreValidationError(
+          field: path,
+          message: issue.message,
+        ));
+      }
+      return CoreValidationResult.failure(errors);
+    }
+  }
+}
+```
+
+#### Template de ViewModel com FormValidationMixin (`*_ui`)
+
+**Localização**: `packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_ui/lib/ui/view_models/{{entity}}_form_view_model.dart`
+
+```dart
+import 'package:flutter/foundation.dart';
+import 'package:core_ui/core_ui.dart';
+import 'package:core_shared/core_shared.dart';
+import 'package:{{feature_name}}_core/{{feature_name}}_core.dart';
+
+/// ViewModel para formulário de criação/edição de {{Entity}}
+class {{Entity}}FormViewModel extends ChangeNotifier with FormValidationMixin {
+  final Create{{Entity}}UseCase _createUseCase;
+  final Update{{Entity}}UseCase? _updateUseCase;
+  final {{Entity}}Details? _initialData;
+
+  bool get isEditMode => _initialData != null;
+
+  {{Entity}}FormViewModel({
+    required Create{{Entity}}UseCase createUseCase,
+    Update{{Entity}}UseCase? updateUseCase,
+    {{Entity}}Details? initialData,
+  })  : _createUseCase = createUseCase,
+        _updateUseCase = updateUseCase,
+        _initialData = initialData {
+    _initializeFields();
+  }
+
+  /// Registra campos do formulário
+  void _initializeFields() {
+    final data = _initialData;
+    if (data != null) {
+      // Modo edição: preenche com dados existentes
+      registerField({{entity}}NameField, initialValue: data.name);
+      registerField({{entity}}EmailField, initialValue: data.email);
+      // ... outros campos
+    } else {
+      // Modo criação: campos vazios
+      registerField({{entity}}NameField);
+      registerField({{entity}}EmailField);
+      // ... outros campos
+    }
+  }
+
+  /// Submete o formulário com validação
+  Future<Result<{{Entity}}Details>> submit() async {
+    final formData = {
+      {{entity}}NameField: getFieldValue({{entity}}NameField),
+      {{entity}}EmailField: getFieldValue({{entity}}EmailField),
+      // ... outros campos
+    };
+
+    return submitForm<{{Entity}}Details>(
+      data: formData,
+      schema: {{Entity}}Validator.schema,
+      onValid: (validatedData) async {
+        final entity = _createEntityFromData(validatedData);
+
+        if (isEditMode) {
+          if (_updateUseCase == null) {
+            return Failure(Exception('Update use case não configurado'));
+          }
+          return await _updateUseCase!.execute(entity);
+        } else {
+          return await _createUseCase.execute(entity);
+        }
+      },
+    );
+  }
+
+  /// Cria entidade a partir dos dados validados
+  {{Entity}}Details _createEntityFromData(Map<String, dynamic> data) {
+    return {{Entity}}Details(
+      id: _initialData?.id ?? '',
+      isDeleted: _initialData?.isDeleted ?? false,
+      isActive: _initialData?.isActive ?? true,
+      createdAt: _initialData?.createdAt,
+      updatedAt: _initialData?.updatedAt,
+      name: data[{{entity}}NameField] as String,
+      email: data[{{entity}}EmailField] as String,
+      // ... outros campos
+    );
+  }
+
+  /// Reseta o formulário para valores iniciais
+  void reset() {
+    if (_initialData != null) {
+      resetForm({
+        {{entity}}NameField: _initialData!.name,
+        {{entity}}EmailField: _initialData!.email,
+        // ... outros campos
+      });
+    } else {
+      resetForm();
+    }
+  }
+
+  @override
+  void dispose() {
+    disposeFormResources(); // ← CRÍTICO: Liberar recursos
+    super.dispose();
+  }
+}
+```
+
+#### Template de Widget de Formulário (`*_ui`)
+
+**Localização**: `packages/{{FEATURE_NAME}}/{{FEATURE_NAME}}_ui/lib/ui/widgets/forms/{{entity}}_form_widget.dart`
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:core_shared/core_shared.dart';
+import 'package:{{feature_name}}_core/{{feature_name}}_core.dart';
+import '../view_models/{{entity}}_form_view_model.dart';
+
+class {{Entity}}FormWidget extends StatefulWidget {
+  final Create{{Entity}}UseCase createUseCase;
+  final Update{{Entity}}UseCase? updateUseCase;
+  final {{Entity}}Details? initialData;
+  final void Function({{Entity}}Details)? onSuccess;
+  final void Function(Exception)? onError;
+
+  const {{Entity}}FormWidget({
+    Key? key,
+    required this.createUseCase,
+    this.updateUseCase,
+    this.initialData,
+    this.onSuccess,
+    this.onError,
+  }) : super(key: key);
+
+  @override
+  State<{{Entity}}FormWidget> createState() => _{{Entity}}FormWidgetState();
+}
+
+class _{{Entity}}FormWidgetState extends State<{{Entity}}FormWidget> {
+  late {{Entity}}FormViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = {{Entity}}FormViewModel(
+      createUseCase: widget.createUseCase,
+      updateUseCase: widget.updateUseCase,
+      initialData: widget.initialData,
+    );
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Campo Nome
+            TextField(
+              controller: _viewModel.registerField({{entity}}NameField),
+              decoration: InputDecoration(
+                labelText: 'Nome',
+                errorText: _viewModel.getFieldError({{entity}}NameField),
+              ),
+            ),
+            SizedBox(height: 16),
+
+            // Campo Email
+            TextField(
+              controller: _viewModel.registerField({{entity}}EmailField),
+              decoration: InputDecoration(
+                labelText: 'Email',
+                errorText: _viewModel.getFieldError({{entity}}EmailField),
+              ),
+              keyboardType: TextInputType.emailAddress,
+            ),
+            SizedBox(height: 24),
+
+            // Botão Submit
+            ElevatedButton(
+              onPressed: _viewModel.isSubmitting
+                  ? null
+                  : (_viewModel.isFormValid && _viewModel.isFormDirty
+                      ? _handleSubmit
+                      : null),
+              child: _viewModel.isSubmitting
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 8),
+                        Text('Salvando...'),
+                      ],
+                    )
+                  : Text(_viewModel.isEditMode ? 'Atualizar' : 'Criar'),
+            ),
+
+            // Botão Reset (opcional)
+            if (_viewModel.isFormDirty)
+              TextButton(
+                onPressed: _viewModel.reset,
+                child: Text('Cancelar'),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleSubmit() async {
+    final result = await _viewModel.submit();
+
+    if (!mounted) return;
+
+    if (result case Success(:final value)) {
+      widget.onSuccess?.call(value);
+    } else if (result case Failure(:final error)) {
+      widget.onError?.call(error);
+    }
+  }
+}
+```
+
+#### Métodos Disponíveis no FormValidationMixin
+
+| Método | Retorno | Descrição |
+|--------|---------|-----------|
+| `registerField(name, {initialValue})` | `TextEditingController` | Registra campo e retorna controller |
+| `getFieldValue(name)` | `String` | Obtém valor atual do campo |
+| `setFieldValue(name, value)` | `void` | Define valor programaticamente |
+| `getFieldError(name)` | `String?` | Obtém erro de validação do campo |
+| `setFieldError(name, error)` | `void` | Define erro manual |
+| `clearErrors([name])` | `void` | Limpa erros (campo específico ou todos) |
+| `validateForm({data, schema})` | `Result<Map>` | Valida sem submeter |
+| `submitForm<T>({data, schema, onValid})` | `Future<Result<T>>` | Valida e submete |
+| `resetForm([initialValues])` | `void` | Reseta formulário |
+| `disposeFormResources()` | `void` | Libera recursos (chamar no dispose) |
+
+#### Getters de Estado
+
+| Getter | Tipo | Descrição |
+|--------|------|-----------|
+| `formErrors` | `Map<String, String?>` | Mapa de erros por campo |
+| `isSubmitting` | `bool` | Formulário sendo submetido |
+| `isValidating` | `bool` | Validação em andamento |
+| `isFormDirty` | `bool` | Algum campo foi modificado |
+| `hasErrors` | `bool` | Existem erros de validação |
+| `isFormValid` | `bool` | Formulário válido (sem erros) |
+
+#### Quando Usar Cada Abordagem
+
+**Use CoreValidator.validate() quando:**
+- ✅ Validar em **UseCases** (antes de persistir)
+- ✅ Validar em **backend** (server-side)
+- ✅ Validar em **testes unitários**
+- ✅ Validação **sem UI**
+
+**Use FormValidationMixin quando:**
+- ✅ Criar/editar **formulários Flutter**
+- ✅ Precisar de **estado reativo** (dirty, errors, loading)
+- ✅ Gerenciar **TextEditingControllers**
+- ✅ Submit com **validação integrada**
+
+#### Referências
+
+- **Documentação Completa**: `docs/adr/0004-use-form-validation-mixin-and-zard.md`
+- **Implementação**: `packages/core/core_ui/lib/core/mixins/form_validation_mixin.dart`
+- **Exemplos de Referência**:
+  - School: `packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart`
+  - Notebook: `packages/notebook/notebook_ui/lib/ui/view_models/notebook_form_view_model.dart`
+
+> **IMPORTANTE**: O pacote `zard_form` está **DESCONTINUADO**. Use apenas FormValidationMixin para novos formulários.
+
 ## 3. Tarefas de Implementação
 
 Gere o código passo a passo, solicitando validação a cada grande bloco:
@@ -651,12 +1010,15 @@ Gere o código passo a passo, solicitando validação a cada grande bloco:
       - Criar `analysis_options.yaml` seguindo **REGRA OBRIGATÓRIA**:
         - Dart packages: `include: ../../../analysis_options_dart.yaml`
         - Flutter packages: `include: ../../../analysis_options_flutter.yaml`
-2.  **Core Domain**: 
+2.  **Core Domain**:
     - Definir Entidades em `domain/entities/`
     - Definir Interfaces de Repositórios em `domain/repositories/` (**OBRIGATÓRIO: retornar `Result<T>`**)
     - Criar Use Cases em `domain/use_cases/` (**OBRIGATÓRIO: retornar `Result<T>`**)
     - Definir DTOs em `data/models/` (`json_serializable`, `@Schema`)
-    - Criar Validators em `validators/` (Zard)
+    - Criar Validators em `validators/` seguindo padrão **Dual Interface** (ver seção 2.9):
+      - Schema estático para FormValidationMixin (UI)
+      - Método `validate()` para UseCases/backend
+      - Constantes de campos compartilhadas
     
     **Exemplo de Repository Interface**:
     ```dart
@@ -744,9 +1106,10 @@ Gere o código passo a passo, solicitando validação a cada grande bloco:
 5.  **UI Foundation**: 
     - Criar `{{FEATURE_NAME}}Module.dart` e registrar rotas
     - Estruturar `ui/pages/`, `ui/view_models/`, `ui/widgets/`
-6.  **UI Screens**: 
+6.  **UI Screens**:
     - Criar Telas seguindo **Responsive Layout** e **Design System**
     - Criar ViewModels seguindo padrão MVVM **COM Result Pattern**
+    - Para formulários: usar **FormValidationMixin** (ver seção 2.9 para templates completos)
     
     **Exemplo de ViewModel**:
     ```dart

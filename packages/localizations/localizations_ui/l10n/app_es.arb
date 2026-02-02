@@ -59,6 +59,26 @@
     "@edit": {
         "description": "Editar"
     },
+    "school": "Escuela",
+    "@school": {
+        "description": "Etiqueta para una escuela"
+    },
+    "schools": "Escuelas",
+    "@schools": {
+        "description": "Etiqueta para múltiples escuelas"
+    },
+    "editSchool": "Editar Escuela",
+    "@editSchool": {
+        "description": "Botón para editar una escuela"
+    },
+    "createSchool": "Crear Escuela",
+    "@createSchool": {
+        "description": "Botón para crear una nueva escuela"
+    },
+    "cie": "CIE",
+    "@cie": {
+        "description": "CIE (Código de Identificación Escolar)"
+    },
     "registeredPleaseLoginAgain": "Registrado! Faça o Login novamente.",
     "@registeredPleaseLoginAgain": {
         "description": "Registrado! Faça o Login novamente."
@@ -334,5 +354,57 @@
     "manageUsers": "Administrar Usuarios",
     "@manageUsers": {
         "description": "Administrar Usuarios"
+    },
+    "systemManagement": "Gestión del Sistema",
+    "@systemManagement": {
+        "description": "Gestión del Sistema"
+    },
+    "savedSuccessfully": "Guardado exitosamente",
+    "@savedSuccessfully": {
+        "description": "Guardado exitosamente"
+    },
+    "theNameCannotBeEmpty": "El nombre no puede estar vacío!",
+    "@theNameCannotBeEmpty": {
+        "description": "El nombre no puede estar vacío!"
+    },
+    "cannotBeEmpty": "No puede estar vacío!",
+    "@cannotBeEmpty": {
+        "description": "No puede estar vacío!"
+    },
+    "address": "Dirección",
+    "@address": {
+        "description": "Dirección"
+    },
+    "phone": "Teléfono",
+    "@phone": {
+        "description": "Teléfono"
+    },
+    "status": "Estado",
+    "@status": {
+        "description": "Estado"
+    },
+    "schoolCreateSuccess": "¡Escuela creada con éxito!",
+    "@schoolCreateSuccess": {
+        "description": "Mensaje de éxito al crear escuela"
+    },
+    "schoolUpdateSuccess": "¡Escuela actualizada con éxito!",
+    "@schoolUpdateSuccess": {
+        "description": "Mensaje de éxito al actualizar escuela"
+    },
+    "schoolDeleteSuccess": "¡Escuela eliminada!",
+    "@schoolDeleteSuccess": {
+        "description": "Mensaje de éxito al eliminar escuela"
+    },
+    "schoolRestoreSuccess": "¡Escuela restaurada con éxito!",
+    "@schoolRestoreSuccess": {
+        "description": "Mensaje de éxito al restaurar escuela"
+    },
+    "schoolDeleteConfirm": "¿Realmente desea eliminar la escuela?",
+    "@schoolDeleteConfirm": {
+        "description": "Confirmación de eliminación de la escuela"
+    },
+    "schoolRestoreConfirm": "¿Desea restaurar la escuela?",
+    "@schoolRestoreConfirm": {
+        "description": "Confirmación de restauración de la escuela"
     }
 }

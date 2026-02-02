@@ -5,6 +5,15 @@ environment:
   sdk: ^3.10.7
 
 workspace:
+  # Servers
+  - servers/ems/server_v1
+  - servers/sms/server_v1
+
+  # Apps
+  - apps/ems/app_v1
+  - apps/ems/app_design_draft
+  - apps/sms/app_v1
+
   # Core
   - packages/core/core_client
   - packages/core/core_server
@@ -47,9 +56,38 @@ workspace:
   - packages/auth/auth_shared
   - packages/auth/auth_ui
 
-  # Servers
-  - servers/ems/server_v1
+  # ProjectCore
+  # - packages/project/project_core/project_core_client
+  # - packages/project/project_core/project_core_server
+  - packages/project/project_core/project_core_shared
+  - packages/project/project_core/project_core_ui
 
-  # Apps
-  - apps/ems/app_v1
-  - apps/ems/app_design_draft
+  # # Project
+  # - packages/project/project_client
+  # - packages/project/project_server
+  # - packages/project/project_shared
+  # - packages/project/project_ui
+
+  # Notebook
+  - packages/notebook/notebook_client
+  - packages/notebook/notebook_server
+  - packages/notebook/notebook_shared
+  - packages/notebook/notebook_ui
+
+  # # Tag
+  - packages/tag/tag_client
+  - packages/tag/tag_server
+  - packages/tag/tag_shared
+  - packages/tag/tag_ui
+
+  # # Task
+  # - packages/task/task_client
+  # - packages/task/task_server
+  # - packages/task/task_shared
+  # - packages/task/task_ui
+
+  # School
+  - packages/school/school_client
+  - packages/school/school_server
+  - packages/school/school_shared
+  - packages/school/school_ui

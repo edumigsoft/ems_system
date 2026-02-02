@@ -1,0 +1,17 @@
+###
+http://localhost:8181/api/v1
+
+###
+http://localhost:8181/api/v1/health
+
+###
+http://localhost:8181/api/v1/users
+
+###
+http://localhost:8181/api/v1/docs/openapi.json
+
+###
+http://localhost:8181/api/v1/docs
+
+###
+http://localhost:8181/api/v1/areas

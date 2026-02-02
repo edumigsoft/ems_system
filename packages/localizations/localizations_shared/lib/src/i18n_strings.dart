@@ -38,6 +38,14 @@ abstract class I18nStrings {
   String get validationPasswordTooShort;
   String get validationRequired;
 
+  // ========== School Management ==========
+
+  String get school;
+  String get schools;
+  String get editSchool;
+  String get createSchool;
+  String get cie;
+
   // ========== Adicione novos métodos aqui ==========
   //
   // IMPORTANTE: Sempre que adicionar um novo método aqui:

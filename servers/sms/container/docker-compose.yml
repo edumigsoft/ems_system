@@ -1,0 +1,16 @@
+services:
+  sms_server:
+    container_name: sms_server
+    build:
+      context: ../../../
+      dockerfile: servers/sms/container/Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - ems_system_net
+
+networks:
+  ems_system_net:
+    external: true

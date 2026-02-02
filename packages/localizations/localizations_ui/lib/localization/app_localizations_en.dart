@@ -65,6 +65,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit => 'Edit';
 
   @override
+  String get school => 'School';
+
+  @override
+  String get schools => 'Schools';
+
+  @override
+  String get editSchool => 'Edit School';
+
+  @override
+  String get createSchool => 'Create School';
+
+  @override
+  String get cie => 'CIE';
+
+  @override
   String get registeredPleaseLoginAgain => 'Registered! Please login again.';
 
   @override
@@ -314,4 +329,151 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get manageUsers => 'Manage Users';
+
+  @override
+  String get systemManagement => 'System Management';
+
+  @override
+  String get savedSuccessfully => 'Saved successfully';
+
+  @override
+  String get theNameCannotBeEmpty => 'The name cannot be empty!';
+
+  @override
+  String get cannotBeEmpty => 'Cannot be empty!';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get phone => 'Phone';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get schoolCreateSuccess => 'School created successfully!';
+
+  @override
+  String get schoolUpdateSuccess => 'School updated successfully!';
+
+  @override
+  String get schoolDeleteSuccess => 'School deleted!';
+
+  @override
+  String get schoolRestoreSuccess => 'School restored successfully!';
+
+  @override
+  String get schoolDeleteConfirm => 'Do you really want to delete the school?';
+
+  @override
+  String get schoolRestoreConfirm => 'Do you want to restore the school?';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get success => 'Success';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get info => 'Info';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String get noData => 'No data found';
+
+  @override
+  String get saveSuccess => 'Saved successfully';
+
+  @override
+  String get deleteSuccess => 'Deleted successfully';
+
+  @override
+  String get restoreSuccess => 'Restored successfully';
+
+  @override
+  String get deleteConfirm => 'Do you really want to delete this item?';
+
+  @override
+  String get manager => 'Manager';
+
+  @override
+  String get city => 'City';
+
+  @override
+  String get state => 'State';
+
+  @override
+  String get zipCode => 'ZIP Code';
+
+  @override
+  String get district => 'District';
+
+  @override
+  String get complement => 'Complement';
+
+  @override
+  String get number => 'Number';
+
+  @override
+  String get saveError => 'Error saving';
+
+  @override
+  String get deleteError => 'Error deleting';
+
+  @override
+  String get restoreError => 'Error restoring';
+
+  @override
+  String get searchSchoolsHint => 'Search schools by name, code or city...';
+
+  @override
+  String get updateList => 'Update list';
+
+  @override
+  String get addSchool => 'Add School';
+
+  @override
+  String get schoolColumn => 'School';
+
+  @override
+  String get locationColumn => 'Location';
+
+  @override
+  String get contactColumn => 'Contact';
+
+  @override
+  String get showActiveSchools => 'Show active schools';
+
+  @override
+  String get showDeletedSchools => 'Show deleted schools';
+
+  @override
+  String get activeSchoolsLabel => 'Active';
+
+  @override
+  String get deletedSchoolsLabel => 'Deleted';
+
+  @override
+  String get schoolDeletedTooltip => 'This school was deleted';
+
+  @override
+  String get noDetailsToEdit => 'There are no details to edit.';
+
+  @override
+  String get noDetailsToSave => 'There are no details to save.';
+
+  @override
+  String get noDetailsToRestore => 'There are no details to restore.';
+
+  @override
+  String get retry => 'Try again';
 }
