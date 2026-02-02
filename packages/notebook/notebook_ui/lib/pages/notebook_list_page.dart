@@ -28,6 +28,7 @@ class _NotebookListPageState extends State<NotebookListPage> {
     // Carrega lista ao inicializar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.viewModel.loadNotebooks();
+      widget.viewModel.loadAvailableTags();
     });
   }
 
@@ -342,8 +343,15 @@ class _NotebookListPageState extends State<NotebookListPage> {
                     itemCount: filteredNotebooks.length,
                     itemBuilder: (context, index) {
                       final notebook = filteredNotebooks[index];
+                      // Cria mapa de tags para resolução rápida (ID -> TagDetails)
+                      final tagsMap = {
+                        for (final tag in widget.viewModel.availableTags)
+                          tag.id: tag,
+                      };
+
                       return NotebookCard(
                         notebook: notebook,
+                        tagsMap: tagsMap,
                         onTap: () => _navigateToDetail(context, notebook.id),
                         onDelete: () => _handleDelete(context, notebook),
                       );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:tag_ui/tag_ui.dart';
+import 'package:tag_shared/tag_shared.dart';
 
 import '../view_models/notebook_detail_view_model.dart';
 import '../widgets/document_list_widget.dart';
@@ -38,6 +40,8 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
         // Carrega hierarquia após carregar o caderno
         widget.viewModel.loadParent();
         widget.viewModel.loadChildren();
+        // Carrega tags disponíveis para resolver nomes e cores
+        widget.viewModel.loadAvailableTags();
       });
     });
   }
@@ -176,16 +180,76 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
 
           // Tags
           if (notebook.tags != null && notebook.tags!.isNotEmpty) ...[
-            Text(
-              'Tags',
-              style: theme.textTheme.titleMedium,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Tags',
+                  style: theme.textTheme.titleMedium,
+                ),
+                TextButton.icon(
+                  onPressed: _showManageTagsDialog,
+                  icon: const Icon(Icons.edit, size: 16),
+                  label: const Text('Gerenciar'),
+                  style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
-              children: notebook.tags!.map((tag) {
-                return Chip(label: Text('#$tag'));
-              }).toList(),
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ...notebook.tags!.map((tagId) {
+                  // Tenta encontrar detalhes da tag
+                  final tagDetails = widget.viewModel.availableTags
+                      .where((t) => t.id == tagId)
+                      .firstOrNull;
+
+                  if (tagDetails != null) {
+                    return TagChip(
+                      tag: tagDetails,
+                      showDelete: true,
+                      onDelete: () =>
+                          widget.viewModel.removeTagFromNotebook(tagId),
+                    );
+                  }
+
+                  // Fallback para ID se não encontrar detalhes
+                  return Chip(
+                    // Using generic Chip from material
+                    label: Text(tagId),
+                    onDeleted: () =>
+                        widget.viewModel.removeTagFromNotebook(tagId),
+                  );
+                }),
+                // Botão rápido de adicionar
+                ActionChip(
+                  avatar: const Icon(Icons.add, size: 18),
+                  label: const Text('Adicionar'),
+                  onPressed: _showManageTagsDialog,
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+          ] else ...[
+            // Caso sem tags, mostra botão para adicionar
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Tags',
+                  style: theme.textTheme.titleMedium,
+                ),
+                TextButton.icon(
+                  onPressed: _showManageTagsDialog,
+                  icon: const Icon(Icons.add, size: 16),
+                  label: const Text('Adicionar'),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
           ],
@@ -520,6 +584,83 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             widget.viewModel.error ?? 'Erro ao adicionar documento',
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showManageTagsDialog() async {
+    final notebook = widget.viewModel.notebook;
+    if (notebook == null) return;
+
+    // Resolve tags atuais para objetos TagDetails
+    // Necessário para o TagSelector saber o que está selecionado
+    final currentTags = widget.viewModel.notebookTagsWithDetails;
+
+    // Se houver tags que não foram resolvidas (IDs sem detalhes),
+    // elas infelizmente não aparecerão como selecionadas no Selector
+    // pois o Selector trabalha com objetos TagDetails.
+    // Mas ao salvar, pegamos a lista completa do Selector.
+    // *Nota:* Tags perdidas (sem ID na lista de disponíveis) seriam removidas
+    // se o usuário salvar o diálogo. Isso é comportamento aceitável para "limpeza",
+    // ou deveríamos mesclar?
+    // Dado que TagSelector é "o estado da verdade", vamos assumir que apenas
+    // tags disponíveis podem ser selecionadas.
+
+    List<TagDetails> newSelection = List.from(currentTags);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Gerenciar Tags'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Selecione as tags para este caderno:',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  if (widget.viewModel.availableTags.isEmpty)
+                    const Text('Nenhuma tag disponível cadastrada.')
+                  else
+                    TagSelector(
+                      availableTags: widget.viewModel.availableTags,
+                      selectedTags: newSelection,
+                      onChanged: (tags) {
+                        newSelection = tags;
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      // Atualiza o notebook com a nova lista de IDs
+      final newTagIds = newSelection.map((t) => t.id).toList();
+      await widget.viewModel.updateNotebook(
+        NotebookUpdate(
+          id: notebook.id,
+          tags: newTagIds,
         ),
       );
     }

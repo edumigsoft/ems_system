@@ -1,5 +1,3 @@
-import 'dart:convert' show jsonEncode;
-
 import 'package:drift/drift.dart';
 import 'package:core_shared/core_shared.dart'
     show Failure, StorageException, Result, Success;
@@ -23,39 +21,65 @@ class NotebookRepositoryServer implements NotebookRepository {
 
   @override
   Future<Result<NotebookDetails>> create(NotebookCreate data) async {
-    try {
-      final companion = NotebookTableCompanion.insert(
-        title: data.title,
-        content: data.content,
-        projectId: Value(data.projectId),
-        parentId: Value(data.parentId),
-        tags: Value(data.tags),
-        type: Value(data.type),
-        reminderDate: Value(data.reminderDate),
-        notifyOnReminder: Value(data.notifyOnReminder),
-        documentIds: const Value(null), // Inicialmente vazio
-      );
+    return db.transaction(() async {
+      try {
+        // 1. Criar o notebook (sem a coluna tags JSON)
+        final companion = NotebookTableCompanion.insert(
+          title: data.title,
+          content: data.content,
+          projectId: Value(data.projectId),
+          parentId: Value(data.parentId),
+          type: Value(data.type),
+          reminderDate: Value(data.reminderDate),
+          notifyOnReminder: Value(data.notifyOnReminder),
+          documentIds: const Value(null),
+          tags: const Value(null), // Ignora coluna legada
+        );
 
-      final row = await db.into(db.notebookTable).insertReturning(companion);
-      return Success(row);
-    } catch (e, s) {
-      return Failure(
-        StorageException('Error creating notebook', stackTrace: s),
-      );
-    }
+        final row = await db.into(db.notebookTable).insertReturning(companion);
+
+        // 2. Inserir tags na junction table
+        if (data.tags != null && data.tags!.isNotEmpty) {
+          await db.batch((batch) {
+            batch.insertAll(
+              db.notebookTagTable,
+              data.tags!.map((tagId) {
+                return NotebookTagTableCompanion.insert(
+                  notebookId: row.id,
+                  tagId: tagId,
+                );
+              }),
+            );
+          });
+        }
+
+        // 3. Retornar com tags preenchidas
+        return Success(row.copyWith(tags: data.tags));
+      } catch (e, s) {
+        return Failure(
+          StorageException('Error creating notebook', stackTrace: s),
+        );
+      }
+    });
   }
 
   @override
   Future<Result<NotebookDetails>> getById(String id) async {
     try {
-      final result = await (db.select(
+      final notebook = await (db.select(
         db.notebookTable,
       )..where((t) => t.id.equals(id))).getSingleOrNull();
 
-      if (result == null) {
+      if (notebook == null) {
         return Failure(StorageException('Notebook not found'));
       }
-      return Success(result);
+
+      // Carregar tags associadas
+      final tagsQuery = db.select(db.notebookTagTable)
+        ..where((t) => t.notebookId.equals(id));
+      final tags = await tagsQuery.map((row) => row.tagId).get();
+
+      return Success(notebook.copyWith(tags: tags));
     } catch (e, s) {
       return Failure(
         StorageException('Error finding notebook', stackTrace: s),
@@ -77,34 +101,30 @@ class NotebookRepositoryServer implements NotebookRepository {
       // Query base
       final query = db.select(db.notebookTable);
 
-      // Aplicar filtro de ativos (soft delete + status ativo)
+      // --- Filtros ---
+
       if (activeOnly) {
         query.where((t) => t.isActive.equals(1) & t.isDeleted.equals(0));
       }
 
-      // Filtro de busca por título/conteúdo
       if (search != null && search.isNotEmpty) {
         query.where(
           (t) => t.title.contains(search) | t.content.contains(search),
         );
       }
 
-      // Filtro por projeto
       if (projectId != null) {
         query.where((t) => t.projectId.equals(projectId));
       }
 
-      // Filtro por parent (notebooks filhos)
       if (parentId != null) {
         query.where((t) => t.parentId.equals(parentId));
       }
 
-      // Filtro por tipo
       if (type != null) {
         query.where((t) => t.type.equals(type.name));
       }
 
-      // Filtro de reminders vencidos
       if (overdueOnly) {
         final now = DateTime.now();
         query.where(
@@ -114,16 +134,46 @@ class NotebookRepositoryServer implements NotebookRepository {
         );
       }
 
-      // Filtro por tags usando operador PostgreSQL @> para JSON arrays
+      // Filtro por tags usando JOIN com a tabela de junção
       if (tags != null && tags.isNotEmpty) {
-        final tagsJson = jsonEncode(tags);
-        query.where((t) => CustomExpression<bool>(
-          "(tags::jsonb @> '$tagsJson'::jsonb)",
-        ));
+        // Subquery para encontrar notebooks que tenham UMA DAS tags (OR logic)
+        final subQuery = db.selectOnly(db.notebookTagTable)
+          ..addColumns([db.notebookTagTable.notebookId]);
+
+        subQuery.where(db.notebookTagTable.tagId.isIn(tags));
+        subQuery.groupBy([db.notebookTagTable.notebookId]);
+
+        query.where((t) => t.id.isInQuery(subQuery));
       }
 
-      final results = await query.get();
-      return Success(results);
+      // Executar query principal
+      final notebooks = await query.get();
+
+      // Carregar tags para todos os notebooks retornados
+      // Para evitar N+1, fazemos uma query para pegar todas as tags desses notebooks
+      if (notebooks.isEmpty) {
+        return const Success([]);
+      }
+
+      final notebookIds = notebooks.map((n) => n.id).toList();
+      final allTagsQuery = db.select(db.notebookTagTable)
+        ..where((t) => t.notebookId.isIn(notebookIds));
+
+      final allTags = await allTagsQuery.get();
+
+      // Agrupar tags por notebookId
+      final tagsMap = <String, List<String>>{};
+      for (final row in allTags) {
+        tagsMap.putIfAbsent(row.notebookId, () => []).add(row.tagId);
+      }
+
+      // Mapear resultado
+      final details = notebooks.map((row) {
+        final tags = tagsMap[row.id] ?? [];
+        return row.copyWith(tags: tags);
+      }).toList();
+
+      return Success(details);
     } catch (e, s) {
       return Failure(
         StorageException('Error listing notebooks', stackTrace: s),
@@ -133,41 +183,76 @@ class NotebookRepositoryServer implements NotebookRepository {
 
   @override
   Future<Result<NotebookDetails>> update(NotebookUpdate data) async {
-    try {
-      final companion = NotebookTableCompanion(
-        title: data.title != null ? Value(data.title!) : const Value.absent(),
-        content: data.content != null
-            ? Value(data.content!)
-            : const Value.absent(),
-        projectId: data.projectId != null
-            ? Value(data.projectId)
-            : const Value.absent(),
-        parentId: data.parentId != null
-            ? Value(data.parentId)
-            : const Value.absent(),
-        tags: data.tags != null ? Value(data.tags) : const Value.absent(),
-        type: data.type != null ? Value(data.type) : const Value.absent(),
-        reminderDate: data.reminderDate != null
-            ? Value(data.reminderDate!)
-            : const Value.absent(),
-        notifyOnReminder: data.notifyOnReminder != null
-            ? Value(data.notifyOnReminder)
-            : const Value.absent(),
-      );
+    return db.transaction(() async {
+      try {
+        final companion = NotebookTableCompanion(
+          title: data.title != null ? Value(data.title!) : const Value.absent(),
+          content: data.content != null
+              ? Value(data.content!)
+              : const Value.absent(),
+          projectId: data.projectId != null
+              ? Value(data.projectId)
+              : const Value.absent(),
+          parentId: data.parentId != null
+              ? Value(data.parentId)
+              : const Value.absent(),
+          type: data.type != null ? Value(data.type) : const Value.absent(),
+          reminderDate: data.reminderDate != null
+              ? Value(data.reminderDate!)
+              : const Value.absent(),
+          notifyOnReminder: data.notifyOnReminder != null
+              ? Value(data.notifyOnReminder)
+              : const Value.absent(),
+          tags: const Value(null), // Ignora coluna legada
+        );
 
-      final query = db.update(db.notebookTable)
-        ..where((t) => t.id.equals(data.id));
-      final rows = await query.writeReturning(companion);
+        final query = db.update(db.notebookTable)
+          ..where((t) => t.id.equals(data.id));
 
-      if (rows.isEmpty) {
-        return Failure(StorageException('Notebook not found'));
+        final rows = await query.writeReturning(companion);
+        if (rows.isEmpty) {
+          return Failure(StorageException('Notebook not found'));
+        }
+
+        final updatedRow = rows.first;
+        List<String> currentTags = [];
+
+        // Atualizar tags se fornecidas
+        if (data.tags != null) {
+          // 1. Remover associações antigas
+          await (db.delete(
+            db.notebookTagTable,
+          )..where((t) => t.notebookId.equals(data.id))).go();
+
+          // 2. Inserir novas associações
+          if (data.tags!.isNotEmpty) {
+            await db.batch((batch) {
+              batch.insertAll(
+                db.notebookTagTable,
+                data.tags!.map((tagId) {
+                  return NotebookTagTableCompanion.insert(
+                    notebookId: data.id,
+                    tagId: tagId,
+                  );
+                }),
+              );
+            });
+            currentTags = data.tags!;
+          }
+        } else {
+          // Se tags não foram atualizadas, precisamos carregá-las
+          final tagsQuery = db.select(db.notebookTagTable)
+            ..where((t) => t.notebookId.equals(data.id));
+          currentTags = await tagsQuery.map((row) => row.tagId).get();
+        }
+
+        return Success(updatedRow.copyWith(tags: currentTags));
+      } catch (e, s) {
+        return Failure(
+          StorageException('Error updating notebook', stackTrace: s),
+        );
       }
-      return Success(rows.first);
-    } catch (e, s) {
-      return Failure(
-        StorageException('Error updating notebook', stackTrace: s),
-      );
-    }
+    });
   }
 
   @override

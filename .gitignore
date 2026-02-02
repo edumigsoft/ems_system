@@ -39,7 +39,7 @@ build/
 
 # Logs e bancos de dados
 *.log
-*.sql
+# *.sql
 *.sqlite
 *.sqlite3
 

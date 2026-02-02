@@ -47,12 +47,11 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
     required TagApiService tagService,
   })  : _initialData = initialData,
         _tagService = tagService {
-    _initializeFields();
-    loadAvailableTags();
+    _initializeFieldsSync();
   }
 
-  /// Inicializa os campos do formulário.
-  void _initializeFields() {
+  /// Inicializa os campos do formulário de forma síncrona.
+  void _initializeFieldsSync() {
     final data = _initialData;
     if (data != null) {
       // Modo edição - preenche com dados existentes
@@ -65,15 +64,23 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
         initialValue: data.content,
       );
       _selectedType = data.type ?? NotebookType.organized;
-
-      // Carrega tags de IDs
-      if (data.tags != null && data.tags!.isNotEmpty) {
-        _loadTagDetailsFromIds(data.tags!);
-      }
     } else {
       // Modo criação - campos vazios
       registerField(notebookTitleField);
       registerField(notebookContentField);
+    }
+  }
+
+  /// Inicializa tags e dados assíncronos.
+  ///
+  /// **IMPORTANTE:** Deve ser chamado após a construção do ViewModel.
+  Future<void> initialize() async {
+    await loadAvailableTags();
+
+    // Carrega tags selecionadas (modo edição)
+    final data = _initialData;
+    if (data != null && data.tags != null && data.tags!.isNotEmpty) {
+      await _loadTagDetailsFromIds(data.tags!);
     }
   }
 

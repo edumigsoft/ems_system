@@ -17,19 +17,22 @@ class StringListConverter extends TypeConverter<List<String>, String> {
     try {
       final decoded = jsonDecode(fromDb);
       if (decoded is List) {
-        return decoded.cast<String>();
+        // Filtra valores não-nulos e não-vazios
+        return decoded
+            .whereType<String>()
+            .where((s) => s.isNotEmpty)
+            .toList();
       }
       return [];
     } catch (_) {
+      // Se falhar ao decodificar JSON, retorna lista vazia
       return [];
     }
   }
 
   @override
   String toSql(List<String> value) {
-    if (value.isEmpty) {
-      return '';
-    }
+    // Sempre retorna JSON válido, mesmo para lista vazia
     return jsonEncode(value);
   }
 }

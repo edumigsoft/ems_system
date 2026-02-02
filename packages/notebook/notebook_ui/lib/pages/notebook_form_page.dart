@@ -27,15 +27,29 @@ class NotebookFormPage extends StatefulWidget {
 
 class _NotebookFormPageState extends State<NotebookFormPage> {
   late NotebookFormViewModel _viewModel;
+  bool _isInitializing = true;
 
   @override
   void initState() {
     super.initState();
+    _initializeViewModel();
+  }
+
+  Future<void> _initializeViewModel() async {
     final tagService = GetIt.I.get<TagApiService>();
     _viewModel = NotebookFormViewModel(
       initialData: widget.notebook,
       tagService: tagService,
     );
+
+    // Aguarda carregamento de tags
+    await _viewModel.initialize();
+
+    if (mounted) {
+      setState(() {
+        _isInitializing = false;
+      });
+    }
   }
 
   @override
@@ -74,13 +88,19 @@ class _NotebookFormPageState extends State<NotebookFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _viewModel.isEditing ? 'Editar Caderno' : 'Novo Caderno',
+          _isInitializing
+            ? 'Carregando...'
+            : (_viewModel.isEditing ? 'Editar Caderno' : 'Novo Caderno'),
         ),
       ),
-      body: ListenableBuilder(
-        listenable: _viewModel,
-        builder: (context, _) {
-          return ListView(
+      body: _isInitializing
+        ? const Center(
+            child: CircularProgressIndicator(),
+          )
+        : ListenableBuilder(
+            listenable: _viewModel,
+            builder: (context, _) {
+              return ListView(
             padding: const EdgeInsets.all(16),
             children: [
               // Título
@@ -186,10 +206,10 @@ class _NotebookFormPageState extends State<NotebookFormPage> {
                   ),
                 ],
               ),
-            ],
-          );
-        },
-      ),
+              ],
+            );
+          },
+        ),
     );
   }
 

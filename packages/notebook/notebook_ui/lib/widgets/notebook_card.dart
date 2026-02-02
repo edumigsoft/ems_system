@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
+import 'package:tag_shared/tag_shared.dart';
 
 /// Card para exibir preview de um caderno na lista.
 class NotebookCard extends StatelessWidget {
   final NotebookDetails notebook;
   final VoidCallback onTap;
   final VoidCallback onDelete;
+  final Map<String, TagDetails> tagsMap;
 
   const NotebookCard({
     super.key,
     required this.notebook,
     required this.onTap,
     required this.onDelete,
+    this.tagsMap = const {},
   });
 
   @override
@@ -85,8 +88,8 @@ class NotebookCard extends StatelessWidget {
 
                   // Tags (mostra até 3)
                   if (notebook.tags != null && notebook.tags!.isNotEmpty)
-                    ...notebook.tags!.take(3).map((tag) {
-                      return _buildTagChip(context, tag);
+                    ...notebook.tags!.take(3).map((tagId) {
+                      return _buildTagChip(context, tagId);
                     }),
 
                   // Indicador de mais tags
@@ -129,18 +132,36 @@ class NotebookCard extends StatelessWidget {
     );
   }
 
-  Widget _buildTagChip(BuildContext context, String tag) {
+  Widget _buildTagChip(BuildContext context, String tagId) {
     final theme = Theme.of(context);
+    final tagParams = tagsMap[tagId];
+
+    // Resolve cor (se houver) ou usa padrão
+    Color? tagColor;
+    if (tagParams?.color != null) {
+      try {
+        tagColor = Color(int.parse(tagParams!.color!.replaceAll('#', '0xFF')));
+      } catch (_) {
+        // Ignora erro de parse
+      }
+    }
+
+    final backgroundColor =
+        tagColor?.withAlpha(40) ?? theme.colorScheme.primaryContainer;
+    final textColor = tagColor ?? theme.colorScheme.onPrimaryContainer;
+    final label = tagParams?.name ?? tagId; // Mostra nome ou ID se não achar
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primaryContainer,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        '#$tag',
+        tagParams != null ? label : '#$label', // Adiciona # se for ID
         style: theme.textTheme.labelSmall?.copyWith(
-          color: theme.colorScheme.onPrimaryContainer,
+          color: textColor,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
