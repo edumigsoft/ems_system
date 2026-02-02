@@ -1,7 +1,7 @@
 name: core_client
 description: Core Client Package (HTTP/Dio Infrastructure)
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -13,8 +13,7 @@ environment:
 dependencies:
   meta: ^1.17.0
   dio: ^5.9.0
-  core_shared:
-    path: ../core_shared
+  core_shared: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0

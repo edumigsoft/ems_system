@@ -1,7 +1,7 @@
 name: tag_server
 description: Server implementation for tag management feature
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -11,16 +11,11 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
-  tag_shared:
-    path: ../tag_shared
-  core_shared:
-    path: ../../core/core_shared
-  core_server:
-    path: ../../core/core_server
-  auth_server:
-    path: ../../auth/auth_server
-  auth_shared:
-    path: ../../auth/auth_shared
+  tag_shared: ^1.1.0
+  core_shared: ^1.1.0
+  core_server: ^1.1.0
+  auth_server: ^1.1.0
+  auth_shared: ^1.1.0
   drift: ^2.23.0
   shelf: ^1.4.2
   shelf_router: ^1.1.4

@@ -1,7 +1,7 @@
 name: open_api_server
 description: OpenAPI Server (Swagger UI)
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -13,12 +13,9 @@ environment:
 dependencies:
   shelf: ^1.4.2
   shelf_router: ^1.1.4
-  core_shared:
-    path: ../../core/core_shared
-  core_server:
-    path: ../../core/core_server
-  open_api_shared:
-    path: ../open_api_shared
+  core_shared: ^1.1.0
+  core_server: ^1.1.0
+  open_api_shared: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0
