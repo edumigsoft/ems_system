@@ -1,7 +1,7 @@
 name: auth_ui
 description: UI Package for Authentication.
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -16,24 +16,16 @@ dependencies:
     sdk: flutter
   logging: ^1.3.0
   get_it: ^9.2.0
-  core_shared:
-    path: ../../core/core_shared
-  core_client:
-    path: ../../core/core_client
-  core_ui:
-    path: ../../core/core_ui
-  design_system_shared:
-    path: ../../design_system/design_system_shared
-  localizations_ui:
-    path: ../../localizations/localizations_ui
+  core_shared: ^1.1.0
+  core_client: ^1.1.0
+  core_ui: ^1.1.0
+  design_system_shared: ^1.1.0
+  localizations_ui: ^1.1.0
   zard_form:
     path: ../../zard_form
-  auth_shared:
-    path: ../auth_shared
-  auth_client:
-    path: ../auth_client
-  user_shared:
-    path: ../../user/user_shared
+  auth_shared: ^1.1.0
+  auth_client: ^1.1.0
+  user_shared: ^1.1.0
   dio: ^5.9.0
 
 dev_dependencies:

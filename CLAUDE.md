@@ -6,7 +6,7 @@ Este arquivo fornece orientações para o Claude Code (claude.ai/code) ao trabal
 
 EMS System (EduMigSoft System) é um monorepo Flutter/Dart multi-serviço para gerenciar usuários, tarefas (Aura), projetos e finanças. A arquitetura usa uma estrutura de pacotes multi-variante consistente que permite compartilhamento de código entre aplicativos Flutter e servidores backend Dart/Shelf.
 
-**Versão Atual:** 1.0.0 (veja arquivo `VERSION`)
+**Versão Atual:** 1.1.0 (veja arquivo `VERSION`)
 
 ### Arquitetura Multi-Serviço
 
@@ -25,22 +25,6 @@ Ambos compartilham:
 - Configurações de análise e scripts de automação
 
 ## Comandos Comuns
-
-### Gerenciamento de Pacotes
-
-```bash
-# Instalar dependências para todos os pacotes
-./scripts/pub_get_all.sh
-
-# Limpar todos os pacotes (remove .dart_tool, artefatos de build)
-./scripts/clean_all.sh
-
-# Executar build_runner em todos os pacotes que o usam
-./scripts/build_runner_all.sh
-
-# Aplicar dart fix em todos os pacotes
-./scripts/dart_fix_all.sh
-```
 
 ### Testes e Análise
 
@@ -77,13 +61,6 @@ flutter run
 ```
 
 ### Infraestrutura e Docker
-
-```bash
-# Validar arquitetura do projeto
-./scripts/validate_architecture.sh
-
-# Verificar completude da documentação
-./scripts/check_documentation.sh
 
 # Iniciar banco de dados PostgreSQL compartilhado
 cd servers/containers/postgres
@@ -223,25 +200,6 @@ Estes pacotes implementam todas as 4 variantes (_shared, _ui, _client, _server):
   - ✓ `images_ui`
   - ⚠ Outras variantes (diretórios existem, sem pubspec.yaml)
 
-### Estrutura Especial: Pacote Project
-O pacote `project/` tem uma estrutura hierárquica única:
-```
-packages/project/
-├── project_core/          # Funcionalidade principal de projetos (2/4 variantes)
-│   ├── project_core_shared/
-│   ├── project_core_ui/
-│   ├── project_core_client/  (diretório, sem pubspec.yaml)
-│   └── project_core_server/  (diretório, sem pubspec.yaml)
-├── project/               # Sub-feature (esqueleto)
-└── task/                  # Sub-feature para tarefas (esqueleto)
-```
-
-### Pacotes Especiais
-- `zard_form/` - **DESCONTINUADO** - Biblioteca standalone de validação de formulários
-  - Sendo substituído por `FormValidationMixin` em `core_ui`
-  - Mantido temporariamente para referência, será removido após validação completa
-  - Use `FormValidationMixin` para novos formulários (veja ADR-0004)
-
 ### Aplicações
 - `apps/ems/app_design_draft/` - App de demonstração do design system com troca dinâmica de tema
 - `apps/ems/app_v1/` - Aplicação EMS em produção
@@ -265,7 +223,7 @@ Para implementar uma nova feature, **consulte o guia completo**:
 
 1. **Ordem de Implementação** (OBRIGATÓRIA - ADR-0005):
    ```
-   1. {feature}_core    → Validar (0 linters)
+   1. {feature}_shared  → Validar (0 linters)
    2. {feature}_client  → Validar (0 linters)
    3. {feature}_server  → Validar (0 linters)
    4. {feature}_ui      → Validar (0 linters)
@@ -274,7 +232,7 @@ Para implementar uma nova feature, **consulte o guia completo**:
 
 2. **Estrutura de Cada Pacote:**
 
-   **{feature}_core** (Domain & Business):
+   **{feature}_shared** (Domain & Business):
    ```
    lib/src/
    ├── domain/
@@ -326,7 +284,7 @@ Para implementar uma nova feature, **consulte o guia completo**:
      - `CONTRIBUTING.md` - Guia de contribuição (ÚNICO para a feature)
      - `CHANGELOG.md` - Histórico agregado
 
-   - Nível Subpacote (cada `_core`, `_client`, `_server`, `_ui`):
+   - Nível Subpacote (cada `_shared`, `_client`, `_server`, `_ui`):
      - `README.md` - Documentação específica do pacote
      - `CHANGELOG.md` - Histórico do pacote
      - `analysis_options.yaml` - Config de linting (importar da raiz)
@@ -340,32 +298,6 @@ Para implementar uma nova feature, **consulte o guia completo**:
 
 **Erros Comuns:**
 - Veja seção 5 de `docs/rules/new_feature.md` para lista completa de erros frequentes e soluções
-
-### Adicionando Novos Pacotes (Estrutura Básica)
-
-Se você precisa criar um pacote simples (não uma feature completa), siga o padrão de 4 variantes:
-
-1. Criar estrutura de diretórios do pacote:
-   ```
-   packages/{feature}/
-   ├── {feature}_shared/    # Apenas Dart puro
-   ├── {feature}_ui/        # Widgets Flutter
-   ├── {feature}_client/    # Lógica do cliente
-   └── {feature}_server/    # Lógica do servidor
-   ```
-
-2. **Em `*_shared`**: Use apenas dependência `meta`. Defina:
-   - Modelos de domínio como classes de dados imutáveis
-   - Objetos de valor com serialização (`toMap`/`fromMap`)
-   - Interfaces abstratas
-   - Constantes e enums
-
-3. **Em `*_ui`**: Dependa de `{feature}_shared`. Adicione:
-   - Widgets Flutter
-   - Extensões de tema
-   - Lógica específica de UI
-
-4. **Em `*_client`/`*_server`**: Dependa de `{feature}_shared` para implementações específicas de plataforma.
 
 ### Padrões de Codificação
 
@@ -385,22 +317,6 @@ Do CONTRIBUTING.md:
 - Mantenha cobertura de testes acima de 80%
 - Testes em `test/` devem espelhar a estrutura de `lib/`
 
-### Análise de Código Não Usado
-
-Vários pacotes contêm arquivos `analise_sem_uso.md` (análise de código não usado):
-- `packages/project/analise_sem_uso.md`
-- `packages/open_api/analise_sem_uso.md`
-
-Estes documentos são gerados por análises automáticas para identificar:
-- Classes não utilizadas
-- Arquivos que podem ser removidos
-- Código duplicado ou redundante
-
-Antes de remover código identificado nestes arquivos, verifique se:
-1. O código realmente não é usado (análise pode ter falsos positivos)
-2. O código não faz parte de uma API pública do pacote
-3. O código não é usado por outros pacotes via dependência
-
 ### Trabalhando com Múltiplos Serviços
 
 O projeto suporta múltiplos serviços (EMS, SMS) que compartilham pacotes:
@@ -408,7 +324,6 @@ O projeto suporta múltiplos serviços (EMS, SMS) que compartilham pacotes:
 **Ao adicionar features:**
 - Determine se a feature é específica de um serviço ou compartilhada
 - Features compartilhadas vão em `/packages`
-- Features específicas ficam no app/server correspondente
 
 **Ao modificar pacotes compartilhados:**
 - Lembre-se que mudanças afetam TODOS os serviços (EMS e SMS)
@@ -588,8 +503,6 @@ class _SchoolFormWidgetState extends State<SchoolFormWidget> {
 - School: `packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart`
 - Notebook: `packages/notebook/notebook_ui/lib/ui/view_models/notebook_form_view_model.dart`
 
-**Nota:** O pacote `zard_form` está sendo descontinuado em favor deste padrão.
-
 ## Estrutura do Projeto
 
 ```
@@ -683,12 +596,6 @@ ems_system/
 - `VERSION` - Versão atual do sistema (2.1.0)
 - `servers/INFRASTRUCTURE.md` - Documentação de infraestrutura Docker e PostgreSQL
 
-**Especificações e Propostas (OpenSpec):**
-- `openspec/AGENTS.md` - Instruções detalhadas para agentes IA trabalhando no projeto
-- `openspec/project.md` - Especificação do projeto
-- `openspec/changes/` - Propostas de mudança
-- `openspec/specs/` - Especificações técnicas detalhadas
-
 **Architecture Decision Records (ADRs):**
 - `docs/adr/0001-result-pattern.md` - Pattern Result para tratamento de erros
 - `docs/adr/0002-dio-error-handler.md` - Mixin Dio error handler
@@ -723,29 +630,6 @@ ems_system/
 - `pubspec.yaml` (root) - Define todos os pacotes membros do workspace
   - **Nota:** Alguns pacotes estão comentados (não ativos no workspace)
   - Veja o arquivo para detalhes sobre quais variantes estão ativas
-
-## Configuração de Workspace e Pacotes Ativos
-
-O arquivo `pubspec.yaml` na raiz define o workspace com todos os pacotes membros. **Importante:** Nem todos os pacotes com diretórios estão ativos no workspace.
-
-### Pacotes Comentados (Não Ativos)
-Os seguintes pacotes têm diretórios mas estão comentados no `pubspec.yaml`:
-- `design_system_client`, `design_system_server`
-- `images_client`, `images_server`, `images_shared`
-- `localizations_client`
-- `open_api_client`, `open_api_ui`
-- `project_core_client`, `project_core_server`
-- Todos os pacotes `project/*` (sub-features)
-- Todos os pacotes `task/*` (sub-features)
-
-Estes pacotes podem ter diretórios e alguns arquivos, mas não possuem `pubspec.yaml` válido e não estão incluídos no workspace ativo.
-
-### Quando Ativar Pacotes Comentados
-Antes de trabalhar em um pacote comentado:
-1. Verifique se o diretório possui `pubspec.yaml`
-2. Se não possuir, crie seguindo o padrão de 4 variantes
-3. Descomente a entrada correspondente no `pubspec.yaml` raiz
-4. Execute `./scripts/pub_get_all.sh`
 
 ## Architecture Decision Records (ADRs)
 
@@ -793,36 +677,3 @@ Para informações mais detalhadas sobre:
 - **Regras de features**: Consulte `docs/rules/new_feature.md`
 - **Padrões de entidades**: Consulte `docs/architecture/entity_patterns.md`
 - **Hierarquia de features**: Consulte `docs/architecture/features_hierarchy.md`
-
-## Scripts de Validação
-
-O projeto inclui scripts de validação para garantir qualidade:
-
-```bash
-# Validar arquitetura (verifica padrão de 4 variantes, dependências corretas, etc.)
-./scripts/validate_architecture.sh
-
-# Verificar completude da documentação
-./scripts/check_documentation.sh
-```
-
-Estes scripts são executados automaticamente em hooks de CI/CD.
-
-<!-- OPENSPEC:START -->
-# Instruções OpenSpec
-
-Estas instruções são para assistentes de IA trabalhando neste projeto.
-
-Sempre abra `@/openspec/AGENTS.md` quando a solicitação:
-- Mencionar planejamento ou propostas (palavras como proposta, especificação, mudança, plano)
-- Introduzir novas capacidades, mudanças disruptivas, mudanças arquiteturais ou grande trabalho de performance/segurança
-- Parecer ambígua e você precisar da especificação autoritativa antes de codificar
-
-Use `@/openspec/AGENTS.md` para aprender:
-- Como criar e aplicar propostas de mudança
-- Formato e convenções de especificação
-- Estrutura e diretrizes do projeto
-
-Mantenha este bloco gerenciado para que 'openspec update' possa atualizar as instruções.
-
-<!-- OPENSPEC:END -->

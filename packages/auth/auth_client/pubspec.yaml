@@ -1,7 +1,7 @@
 name: auth_client
 description: Client implementation for Authentication.
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -14,14 +14,10 @@ dependencies:
   dio: ^5.0.0
   retrofit: 4.9.1
   flutter_secure_storage: ^9.2.4
-  core_shared:
-    path: ../../core/core_shared
-  core_client:
-    path: ../../core/core_client
-  auth_shared:
-    path: ../../auth/auth_shared
-  user_shared:
-    path: ../../user/user_shared
+  core_shared: ^1.1.0
+  core_client: ^1.1.0
+  auth_shared: ^1.1.0
+  user_shared: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0

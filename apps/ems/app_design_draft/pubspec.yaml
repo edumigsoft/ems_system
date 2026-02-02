@@ -1,7 +1,7 @@
 name: ems_app_design_draft
 description: "A new Flutter project."
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -14,14 +14,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  core_shared:
-    path: ../../../packages/core/core_shared
-  core_ui:
-    path: ../../../packages/core/core_ui
-  design_system_shared:
-    path: ../../../packages/design_system/design_system_shared
-  design_system_ui:
-    path: ../../../packages/design_system/design_system_ui
+  core_shared: ^1.1.0
+  core_ui: ^1.1.0
+  design_system_shared: ^1.1.0
+  design_system_ui: ^1.1.0
 
 dev_dependencies:
   flutter_test:

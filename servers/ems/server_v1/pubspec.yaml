@@ -1,7 +1,7 @@
 name: ems_server_v1
 description: EMS System Server V1
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -19,22 +19,14 @@ dependencies:
   dart_jsonwebtoken: ^3.3.1
   logging: ^1.3.0
   get_it: ^9.2.0
-  core_shared:
-    path: ../../../packages/core/core_shared
-  core_server:
-    path: ../../../packages/core/core_server
-  open_api_shared:
-    path: ../../../packages/open_api/open_api_shared
-  open_api_server:
-    path: ../../../packages/open_api/open_api_server
-  auth_server:
-    path: ../../../packages/auth/auth_server
-  user_server:
-    path: ../../../packages/user/user_server
-  tag_server:
-    path: ../../../packages/tag/tag_server
-  notebook_server:
-    path: ../../../packages/notebook/notebook_server
+  core_shared: ^1.1.0
+  core_server: ^1.1.0
+  open_api_shared: ^1.1.0
+  open_api_server: ^1.1.0
+  auth_server: ^1.1.0
+  user_server: ^1.1.0
+  tag_server: ^1.1.0
+  notebook_server: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0
