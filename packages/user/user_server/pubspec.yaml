@@ -1,7 +1,7 @@
 name: user_server
 description: Server implementation for User Management.
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -14,18 +14,12 @@ dependencies:
   shelf: ^1.4.2
   shelf_router: ^1.1.4
   drift: ^2.30.1
-  core_shared:
-    path: ../../core/core_shared
-  core_server:
-    path: ../../core/core_server
-  open_api_shared:
-    path: ../../open_api/open_api_shared
-  auth_server:
-    path: ../../auth/auth_server
-  auth_shared:
-    path: ../../auth/auth_shared
-  user_shared:
-    path: ../user_shared
+  core_shared: ^1.1.0
+  core_server: ^1.1.0
+  open_api_shared: ^1.1.0
+  auth_server: ^1.1.0
+  auth_shared: ^1.1.0
+  user_shared: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0

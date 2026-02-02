@@ -1,7 +1,7 @@
 name: tag_client
 description: HTTP client implementation for tag management feature
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -14,12 +14,9 @@ dependencies:
   dio: ^5.0.0
   retrofit: 4.9.1
   json_annotation: ^4.9.0
-  tag_shared:
-    path: ../tag_shared
-  core_shared:
-    path: ../../core/core_shared
-  core_client:
-    path: ../../core/core_client
+  tag_shared: ^1.1.0
+  core_shared: ^1.1.0
+  core_client: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0

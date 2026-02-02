@@ -1,7 +1,7 @@
 name: core_ui
 description: "Core UI Package"
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -18,8 +18,7 @@ dependencies:
   logging: ^1.3.0
   path_provider: ^2.1.5
   zard: ^0.0.25
-  core_shared:
-    path: ../core_shared
+  core_shared: ^1.1.0
 
 dev_dependencies:
   flutter_test:

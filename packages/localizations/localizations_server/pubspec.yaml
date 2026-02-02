@@ -1,7 +1,7 @@
 name: localizations_server
 description: Server implementation for Localizations.
 publish_to: none
-version: 1.0.0
+version: 1.1.0
 
 # repository: https://github.com/edumigsoft/ems_system_core
 
@@ -11,8 +11,7 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
-  localizations_shared:
-    path: ../localizations_shared
+  localizations_shared: ^1.1.0
 
 dev_dependencies:
   lints: ^6.0.0
