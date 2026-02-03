@@ -377,6 +377,8 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           DocumentListWidget(
             documents: widget.viewModel.documents ?? [],
             onDelete: _handleDeleteDocument,
+            dio: widget.viewModel.dio,
+            notebookId: widget.notebookId,
           ),
         ],
       ),

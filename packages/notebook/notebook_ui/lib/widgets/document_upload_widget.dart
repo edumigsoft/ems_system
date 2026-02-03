@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -205,17 +206,20 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
                     ? () => setState(() => _selectedType = DocumentAddType.url)
                     : null,
               ),
-              const SizedBox(height: 8),
-              _TypeButton(
-                icon: Icons.folder,
-                label: 'Arquivo Local',
-                description: 'Caminho no seu PC',
-                onPressed: widget.enabled
-                    ? () => setState(
-                        () => _selectedType = DocumentAddType.localPath,
-                      )
-                    : null,
-              ),
+              // Apenas no desktop — no mobile não há como selecionar caminho manual
+              if (!kIsWeb && !Platform.isAndroid && !Platform.isIOS) ...[
+                const SizedBox(height: 8),
+                _TypeButton(
+                  icon: Icons.folder,
+                  label: 'Arquivo Local',
+                  description: 'Caminho no seu PC',
+                  onPressed: widget.enabled
+                      ? () => setState(
+                          () => _selectedType = DocumentAddType.localPath,
+                        )
+                      : null,
+                ),
+              ],
             ],
 
             // Formulário baseado no tipo selecionado

@@ -130,6 +130,17 @@ class NotebookRoutes extends Routes {
           ),
     );
 
+    // GET /notebooks/:id/documents/:docId/download - Download de arquivo
+    router.get(
+      '/<id>/documents/<docId>/download',
+      Pipeline()
+          .addMiddleware(authedMiddleware)
+          .addHandler(
+            (req) => _downloadDocument(
+              req, req.params['id']!, req.params['docId']!),
+          ),
+    );
+
     return router;
   }
 
@@ -548,6 +559,7 @@ class NotebookRoutes extends Routes {
       }
 
       String? fileName;
+      String? uniqueFileName;
       String? savedFilePath;
       int? fileSize;
       String? mimeType;
@@ -563,7 +575,7 @@ class NotebookRoutes extends Routes {
           final timestamp = DateTime.now().millisecondsSinceEpoch;
           final extension = p.extension(fileName);
           final baseName = p.basenameWithoutExtension(fileName);
-          final uniqueFileName = '${baseName}_$timestamp$extension';
+          uniqueFileName = '${baseName}_$timestamp$extension';
 
           // Caminho completo do arquivo
           final filePath = p.join(_uploadsPath, uniqueFileName);
@@ -595,7 +607,7 @@ class NotebookRoutes extends Routes {
       // Criar referência no banco de dados
       final createDto = DocumentReferenceCreate(
         name: fileName,
-        path: savedFilePath,
+        path: uniqueFileName!,
         storageType: DocumentStorageType.server,
         mimeType: mimeType,
         sizeBytes: fileSize,
@@ -638,5 +650,61 @@ class NotebookRoutes extends Routes {
         headers: {'Content-Type': 'application/json'},
       );
     }
+  }
+
+  /// GET /notebooks/:id/documents/:docId/download - Download de arquivo.
+  ///
+  /// Retorna os bytes do arquivo armazenado no servidor.
+  /// Valida que o documento pertence ao notebook indicado na URL.
+  Future<Response> _downloadDocument(
+    Request request, String id, String docId,
+  ) async {
+    final authContext = request.context['authContext'] as AuthContext?;
+    if (authContext == null) {
+      return Response.forbidden(
+        jsonEncode({'error': 'Authentication required'}),
+        headers: {'Content-Type': 'application/json'},
+      );
+    }
+
+    final result = await documentRepository.getById(docId);
+
+    return result.when(
+      success: (document) async {
+        if (document.notebookId != id) {
+          return Response.notFound(
+            jsonEncode({'error': 'Document not found in this notebook'}),
+            headers: {'Content-Type': 'application/json'},
+          );
+        }
+        if (document.storageType != DocumentStorageType.server) {
+          return Response(
+            400,
+            body: jsonEncode({'error': 'Document is not server-hosted'}),
+            headers: {'Content-Type': 'application/json'},
+          );
+        }
+
+        final filePath = p.join(_uploadsPath, document.path);
+        final file = File(filePath);
+        if (!await file.exists()) {
+          return Response.notFound(
+            jsonEncode({'error': 'File not found on disk'}),
+            headers: {'Content-Type': 'application/json'},
+          );
+        }
+
+        final bytes = await file.readAsBytes();
+        return Response.ok(bytes, headers: {
+          'Content-Type': document.mimeType ?? 'application/octet-stream',
+          'Content-Disposition': 'attachment; filename="${document.name}"',
+          'Content-Length': bytes.length.toString(),
+        });
+      },
+      failure: (_) => Response.notFound(
+        jsonEncode({'error': 'Document not found'}),
+        headers: {'Content-Type': 'application/json'},
+      ),
+    );
   }
 }

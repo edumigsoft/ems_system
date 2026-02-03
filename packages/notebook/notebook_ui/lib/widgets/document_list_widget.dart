@@ -1,20 +1,25 @@
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
-import 'dart:io';
 import 'pdf_viewer_page.dart';
 
 /// Widget para exibir lista de documentos anexados.
 class DocumentListWidget extends StatelessWidget {
   final List<DocumentReferenceDetails> documents;
   final void Function(String documentId)? onDelete;
+  final Dio dio;
+  final String notebookId;
 
   const DocumentListWidget({
     super.key,
     required this.documents,
     this.onDelete,
+    required this.dio,
+    required this.notebookId,
   });
 
   @override
@@ -49,6 +54,8 @@ class DocumentListWidget extends StatelessWidget {
         return _DocumentItem(
           document: doc,
           onDelete: onDelete != null ? () => onDelete!(doc.id) : null,
+          dio: dio,
+          notebookId: notebookId,
         );
       }).toList(),
     );
@@ -58,10 +65,14 @@ class DocumentListWidget extends StatelessWidget {
 class _DocumentItem extends StatelessWidget {
   final DocumentReferenceDetails document;
   final VoidCallback? onDelete;
+  final Dio dio;
+  final String notebookId;
 
   const _DocumentItem({
     required this.document,
     this.onDelete,
+    required this.dio,
+    required this.notebookId,
   });
 
   @override
@@ -168,33 +179,37 @@ class _DocumentItem extends StatelessWidget {
             ),
           ),
 
-          // Preview inline para imagens (apenas servidor)
+          // Preview inline para imagens (apenas servidor, com cache)
           if (isImage && document.storageType == DocumentStorageType.server)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  document.path,
-                  fit: BoxFit.cover,
-                  height: 150,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+                child: FutureBuilder<Uint8List?>(
+                  future: _loadCachedImage(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        height: 150,
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    if (snapshot.data == null) {
+                      return Container(
+                        height: 150,
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: const Center(
+                          child: Icon(Icons.broken_image),
+                        ),
+                      );
+                    }
+                    return Image.memory(
+                      snapshot.data!,
+                      fit: BoxFit.cover,
                       height: 150,
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: const Center(
-                        child: Icon(Icons.broken_image),
-                      ),
-                    );
-                  },
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return Container(
-                      height: 150,
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
                     );
                   },
                 ),
@@ -242,8 +257,9 @@ class _DocumentItem extends StatelessWidget {
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (context) => PdfViewerPage(
-            url: document.path,
-            documentName: document.name,
+            document: document,
+            dio: dio,
+            notebookId: notebookId,
           ),
         ),
       );
@@ -261,7 +277,6 @@ class _DocumentItem extends StatelessWidget {
 
   Future<void> _downloadDocument(BuildContext context) async {
     try {
-      // Show loading indicator
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -281,25 +296,19 @@ class _DocumentItem extends StatelessWidget {
         );
       }
 
-      // Get downloads directory
-      final Directory? downloadsDir = await getDownloadsDirectory();
-      if (downloadsDir == null) {
-        throw Exception('Não foi possível acessar a pasta de Downloads');
+      // Sandbox do app no mobile; Downloads no desktop
+      final Directory targetDir;
+      if (Platform.isAndroid || Platform.isIOS) {
+        targetDir = await getApplicationDocumentsDirectory();
+      } else {
+        targetDir =
+            await getDownloadsDirectory() ?? await getTemporaryDirectory();
       }
 
-      // Create file path
-      final filePath = '${downloadsDir.path}/${document.name}';
-
-      // Download file
-      final dio = Dio();
-      await dio.download(
-        document.path,
-        filePath,
-        onReceiveProgress: (received, total) {
-          // Progress updates could be shown in a dialog if needed
-          // Current progress: (received / total * 100)
-        },
-      );
+      final filePath = '${targetDir.path}/${document.name}';
+      final url =
+          '/notebooks/$notebookId/documents/${document.id}/download';
+      await dio.download(url, filePath);
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -308,10 +317,16 @@ class _DocumentItem extends StatelessWidget {
             content: Text('Download concluído: ${document.name}'),
             backgroundColor: Theme.of(context).colorScheme.primary,
             action: SnackBarAction(
-              label: 'Abrir pasta',
-              onPressed: () {
-                // Open file manager at downloads folder
-                _openFileLocation(downloadsDir.path);
+              label: Platform.isAndroid || Platform.isIOS
+                  ? 'Abrir'
+                  : 'Abrir pasta',
+              onPressed: () async {
+                if (Platform.isAndroid || Platform.isIOS) {
+                  await launchUrl(Uri.file(filePath),
+                      mode: LaunchMode.platformDefault);
+                } else {
+                  _openFileLocation(targetDir.path);
+                }
               },
             ),
           ),
@@ -327,6 +342,29 @@ class _DocumentItem extends StatelessWidget {
           ),
         );
       }
+    }
+  }
+
+  Future<Uint8List?> _loadCachedImage() async {
+    final cacheDir = await getApplicationCacheDirectory();
+    final ext = document.mimeType?.split('/').last ?? 'jpg';
+    final cacheFile =
+        File('${cacheDir.path}/img_cache_${document.id}.$ext');
+
+    if (await cacheFile.exists()) return await cacheFile.readAsBytes();
+
+    final url =
+        '/notebooks/$notebookId/documents/${document.id}/download';
+    try {
+      final response = await dio.get<List<int>>(
+        url,
+        options: Options(responseType: ResponseType.bytes),
+      );
+      final bytes = Uint8List.fromList(response.data!);
+      await cacheFile.writeAsBytes(bytes);
+      return bytes;
+    } catch (_) {
+      return null;
     }
   }
 

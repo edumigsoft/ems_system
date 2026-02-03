@@ -14,14 +14,17 @@ class NotebookDetailViewModel extends ChangeNotifier
   final NotebookApiService _notebookService;
   final DocumentReferenceApiService _documentService;
   final TagApiService _tagService;
+  final Dio _dio;
 
   NotebookDetailViewModel({
     required NotebookApiService notebookService,
     required DocumentReferenceApiService documentService,
     required TagApiService tagService,
+    required Dio dio,
   }) : _notebookService = notebookService,
        _documentService = documentService,
-       _tagService = tagService;
+       _tagService = tagService,
+       _dio = dio;
 
   NotebookDetails? _notebook;
   NotebookDetails? get notebook => _notebook;
@@ -383,8 +386,7 @@ class NotebookDetailViewModel extends ChangeNotifier
         ),
       });
 
-      final dio = Dio();
-      final response = await dio.post<Map<String, dynamic>>(
+      final response = await _dio.post<Map<String, dynamic>>(
         '/notebooks/${_notebook!.id}/documents/upload',
         data: formData,
         onSendProgress: (sent, total) {
@@ -413,6 +415,18 @@ class NotebookDetailViewModel extends ChangeNotifier
       notifyListeners();
       return false;
     }
+  }
+
+  /// Dio configurado com base URL e interceptores de auth.
+  /// Exposto para widgets que precisam fazer downloads autenticados.
+  Dio get dio => _dio;
+
+  /// URL relativa para download de documento no servidor.
+  /// Retorna null se o documento não for server-hosted ou notebook não carregado.
+  String? getDocumentDownloadUrl(DocumentReferenceDetails document) {
+    if (_notebook == null) return null;
+    if (document.storageType != DocumentStorageType.server) return null;
+    return '/notebooks/${_notebook!.id}/documents/${document.id}/download';
   }
 
   /// Limpa erro atual.

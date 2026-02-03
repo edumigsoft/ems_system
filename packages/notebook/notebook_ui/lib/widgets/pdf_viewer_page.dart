@@ -1,17 +1,22 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:notebook_shared/notebook_shared.dart';
 
 /// Page for viewing PDF documents inline.
 class PdfViewerPage extends StatefulWidget {
-  final String url;
-  final String documentName;
+  final DocumentReferenceDetails document;
+  final Dio dio;
+  final String notebookId;
 
   const PdfViewerPage({
     super.key,
-    required this.url,
-    required this.documentName,
+    required this.document,
+    required this.dio,
+    required this.notebookId,
   });
 
   @override
@@ -38,8 +43,8 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     });
 
     try {
-      // Download PDF from URL
-      final pdfData = await _downloadPdf(widget.url);
+      // Download PDF (with local cache)
+      final pdfData = await _downloadPdf();
 
       // Initialize PDF controller with downloaded data
       _pdfController = PdfControllerPinch(
@@ -66,26 +71,25 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     }
   }
 
-  Future<Uint8List> _downloadPdf(String url) async {
-    try {
-      final dio = Dio();
-      final response = await dio.get<List<int>>(
-        url,
-        options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: true,
-          validateStatus: (status) => status! < 500,
-        ),
-      );
+  Future<Uint8List> _downloadPdf() async {
+    final cacheDir = await getApplicationCacheDirectory();
+    final cacheFile =
+        File('${cacheDir.path}/pdf_cache_${widget.document.id}.pdf');
 
-      if (response.statusCode != 200) {
-        throw Exception('Falha ao baixar PDF: HTTP ${response.statusCode}');
-      }
-
-      return Uint8List.fromList(response.data!);
-    } catch (e) {
-      throw Exception('Erro ao baixar PDF: $e');
+    if (await cacheFile.exists()) {
+      return await cacheFile.readAsBytes();
     }
+
+    final url =
+        '/notebooks/${widget.notebookId}/documents/${widget.document.id}/download';
+    final response = await widget.dio.get<List<int>>(
+      url,
+      options: Options(responseType: ResponseType.bytes),
+    );
+    final bytes = Uint8List.fromList(response.data!);
+
+    await cacheFile.writeAsBytes(bytes);
+    return bytes;
   }
 
   @override
@@ -101,7 +105,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.documentName,
+          widget.document.name,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
