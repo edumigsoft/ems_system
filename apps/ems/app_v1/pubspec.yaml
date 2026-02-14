@@ -83,13 +83,13 @@ names_launcher:
       # name: "Your iOS App Name"
     web:
       enable: true
-      name: "EduMigSoft Manager System"
+      name: "EduMigSoft_Manager_System"
     macos:
       enable: false
       # name: "Your MasOS App Name"
     windows:
       enable: true
-      name: "EduMigSoft Manager System"
+      name: "EduMigSoft_Manager_System"
     linux:
-      enable: true
-      name: "EduMigSoft Manager System"
+      enable: false
+      name: "EduMigSoft_Manager_System"
