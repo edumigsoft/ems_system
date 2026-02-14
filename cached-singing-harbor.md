@@ -1,23 +1,59 @@
-# Plano: Integração do Servidor EMS com GitHub Container Registry (GHCR)
+# Plano: Integração dos Servidores EMS e SMS com GitHub Container Registry (GHCR)
+## Abordagem Híbrida: Build Local + Workflows Manuais
 
 ## Context
 
-O servidor EMS atualmente usa build local de imagens Docker (`ems_server_image:v1`), o que não é ideal para deploy em VPS de produção. A integração com GitHub Container Registry (GHCR) permitirá:
+Os servidores EMS e SMS atualmente usam build local de imagens Docker. Este plano estabelece uma **abordagem híbrida** que combina:
+- ✅ **Build local** para desenvolvimento (rápido, sem custos)
+- ✅ **Workflows manuais** para releases oficiais (qualidade garantida)
+- ✅ **GHCR** como registry centralizado (produção)
 
-1. **Build Automatizado**: CI/CD via GitHub Actions para build e publicação automática de imagens
-2. **Versionamento Consistente**: Tags semânticas (latest, 1.1.0, v1.1) sincronizadas com o arquivo VERSION
-3. **Deploy Simplificado**: Pull direto de imagens pré-compiladas na VPS sem necessidade de build local
-4. **Rollback Facilitado**: Capacidade de voltar para versões anteriores rapidamente
-5. **Rastreabilidade**: Todas as imagens vinculadas a commits específicos via SHA
+### Benefícios da Abordagem Híbrida
+
+1. **Custo Zero**: Builds locais durante desenvolvimento, workflows apenas para releases
+2. **Versionamento Independente**: Cada servidor com sua própria versão semântica via `pubspec.yaml`
+3. **Flexibilidade**: Build local rápido + CI/CD para releases oficiais
+4. **Deploy Simplificado**: Pull direto de imagens do GHCR na VPS
+5. **Rollback Facilitado**: Versões anteriores disponíveis no registry
+6. **Rastreabilidade**: Imagens taggeadas com versão e commit SHA
+
+### Estratégia de Build
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              DESENVOLVIMENTO (90% do tempo)             │
+│  • Build local no computador                           │
+│  • Teste com docker-compose                            │
+│  • Push manual para GHCR (opcional)                    │
+│  • Custo: $0                                            │
+└─────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────┐
+│              RELEASES OFICIAIS (10% do tempo)           │
+│  • Workflow manual via GitHub Actions                  │
+│  • Build limpo e reproduzível                          │
+│  • Push automático para GHCR                           │
+│  • Custo: ~$0.03-0.05 por release                      │
+└─────────────────────────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────┐
+│                   PRODUÇÃO (VPS)                        │
+│  • Pull de imagens do GHCR                             │
+│  • Deploy via scripts automatizados                    │
+│  • Rollback para versões anteriores                    │
+└─────────────────────────────────────────────────────────┘
+```
 
 **Situação Atual:**
-- Dockerfile multi-stage otimizado (dart:stable → scratch)
-- Faltam pacotes `tag` e `notebook` no Dockerfile (presentes no pubspec.yaml mas não copiados)
+- Dockerfiles multi-stage otimizados (dart:stable → scratch)
+- **EMS**: Faltam pacotes `tag` e `notebook` no Dockerfile
+- **SMS**: Caminho incorreto e falta pacote `school` no Dockerfile
 - docker-compose.yml usa build local
 - Sem workflows GitHub Actions configurados
+- Sem scripts de build/push padronizados
 
 **Objetivo:**
-Configurar infraestrutura completa de CI/CD para publicar imagens Docker do servidor EMS no GitHub Packages (ghcr.io), mantendo compatibilidade com desenvolvimento local.
+Configurar infraestrutura híbrida para desenvolvimento local e CI/CD manual, com publicação de imagens no GHCR, versionamento independente e custo zero/mínimo.
 
 ---
 
@@ -25,32 +61,83 @@ Configurar infraestrutura completa de CI/CD para publicar imagens Docker do serv
 
 ### Arquivos a Criar
 
-1. **`.github/workflows/docker-ems-server.yml`**
-   - Workflow de CI/CD para build e publicação automática no GHCR
-   - Triggers: push em main/develop, releases, workflow_dispatch
-   - Tags: latest, semver (1.1.0), major.minor (v1.1), branch, sha
+**Scripts de Build Local:**
 
-2. **`servers/ems/container/docker-compose.prod.yml`**
+1. **`scripts/build-local.sh`**
+   - Script para build local de imagens Docker
+   - Suporte para EMS e SMS
+   - Validação de argumentos e feedback visual
+
+2. **`scripts/push-to-ghcr.sh`**
+   - Script para push manual de imagens para GHCR
+   - Login automático no GHCR
+   - Tagging automático (versão + latest)
+
+**Guia de Operações:**
+
+3. **`servers/OPERATIONS.md`** ⭐ **NOVO**
+   - **Guia completo de operações** em ordem de execução
+   - Build local para desenvolvimento
+   - Push manual para GHCR
+   - Trigger de workflows manuais
+   - Deploy em VPS
+   - Rollback e troubleshooting
+   - FAQs e boas práticas
+
+**Workflows GitHub Actions (Manuais):**
+
+4. **`.github/workflows/docker-ems-server.yml`**
+   - Workflow de CI/CD para servidor EMS
+   - **Trigger apenas manual** (`workflow_dispatch`)
+   - Versão lida de `servers/ems/server_v1/pubspec.yaml`
+   - Tags: latest, semver (1.1.0), major.minor (v1.1), sha
+
+5. **`.github/workflows/docker-sms-server.yml`**
+   - Workflow de CI/CD para servidor SMS
+   - **Trigger apenas manual** (`workflow_dispatch`)
+   - Versão lida de `servers/sms/server_v1/pubspec.yaml`
+   - Tags: latest, semver, major.minor, sha
+
+**Configurações de Produção:**
+
+6. **`servers/ems/container/docker-compose.prod.yml`**
    - Configuração para produção usando imagem do GHCR
    - Pull de `ghcr.io/edumigsoft/ems-server:latest`
    - Healthcheck e labels para monitoramento
 
-3. **`servers/ems/container/deploy-prod.sh`**
+7. **`servers/sms/container/docker-compose.prod.yml`**
+   - Configuração para produção usando imagem do GHCR
+   - Pull de `ghcr.io/edumigsoft/sms-server:latest`
+   - Porta 8080 (diferente do EMS)
+
+**Scripts de Deploy:**
+
+8. **`servers/ems/container/deploy-prod.sh`**
    - Script automatizado de deploy na VPS
    - Seleção de versão (latest ou específica)
    - Login no GHCR com PAT
-   - Pull, down, up e verificação
 
-4. **`servers/ems/container/rollback.sh`**
-   - Script para rollback para versões anteriores
-   - Lista de versões disponíveis
-   - Pull e restart automático
+9. **`servers/sms/container/deploy-prod.sh`**
+   - Script de deploy para SMS
+   - Mesma estrutura do EMS, adaptado para SMS
 
-5. **`servers/ems/container/DEPLOY.md`**
-   - Documentação completa de autenticação GHCR
-   - Instruções de deploy e rollback
-   - Troubleshooting comum
-   - Estrutura de tags
+10. **`servers/ems/container/rollback.sh`**
+    - Script para rollback de versões do EMS
+    - Lista de versões disponíveis
+
+11. **`servers/sms/container/rollback.sh`**
+    - Script para rollback de versões do SMS
+
+**Documentação:**
+
+12. **`servers/ems/container/DEPLOY.md`**
+    - Documentação específica de deploy do EMS
+    - Autenticação GHCR
+    - Instruções de deploy e rollback
+
+13. **`servers/sms/container/DEPLOY.md`**
+    - Documentação específica de deploy do SMS
+    - Diferenças em relação ao EMS
 
 ### Arquivos a Atualizar
 
@@ -71,21 +158,91 @@ Configurar infraestrutura completa de CI/CD para publicar imagens Docker do serv
 
 ## Implementação Detalhada
 
-### Etapa 1: Criar Workflow GitHub Actions
+### Etapa 1: Criar Scripts de Build Local
+
+**Arquivo:** `scripts/build-local.sh`
+
+**Propósito:** Facilitar build local durante desenvolvimento sem custos.
+
+**Características:**
+- Suporte para EMS e SMS via argumento
+- Leitura automática de versão do `pubspec.yaml`
+- Validação de argumentos
+- Feedback visual do progresso
+- Tagging automático
+
+**Uso:**
+```bash
+./scripts/build-local.sh ems    # Build do servidor EMS
+./scripts/build-local.sh sms    # Build do servidor SMS
+```
+
+**Arquivo:** `scripts/push-to-ghcr.sh`
+
+**Propósito:** Push manual de imagens para GHCR quando necessário.
+
+**Características:**
+- Login automático no GHCR
+- Leitura de versão do `pubspec.yaml`
+- Push com múltiplas tags (versão + latest)
+- Validação de autenticação
+
+**Uso:**
+```bash
+export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXX
+./scripts/push-to-ghcr.sh ems    # Push do servidor EMS
+./scripts/push-to-ghcr.sh sms    # Push do servidor SMS
+```
+
+### Etapa 2: Criar Guia de Operações
+
+**Arquivo:** `servers/OPERATIONS.md`
+
+**Propósito:** Guia completo de operações em ordem de execução.
+
+**Seções:**
+1. **Build Local (Desenvolvimento)**
+   - Como fazer build local
+   - Teste com docker-compose
+   - Quando fazer push para GHCR
+
+2. **Push Manual para GHCR**
+   - Configuração de autenticação
+   - Uso do script push-to-ghcr.sh
+   - Verificação de imagens publicadas
+
+3. **Workflows Manuais (Releases)**
+   - Como triggerar workflows via GitHub UI
+   - Como triggerar via GitHub CLI
+   - Quando usar workflows vs push manual
+
+4. **Deploy em VPS**
+   - Uso dos scripts de deploy
+   - Seleção de versões
+   - Verificação de saúde
+
+5. **Rollback e Troubleshooting**
+   - Como fazer rollback
+   - Problemas comuns e soluções
+   - FAQs
+
+### Etapa 3: Criar Workflows GitHub Actions (Manuais)
 
 **Arquivo:** `.github/workflows/docker-ems-server.yml`
 
 **Características:**
-- Build apenas quando houver mudanças relevantes:
+- **Trigger apenas manual** (`workflow_dispatch`) - **SEM push automático**
+- Build apenas quando você decidir (releases oficiais)
+- Custo: ~$0.03-0.05 por build (ou $0 se repositório público)
   - Código do servidor EMS (`servers/ems/server_v1/**`)
   - Dockerfile/compose (`servers/ems/container/**`)
   - Pacotes `_shared` e `_server` usados pelo EMS
-  - Arquivo VERSION
   - Próprio workflow
 
 - Versionamento:
-  - Lê versão do arquivo `/VERSION`
+  - Lê versão de `servers/ems/server_v1/pubspec.yaml`
   - Gera tags: `latest`, `1.1.0`, `v1.1`, `develop`, `sha-abc1234`
+  - Versionamento independente do servidor SMS
 
 - Otimizações:
   - Cache de camadas Docker via GitHub Actions cache
@@ -93,6 +250,22 @@ Configurar infraestrutura completa de CI/CD para publicar imagens Docker do serv
 
 - Metadados:
   - Labels OCI para rastreabilidade
+
+- Implementação de Leitura de Versão:
+  ```yaml
+  - name: Read EMS version from pubspec.yaml
+    id: version
+    run: |
+      VERSION=$(grep '^version:' servers/ems/server_v1/pubspec.yaml | sed 's/version: *//' | tr -d ' ')
+      echo "version=$VERSION" >> $GITHUB_OUTPUT
+      echo "major_minor=v$(echo $VERSION | cut -d. -f1,2)" >> $GITHUB_OUTPUT
+      echo "EMS Version: $VERSION"
+  
+  # Usar nos tags:
+  # - ghcr.io/edumigsoft/ems-server:${{ steps.version.outputs.version }}
+  # - ghcr.io/edumigsoft/ems-server:${{ steps.version.outputs.major_minor }}
+  # - ghcr.io/edumigsoft/ems-server:latest
+  ```
 
 ### Etapa 2: Atualizar Dockerfile
 
@@ -197,17 +370,29 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 ## Estrutura de Versionamento
 
-**Tags Geradas:**
+**Estratégia: Versionamento Independente por Servidor**
+
+Cada servidor mantém sua própria versão no respectivo `pubspec.yaml`:
+- **EMS**: `servers/ems/server_v1/pubspec.yaml` → `version: 1.1.0`
+- **SMS**: `servers/sms/server_v1/pubspec.yaml` → `version: 1.1.0`
+
+**Tags Geradas (por servidor):**
 - `latest` → Última versão estável (branch main)
-- `1.1.0` → Versão específica do arquivo VERSION
+- `1.1.0` → Versão específica do pubspec.yaml
 - `v1.1` → Major.minor (facilita upgrades de patch)
 - `develop` → Branch de desenvolvimento
 - `sha-abc1234` → Commit específico (rastreabilidade)
 
 **Workflow de Release:**
-1. Mudanças pushadas para `develop` → Imagem `develop` publicada
+1. Mudanças pushadas para `develop` → Imagem `develop` publicada (se paths relevantes mudaram)
 2. Merge para `main` → Imagens `latest`, `1.1.0`, `v1.1` publicadas
-3. GitHub Release criado → Todas as tags + tag do release
+3. Incrementar versão no `pubspec.yaml` → Novas tags geradas no próximo push
+
+**Vantagens:**
+- ✅ EMS e SMS evoluem independentemente
+- ✅ Builds apenas quando servidor específico muda
+- ✅ Semver correto por servidor
+- ✅ Deploy independente (EMS v1.3.0, SMS v1.1.5)
 
 ---
 
@@ -368,17 +553,44 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 
 ## Ordem de Execução
 
-1. Criar diretório `.github/workflows/`
-2. Criar workflow `docker-ems-server.yml`
-3. Atualizar `Dockerfile` (pacotes + cache + labels)
-4. Atualizar `.dockerignore` (remover duplicações + otimizar)
-5. Criar `docker-compose.prod.yml`
-6. Atualizar `docker-compose.yml` (renomear container + labels)
-7. Criar `deploy-prod.sh` e `rollback.sh`
-8. Criar `DEPLOY.md`
-9. Commit e push para branch de teste
-10. Validar workflow no GitHub Actions
-11. Testar pull e deploy na VPS
+### Fase 1: Infraestrutura Local (Desenvolvimento)
+
+1. Criar diretório `scripts/`
+2. Criar `scripts/build-local.sh` (build local de imagens)
+3. Criar `scripts/push-to-ghcr.sh` (push manual para GHCR)
+4. Criar `servers/OPERATIONS.md` ⭐ (guia completo de operações)
+5. Atualizar `Dockerfile` do EMS (pacotes + cache + labels)
+6. Atualizar `Dockerfile` do SMS (caminhos + pacotes + cache + labels)
+7. Atualizar `.dockerignore` (remover duplicações + otimizar)
+8. Atualizar `docker-compose.yml` de dev (renomear containers + labels)
+
+### Fase 2: Workflows Manuais (CI/CD)
+
+9. Criar diretório `.github/workflows/`
+10. Criar `docker-ems-server.yml` (workflow manual para EMS)
+11. Criar `docker-sms-server.yml` (workflow manual para SMS)
+
+### Fase 3: Infraestrutura de Produção
+
+12. Criar `docker-compose.prod.yml` para EMS
+13. Criar `docker-compose.prod.yml` para SMS
+14. Criar `deploy-prod.sh` para EMS
+15. Criar `deploy-prod.sh` para SMS
+16. Criar `rollback.sh` para EMS
+17. Criar `rollback.sh` para SMS
+18. Criar `DEPLOY.md` para EMS
+19. Criar `DEPLOY.md` para SMS
+
+### Fase 4: Validação
+
+20. Testar build local (EMS e SMS)
+21. Testar push manual para GHCR
+22. Commit e push para branch de teste
+23. Trigger workflow manual via GitHub UI
+24. Validar imagens no GHCR
+25. Testar deploy na VPS
+
+**Nota:** A Fase 1 é prioritária e suficiente para desenvolvimento. Fases 2-4 podem ser implementadas gradualmente conforme necessidade.
 
 ---
 
@@ -405,8 +617,7 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 
 - **Dockerfile atual:** `servers/ems/container/Dockerfile`
 - **docker-compose atual:** `servers/ems/container/docker-compose.yml`
-- **pubspec.yaml:** `servers/ems/server_v1/pubspec.yaml` (dependências de referência)
-- **VERSION:** `/VERSION` (fonte de versionamento)
+- **pubspec.yaml:** `servers/ems/server_v1/pubspec.yaml` (dependências e **fonte de versionamento**)
 - **Infraestrutura:** `servers/INFRASTRUCTURE.md` (documentação existente)
 
 ---
@@ -540,6 +751,22 @@ O servidor SMS segue a mesma arquitetura do servidor EMS, mas com algumas difere
   ```yaml
   org.opencontainers.image.title=SMS Server
   org.opencontainers.image.description=SMS System Server - Backend Dart/Shelf
+  ```
+
+- **Implementação de Leitura de Versão:**
+  ```yaml
+  - name: Read SMS version from pubspec.yaml
+    id: version
+    run: |
+      VERSION=$(grep '^version:' servers/sms/server_v1/pubspec.yaml | sed 's/version: *//' | tr -d ' ')
+      echo "version=$VERSION" >> $GITHUB_OUTPUT
+      echo "major_minor=v$(echo $VERSION | cut -d. -f1,2)" >> $GITHUB_OUTPUT
+      echo "SMS Version: $VERSION"
+  
+  # Usar nos tags:
+  # - ghcr.io/edumigsoft/sms-server:${{ steps.version.outputs.version }}
+  # - ghcr.io/edumigsoft/sms-server:${{ steps.version.outputs.major_minor }}
+  # - ghcr.io/edumigsoft/sms-server:latest
   ```
 
 ### Docker Compose Produção (SMS)
@@ -718,9 +945,10 @@ curl http://localhost:8181/health  # EMS
    - Ambos os servidores usam a mesma rede `ems_system_net`
    - Facilita comunicação entre serviços se necessário
 
-4. **Versionamento Sincronizado:**
-   - Ambos leem a mesma versão do arquivo `/VERSION`
-   - Releases sincronizados para manter compatibilidade
+4. **Versionamento Independente:**
+   - EMS lê versão de `servers/ems/server_v1/pubspec.yaml`
+   - SMS lê versão de `servers/sms/server_v1/pubspec.yaml`
+   - Cada servidor evolui no seu próprio ritmo (ex: EMS v1.3.0, SMS v1.1.5)
 
 5. **Deploy Independente:**
    - Cada servidor pode ser deployado independentemente
@@ -745,6 +973,5 @@ curl http://localhost:8181/health  # EMS
 
 - **Dockerfile atual:** `servers/sms/container/Dockerfile`
 - **docker-compose atual:** `servers/sms/container/docker-compose.yml`
-- **pubspec.yaml:** `servers/sms/server_v1/pubspec.yaml`
-- **VERSION:** `/VERSION` (compartilhado com EMS)
+- **pubspec.yaml:** `servers/sms/server_v1/pubspec.yaml` (dependências e **fonte de versionamento**)
 - **Infraestrutura:** `servers/INFRASTRUCTURE.md`
