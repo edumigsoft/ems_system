@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
+import 'package:user_ui/view_models/settings_view_model.dart';
 import '../view_models/auth_view_model.dart';
 
 /// Página de Login.
@@ -20,6 +22,11 @@ class LoginPage extends StatefulWidget {
   /// Mensagem de boas-vindas opcional (ex: após registro).
   final String? welcomeMessage;
 
+  /// ViewModel de configurações (opcional).
+  ///
+  /// Se fornecido, permite seleção de servidor na tela de login (DEBUG apenas).
+  final SettingsViewModel? settingsViewModel;
+
   const LoginPage({
     super.key,
     required this.viewModel,
@@ -27,6 +34,7 @@ class LoginPage extends StatefulWidget {
     this.onForgotPasswordTap,
     this.onLoginSuccess,
     this.welcomeMessage,
+    this.settingsViewModel,
   });
 
   @override
@@ -68,6 +76,62 @@ class _LoginPageState extends State<LoginPage> {
       _emailController.text.trim(),
       _passwordController.text,
       rememberMe: _rememberMe,
+    );
+  }
+
+  /// Manipula mudança de servidor.
+  ///
+  /// Salva a nova configuração e mostra dialog informando necessidade de reiniciar.
+  void _handleServerChange(String? newServerType) {
+    if (newServerType == null) return;
+
+    final oldServerType = widget.settingsViewModel!.serverType;
+    if (oldServerType == newServerType) return;
+
+    // Salva nova configuração
+    widget.settingsViewModel!.setServerType(newServerType);
+
+    // Mostra dialog informando necessidade de reiniciar
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.info_outline, size: 48),
+        title: const Text('Reinício Necessário'),
+        content: Text(
+          'Para conectar ao servidor ${newServerType == 'local' ? 'local' : 'remoto'}, '
+          'é necessário reiniciar o aplicativo.\n\n'
+          'Deseja continuar?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Reverte a mudança
+              widget.settingsViewModel!.setServerType(oldServerType);
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              // Mostra SnackBar instruindo usuário a reiniciar manualmente
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Configuração salva! Feche e reabra o aplicativo para aplicar.',
+                    ),
+                    duration: Duration(seconds: 5),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -275,6 +339,81 @@ class _LoginPageState extends State<LoginPage> {
                           contentPadding: EdgeInsets.zero,
                         ),
                         const SizedBox(height: 8),
+
+                        // Seletor de Servidor (DEBUG apenas)
+                        if (kDebugMode && widget.settingsViewModel != null)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: ListenableBuilder(
+                              listenable: widget.settingsViewModel!,
+                              builder: (context, _) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.surfaceContainerHighest
+                                        .withValues(alpha: 0.5),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: theme.colorScheme.outline
+                                          .withValues(alpha: 0.3),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.dns_outlined,
+                                            size: 16,
+                                            color:
+                                                theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Servidor (Desenvolvimento)',
+                                            style: theme.textTheme.labelSmall
+                                                ?.copyWith(
+                                              color: theme
+                                                  .colorScheme.onSurfaceVariant,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      SegmentedButton<String>(
+                                        segments: const [
+                                          ButtonSegment<String>(
+                                            value: 'local',
+                                            label: Text('Local'),
+                                            icon: Icon(Icons.computer, size: 16),
+                                          ),
+                                          ButtonSegment<String>(
+                                            value: 'remote',
+                                            label: Text('Remoto'),
+                                            icon: Icon(Icons.cloud, size: 16),
+                                          ),
+                                        ],
+                                        selected: {
+                                          widget.settingsViewModel!.serverType
+                                        },
+                                        onSelectionChanged: (Set<String> selected) {
+                                          _handleServerChange(selected.first);
+                                        },
+                                        showSelectedIcon: false,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
 
                         // Erro
                         if (widget.viewModel.errorMessage != null)

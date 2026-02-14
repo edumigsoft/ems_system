@@ -26,6 +26,7 @@ dependencies:
   auth_shared: ^1.1.0
   auth_client: ^1.1.0
   user_shared: ^1.1.0
+  user_ui: ^1.1.0
   dio: ^5.9.0
 
 dev_dependencies:
