@@ -21,23 +21,37 @@ COPY packages/auth/auth_server /app/packages/auth/auth_server
 COPY packages/user/user_shared /app/packages/user/user_shared
 COPY packages/user/user_server /app/packages/user/user_server
 
-# --- 2. CÓPIA DO CÓDIGO FONTE DO SERVIDOR (EMS) ---
-COPY servers/ems/server_v1 /app/servers/ems/server_v1
+# Tag
+COPY packages/tag/tag_shared /app/packages/tag/tag_shared
+COPY packages/tag/tag_server /app/packages/tag/tag_server
 
-# --- 3. PREPARAÇÃO E DEPENDÊNCIAS ---
+# Notebook
+COPY packages/notebook/notebook_shared /app/packages/notebook/notebook_shared
+COPY packages/notebook/notebook_server /app/packages/notebook/notebook_server
+
+# --- 2. OTIMIZAÇÃO: Cachear camada de dependências ---
 WORKDIR /app/servers/ems/server_v1
 
-# Removemos a referência ao workspace para o build ser independente
-RUN sed -i '/resolution: workspace/d' pubspec.yaml
+# Copiar apenas pubspec para instalar dependências primeiro
+COPY servers/ems/server_v1/pubspec.yaml .
 
-# Baixa as dependências
+# Remover workspace e instalar deps (essa camada será cacheada)
+RUN sed -i '/resolution: workspace/d' pubspec.yaml
 RUN dart pub get
+
+# --- 3. COPIAR CÓDIGO FONTE ---
+COPY servers/ems/server_v1 /app/servers/ems/server_v1
 
 # --- 4. COMPILAÇÃO ---
 RUN dart compile exe bin/server.dart -o bin/server
 
 # Estágio de Produção (Imagem Mínima)
 FROM scratch
+
+# Metadados OCI
+LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
+LABEL org.opencontainers.image.description="EMS Server - Backend Dart/Shelf"
+LABEL org.opencontainers.image.licenses="MIT"
 
 # Copia bibliotecas do sistema necessárias
 COPY --from=build /runtime/ /

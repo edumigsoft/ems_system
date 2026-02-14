@@ -40,6 +40,25 @@ Cada feature pode ter seus próprios membros com papéis independentes (owner, a
 
 **Legenda:** 🟢 Ativo | 🟡 Em desenvolvimento | 🔴 Planejado
 
+## 🚀 Quick Start - Build e Publicação de Servidores
+
+### Build Local
+```bash
+# EMS Server
+./scripts/build-local.sh ems
+
+# SMS Server
+./scripts/build-local.sh sms
+```
+
+### Publicar no GHCR
+```bash
+export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXX
+./scripts/push-to-ghcr.sh ems
+```
+
+Para documentação completa, veja: [`servers/OPERATIONS.md`](servers/OPERATIONS.md)
+
 ## ✨ Features
 
 Features da ideia inicial:

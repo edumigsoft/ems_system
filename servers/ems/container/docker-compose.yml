@@ -1,6 +1,6 @@
 services:
   ems_server:
-    container_name: ems_server
+    container_name: ems_server_dev
     image: ems_server_image:v1
     build:
       # Sobe até a raiz do projeto (ems_system)
@@ -14,6 +14,9 @@ services:
     restart: unless-stopped
     networks:
       - ems_system_net
+    labels:
+      com.ems.service: "ems-server"
+      com.ems.environment: "development"
 
 networks:
   ems_system_net:

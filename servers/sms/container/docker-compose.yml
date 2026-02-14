@@ -1,6 +1,6 @@
 services:
   sms_server:
-    container_name: sms_server
+    container_name: sms_server_dev
     build:
       context: ../../../
       dockerfile: servers/sms/container/Dockerfile
@@ -8,8 +8,12 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    restart: unless-stopped
     networks:
       - ems_system_net
+    labels:
+      com.ems.service: "sms-server"
+      com.ems.environment: "development"
 
 networks:
   ems_system_net:

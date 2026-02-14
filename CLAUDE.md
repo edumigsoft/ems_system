@@ -77,100 +77,16 @@ dart run bin/server.dart
 
 **Nota:** Veja `servers/INFRASTRUCTURE.md` para detalhes completos sobre configuração Docker e infraestrutura.
 
-## Arquitetura de Alto Nível
+## Arquitetura
 
-### Padrão de Pacotes Multi-Variante
-
-O monorepo usa uma **estrutura de pacotes com 4 variantes** onde cada pacote é dividido em camadas específicas de plataforma:
-
-```
-packages/{package_name}/
-├── {package}_shared/    # Dart puro, zero dependências Flutter
-├── {package}_ui/        # Widgets Flutter e componentes de UI
-├── {package}_client/    # Lógica do lado do cliente (atualmente mínima)
-└── {package}_server/    # Lógica do lado do servidor para backend Dart/Shelf
-```
-
-**Princípios Arquiteturais Principais:**
-
-1. **Camada Compartilhada é Dart Puro**: Pacotes `*_shared` contêm ZERO dependências Flutter. Eles usam apenas `meta: ^1.17.0` e definem modelos de domínio, objetos de valor e configuração como Plain Old Dart Objects (PODOs).
-
-2. **Direção de Dependências (Em Camadas)**:
-   ```
-   *_ui     → *_shared
-   *_client → *_shared
-   *_server → *_shared
-   ```
-   Sem dependências horizontais entre variantes.
-
-3. **Configuração como Dados**: Conceitos de domínio como temas são representados como classes de dados serializáveis (não singletons), permitindo:
-   - Transmissão via API entre backend e frontend
-   - Persistência em bancos de dados ou armazenamento local
-   - Padrões de UI dirigida por servidor
-   - Configuração dinâmica sem alterações de código
-
-### Arquitetura do Design System
-
-O pacote `design_system` demonstra a implementação deste padrão (atualmente com 2/4 variantes implementadas: _shared e _ui):
-
-**design_system_shared** (Dart Puro):
-- `ColorValue`: Objeto de valor de cor agnóstico a framework (ARGB int32)
-  - Suporta `fromHex()`, `fromARGB()`, `toHex()`, `toCSSRGBA()`
-  - Serializável via `toMap()` / `fromMap()`
-
-- `DSThemeConfig`: Classe de dados de configuração de tema imutável
-  - Contém `seedColor`, `cardBackground`, `cardBorder`, configurações de tipografia
-  - Suporta padrão `copyWith()` para variações
-  - Pode ser enviado via API ou persistido
-
-- Presets de Tema: Configurações estáticas (`DefaultPreset`, `BlueGrayPreset`, `AcquaPreset`, `LoloPreset`, `TealPreset`)
-
-- Design Tokens: Constantes para espaçamento, raio, paddings, sombras
-  ```dart
-  DSSpacing.xs, DSSpacing.small, DSSpacing.medium
-  DSRadius.small, DSRadius.medium, DSRadius.large
-  DSPaddings.extraSmall, DSPaddings.medium
-  ```
-
-**design_system_ui** (Flutter):
-- `DSTheme`: Converte `DSThemeConfig` para `ThemeData` do Material 3
-  - `DSTheme.fromConfig(config, brightness)` → `ThemeData`
-  - `DSTheme.forPreset(DSThemeEnum.lolo, brightness)` → `ThemeData`
-
-- Extensões:
-  - `ColorValue.toColor()` ↔ `Color.toColorValue()`
-  - `context.dsTheme`, `context.dsColors`, `context.dsTextStyles`
-
-- Componentes: `DSCard`, `DSInfoCard`, `DSActionCard`
-
-**Exemplo de Fluxo de Dados**:
-```
-Backend (design_system_server)
-  → Gera DSThemeConfig
-  → Envia via API como JSON
-
-App Flutter (design_system_ui)
-  → Recebe JSON
-  → Deserializa para DSThemeConfig (fromMap)
-  → Converte para ThemeData via DSTheme.fromConfig()
-  → Renderiza UI com tema
-```
-
-### Opções de Análise
-
-O projeto usa duas configurações de análise:
-
-- **`analysis_options_dart.yaml`**: Para pacotes Dart puro (`*_shared`, `*_client`, `*_server`)
-  - Usa `package:lints/recommended.yaml`
-  - Aplica tipagem estrita: `strict-casts`, `strict-inference`, `strict-raw-types`
-  - Regras específicas de servidor/API: `avoid_dynamic_calls`, `cancel_subscriptions`, `close_sinks`
-
-- **`analysis_options_flutter.yaml`**: Para pacotes Flutter (`*_ui`, apps)
-  - Usa `package:flutter_lints/flutter.yaml`
-  - Regras específicas do Flutter: `use_key_in_widget_constructors`, `avoid_unnecessary_containers`
-  - Regras de performance: `prefer_const_constructors_in_immutables`
-
-Ambos excluem arquivos gerados: `**/*.g.dart`, `**/*.freezed.dart`, `**/*.mocks.dart`
+> [!IMPORTANT]
+> A documentação completa da arquitetura do sistema, incluindo padrões de pacotes, Clean Architecture, MVVM e fluxo de dados, foi movida para **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+>
+> Consulte `ARCHITECTURE.md` para detalhes sobre:
+> - Estrutura de Pacotes Multi-Variante (Shared, UI, Client, Server)
+> - Clean Architecture & MVVM
+> - Padrões de Design System e Validação
+> - Injeção de Dependência e Fluxos de Dados
 
 ## Organização de Pacotes
 
@@ -214,90 +130,18 @@ Estes pacotes implementam todas as 4 variantes (_shared, _ui, _client, _server):
 
 ### Implementação de Novas Features
 
-**IMPORTANTE:** Este projeto usa uma arquitetura chamada **"Great Schism Refined"** que divide cada feature em 4 pacotes isolados com responsabilidades claras.
+Para implementar uma nova feature, consulte os seguintes documentos obrigatórios:
 
-Para implementar uma nova feature, **consulte o guia completo**:
-- `docs/rules/new_feature.md` - Template detalhado passo a passo para implementação
+1.  **[Regras de Features](docs/rules/new_feature.md)**: Template detalhado passo a passo.
+2.  **[Arquitetura](ARCHITECTURE.md)**: Entenda a separação de camadas e responsabilidades.
 
-**Resumo do processo:**
+**Resumo da Ordem de Implementação:**
+1. `{feature}_shared` (Domínio)
+2. `{feature}_client` (API Client)
+3. `{feature}_server` (Backend)
+4. `{feature}_ui` (Apresentação)
 
-1. **Ordem de Implementação** (OBRIGATÓRIA - ADR-0005):
-   ```
-   1. {feature}_shared  → Validar (0 linters)
-   2. {feature}_client  → Validar (0 linters)
-   3. {feature}_server  → Validar (0 linters)
-   4. {feature}_ui      → Validar (0 linters)
-   ```
-   **NÃO** prosseguir para o próximo pacote sem validar o anterior.
-
-2. **Estrutura de Cada Pacote:**
-
-   **{feature}_shared** (Domain & Business):
-   ```
-   lib/src/
-   ├── domain/
-   │   ├── entities/      # Entidades de domínio + {Entity}Details
-   │   ├── repositories/  # Interfaces de repositórios (retornam Result<T>)
-   │   └── use_cases/     # Casos de uso (retornam Result<T>)
-   ├── data/
-   │   └── models/        # DTOs com @Schema() para OpenAPI
-   ├── validators/        # CoreValidator + schemas Zard (UI e backend)
-   └── constants/         # Constantes de domínio
-   ```
-
-   **{feature}_client** (HTTP Client):
-   ```
-   lib/src/
-   ├── repositories/      # Implementações com Dio/Retrofit + Result
-   └── services/          # API services
-   ```
-
-   **{feature}_server** (Backend/DB):
-   ```
-   lib/src/
-   ├── database/          # Tabelas Drift
-   ├── handlers/          # Handlers Shelf/API
-   └── repositories/      # Implementações server-side
-   ```
-
-   **{feature}_ui** (Presentation):
-   ```
-   lib/
-   ├── {feature}_module.dart  # AppModule com DI e navegação
-   └── ui/
-       ├── pages/         # Telas
-       ├── view_models/   # ViewModels (MVVM)
-       └── widgets/       # Widgets reutilizáveis
-   ```
-
-3. **Padrões Obrigatórios:**
-   - **Result Pattern**: Repositórios e Use Cases devem retornar `Result<T, Exception>` (ADR-0001)
-   - **Entidades Details**: Use `{Entity}Details` para persistência com Drift (veja seção 2.2 de `new_feature.md`)
-   - **TypeConverters**: Necessário para enums e tipos customizados no Drift
-   - **DateTimeConverter**: Obrigatório para campos `DateTime` em tabelas Drift
-   - **Injeção de Dependência**: Use `AppModule` (não mapas de rotas estáticos)
-   - **Validação de Formulários**: Use `FormValidationMixin` (core_ui) + schemas Zard em `*_shared` (ADR-0004)
-
-4. **Documentação Obrigatória:**
-   - Nível Feature (`packages/{feature}/`):
-     - `README.md` - Visão geral da feature completa
-     - `CONTRIBUTING.md` - Guia de contribuição (ÚNICO para a feature)
-     - `CHANGELOG.md` - Histórico agregado
-
-   - Nível Subpacote (cada `_shared`, `_client`, `_server`, `_ui`):
-     - `README.md` - Documentação específica do pacote
-     - `CHANGELOG.md` - Histórico do pacote
-     - `analysis_options.yaml` - Config de linting (importar da raiz)
-
-5. **Definição de Pronto (DoD):**
-   - ✅ `dart analyze` ou `flutter analyze` → **0 warnings/errors**
-   - ✅ Cobertura de testes: Core (90%), Client/Server (80%), UI (50%)
-   - ✅ 100% dos membros públicos documentados (DartDoc)
-   - ✅ Swagger exibindo endpoints (se aplicável)
-   - ✅ Validação arquitetural: `_ui` não importa `_server`
-
-**Erros Comuns:**
-- Veja seção 5 de `docs/rules/new_feature.md` para lista completa de erros frequentes e soluções
+**Nota:** Valide cada pacote com `dart analyze` antes de prosseguir para o próximo.
 
 ### Padrões de Codificação
 
@@ -368,140 +212,11 @@ Para adicionar um novo preset de tema:
 
 3. Atualize `DSTheme.forPreset()` em `design_system_ui`
 
-### Padrão de Objeto de Valor
 
-Ao criar conceitos de domínio (cores, moedas, etc.), siga o padrão `ColorValue`:
 
-```dart
-class YourValue {
-  final int _value;
-  const YourValue._(this._value);
+### Validação de Formulários
 
-  // Factory constructors
-  factory YourValue.fromX(...) => ...;
-
-  // Serialization
-  Map<String, dynamic> toMap() => {...};
-  factory YourValue.fromMap(Map<String, dynamic> map) => ...;
-
-  // Equality
-  @override
-  bool operator ==(Object other) => ...;
-
-  @override
-  int get hashCode => _value.hashCode;
-
-  // Utilities
-  YourValue copyWith(...) => ...;
-}
-```
-
-### Validação de Formulários (FormValidationMixin)
-
-O projeto usa um padrão **Dual Interface** para validação de formulários que isola completamente a biblioteca Zard:
-
-**Arquitetura:**
-```
-*_shared (Dart Puro)
-  → FeatureValidator + schema (Zard isolado)
-    → CoreValidator.validate() para backend/UseCases
-    → Schema estático para FormValidationMixin (UI)
-
-core_ui (Camada de Abstração)
-  → FormValidationMixin (gerencia estado completo de formulários)
-
-*_ui (ViewModels + Widgets)
-  → ViewModel com FormValidationMixin
-```
-
-**Localização:**
-- `FormValidationMixin`: `packages/core/core_ui/lib/core/mixins/form_validation_mixin.dart`
-- `CoreValidator`: `packages/core/core_shared/lib/src/validators/validators.dart`
-- Documentado em: `docs/adr/0004-use-form-validation-mixin-and-zard.md`
-
-**Exemplo Completo:**
-
-1. **Criar validador em `*_shared`:**
-```dart
-// packages/school/school_shared/lib/src/validators/school_validators.dart
-class SchoolDetailsValidator extends CoreValidator<SchoolDetails> {
-  const SchoolDetailsValidator();
-
-  // Schema para FormValidationMixin (UI)
-  static final schema = z.map({
-    schoolNameField: z.string().min(1, message: 'Nome obrigatório'),
-    schoolEmailField: z.string().email(message: 'Email inválido'),
-  });
-
-  // Método validate para UseCases/backend
-  @override
-  CoreValidationResult validate(SchoolDetails value) {
-    final result = schema.safeParse({
-      schoolNameField: value.name,
-      schoolEmailField: value.email,
-    });
-    // ... converter para CoreValidationResult
-  }
-}
-```
-
-2. **Criar ViewModel com FormValidationMixin:**
-```dart
-// packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart
-class SchoolFormViewModel extends ChangeNotifier with FormValidationMixin {
-  SchoolFormViewModel() {
-    registerField(schoolNameField);
-    registerField(schoolEmailField);
-  }
-
-  Future<Result<SchoolDetails>> submit() {
-    return submitForm<SchoolDetails>(
-      data: {
-        schoolNameField: getFieldValue(schoolNameField),
-        schoolEmailField: getFieldValue(schoolEmailField),
-      },
-      schema: SchoolDetailsValidator.schema,
-      onValid: (validatedData) async {
-        return _createUseCase.execute(...);
-      },
-    );
-  }
-}
-```
-
-3. **Usar no Widget:**
-```dart
-class SchoolFormWidget extends StatefulWidget {
-  // ...
-}
-
-class _SchoolFormWidgetState extends State<SchoolFormWidget> {
-  late SchoolFormViewModel _viewModel;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _viewModel,
-      builder: (context, _) {
-        return TextField(
-          controller: _viewModel.registerField(schoolNameField),
-          decoration: InputDecoration(
-            errorText: _viewModel.getFieldError(schoolNameField),
-          ),
-        );
-      },
-    );
-  }
-}
-```
-
-**Quando usar cada abordagem:**
-- **CoreValidator.validate()**: UseCases, backend, testes unitários, validação sem UI
-- **FormValidationMixin**: Formulários Flutter, estado reativo, TextEditingControllers
-
-**Referências de Implementação:**
-- School: `packages/school/school_ui/lib/ui/view_models/school_form_view_model.dart`
-- Notebook: `packages/notebook/notebook_ui/lib/ui/view_models/notebook_form_view_model.dart`
+Consulte `ARCHITECTURE.md` para obter detalhes sobre o padrão **Dual Interface** (CoreValidator + FormValidationMixin) e exemplos de implementação.
 
 ## Estrutura do Projeto
 

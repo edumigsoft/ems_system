@@ -16,20 +16,22 @@ COPY packages/auth/auth_server /app/packages/auth/auth_server
 COPY packages/user/user_shared /app/packages/user/user_shared
 COPY packages/user/user_server /app/packages/user/user_server
 
-# Se o SMS tiver pacotes exclusivos (ex: packages/sms/sms_shared), adicione aqui:
-# COPY packages/sms/sms_shared /app/packages/sms/sms_shared
+# School
+COPY packages/school/school_shared /app/packages/school/school_shared
+COPY packages/school/school_server /app/packages/school/school_server
 
-# --- 2. CÓPIA DO CÓDIGO FONTE DO SERVIDOR (SMS) ---
-# ATENÇÃO: Verifique se o caminho da pasta bate com sua estrutura real
-COPY servers/sms_server/server_v1 /app/servers/sms_server/server_v1
+# --- 2. OTIMIZAÇÃO: Cachear camada de dependências ---
+WORKDIR /app/servers/sms/server_v1
 
-# --- 3. PREPARAÇÃO E DEPENDÊNCIAS ---
-WORKDIR /app/servers/sms_server/server_v1
+# Copiar apenas pubspec para instalar dependências primeiro
+COPY servers/sms/server_v1/pubspec.yaml .
 
-# Remove referência ao workspace
+# Remover workspace e instalar deps (essa camada será cacheada)
 RUN sed -i '/resolution: workspace/d' pubspec.yaml
-
 RUN dart pub get
+
+# --- 3. COPIAR CÓDIGO FONTE ---
+COPY servers/sms/server_v1 /app/servers/sms/server_v1
 
 # --- 4. COMPILAÇÃO ---
 RUN dart compile exe bin/server.dart -o bin/server
@@ -37,10 +39,15 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Estágio de Produção
 FROM scratch
 
+# Metadados OCI
+LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
+LABEL org.opencontainers.image.description="SMS Server - Backend Dart/Shelf"
+LABEL org.opencontainers.image.licenses="MIT"
+
 COPY --from=build /runtime/ /
 
-# ATENÇÃO: Caminho de origem ajustado para o SMS
-COPY --from=build /app/servers/sms_server/server_v1/bin/server /app/bin/server
+# Copiar executável compilado
+COPY --from=build /app/servers/sms/server_v1/bin/server /app/bin/server
 
 ENV PORT=8080
 ENV INTERFACE=0.0.0.0
