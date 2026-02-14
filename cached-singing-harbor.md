@@ -408,3 +408,343 @@ docker ps --format "table {{.Names}}\t{{.Status}}"
 - **pubspec.yaml:** `servers/ems/server_v1/pubspec.yaml` (dependências de referência)
 - **VERSION:** `/VERSION` (fonte de versionamento)
 - **Infraestrutura:** `servers/INFRASTRUCTURE.md` (documentação existente)
+
+---
+
+## Adequações para o Servidor SMS
+
+### Contexto do Servidor SMS
+
+O servidor SMS segue a mesma arquitetura do servidor EMS, mas com algumas diferenças:
+
+- **Porta padrão:** 8080 (EMS usa 8181)
+- **Caminho do servidor:** `servers/sms/server_v1` (correto, não `servers/sms_server/server_v1` como está no Dockerfile atual)
+- **Dependências:** Usa `school_server` além dos pacotes core, auth e user
+- **Estrutura:** Mesma base de pacotes compartilhados (_shared e _server)
+
+**Problemas Identificados no Dockerfile Atual:**
+1. Caminho incorreto: usa `servers/sms_server/server_v1` ao invés de `servers/sms/server_v1`
+2. Falta pacote `school_server` (presente no pubspec.yaml mas não copiado)
+3. Sem otimização de cache de dependências
+4. Sem labels OCI para rastreabilidade
+
+### Arquivos a Criar (SMS)
+
+1. **`.github/workflows/docker-sms-server.yml`**
+   - Workflow de CI/CD específico para o servidor SMS
+   - Triggers: mudanças em `servers/sms/**`, pacotes relevantes, VERSION
+   - Tags: `latest`, semver, branch, sha (mesmo padrão do EMS)
+   - Imagem: `ghcr.io/edumigsoft/sms-server`
+
+2. **`servers/sms/container/docker-compose.prod.yml`**
+   - Configuração para produção usando imagem do GHCR
+   - Pull de `ghcr.io/edumigsoft/sms-server:latest`
+   - Porta: 8080 (diferente do EMS)
+   - Healthcheck e labels para monitoramento
+
+3. **`servers/sms/container/deploy-prod.sh`**
+   - Script automatizado de deploy na VPS
+   - Mesma estrutura do script do EMS, adaptado para SMS
+   - Seleção de versão e login no GHCR
+
+4. **`servers/sms/container/rollback.sh`**
+   - Script para rollback de versões
+   - Adaptado para o container `sms_server_prod`
+
+5. **`servers/sms/container/DEPLOY.md`**
+   - Documentação específica do deploy do SMS
+   - Diferenças em relação ao EMS (porta, dependências)
+   - Instruções de deploy conjunto (EMS + SMS)
+
+### Arquivos a Atualizar (SMS)
+
+6. **`servers/sms/container/Dockerfile`**
+   
+   **Correções Críticas:**
+   - Corrigir caminho: `servers/sms/server_v1` (linhas 24, 27, 43)
+   - Adicionar pacote `school_server` (após linha 17)
+   
+   **Otimizações:**
+   - Adicionar cache de dependências (copiar pubspec.yaml antes do código)
+   - Adicionar labels OCI
+   
+   **Mudanças Detalhadas:**
+   
+   ```dockerfile
+   # Após linha 17 (user_server), adicionar:
+   COPY packages/school/school_shared /app/packages/school/school_shared
+   COPY packages/school/school_server /app/packages/school/school_server
+   
+   # Substituir linhas 22-32 por:
+   # --- 2. OTIMIZAÇÃO: Cachear camada de dependências ---
+   WORKDIR /app/servers/sms/server_v1
+   
+   # Copiar apenas pubspec para instalar dependências primeiro
+   COPY servers/sms/server_v1/pubspec.yaml .
+   
+   # Remover workspace e instalar deps (essa camada será cacheada)
+   RUN sed -i '/resolution: workspace/d' pubspec.yaml
+   RUN dart pub get
+   
+   # --- 3. COPIAR CÓDIGO FONTE ---
+   COPY servers/sms/server_v1 /app/servers/sms/server_v1
+   
+   # Após linha 35 (compilação), adicionar labels:
+   # Metadados
+   LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
+   LABEL org.opencontainers.image.description="SMS Server - Backend Dart/Shelf"
+   LABEL org.opencontainers.image.licenses="MIT"
+   
+   # Corrigir linha 43:
+   COPY --from=build /app/servers/sms/server_v1/bin/server /app/bin/server
+   ```
+
+7. **`servers/sms/container/docker-compose.yml`**
+   - Renomear container para `sms_server_dev` (distinguir de prod)
+   - Adicionar labels para identificar ambiente de desenvolvimento
+   - Manter porta 8080
+
+### Workflow GitHub Actions para SMS
+
+**Arquivo:** `.github/workflows/docker-sms-server.yml`
+
+**Diferenças em relação ao workflow do EMS:**
+
+- **Nome:** "Build and Publish SMS Server Docker Image"
+- **Paths monitorados:**
+  ```yaml
+  paths:
+    - 'servers/sms/server_v1/**'
+    - 'servers/sms/container/**'
+    - 'packages/core/**'
+    - 'packages/open_api/**'
+    - 'packages/auth/**'
+    - 'packages/user/**'
+    - 'packages/school/**'  # Adicional para SMS
+    - 'VERSION'
+    - '.github/workflows/docker-sms-server.yml'
+  ```
+
+- **Context e Dockerfile:**
+  ```yaml
+  context: .
+  file: ./servers/sms/container/Dockerfile
+  ```
+
+- **Imagem:**
+  ```yaml
+  images: ghcr.io/edumigsoft/sms-server
+  ```
+
+- **Labels:**
+  ```yaml
+  org.opencontainers.image.title=SMS Server
+  org.opencontainers.image.description=SMS System Server - Backend Dart/Shelf
+  ```
+
+### Docker Compose Produção (SMS)
+
+**Arquivo:** `servers/sms/container/docker-compose.prod.yml`
+
+**Características:**
+
+```yaml
+services:
+  sms_server:
+    container_name: sms_server_prod
+    image: ghcr.io/edumigsoft/sms-server:latest
+    ports:
+      - "8080:8080"  # Porta diferente do EMS
+    env_file:
+      - .env
+    networks:
+      - ems_system_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      com.ems.service: "sms-server"
+      com.ems.environment: "production"
+
+networks:
+  ems_system_net:
+    external: true
+```
+
+### Scripts de Deploy (SMS)
+
+**Arquivo:** `servers/sms/container/deploy-prod.sh`
+
+**Adaptações:**
+- Container name: `sms_server_prod`
+- Imagem: `ghcr.io/edumigsoft/sms-server`
+- Porta de verificação: 8080
+- Arquivo compose: `docker-compose.prod.yml`
+
+**Arquivo:** `servers/sms/container/rollback.sh`
+
+**Adaptações:**
+- Container name: `sms_server_prod`
+- Imagem base: `ghcr.io/edumigsoft/sms-server`
+
+### Documentação de Deploy (SMS)
+
+**Arquivo:** `servers/sms/container/DEPLOY.md`
+
+**Seções Específicas:**
+
+1. **Diferenças em relação ao EMS:**
+   - Porta 8080 vs 8181
+   - Dependência adicional: school_server
+   - Mesmo processo de autenticação GHCR
+
+2. **Deploy Conjunto (EMS + SMS):**
+   ```bash
+   # Deploy de ambos os servidores
+   cd /caminho/para/servers/ems/container
+   ./deploy-prod.sh
+   
+   cd /caminho/para/servers/sms/container
+   ./deploy-prod.sh
+   ```
+
+3. **Verificação de Saúde:**
+   ```bash
+   # Verificar ambos os servidores
+   docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+   
+   # Healthcheck específico
+   curl http://localhost:8080/health  # SMS
+   curl http://localhost:8181/health  # EMS
+   ```
+
+### Ordem de Execução (SMS)
+
+1. Corrigir `Dockerfile` (caminhos + pacote school + cache + labels)
+2. Atualizar `docker-compose.yml` (renomear container + labels)
+3. Criar workflow `.github/workflows/docker-sms-server.yml`
+4. Criar `docker-compose.prod.yml`
+5. Criar `deploy-prod.sh` e `rollback.sh`
+6. Criar `DEPLOY.md`
+7. Commit e push para branch de teste
+8. Validar workflow no GitHub Actions
+9. Testar pull e deploy na VPS
+
+### Verificação End-to-End (SMS)
+
+#### 1. Validar Build Local
+
+```bash
+cd servers/sms/container
+docker build -f Dockerfile -t sms-server-test:local ../../..
+docker images | grep sms-server-test
+```
+
+**Esperado:** Imagem criada com sucesso (~20-50MB)
+
+#### 2. Testar Desenvolvimento Local
+
+```bash
+cd servers/sms/container
+docker-compose up --build -d
+docker-compose logs -f
+```
+
+**Esperado:**
+- Container `sms_server_dev` iniciado
+- Logs mostrando servidor rodando na porta 8080
+
+#### 3. Testar Workflow GitHub Actions
+
+**Trigger de Teste:**
+```bash
+git checkout -b test/sms-ghcr-integration
+git add .
+git commit -m "ci: Add GitHub Container Registry integration for SMS server"
+git push origin test/sms-ghcr-integration
+```
+
+**Validação:**
+1. Verificar workflow "Build and Publish SMS Server Docker Image" executando
+2. Aguardar conclusão (~5-10 minutos)
+3. Verificar imagem: https://github.com/edumigsoft/ems_system/pkgs/container/sms-server
+
+#### 4. Testar Deploy Produção
+
+```bash
+cd /caminho/para/servers/sms/container
+chmod +x deploy-prod.sh
+./deploy-prod.sh
+```
+
+**Validação:**
+- Container `sms_server_prod` iniciado
+- Servidor acessível na porta 8080
+- Healthcheck mostrando "(healthy)"
+
+#### 5. Testar Deploy Conjunto (EMS + SMS)
+
+```bash
+# Verificar ambos os servidores rodando
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+# Verificar conectividade
+curl http://localhost:8080/health  # SMS
+curl http://localhost:8181/health  # EMS
+```
+
+**Esperado:**
+- Ambos os containers rodando
+- Ambos os healthchecks respondendo
+- Portas 8080 e 8181 acessíveis
+
+### Notas Importantes (SMS)
+
+1. **Porta Diferente:**
+   - SMS usa porta 8080
+   - EMS usa porta 8181
+   - Não há conflito ao rodar ambos simultaneamente
+
+2. **Dependências Compartilhadas:**
+   - Ambos usam os mesmos pacotes core, auth, user
+   - SMS adiciona school_server
+   - Mudanças em pacotes compartilhados afetam ambos os workflows
+
+3. **Rede Docker:**
+   - Ambos os servidores usam a mesma rede `ems_system_net`
+   - Facilita comunicação entre serviços se necessário
+
+4. **Versionamento Sincronizado:**
+   - Ambos leem a mesma versão do arquivo `/VERSION`
+   - Releases sincronizados para manter compatibilidade
+
+5. **Deploy Independente:**
+   - Cada servidor pode ser deployado independentemente
+   - Rollback independente para cada serviço
+   - Facilita manutenção e troubleshooting
+
+### Riscos e Mitigações (SMS)
+
+**Risco:** Caminho incorreto no Dockerfile causar falha de build
+- **Mitigação:** Correção documentada de `servers/sms_server` para `servers/sms`
+
+**Risco:** Pacote school_server faltante causar erro de compilação
+- **Mitigação:** Dockerfile atualizado inclui todos os pacotes do pubspec.yaml
+
+**Risco:** Conflito de portas entre EMS e SMS
+- **Mitigação:** Portas diferentes (8080 vs 8181) documentadas claramente
+
+**Risco:** Workflows disparando builds desnecessários
+- **Mitigação:** Paths específicos para cada servidor evitam builds cruzados
+
+### Arquivos de Referência (SMS)
+
+- **Dockerfile atual:** `servers/sms/container/Dockerfile`
+- **docker-compose atual:** `servers/sms/container/docker-compose.yml`
+- **pubspec.yaml:** `servers/sms/server_v1/pubspec.yaml`
+- **VERSION:** `/VERSION` (compartilhado com EMS)
+- **Infraestrutura:** `servers/INFRASTRUCTURE.md`
