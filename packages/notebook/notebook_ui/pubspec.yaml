@@ -33,7 +33,7 @@ dependencies:
   tag_ui: ^1.1.0
   auth_client: ^1.1.0
   auth_ui: ^1.1.0
-  file_picker: ^6.1.1
+  file_picker: ^10.3.10
   url_launcher: ^6.2.5
   path_provider: ^2.1.2
   pdfx: ^2.7.0

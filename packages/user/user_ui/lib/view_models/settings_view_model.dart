@@ -46,6 +46,9 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     );
   }
 
+  String _serverType = 'local';
+  String get serverType => _serverType;
+
   Locale get locale {
     final parts = _language.split('_');
     if (parts.length == 2) {
@@ -105,6 +108,13 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     _autoSave();
   }
 
+  /// Define o tipo de servidor.
+  void setServerType(String type) {
+    _serverType = type;
+    notifyListeners();
+    _autoSave();
+  }
+
   ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
 
   ThemeData get themeDataLight =>
@@ -133,6 +143,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
         _darkMode = settings.darkMode;
         _language = settings.language;
         _theme = settings.theme;
+        _serverType = settings.serverType;
         logger.info('Settings loaded successfully');
       },
       failure: (error) {
@@ -154,6 +165,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
       darkMode: _darkMode,
       language: _language,
       theme: _theme,
+      serverType: _serverType,
     );
 
     logger.info('Saving settings...');
@@ -180,6 +192,7 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     _darkMode = defaults.darkMode;
     _language = defaults.language;
     _theme = defaults.theme;
+    _serverType = defaults.serverType;
     notifyListeners();
     await saveSettings();
   }
@@ -266,4 +279,17 @@ class SettingsViewModel extends ChangeNotifier with Loggable {
     );
     return themeEnum.label;
   }
+
+  String getServerTypeLabel(String type) {
+    switch (type) {
+      case 'local':
+        return 'Servidor Local';
+      case 'remote':
+        return 'Servidor Remoto';
+      default:
+        return 'Servidor Local';
+    }
+  }
+
+  bool get isRemoteServer => _serverType == 'remote';
 }

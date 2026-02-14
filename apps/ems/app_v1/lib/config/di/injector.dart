@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:notebook_ui/notebook_ui.dart';
 import 'package:tag_ui/tag_ui.dart' show TagModule;
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
+import 'package:user_client/user_client.dart' show SettingsStorage;
 
 import '../../app_layout.dart';
 import '../../view_models/app_view_model.dart';
@@ -22,7 +23,7 @@ class Injector with Loggable {
     logger.info('injector');
 
     // 1. Registra serviços core (Dio, Storage, etc) - SEM AppViewModel ainda
-    _registerCoreServices(_diMain);
+    await _registerCoreServices(_diMain);
 
     // 2. Registra módulos (que registram AuthViewModel, etc)
     final List<AppModule> appModules = [
@@ -71,8 +72,32 @@ class Injector with Loggable {
     _setupDioInterceptors(_diMain);
   }
 
-  void _registerCoreServices(DependencyInjector di) {
-    di.registerLazySingleton<Dio>(() => DioFactory.create());
+  Future<void> _registerCoreServices(DependencyInjector di) async {
+    // Registra SettingsStorage para carregar configurações de servidor
+    final settingsStorage = SettingsStorage();
+
+    // Carrega configurações de servidor
+    final settingsResult = await settingsStorage.loadSettings();
+    String? customBaseUrl;
+
+    settingsResult.when(
+      success: (settings) {
+        if (settings.serverType == 'remote') {
+          customBaseUrl = '${Env.backendRemoteUrl}${Env.backendPathApi}';
+          logger.info('Using remote server: $customBaseUrl');
+        } else {
+          customBaseUrl = '${Env.backendBaseUrl}${Env.backendPathApi}';
+          logger.info('Using local server: $customBaseUrl');
+        }
+      },
+      failure: (_) {
+        logger.warning('Failed to load server settings, using default (local)');
+        customBaseUrl = '${Env.backendBaseUrl}${Env.backendPathApi}';
+      },
+    );
+
+    // Cria Dio com URL dinâmica
+    di.registerLazySingleton<Dio>(() => DioFactory.create(customBaseUrl: customBaseUrl));
     // Outros serviços core básicos...
   }
 

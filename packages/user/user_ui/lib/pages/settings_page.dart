@@ -115,6 +115,16 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const Divider(),
 
+              // Seção Conexão
+              _buildSectionHeader(theme, 'Conexão'),
+              _buildListTile(
+                icon: Icons.dns,
+                title: 'Servidor',
+                subtitle: _getServerName(widget.viewModel.serverType),
+                onTap: () => _showServerDialog(context),
+              ),
+              const Divider(),
+
               // Seção Privacidade
               _buildSectionHeader(theme, 'Privacidade'),
               _buildListTile(
@@ -370,6 +380,71 @@ class _SettingsPageState extends State<SettingsPage> {
               );
             },
           ),
+        ),
+      ),
+    );
+  }
+
+  String _getServerName(String type) {
+    return widget.viewModel.getServerTypeLabel(type);
+  }
+
+  void _showServerDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Selecionar Servidor'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Para alterar a URL do servidor remoto, '
+              'edite o arquivo .env na raiz do projeto.',
+              style: TextStyle(fontSize: 12),
+            ),
+            const SizedBox(height: 16),
+            ListenableBuilder(
+              listenable: widget.viewModel,
+              builder: (context, _) {
+                return RadioGroup<String>(
+                  groupValue: widget.viewModel.serverType,
+                  onChanged: (value) {
+                    if (value != null) {
+                      widget.viewModel.setServerType(value);
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            value == 'local'
+                                ? 'Conectando ao servidor local'
+                                : 'Conectando ao servidor remoto\n'
+                                      'Reinicie o app para aplicar as alterações',
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 4),
+                        ),
+                      );
+                    }
+                  },
+                  child: const Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RadioListTile<String>(
+                        title: Text('Servidor Local'),
+                        subtitle: Text('localhost (configurado no .env)'),
+                        value: 'local',
+                      ),
+                      RadioListTile<String>(
+                        title: Text('Servidor Remoto'),
+                        subtitle: Text('Internet/Rede (configurado no .env)'),
+                        value: 'remote',
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -196,7 +196,7 @@ class AuthService {
         'current_password': currentPassword,
         'new_password': newPassword,
         'confirm_password': confirmPassword,
-        if (refreshToken != null) 'refresh_token': refreshToken,
+        'refresh_token': ?refreshToken,
       };
 
       await _api.changePassword(requestData);
