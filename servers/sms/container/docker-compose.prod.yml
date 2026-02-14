@@ -1,0 +1,24 @@
+services:
+  sms_server:
+    container_name: sms_server_prod
+    image: ghcr.io/edumigsoft/sms-server:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - ems_system_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      com.ems.service: "sms-server"
+      com.ems.environment: "production"
+
+networks:
+  ems_system_net:
+    external: true

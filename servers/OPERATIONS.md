@@ -1,33 +1,31 @@
-# Guia de Operações: Servidores EMS e SMS
-## Build, Deploy e Gerenciamento de Imagens Docker
+# Guia de Operações - Servidores EMS e SMS
 
-Este guia descreve **em ordem de execução** como trabalhar com os servidores EMS e SMS, desde o desenvolvimento local até o deploy em produção.
+Este guia documenta todas as operações relacionadas ao build, publicação e deploy dos servidores EMS e SMS, seguindo a abordagem híbrida de desenvolvimento local + CI/CD manual.
 
----
-
-## 📋 Índice
+## Índice
 
 1. [Build Local (Desenvolvimento)](#1-build-local-desenvolvimento)
 2. [Push Manual para GHCR](#2-push-manual-para-ghcr)
-3. [Workflows Manuais (Releases Oficiais)](#3-workflows-manuais-releases-oficiais)
+3. [Workflows Manuais (Releases)](#3-workflows-manuais-releases)
 4. [Deploy em VPS](#4-deploy-em-vps)
-5. [Rollback](#5-rollback)
-6. [Troubleshooting](#6-troubleshooting)
-7. [FAQs](#7-faqs)
+5. [Rollback e Troubleshooting](#5-rollback-e-troubleshooting)
+6. [FAQs](#6-faqs)
 
 ---
 
 ## 1. Build Local (Desenvolvimento)
 
-### 🎯 Quando Usar
-- ✅ Durante desenvolvimento ativo
-- ✅ Para testar mudanças rapidamente
-- ✅ Antes de fazer commit
-- ✅ **90% do tempo** - Custo: **$0**
+### 1.1 Quando Usar
 
-### 📝 Passo a Passo
+Use build local durante o desenvolvimento para:
+- ✅ Testar mudanças rapidamente
+- ✅ Validar Dockerfile sem custos
+- ✅ Rodar com docker-compose localmente
+- ✅ Debug de problemas de build
 
-#### Opção A: Build com Script (Recomendado)
+**Custo:** $0 (executado localmente)
+
+### 1.2 Como Fazer Build Local
 
 ```bash
 # Build do servidor EMS
@@ -38,261 +36,252 @@ Este guia descreve **em ordem de execução** como trabalhar com os servidores E
 ```
 
 O script automaticamente:
-- Lê a versão do `pubspec.yaml`
-- Faz build da imagem
-- Cria tags apropriadas
+- Lê a versão do `pubspec.yaml` do servidor
+- Executa o build do Docker
+- Cria tags: `{server}-server:{version}` e `{server}-server:latest`
+- Exibe instruções de próximos passos
 
-#### Opção B: Build Manual
+### 1.3 Testando com Docker Compose
 
+**EMS:**
 ```bash
-# EMS
-cd servers/ems/container
-docker build -f Dockerfile -t ems-server:local ../../..
-
-# SMS
-cd servers/sms/container
-docker build -f Dockerfile -t sms-server:local ../../..
-```
-
-### 🧪 Testar Localmente
-
-```bash
-# EMS
 cd servers/ems/container
 docker-compose up -d
 docker-compose logs -f
+```
 
-# SMS
+**SMS:**
+```bash
 cd servers/sms/container
 docker-compose up -d
 docker-compose logs -f
-
-# Verificar saúde
-curl http://localhost:8181/health  # EMS
-curl http://localhost:8080/health  # SMS
 ```
 
-### 🔄 Quando Fazer Push para GHCR?
+**Verificação:**
+```bash
+# Healthcheck EMS
+curl http://localhost:8181/health
 
-**Faça push manual quando:**
-- ✅ Versão estável para testar em staging
-- ✅ Compartilhar com equipe
-- ✅ Preparar para deploy em VPS
+# Healthcheck SMS
+curl http://localhost:8080/health
+```
 
-**NÃO faça push para:**
-- ❌ Builds experimentais
-- ❌ Testes locais
-- ❌ WIP (Work in Progress)
+### 1.4 Quando Fazer Push para GHCR
+
+Após build local, faça push manual para GHCR quando:
+- ✅ Você quer compartilhar a imagem com a equipe
+- ✅ Você quer testar deploy na VPS sem usar workflow
+- ✅ Você fez mudanças pequenas que não justificam um workflow completo
+
+Para releases oficiais, prefira usar workflows manuais (seção 3).
 
 ---
 
 ## 2. Push Manual para GHCR
 
-### 🎯 Quando Usar
-- ✅ Versão estável pronta para staging/produção
-- ✅ Compartilhar imagem com equipe
-- ✅ Deploy em VPS sem usar GitHub Actions
-- ⚠️ **Ocasional** - Custo: **$0**
+### 2.1 Pré-requisitos
 
-### 🔐 Configuração Inicial (Uma Vez)
-
-#### Criar Personal Access Token (PAT)
-
+**Criar Personal Access Token (PAT):**
 1. Acesse: https://github.com/settings/tokens
-2. Clique em "Generate new token" → "Generate new token (classic)"
-3. Configure:
-   - **Note**: "GHCR Push Access"
-   - **Expiration**: 90 dias
-   - **Scopes**: 
-     - ✅ `write:packages`
-     - ✅ `read:packages`
-     - ✅ `delete:packages` (opcional)
-4. Copie o token (começa com `ghp_`)
+2. Clique em "Generate new token (classic)"
+3. Scopes necessários: `write:packages`, `read:packages`
+4. Validade recomendada: 90 dias
+5. Copie o token gerado (ex: `ghp_XXXXXXXXXXXXXXXXXXXX`)
 
-#### Configurar Token Localmente
-
+**Configurar Token:**
 ```bash
-# Exportar token (temporário - sessão atual)
 export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXX
 
-# OU persistir no .bashrc/.zshrc (permanente)
-echo 'export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXX' >> ~/.bashrc
+# Opcional: Tornar persistente
+echo 'export GITHUB_TOKEN=ghp_XXX' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### 📝 Passo a Passo
-
-#### Opção A: Push com Script (Recomendado)
+### 2.2 Push Manual
 
 ```bash
-# Garantir que token está configurado
-echo $GITHUB_TOKEN  # Deve mostrar seu token
-
 # Push do servidor EMS
-./scripts/push-to-ghcr.sh ems
+GITHUB_TOKEN=ghp_XXX ./scripts/push-to-ghcr.sh ems
 
 # Push do servidor SMS
-./scripts/push-to-ghcr.sh sms
+GITHUB_TOKEN=ghp_XXX ./scripts/push-to-ghcr.sh sms
 ```
 
 O script automaticamente:
+- Valida o token GitHub
+- Verifica se a imagem local existe
 - Faz login no GHCR
-- Lê versão do `pubspec.yaml`
-- Faz build da imagem
-- Cria tags (versão + latest)
-- Faz push para GHCR
+- Cria tags: `{version}`, `v{major.minor}`, `latest`
+- Faz push de todas as tags
+- Exibe link para verificar no GHCR
 
-#### Opção B: Push Manual
+### 2.3 Verificar Imagens Publicadas
 
+**Via Web:**
+- EMS: https://github.com/edumigsoft/ems_system/pkgs/container/ems-server
+- SMS: https://github.com/edumigsoft/ems_system/pkgs/container/sms-server
+
+**Via CLI:**
 ```bash
-# 1. Login no GHCR
-echo $GITHUB_TOKEN | docker login ghcr.io -u SEU_USUARIO_GITHUB --password-stdin
-
-# 2. Build e tag (EMS exemplo)
-cd servers/ems/container
-VERSION=$(grep '^version:' ../server_v1/pubspec.yaml | sed 's/version: *//' | tr -d ' ')
-docker build -f Dockerfile -t ghcr.io/edumigsoft/ems-server:$VERSION ../../..
-docker tag ghcr.io/edumigsoft/ems-server:$VERSION ghcr.io/edumigsoft/ems-server:latest
-
-# 3. Push
-docker push ghcr.io/edumigsoft/ems-server:$VERSION
-docker push ghcr.io/edumigsoft/ems-server:latest
-```
-
-### ✅ Verificar Imagens Publicadas
-
-```bash
-# Via Docker CLI
-docker pull ghcr.io/edumigsoft/ems-server:latest
-docker images | grep ems-server
-
-# Via GitHub Web
-# Acesse: https://github.com/edumigsoft/ems_system/pkgs/container/ems-server
+# Listar tags disponíveis (requer gh CLI)
+gh api /orgs/edumigsoft/packages/container/ems-server/versions
+gh api /orgs/edumigsoft/packages/container/sms-server/versions
 ```
 
 ---
 
-## 3. Workflows Manuais (Releases Oficiais)
+## 3. Workflows Manuais (Releases)
 
-### 🎯 Quando Usar
+### 3.1 Quando Usar Workflows
+
+Use workflows GitHub Actions para:
 - ✅ Releases oficiais (v1.2.0, v1.3.0, etc.)
-- ✅ Garantir build limpo e reproduzível
-- ✅ Quando não tem ambiente de build local disponível
-- ⚠️ **Raro (10% do tempo)** - Custo: **~$0.03-0.05 por build** (ou $0 se repo público)
+- ✅ Builds limpos e reproduzíveis
+- ✅ Rastreabilidade completa (commit SHA, labels OCI)
+- ✅ Garantia de qualidade (ambiente isolado)
 
-### 📝 Passo a Passo
+**Custo:** ~$0.03-0.05 por build (ou $0 se repositório público)
 
-#### Opção A: Via GitHub Web UI
+### 3.2 Trigger via GitHub UI
 
 1. Acesse: https://github.com/edumigsoft/ems_system/actions
-2. Selecione o workflow:
-   - "Build and Publish EMS Server Docker Image" (para EMS)
-   - "Build and Publish SMS Server Docker Image" (para SMS)
+2. Selecione o workflow desejado:
+   - "Build and Publish EMS Server Docker Image"
+   - "Build and Publish SMS Server Docker Image"
 3. Clique em "Run workflow"
-4. Selecione branch (geralmente `main`)
-5. Clique em "Run workflow" (confirmar)
-6. Aguarde conclusão (~5-8 minutos)
+4. Selecione a branch (ex: `main` para releases, `develop` para testes)
+5. Clique em "Run workflow" novamente
+6. Aguarde conclusão (~5-10 minutos)
+7. Verifique a imagem publicada no GHCR
 
-#### Opção B: Via GitHub CLI
-
-```bash
-# Instalar GitHub CLI (se necessário)
-# https://cli.github.com/
-
-# Autenticar
-gh auth login
-
-# Trigger workflow EMS
-gh workflow run docker-ems-server.yml
-
-# Trigger workflow SMS
-gh workflow run docker-sms-server.yml
-
-# Monitorar progresso
-gh run list --workflow=docker-ems-server.yml
-gh run watch
-```
-
-### ✅ Verificar Build
+### 3.3 Trigger via GitHub CLI
 
 ```bash
+# Trigger workflow do EMS (branch main)
+gh workflow run docker-ems-server.yml --ref main
+
+# Trigger workflow do SMS (branch develop)
+gh workflow run docker-sms-server.yml --ref develop
+
 # Verificar status
-gh run list --workflow=docker-ems-server.yml --limit 1
+gh run list --workflow=docker-ems-server.yml
+gh run list --workflow=docker-sms-server.yml
 
-# Ver logs
-gh run view --log
-
-# Verificar imagem publicada
-docker pull ghcr.io/edumigsoft/ems-server:latest
+# Ver logs de uma execução específica
+gh run view <RUN_ID> --log
 ```
+
+### 3.4 Versionamento
+
+**Como Funciona:**
+- Cada servidor lê a versão do próprio `pubspec.yaml`
+- **EMS:** `servers/ems/server_v1/pubspec.yaml`
+- **SMS:** `servers/sms/server_v1/pubspec.yaml`
+- Versionamento independente (EMS v1.3.0, SMS v1.1.5)
+
+**Tags Geradas:**
+- `latest` → Última versão estável (branch main)
+- `{version}` → Versão específica (ex: `1.1.0`)
+- `v{major.minor}` → Major.minor (ex: `v1.1`)
+- `sha-{commit}` → Commit específico (rastreabilidade)
+
+**Incrementar Versão:**
+1. Edite `servers/{ems|sms}/server_v1/pubspec.yaml`
+2. Atualize o campo `version: X.Y.Z`
+3. Commit: `git commit -m "chore: bump {ems|sms} version to X.Y.Z"`
+4. Trigger workflow manual
+
+### 3.5 Push Manual vs Workflow
+
+| Critério | Push Manual | Workflow Manual |
+|----------|-------------|-----------------|
+| **Velocidade** | Rápido (2-5 min) | Médio (5-10 min) |
+| **Custo** | $0 | ~$0.03-0.05 |
+| **Rastreabilidade** | Básica | Completa (labels OCI) |
+| **Reproduzibilidade** | Depende do ambiente local | Garantida (GitHub Actions) |
+| **Quando usar** | Desenvolvimento, testes rápidos | Releases oficiais, produção |
 
 ---
 
 ## 4. Deploy em VPS
 
-### 🎯 Pré-requisitos
+### 4.1 Configuração Inicial na VPS
 
-- ✅ VPS com Docker instalado
-- ✅ Rede `ems_system_net` criada
-- ✅ Arquivo `.env` configurado
-- ✅ Token GHCR configurado (para pull de imagens privadas)
-
-### 📝 Configuração Inicial (Uma Vez)
-
+**Instalar Docker:**
 ```bash
-# Na VPS
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+```
 
-# 1. Criar rede Docker
+**Criar Rede Docker:**
+```bash
 docker network create ems_system_net
+```
 
-# 2. Configurar token GHCR
+**Configurar Autenticação GHCR:**
+```bash
 export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXX
-echo 'export GITHUB_TOKEN=ghp_XXX' >> ~/.bashrc
+echo "$GITHUB_TOKEN" | docker login ghcr.io -u edumigsoft --password-stdin
+```
 
-# 3. Clonar repositório (ou copiar arquivos necessários)
+**Clonar Repositório (ou copiar arquivos necessários):**
+```bash
+# Opção 1: Clonar repo completo
 git clone https://github.com/edumigsoft/ems_system.git
 cd ems_system
 
-# 4. Configurar .env
-cd servers/ems/container
-cp .env.example .env
-nano .env  # Ajustar credenciais
+# Opção 2: Copiar apenas arquivos de deploy
+scp -r servers/ems/container user@vps:/caminho/deploy/ems
+scp -r servers/sms/container user@vps:/caminho/deploy/sms
 ```
 
-### 📝 Deploy
+### 4.2 Configurar Variáveis de Ambiente
 
-#### Opção A: Script Automatizado (Recomendado)
-
+**EMS:**
 ```bash
-# Deploy EMS
+cd servers/ems/container
+cp .env.example .env
+nano .env  # Configurar credenciais
+```
+
+**SMS:**
+```bash
+cd servers/sms/container
+cp .env.example .env
+nano .env  # Configurar credenciais
+```
+
+### 4.3 Deploy com Scripts Automatizados
+
+**EMS:**
+```bash
 cd servers/ems/container
 chmod +x deploy-prod.sh
 ./deploy-prod.sh
+```
 
-# Deploy SMS
+**SMS:**
+```bash
 cd servers/sms/container
 chmod +x deploy-prod.sh
 ./deploy-prod.sh
 ```
 
-O script irá:
-1. Solicitar versão (latest ou específica)
-2. Fazer login no GHCR
-3. Pull da imagem
-4. Parar container antigo
-5. Iniciar novo container
-6. Exibir logs e status
+**O que o script faz:**
+1. Solicita seleção de versão (latest, específica, ou custom)
+2. Faz login no GHCR
+3. Faz pull da imagem
+4. Para containers antigos
+5. Inicia novo container
+6. Exibe logs e status
 
-#### Opção B: Manual
+### 4.4 Deploy Manual (sem script)
 
+**EMS:**
 ```bash
-# EMS
 cd servers/ems/container
 
-# Login GHCR
-echo $GITHUB_TOKEN | docker login ghcr.io -u SEU_USUARIO --password-stdin
-
-# Pull imagem
+# Pull da imagem
 docker pull ghcr.io/edumigsoft/ems-server:latest
 
 # Deploy
@@ -300,239 +289,324 @@ docker-compose -f docker-compose.prod.yml down
 docker-compose -f docker-compose.prod.yml up -d
 
 # Verificar
+docker-compose -f docker-compose.prod.yml ps
 docker-compose -f docker-compose.prod.yml logs -f
 ```
 
-### ✅ Verificar Deploy
+**SMS:**
+```bash
+cd servers/sms/container
+
+# Pull da imagem
+docker pull ghcr.io/edumigsoft/sms-server:latest
+
+# Deploy
+docker-compose -f docker-compose.prod.yml down
+docker-compose -f docker-compose.prod.yml up -d
+
+# Verificar
+docker-compose -f docker-compose.prod.yml ps
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+### 4.5 Verificação de Saúde
 
 ```bash
-# Status dos containers
+# Verificar status dos containers
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-# Healthcheck
+# Healthcheck via curl
 curl http://localhost:8181/health  # EMS
 curl http://localhost:8080/health  # SMS
 
-# Logs
-docker logs ems_server_prod -f
-docker logs sms_server_prod -f
+# Logs em tempo real
+docker logs -f ems_server_prod
+docker logs -f sms_server_prod
 ```
 
 ---
 
-## 5. Rollback
+## 5. Rollback e Troubleshooting
 
-### 🎯 Quando Usar
-- ⚠️ Bug crítico em produção
-- ⚠️ Nova versão instável
-- ⚠️ Necessidade de voltar para versão anterior
+### 5.1 Rollback com Script
 
-### 📝 Passo a Passo
-
-#### Opção A: Script Automatizado
-
+**EMS:**
 ```bash
-# Rollback EMS
 cd servers/ems/container
 chmod +x rollback.sh
 ./rollback.sh
+```
 
-# Rollback SMS
+**SMS:**
+```bash
 cd servers/sms/container
 chmod +x rollback.sh
 ./rollback.sh
 ```
 
-O script irá:
-1. Listar versões disponíveis no GHCR
-2. Solicitar versão para rollback
-3. Pull da versão antiga
-4. Restart do container
+**O que o script faz:**
+1. Lista versões disponíveis no GHCR
+2. Solicita seleção da versão para rollback
+3. Faz pull da imagem
+4. Para container atual
+5. Inicia container com versão anterior
+6. Exibe logs
 
-#### Opção B: Manual
+### 5.2 Rollback Manual
 
 ```bash
-# 1. Listar versões disponíveis
-# Acesse: https://github.com/edumigsoft/ems_system/pkgs/container/ems-server
-
-# 2. Pull versão antiga
-docker pull ghcr.io/edumigsoft/ems-server:1.1.0
-
-# 3. Atualizar docker-compose.prod.yml
-nano docker-compose.prod.yml
-# Mudar: image: ghcr.io/edumigsoft/ems-server:latest
-# Para:  image: ghcr.io/edumigsoft/ems-server:1.1.0
-
-# 4. Restart
+# EMS - Rollback para versão específica
+cd servers/ems/container
 docker-compose -f docker-compose.prod.yml down
+docker pull ghcr.io/edumigsoft/ems-server:1.0.0
+# Editar docker-compose.prod.yml para usar tag 1.0.0
+docker-compose -f docker-compose.prod.yml up -d
+
+# SMS - Rollback para versão específica
+cd servers/sms/container
+docker-compose -f docker-compose.prod.yml down
+docker pull ghcr.io/edumigsoft/sms-server:1.0.0
+# Editar docker-compose.prod.yml para usar tag 1.0.0
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
----
+### 5.3 Problemas Comuns
 
-## 6. Troubleshooting
+#### Problema: Autenticação GHCR falha
 
-### ❌ Problema: "Error response from daemon: pull access denied"
-
-**Causa:** Token GHCR não configurado ou expirado
+**Sintomas:**
+```
+Error response from daemon: unauthorized: authentication required
+```
 
 **Solução:**
 ```bash
-# Verificar token
+# Verificar se token está configurado
 echo $GITHUB_TOKEN
 
-# Reconfigurar
-export GITHUB_TOKEN=ghp_NOVO_TOKEN
-echo $GITHUB_TOKEN | docker login ghcr.io -u SEU_USUARIO --password-stdin
+# Fazer login novamente
+echo "$GITHUB_TOKEN" | docker login ghcr.io -u edumigsoft --password-stdin
+
+# Verificar permissões do token
+# Token precisa de scopes: read:packages, write:packages
 ```
 
-### ❌ Problema: "network ems_system_net not found"
+#### Problema: Container não inicia
 
-**Causa:** Rede Docker não criada
+**Sintomas:**
+```
+Container exits with code 1
+```
 
 **Solução:**
 ```bash
-docker network create ems_system_net
+# Verificar logs
+docker logs ems_server_prod
+docker logs sms_server_prod
+
+# Verificar variáveis de ambiente
+docker exec ems_server_prod env | grep DB_
+
+# Verificar conectividade com PostgreSQL
+docker exec ems_server_prod ping postgres
+
+# Verificar se rede existe
+docker network ls | grep ems_system_net
 ```
 
-### ❌ Problema: Build local falha com "packages not found"
+#### Problema: Healthcheck failing
 
-**Causa:** Dockerfile desatualizado ou pacotes faltando
+**Sintomas:**
+```
+Status: unhealthy
+```
+
+**Solução:**
+```bash
+# Testar endpoint manualmente
+docker exec ems_server_prod wget -O- http://localhost:8181/health
+
+# Verificar se porta está exposta
+docker port ems_server_prod
+
+# Verificar logs de erro
+docker logs ems_server_prod --tail 100
+```
+
+#### Problema: Build local falha
+
+**Sintomas:**
+```
+ERROR: failed to solve: process "/bin/sh -c dart pub get" did not complete successfully
+```
 
 **Solução:**
 ```bash
 # Verificar se todos os pacotes estão no Dockerfile
-# Comparar com pubspec.yaml do servidor
+# Comparar dependencies do pubspec.yaml com COPY no Dockerfile
+
+# Limpar cache do Docker
+docker builder prune -a
+
+# Rebuild sem cache
+docker build --no-cache -f servers/ems/container/Dockerfile -t ems-server:test .
 ```
 
-### ❌ Problema: Container não inicia (exit code 1)
+#### Problema: Workflow GitHub Actions falha
 
-**Causa:** Variáveis de ambiente faltando ou incorretas
+**Sintomas:**
+```
+Error: buildx failed with: ERROR: failed to solve...
+```
 
 **Solução:**
-```bash
-# Verificar .env
-cat .env
-
-# Ver logs do container
-docker logs ems_server_prod
-
-# Validar variáveis
-docker exec ems_server_prod env | grep DB_
-```
+1. Verificar logs completos no GitHub Actions
+2. Verificar se paths do workflow estão corretos
+3. Verificar se Dockerfile está correto
+4. Testar build localmente primeiro
+5. Verificar permissões do repositório
 
 ---
 
-## 7. FAQs
+## 6. FAQs
 
-### ❓ Quando devo usar build local vs workflow manual?
+### 6.1 Qual a diferença entre build local e workflow?
 
-**Build Local:**
-- Durante desenvolvimento
-- Testes rápidos
-- Iteração frequente
-- **Custo: $0**
+- **Build local:** Rápido, gratuito, para desenvolvimento e testes. Executado na sua máquina.
+- **Workflow:** Build limpo e reproduzível, para releases oficiais. Executado no GitHub Actions.
 
-**Workflow Manual:**
-- Releases oficiais
-- Build limpo garantido
-- Sem ambiente local disponível
-- **Custo: ~$0.03-0.05 (ou $0 se repo público)**
+### 6.2 Quando usar `latest` vs versão específica?
 
-### ❓ Preciso fazer push para GHCR toda vez que faço build local?
+- **`latest`:** Desenvolvimento, testes, ambientes não-críticos. Sempre aponta para a versão mais recente.
+- **Versão específica (ex: `1.2.0`):** Produção, ambientes críticos. Garante versão exata.
+- **`v{major.minor}` (ex: `v1.2`):** Facilita upgrades de patch (1.2.0 → 1.2.1) sem mudar tag.
 
-**Não!** Apenas faça push quando:
-- Versão estável para staging/produção
-- Compartilhar com equipe
-- Preparar para deploy
-
-### ❓ Como sei qual versão está rodando em produção?
-
-```bash
-# Ver tag da imagem
-docker inspect ems_server_prod | grep Image
-
-# Ver logs de inicialização (geralmente mostra versão)
-docker logs ems_server_prod | head -20
-```
-
-### ❓ Posso rodar EMS e SMS simultaneamente?
-
-**Sim!** Eles usam portas diferentes:
-- EMS: 8181
-- SMS: 8080
-
-### ❓ Como atualizar apenas um servidor (EMS ou SMS)?
+### 6.3 Como atualizar apenas um servidor (EMS ou SMS)?
 
 Cada servidor é independente:
 ```bash
 # Atualizar apenas EMS
 cd servers/ems/container
-./deploy-prod.sh
+./deploy-prod.sh  # Selecione nova versão
 
-# SMS continua na versão antiga
+# SMS continua rodando versão antiga
 ```
 
-### ❓ O que fazer se o workflow manual falhar?
+### 6.4 Como rodar EMS e SMS simultaneamente?
 
-1. Ver logs do workflow no GitHub Actions
-2. Verificar se Dockerfile está correto
-3. Verificar se todos os pacotes existem
-4. Tentar build local para debug
-5. Se necessário, fazer push manual
+Ambos podem rodar juntos pois usam portas diferentes:
+- **EMS:** Porta 8181
+- **SMS:** Porta 8080
+- **Rede:** Ambos usam `ems_system_net`
+
+```bash
+# Iniciar ambos
+cd servers/ems/container && docker-compose -f docker-compose.prod.yml up -d
+cd servers/sms/container && docker-compose -f docker-compose.prod.yml up -d
+
+# Verificar
+curl http://localhost:8181/health  # EMS
+curl http://localhost:8080/health  # SMS
+```
+
+### 6.5 Como rotacionar o GITHUB_TOKEN?
+
+1. Criar novo token: https://github.com/settings/tokens
+2. Atualizar variável de ambiente:
+   ```bash
+   export GITHUB_TOKEN=ghp_NOVO_TOKEN
+   echo 'export GITHUB_TOKEN=ghp_NOVO_TOKEN' >> ~/.bashrc
+   ```
+3. Fazer novo login:
+   ```bash
+   echo "$GITHUB_TOKEN" | docker login ghcr.io -u edumigsoft --password-stdin
+   ```
+4. Revogar token antigo no GitHub
+
+### 6.6 Como ver histórico de versões disponíveis?
+
+```bash
+# Via GitHub CLI
+gh api /orgs/edumigsoft/packages/container/ems-server/versions | jq '.[].metadata.container.tags'
+gh api /orgs/edumigsoft/packages/container/sms-server/versions | jq '.[].metadata.container.tags'
+
+# Via Web
+# https://github.com/edumigsoft/ems_system/pkgs/container/ems-server
+# https://github.com/edumigsoft/ems_system/pkgs/container/sms-server
+```
+
+### 6.7 O que fazer se o banco de dados PostgreSQL não está rodando?
+
+```bash
+# Verificar se container existe
+docker ps -a | grep postgres
+
+# Iniciar PostgreSQL
+cd servers/containers/postgres
+docker-compose up -d
+
+# Verificar logs
+docker-compose logs -f
+
+# Verificar conectividade
+docker exec postgres_db psql -U postgres -c "SELECT version();"
+```
+
+### 6.8 Como limpar imagens antigas do Docker?
+
+```bash
+# Listar imagens
+docker images | grep -E "ems-server|sms-server"
+
+# Remover imagens não usadas
+docker image prune -a --filter "label=org.opencontainers.image.source=https://github.com/edumigsoft/ems_system"
+
+# Remover versões específicas
+docker rmi ghcr.io/edumigsoft/ems-server:1.0.0
+docker rmi ghcr.io/edumigsoft/sms-server:1.0.0
+```
+
+### 6.9 Como monitorar recursos dos containers?
+
+```bash
+# Uso de recursos em tempo real
+docker stats ems_server_prod sms_server_prod
+
+# Informações detalhadas
+docker inspect ems_server_prod
+docker inspect sms_server_prod
+```
+
+### 6.10 Como fazer backup antes de deploy?
+
+```bash
+# Backup do banco de dados
+cd servers/containers/postgres
+docker-compose exec postgres pg_dump -U postgres -d ems_db > backup_$(date +%Y%m%d_%H%M%S).sql
+
+# Backup de imagem atual (snapshot)
+docker commit ems_server_prod ems-server:backup-$(date +%Y%m%d)
+docker commit sms_server_prod sms-server:backup-$(date +%Y%m%d)
+```
 
 ---
 
-## 📊 Resumo de Custos
+## Boas Práticas
 
-| Operação | Frequência | Custo |
-|----------|-----------|-------|
-| Build Local | Diária | $0 |
-| Push Manual | Semanal | $0 |
-| Workflow Manual | Mensal (releases) | $0 (público) ou ~$0.03-0.05 (privado) |
-| Deploy VPS | Conforme necessário | $0 (apenas custo da VPS) |
-
-**Custo Total Estimado:** **$0 - $2/mês** (se repo privado com ~40 releases/mês)
-
----
-
-## 🔗 Links Úteis
-
-- **GitHub Packages (EMS)**: https://github.com/edumigsoft/ems_system/pkgs/container/ems-server
-- **GitHub Packages (SMS)**: https://github.com/edumigsoft/ems_system/pkgs/container/sms-server
-- **GitHub Actions**: https://github.com/edumigsoft/ems_system/actions
-- **Criar PAT**: https://github.com/settings/tokens
-- **GitHub CLI**: https://cli.github.com/
+1. **Sempre teste localmente antes de fazer push para GHCR**
+2. **Use workflows para releases oficiais em produção**
+3. **Mantenha o GITHUB_TOKEN seguro e rotacione regularmente**
+4. **Faça backup do banco de dados antes de deploys importantes**
+5. **Use versões específicas em produção, não `latest`**
+6. **Monitore logs após deploy para detectar problemas**
+7. **Documente mudanças no CHANGELOG.md**
+8. **Incremente a versão no pubspec.yaml antes de releases**
 
 ---
 
-## 📝 Ordem de Execução Típica
+## Referências
 
-### Desenvolvimento
-```
-1. Fazer mudanças no código
-2. Build local (./scripts/build-local.sh ems)
-3. Testar localmente (docker-compose up)
-4. Commit e push para Git
-5. (Opcional) Push manual para GHCR se versão estável
-```
-
-### Release Oficial
-```
-1. Incrementar versão no pubspec.yaml
-2. Commit e push
-3. Trigger workflow manual (GitHub UI ou CLI)
-4. Aguardar build (~5-8 min)
-5. Verificar imagem no GHCR
-6. Deploy em VPS
-```
-
-### Deploy em Produção
-```
-1. SSH na VPS
-2. cd servers/ems/container (ou sms)
-3. ./deploy-prod.sh
-4. Selecionar versão
-5. Aguardar deploy
-6. Verificar healthcheck
-```
+- **Infraestrutura Docker:** `servers/INFRASTRUCTURE.md`
+- **Plano de Integração GHCR:** `cached-singing-harbor.md`
+- **Deploy EMS:** `servers/ems/container/DEPLOY.md`
+- **Deploy SMS:** `servers/sms/container/DEPLOY.md`

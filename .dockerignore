@@ -1,15 +1,65 @@
+# Git e controle de versão
 .git
+.gitignore
+.gitattributes
+
+# Build e cache
 .dart_tool
 build
-.fvm
-.idea
-.vscode
-**/doc/api
-**/build.git
-.dart_tool
-build
-.fvm
-.idea
-.vscode
-**/doc/api
 **/build
+**/doc/api
+
+# IDEs e editores
+.fvm
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Documentação e guias
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+LICENSE.md
+CLAUDE.md
+ARCHITECTURE.md
+docs/
+openspec/
+
+# Scripts de automação (não necessários no container)
+scripts/
+*.sh
+
+# Arquivos de ambiente e configuração local
+.env
+.env.local
+.env.*.local
+*.log
+
+# Arquivos temporários
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# GitHub Actions (não necessário no container)
+.github/
+
+# Apps e servidores não relacionados
+# (Cada Dockerfile copia apenas o que precisa)
+apps/
+# servers/ será copiado seletivamente por cada Dockerfile
+
+# Testes e coverage
+**/test/
+**/coverage/
+**/.test_coverage.dart
+
+# Arquivos de análise
+analysis_options*.yaml
+devtools_options.yaml
+
+# Outros arquivos de configuração
+pubspec.lock
+melos.yaml

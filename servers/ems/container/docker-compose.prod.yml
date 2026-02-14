@@ -1,0 +1,24 @@
+services:
+  ems_server:
+    container_name: ems_server_prod
+    image: ghcr.io/edumigsoft/ems-server:latest
+    ports:
+      - "8181:8181"
+    env_file:
+      - .env
+    networks:
+      - ems_system_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8181/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      com.ems.service: "ems-server"
+      com.ems.environment: "production"
+
+networks:
+  ems_system_net:
+    external: true
