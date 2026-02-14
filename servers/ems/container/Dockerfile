@@ -3,10 +3,64 @@ FROM dart:stable AS build
 
 WORKDIR /app
 
-# --- 1. CÓPIA DE PACOTES COMPARTILHADOS ---
-# É crucial copiar tanto os pacotes _server quanto os _shared
-# Se você criar novos módulos no futuro, adicione-os aqui.
+# --- 1. CRIAR WORKSPACE MÍNIMO PARA EMS ---
+# Criar pubspec.yaml root customizado apenas com pacotes necessários para EMS
+RUN echo 'name: ems_system_build' > /app/pubspec.yaml && \
+    echo 'publish_to: none' >> /app/pubspec.yaml && \
+    echo '' >> /app/pubspec.yaml && \
+    echo 'environment:' >> /app/pubspec.yaml && \
+    echo '  sdk: ^3.10.7' >> /app/pubspec.yaml && \
+    echo '' >> /app/pubspec.yaml && \
+    echo 'workspace:' >> /app/pubspec.yaml && \
+    echo '  - servers/ems/server_v1' >> /app/pubspec.yaml && \
+    echo '  - packages/core/core_server' >> /app/pubspec.yaml && \
+    echo '  - packages/core/core_shared' >> /app/pubspec.yaml && \
+    echo '  - packages/open_api/open_api_server' >> /app/pubspec.yaml && \
+    echo '  - packages/open_api/open_api_shared' >> /app/pubspec.yaml && \
+    echo '  - packages/auth/auth_server' >> /app/pubspec.yaml && \
+    echo '  - packages/auth/auth_shared' >> /app/pubspec.yaml && \
+    echo '  - packages/user/user_server' >> /app/pubspec.yaml && \
+    echo '  - packages/user/user_shared' >> /app/pubspec.yaml && \
+    echo '  - packages/tag/tag_server' >> /app/pubspec.yaml && \
+    echo '  - packages/tag/tag_shared' >> /app/pubspec.yaml && \
+    echo '  - packages/notebook/notebook_server' >> /app/pubspec.yaml && \
+    echo '  - packages/notebook/notebook_shared' >> /app/pubspec.yaml
 
+# --- 2. CÓPIA DE PUBSPEC.YAML DOS PACOTES ---
+# Copiar pubspec.yaml de cada pacote para estrutura de workspace
+
+# Core
+COPY packages/core/core_shared/pubspec.yaml /app/packages/core/core_shared/pubspec.yaml
+COPY packages/core/core_server/pubspec.yaml /app/packages/core/core_server/pubspec.yaml
+
+# Open API
+COPY packages/open_api/open_api_shared/pubspec.yaml /app/packages/open_api/open_api_shared/pubspec.yaml
+COPY packages/open_api/open_api_server/pubspec.yaml /app/packages/open_api/open_api_server/pubspec.yaml
+
+# Auth
+COPY packages/auth/auth_shared/pubspec.yaml /app/packages/auth/auth_shared/pubspec.yaml
+COPY packages/auth/auth_server/pubspec.yaml /app/packages/auth/auth_server/pubspec.yaml
+
+# User
+COPY packages/user/user_shared/pubspec.yaml /app/packages/user/user_shared/pubspec.yaml
+COPY packages/user/user_server/pubspec.yaml /app/packages/user/user_server/pubspec.yaml
+
+# Tag
+COPY packages/tag/tag_shared/pubspec.yaml /app/packages/tag/tag_shared/pubspec.yaml
+COPY packages/tag/tag_server/pubspec.yaml /app/packages/tag/tag_server/pubspec.yaml
+
+# Notebook
+COPY packages/notebook/notebook_shared/pubspec.yaml /app/packages/notebook/notebook_shared/pubspec.yaml
+COPY packages/notebook/notebook_server/pubspec.yaml /app/packages/notebook/notebook_server/pubspec.yaml
+
+# Server pubspec
+COPY servers/ems/server_v1/pubspec.yaml /app/servers/ems/server_v1/pubspec.yaml
+
+# --- 3. INSTALAR DEPENDÊNCIAS (com workspace) ---
+WORKDIR /app
+RUN dart pub get
+
+# --- 4. COPIAR CÓDIGO FONTE DOS PACOTES ---
 # Core & Open API
 COPY packages/core/core_shared /app/packages/core/core_shared
 COPY packages/core/core_server /app/packages/core/core_server
@@ -29,20 +83,11 @@ COPY packages/tag/tag_server /app/packages/tag/tag_server
 COPY packages/notebook/notebook_shared /app/packages/notebook/notebook_shared
 COPY packages/notebook/notebook_server /app/packages/notebook/notebook_server
 
-# --- 2. OTIMIZAÇÃO: Cachear camada de dependências ---
-WORKDIR /app/servers/ems/server_v1
-
-# Copiar apenas pubspec para instalar dependências primeiro
-COPY servers/ems/server_v1/pubspec.yaml .
-
-# Remover workspace e instalar deps (essa camada será cacheada)
-RUN sed -i '/resolution: workspace/d' pubspec.yaml
-RUN dart pub get
-
-# --- 3. COPIAR CÓDIGO FONTE ---
+# --- 5. COPIAR CÓDIGO FONTE DO SERVIDOR ---
 COPY servers/ems/server_v1 /app/servers/ems/server_v1
 
-# --- 4. COMPILAÇÃO ---
+# --- 6. COMPILAÇÃO ---
+WORKDIR /app/servers/ems/server_v1
 RUN dart compile exe bin/server.dart -o bin/server
 
 # Estágio de Produção (Imagem Mínima)
