@@ -16,6 +16,7 @@ import '../../app_layout.dart';
 import '../../view_models/app_view_model.dart';
 import '../env/env.dart';
 import '../network/dio_factory.dart';
+import '../network/safe_log_interceptor.dart';
 
 final _diMain = GetItInjector();
 
@@ -77,23 +78,41 @@ class Injector with Loggable {
     // Registra SettingsStorage para carregar configurações de servidor
     final settingsStorage = SettingsStorage();
 
+    logger.info('🔍 Starting server configuration...');
+    logger.info('ENV - backendBaseUrl: ${Env.backendBaseUrl}');
+    logger.info('ENV - backendRemoteUrl: ${Env.backendRemoteUrl}');
+    logger.info('ENV - backendPathApi: ${Env.backendPathApi}');
+
     // Carrega configurações de servidor
     final settingsResult = await settingsStorage.loadSettings();
     String? customBaseUrl;
+    String? customRefreshUrl;
 
     settingsResult.when(
       success: (settings) {
+        // Log modo de execução
+        logger.info('═══════════════════════════════════════════════════');
+        logger.info('Build Mode: ${kReleaseMode ? "RELEASE" : "DEBUG"}');
+        logger.info('User Settings - Server Type: ${settings.serverType}');
+
         // ⚠️ SEGURANÇA: Em RELEASE, FORÇA servidor remoto
-        final effectiveServerType = kReleaseMode ? 'remote' : settings.serverType;
+        final effectiveServerType = kReleaseMode
+            ? 'remote'
+            : settings.serverType;
+        logger.info('Effective Server Type: $effectiveServerType');
 
         if (effectiveServerType == 'remote') {
           customBaseUrl = '${Env.backendRemoteUrl}${Env.backendPathApi}';
-          logger.info('Using remote server: $customBaseUrl');
+          customRefreshUrl =
+              '${Env.backendRemoteUrl}${Env.backendPathApi}/auth/refresh';
+          logger.info('✓ Using REMOTE server');
+          logger.info('  Base URL: $customBaseUrl');
+          logger.info('  Refresh URL: $customRefreshUrl');
 
           // Se forçou em RELEASE, atualiza configuração salva para consistência
           if (kReleaseMode && settings.serverType != 'remote') {
             logger.warning(
-              'RELEASE mode detected: forcing remote server (was: ${settings.serverType})',
+              '⚠ RELEASE mode detected: forcing remote server (was: ${settings.serverType})',
             );
             settingsStorage.saveSettings(
               settings.copyWith(serverType: 'remote'),
@@ -101,45 +120,61 @@ class Injector with Loggable {
           }
         } else {
           customBaseUrl = '${Env.backendBaseUrl}${Env.backendPathApi}';
-          logger.info('Using local server: $customBaseUrl');
+          customRefreshUrl =
+              '${Env.backendBaseUrl}${Env.backendPathApi}/auth/refresh';
+          logger.info('✓ Using LOCAL server');
+          logger.info('  Base URL: $customBaseUrl');
+          logger.info('  Refresh URL: $customRefreshUrl');
         }
+        logger.info('═══════════════════════════════════════════════════');
       },
       failure: (_) {
         logger.warning('Failed to load server settings, using default');
         // Em RELEASE, fallback é remote; em DEBUG, é local
-        customBaseUrl = kReleaseMode
-            ? '${Env.backendRemoteUrl}${Env.backendPathApi}'
-            : '${Env.backendBaseUrl}${Env.backendPathApi}';
+        if (kReleaseMode) {
+          customBaseUrl = '${Env.backendRemoteUrl}${Env.backendPathApi}';
+          customRefreshUrl =
+              '${Env.backendRemoteUrl}${Env.backendPathApi}/auth/refresh';
+        } else {
+          customBaseUrl = '${Env.backendBaseUrl}${Env.backendPathApi}';
+          customRefreshUrl =
+              '${Env.backendBaseUrl}${Env.backendPathApi}/auth/refresh';
+        }
       },
     );
 
     // Cria Dio com URL dinâmica
-    di.registerLazySingleton<Dio>(() => DioFactory.create(customBaseUrl: customBaseUrl));
+    final dio = DioFactory.create(customBaseUrl: customBaseUrl);
+    logger.info('🌐 Dio created with baseUrl: ${dio.options.baseUrl}');
+
+    di.registerLazySingleton<Dio>(() => dio);
+
+    // Registra a refreshUrl para uso posterior
+    di.registerLazySingleton<String>(
+      () => customRefreshUrl!,
+      instanceName: 'refreshUrl',
+    );
+    logger.info('🔒 RefreshUrl registered: $customRefreshUrl');
     // Outros serviços core básicos...
   }
 
   void _setupDioInterceptors(DependencyInjector di) {
     final dio = di.get<Dio>();
+    final refreshUrl = di.get<String>(instanceName: 'refreshUrl');
 
     // Registra AuthInterceptor do pacote auth_client
     di.registerLazySingleton<AuthInterceptor>(
       () => AuthInterceptor(
         tokenStorage: di.get<TokenStorage>(),
         dio: dio,
-        refreshUrl: '${Env.backendBaseUrl}${Env.backendPathApi}/auth/refresh',
+        refreshUrl: refreshUrl,
       ),
     );
 
     if (!dio.interceptors.any((i) => i is AuthInterceptor)) {
       dio.interceptors.addAll([
         di.get<AuthInterceptor>(),
-        LogInterceptor(
-          request: true,
-          requestHeader: true,
-          requestBody: true,
-          responseBody: true,
-          error: true,
-        ),
+        SafeLogInterceptor(), // Interceptor seguro que filtra dados sensíveis
       ]);
     }
   }

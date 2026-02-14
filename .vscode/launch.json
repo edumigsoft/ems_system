@@ -22,14 +22,14 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
-            "program": "apps/ems/app_v1/lib/main.dart"
+            "program": "apps/ems/app_v1/lib/main_development.dart"
         },
         {
             "name": "SMS App V1 (debug mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "debug",
-            "program": "apps/sms/app_v1/lib/main.dart"
+            "program": "apps/sms/app_v1/lib/main_development.dart"
         },
         {
             "name": "SMS Server V1",
