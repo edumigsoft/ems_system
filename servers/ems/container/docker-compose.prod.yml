@@ -2,8 +2,9 @@ services:
   ems_server:
     container_name: ems_server_prod
     image: ghcr.io/edumigsoft/ems-server:latest
-    ports:
-      - "8181:8181"
+    # Porta removida - acessível apenas via NPM internamente
+    expose:
+      - "8181"
     env_file:
       - .env
     networks:
