@@ -10,6 +10,9 @@ class UserSettings {
   final String language;
   final String theme;
 
+  /// Tipo de servidor: 'local' ou 'remote'.
+  final String serverType;
+
   const UserSettings({
     this.notificationsEnabled = true,
     this.emailNotifications = true,
@@ -17,6 +20,7 @@ class UserSettings {
     this.darkMode = false,
     this.language = 'pt_BR',
     this.theme = 'acqua',
+    this.serverType = 'local',
   });
 
   /// Default settings instance.
@@ -30,6 +34,7 @@ class UserSettings {
     'dark_mode': darkMode,
     'language': language,
     'theme': theme,
+    'server_type': serverType,
   };
 
   /// Deserialization from Map.
@@ -41,6 +46,7 @@ class UserSettings {
       darkMode: map['dark_mode'] as bool? ?? false,
       language: map['language'] as String? ?? 'pt_BR',
       theme: map['theme'] as String? ?? 'acqua',
+      serverType: map['server_type'] as String? ?? 'local',
     );
   }
 
@@ -52,6 +58,7 @@ class UserSettings {
     bool? darkMode,
     String? language,
     String? theme,
+    String? serverType,
   }) {
     return UserSettings(
       notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
@@ -60,6 +67,7 @@ class UserSettings {
       darkMode: darkMode ?? this.darkMode,
       language: language ?? this.language,
       theme: theme ?? this.theme,
+      serverType: serverType ?? this.serverType,
     );
   }
 
@@ -73,7 +81,8 @@ class UserSettings {
           pushNotifications == other.pushNotifications &&
           darkMode == other.darkMode &&
           language == other.language &&
-          theme == other.theme;
+          theme == other.theme &&
+          serverType == other.serverType;
 
   @override
   int get hashCode =>
@@ -82,11 +91,13 @@ class UserSettings {
       pushNotifications.hashCode ^
       darkMode.hashCode ^
       language.hashCode ^
-      theme.hashCode;
+      theme.hashCode ^
+      serverType.hashCode;
 
   @override
   String toString() =>
       'UserSettings(notifications: $notificationsEnabled, '
       'email: $emailNotifications, push: $pushNotifications, '
-      'darkMode: $darkMode, language: $language, theme: $theme)';
+      'darkMode: $darkMode, language: $language, theme: $theme, '
+      'serverType: $serverType)';
 }
