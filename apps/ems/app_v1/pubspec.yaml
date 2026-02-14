@@ -36,6 +36,60 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: ^2.10.5
   envied_generator: ^1.3.2
+  icons_launcher: ^3.0.3
+  names_launcher: ^0.0.2
 
 flutter:
   uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/
+
+#dart run icons_launcher:create
+icons_launcher:
+  image_path: "assets/images/app_logo_full.png"
+  platforms:
+    android:
+      enable: true
+      # adaptive_background_color: '#ffffff'
+      # adaptive_background_image: 'assets/ic_background.png'
+      # adaptive_foreground_image: 'assets/ic_foreground.png'
+      # adaptive_round_image: 'assets/ic_logo_round.png'
+      # adaptive_monochrome_image: 'assets/ic_logo_monochrome.png'
+    ios:
+      enable: false
+    web:
+      enable: true
+      # image_path: 'assets/ic_logo_border.png'
+      # favicon_path: 'assets/ic_logo_round.png'
+    macos:
+      enable: false
+    windows:
+      enable: true
+      # image_path: 'assets/ic_logo_border.png'
+    linux:
+      enable: true
+      # image_path: 'assets/ic_logo_border.png'
+
+# dart run names_launcher:change
+names_launcher:
+  name: "EduMigSoft Manager System"
+  platforms:
+    android:
+      enable: true
+      name: "EMS System"
+    ios:
+      enable: false
+      # name: "Your iOS App Name"
+    web:
+      enable: true
+      name: "EduMigSoft Manager System"
+    macos:
+      enable: false
+      # name: "Your MasOS App Name"
+    windows:
+      enable: true
+      name: "EduMigSoft Manager System"
+    linux:
+      enable: true
+      name: "EduMigSoft Manager System"

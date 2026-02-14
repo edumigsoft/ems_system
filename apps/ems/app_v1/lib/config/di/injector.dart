@@ -6,6 +6,7 @@ import 'package:core_shared/core_shared.dart'
 import 'package:core_ui/core_ui.dart' show AppModule;
 import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:notebook_ui/notebook_ui.dart';
 import 'package:tag_ui/tag_ui.dart' show TagModule;
 import 'package:user_ui/user_ui.dart' show SettingsViewModel, UserModule;
@@ -82,17 +83,33 @@ class Injector with Loggable {
 
     settingsResult.when(
       success: (settings) {
-        if (settings.serverType == 'remote') {
+        // ⚠️ SEGURANÇA: Em RELEASE, FORÇA servidor remoto
+        final effectiveServerType = kReleaseMode ? 'remote' : settings.serverType;
+
+        if (effectiveServerType == 'remote') {
           customBaseUrl = '${Env.backendRemoteUrl}${Env.backendPathApi}';
           logger.info('Using remote server: $customBaseUrl');
+
+          // Se forçou em RELEASE, atualiza configuração salva para consistência
+          if (kReleaseMode && settings.serverType != 'remote') {
+            logger.warning(
+              'RELEASE mode detected: forcing remote server (was: ${settings.serverType})',
+            );
+            settingsStorage.saveSettings(
+              settings.copyWith(serverType: 'remote'),
+            );
+          }
         } else {
           customBaseUrl = '${Env.backendBaseUrl}${Env.backendPathApi}';
           logger.info('Using local server: $customBaseUrl');
         }
       },
       failure: (_) {
-        logger.warning('Failed to load server settings, using default (local)');
-        customBaseUrl = '${Env.backendBaseUrl}${Env.backendPathApi}';
+        logger.warning('Failed to load server settings, using default');
+        // Em RELEASE, fallback é remote; em DEBUG, é local
+        customBaseUrl = kReleaseMode
+            ? '${Env.backendRemoteUrl}${Env.backendPathApi}'
+            : '${Env.backendBaseUrl}${Env.backendPathApi}';
       },
     );
 

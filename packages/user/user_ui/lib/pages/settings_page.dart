@@ -1,4 +1,5 @@
 import 'package:design_system_shared/design_system_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localization/app_localizations.dart'
     show AppLocalizations;
@@ -115,15 +116,17 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const Divider(),
 
-              // Seção Conexão
-              _buildSectionHeader(theme, 'Conexão'),
-              _buildListTile(
-                icon: Icons.dns,
-                title: 'Servidor',
-                subtitle: _getServerName(widget.viewModel.serverType),
-                onTap: () => _showServerDialog(context),
-              ),
-              const Divider(),
+              // Seção Conexão (DEBUG apenas)
+              if (kDebugMode) ...[
+                _buildSectionHeader(theme, 'Conexão'),
+                _buildListTile(
+                  icon: Icons.dns,
+                  title: 'Servidor',
+                  subtitle: _getServerName(widget.viewModel.serverType),
+                  onTap: () => _showServerDialog(context),
+                ),
+                const Divider(),
+              ],
 
               // Seção Privacidade
               _buildSectionHeader(theme, 'Privacidade'),

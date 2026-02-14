@@ -119,6 +119,7 @@ class _AppLayoutState extends State<AppLayout> {
           home: AppPage(
             viewModel: widget.viewModel,
             authViewModel: widget.authViewModel,
+            settingsViewModel: widget.settingsViewModel,
           ),
           debugShowCheckedModeBanner: false,
           // Themes

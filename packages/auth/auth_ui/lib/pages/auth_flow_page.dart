@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:user_ui/view_models/settings_view_model.dart';
 import '../view_models/auth_view_model.dart';
 import 'login_page.dart';
 import 'register_page.dart';
@@ -73,10 +74,16 @@ class AuthFlowPage extends StatefulWidget {
   /// Se fornecido, inicia o fluxo na tela de reset de senha.
   final String? initialResetToken;
 
+  /// ViewModel de configurações (opcional).
+  ///
+  /// Se fornecido, permite seleção de servidor na tela de login (DEBUG apenas).
+  final SettingsViewModel? settingsViewModel;
+
   const AuthFlowPage({
     super.key,
     required this.authViewModel,
     this.initialResetToken,
+    this.settingsViewModel,
   });
 
   @override
@@ -154,6 +161,7 @@ class _AuthFlowPageState extends State<AuthFlowPage> {
         return LoginPage(
           key: const ValueKey('login'),
           viewModel: widget.authViewModel,
+          settingsViewModel: widget.settingsViewModel,
           onRegisterTap: () => _navigateTo(AuthFlowState.register),
           onForgotPasswordTap: () => _navigateTo(AuthFlowState.forgotPassword),
           welcomeMessage: _loginWelcomeMessage,

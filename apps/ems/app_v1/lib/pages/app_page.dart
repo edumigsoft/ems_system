@@ -3,6 +3,7 @@ import 'package:auth_ui/auth_ui.dart'
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:core_ui/core_ui.dart' show ResponsiveLayout;
 import 'package:flutter/material.dart';
+import 'package:user_ui/view_models/settings_view_model.dart';
 
 import '../view_models/app_view_model.dart';
 import 'desktop_page.dart';
@@ -12,11 +13,13 @@ import 'tablet_page.dart';
 class AppPage extends StatefulWidget {
   final AppViewModel viewModel;
   final AuthViewModel authViewModel;
+  final SettingsViewModel settingsViewModel;
 
   const AppPage({
     super.key,
     required this.viewModel,
     required this.authViewModel,
+    required this.settingsViewModel,
   });
 
   @override
@@ -54,6 +57,7 @@ class _AppPageState extends State<AppPage> {
               ),
               unauthenticatedChild: AuthFlowPage(
                 authViewModel: widget.authViewModel,
+                settingsViewModel: widget.settingsViewModel,
               ),
             );
           },
