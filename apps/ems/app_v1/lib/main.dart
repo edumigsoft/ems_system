@@ -1,10 +1,8 @@
+import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:ems_app_v1/app_layout.dart';
+import 'package:flutter/material.dart';
 
 import 'config/di/injector.dart';
-import 'package:core_shared/core_shared.dart'
-    show GetItInjector, LogService, LogLevel;
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 /// Ponto de entrada principal do aplicativo EMS System.
 ///
@@ -46,17 +44,6 @@ import 'package:flutter/material.dart';
 void main() async {
   // Inicializa os bindings do Flutter
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializa o serviço de log com nível apropriado
-  await LogService.init(
-    kReleaseMode ? LogLevel.warning : LogLevel.verbose,
-    writeToFile: true,
-  );
-
-  final logger = LogService.getLogger('Main');
-  logger.info(
-    'EMS System starting in ${kReleaseMode ? "RELEASE" : "DEBUG"} mode',
-  );
 
   // Inicializa injeção de dependências
   await Injector().injector();
