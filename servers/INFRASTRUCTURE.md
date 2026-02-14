@@ -18,7 +18,7 @@ Antes de subir qualquer contêiner, é **obrigatório** criar a rede compartilha
 Execute no terminal:
 
 ```bash
-docker network create ems_net
+docker network create ems_system_net
 
 ```
 
@@ -29,18 +29,21 @@ docker network create ems_net
 ```text
 ems_system/
 ├── servers/
-│   ├── container/
-│   │   └── postgres/           # Infraestrutura (Banco de Dados)
-│   │       ├── docker-compose.yml
-│   │       ├── .env            # Credenciais MESTRAS e de USUÁRIOS
-│   │       └── init_users.sh   # Script de criação automática de users
+│   ├── containers/             # Infraestrutura Global
+│   │   ├── postgres/           # Banco de Dados
+│   │   │   ├── docker-compose.yml
+│   │   │   ├── .env
+│   │   │   └── init_users.sh
+│   │   │
+│   │   └── proxy/              # Nginx Proxy Manager (Novo)
+│   │       └── docker-compose.yml
 │   │
 │   ├── ems/
 │   │   ├── server_v1/          # Código Fonte Dart
 │   │   └── container/          # Docker do EMS
 │   │       ├── Dockerfile
 │   │       ├── docker-compose.yml
-│   │       └── .env            # Credenciais APENAS do EMS
+│   │       └── .env
 │   │
 │   └── sms_server/
 │       ├── server_v1/          # Código Fonte Dart
@@ -57,20 +60,20 @@ ems_system/
 
 O banco de dados é o "coração" da infraestrutura e deve ser iniciado primeiro.
 
-**Local:** `servers/container/postgres/`
+**Local:** `servers/containers/postgres/`
 
 ### Funcionalidades
 
-* Utiliza um script `.sh` (`init_users.sh`) mapeado para `/docker-entrypoint-initdb.d/`.
-* Este script roda apenas na **primeira execução** (quando o volume está vazio).
-* Lê as variáveis do `.env` para criar os bancos `db_ems`, `db_sms` e seus respectivos usuários automaticamente.
+*   Utiliza um script `.sh` (`init_users.sh`) mapeado para `/docker-entrypoint-initdb.d/`.
+*   Este script roda apenas na **primeira execução** (quando o volume está vazio).
+*   Lê as variáveis do `.env` para criar os bancos `db_ems`, `db_sms` e seus respectivos usuários automaticamente.
 
 ### Comandos de Operação
 
 **Iniciar:**
 
 ```bash
-cd servers/container/postgres/
+cd servers/containers/postgres/
 docker compose up -d
 
 ```
@@ -95,10 +98,10 @@ Os servidores são compilados em Dart e rodam em contêineres mínimos.
 
 ### O Dockerfile (Destaques)
 
-* **Build Context:** O `docker-compose.yml` define o contexto na raiz (`../../..`).
-* **Cópia de Pacotes:** Copia a pasta `packages/` para garantir que dependências locais (shared) estejam disponíveis.
-* **Isolamento:** Executa um comando `sed` para remover `resolution: workspace` do `pubspec.yaml`, permitindo compilação isolada sem o Flutter.
-* **Conexão DB:** Utiliza `Platform.environment` no Dart para ler as variáveis injetadas.
+*   **Build Context:** O `docker-compose.yml` define o contexto na raiz (`../../..`).
+*   **Cópia de Pacotes:** Copia a pasta `packages/` para garantir que dependências locais (shared) estejam disponíveis.
+*   **Isolamento:** Executa um comando `sed` para remover `resolution: workspace` do `pubspec.yaml`, permitindo compilação isolada sem o Flutter.
+*   **Conexão DB:** Utiliza `Platform.environment` no Dart para ler as variáveis injetadas.
 
 ### Configuração de Rede (`docker-compose.yml`)
 
@@ -106,7 +109,7 @@ Todos os serviços de aplicação devem declarar a rede externa no final do arqu
 
 ```yaml
 networks:
-  ems_net:
+  ems_system_net:
     external: true
 
 ```
@@ -144,10 +147,50 @@ docker logs -f ems_server_app
 
 O banco de dados expõe a porta `5432` para o host.
 
-* **Host:** `localhost` (ou IP da VPS)
-* **Porta:** `5432`
-* **Database:** `postgres_admin`, `db_ems` ou `db_sms`
-* **Username/Password:** Conforme definido no arquivo `.env` da pasta `postgres`.
+*   **Host:** `localhost` (ou IP da VPS)
+*   **Porta:** `5432`
+*   **Database:** `postgres_admin`, `db_ems` ou `db_sms`
+*   **Username/Password:** Conforme definido no arquivo `.env` da pasta `postgres`.
+
+---
+
+---
+
+## 6. Ambiente Local com HTTPS (Nginx Proxy Manager)
+
+Para simular o ambiente de produção (VPS) e ter SSL localmente:
+
+1.  **Iniciar o Proxy:**
+
+    ```bash
+    cd servers/containers/proxy/
+    docker compose up -d
+    ```
+
+2.  **Configurar:**
+    *   Acesse `http://localhost:81`
+    *   Login padrão: `admin@example.com` / `changeme`
+    *   Altere as credenciais conforme solicitado.
+
+3.  **Criar Proxy Host:**
+    *   Navegue para **Hosts** > **Proxy Hosts** > **Add Proxy Host**.
+    *   **Details:**
+        *   Domain Names: `localhost` (ou `ems.local` se configurado no `/etc/hosts`)
+        *   Scheme: `http`
+        *   Forward Hostname / IP: `ems_server_dev` (nome do container na rede interna)
+        *   Forward Port: `8181`
+        *   Cache Assets: Enable (opcional)
+        *   Block Common Exploits: Enable (opcional)
+    *   **SSL:**
+        *   SSL Certificate: *Request a new SSL Certificate*
+        *   Force SSL: Enable
+        *   HTTP/2 Support: Enable
+        *   *Nota:* Para `localhost`, o Let's Encrypt pode falhar. Use "Self Signed" se disponível ou apenas HTTP na porta 80 para testes simples, mas para simular SSL real, recomenda-se configurar um domínio local no `/etc/hosts` e gerar um certificado self-signed dentro do container ou importá-lo.
+    *   Save.
+
+4.  **Acessar:**
+    *   Acesse `https://localhost` (ou o domínio configurado).
+    *   A API estará disponível com terminação SSL gerenciada pelo Nginx.
 
 ---
 
@@ -155,7 +198,7 @@ O banco de dados expõe a porta `5432` para o host.
 
 | Erro | Causa Provável | Solução |
 | --- | --- | --- |
-| `Network ems_net not found` | A rede não foi criada manualmente. | Rode `docker network create ems_net`. |
-| `Connection Refused (localhost)` | A app está tentando conectar no próprio container. | Verifique se o código Dart usa `Platform.environment['DB_HOST']` e se o `.env` aponta para `postgres_shared_db`. |
+| `Network ems_system_net not found` | A rede não foi criada manualmente. | Rode `docker network create ems_system_net`. |
+| `Connection Refused (localhost)` | A app está tentando conectar no próprio container. | Verifique se o código Dart usa `Platform.environment['DB_HOST']` e se o `.env` aponta para `postgres_ems_system`. |
 | `database files are incompatible` | Tentativa de rodar Postgres 15 em volume criado por versão 17. | Apague o volume do Docker (`docker volume rm`) e inicie novamente. |
 | `Fatal: password authentication failed` | O volume antigo persistiu senhas antigas. | Apague o volume do Docker e inicie novamente para rodar o script de usuários com as novas senhas. |

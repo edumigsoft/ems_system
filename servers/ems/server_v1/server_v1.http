@@ -1,17 +1,17 @@
 ###
-http://localhost:8181/api/v1
+https://ems.local/api/v1
 
 ###
-http://localhost:8181/api/v1/health
+https://ems.local/api/v1/health
 
 ###
-http://localhost:8181/api/v1/users
+https://ems.local/api/v1/users
 
 ###
-http://localhost:8181/api/v1/docs/openapi.json
+https://ems.local/api/v1/docs/openapi.json
 
 ###
-http://localhost:8181/api/v1/docs
+https://ems.local/api/v1/docs
 
 ###
-http://localhost:8181/api/v1/areas
+https://ems.local/api/v1/areas
