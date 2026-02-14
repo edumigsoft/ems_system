@@ -77,14 +77,17 @@ class SafeLogInterceptor extends Interceptor {
     debugPrint('│ ❌ ERROR');
     debugPrint('├─────────────────────────────────────────────────');
     debugPrint('│ ${err.requestOptions.method} ${err.requestOptions.uri}');
-    debugPrint('│ ${err.type}: ${err.message}');
+    debugPrint('│ Type: ${err.type}');
+    debugPrint('│ Message: ${err.message}');
 
     if (err.response != null) {
-      debugPrint('│ Status: ${err.response?.statusCode}');
+      debugPrint('│ Status Code: ${err.response?.statusCode}');
       if (err.response?.data != null) {
         final filteredData = _filterSensitiveData(err.response!.data);
-        debugPrint('│ Error Data: $filteredData');
+        debugPrint('│ Response Data: $filteredData');
       }
+    } else {
+      debugPrint('│ No response received (connection error, timeout, etc.)');
     }
 
     debugPrint('└─────────────────────────────────────────────────');
