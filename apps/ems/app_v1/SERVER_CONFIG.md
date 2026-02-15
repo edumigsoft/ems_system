@@ -196,3 +196,8 @@ flutter build apk --release
 
 **Versão**: 1.1.0
 **Última atualização**: 2026-02-14
+
+
+
+# Configuração de Servidor - EMS App v1
+
