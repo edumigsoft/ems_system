@@ -86,7 +86,11 @@ COPY packages/notebook/notebook_server /app/packages/notebook/notebook_server
 # --- 5. COPIAR CÓDIGO FONTE DO SERVIDOR ---
 COPY servers/ems/server_v1 /app/servers/ems/server_v1
 
-# --- 6. COMPILAÇÃO ---
+# --- 6. COPIAR ARQUIVOS .ENV ---
+COPY servers/ems/server_v1/.env /app/servers/ems/server_v1/.env
+COPY servers/ems/container/.env /app/servers/ems/container/.env
+
+# --- 7. COMPILAÇÃO ---
 WORKDIR /app/servers/ems/server_v1
 RUN dart compile exe bin/server.dart -o bin/server
 
