@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
+import 'package:flutter/foundation.dart';
 import '../env/env.dart';
 
 class DioFactory {
@@ -8,7 +11,7 @@ class DioFactory {
   static Dio create({String? customBaseUrl}) {
     final baseUrl = customBaseUrl ?? '${Env.backendBaseUrl}${Env.backendPathApi}';
 
-    return Dio(
+    final dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 30),
@@ -16,5 +19,17 @@ class DioFactory {
         headers: {'Content-Type': 'application/json'},
       ),
     );
+
+    // ⚠️ APENAS EM DEBUG: Aceita certificados SSL auto-assinados
+    if (kDebugMode) {
+      (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        final client = HttpClient();
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      };
+    }
+
+    return dio;
   }
 }
