@@ -1,6 +1,7 @@
 services:
   sms_server:
     container_name: sms_server_dev
+    image: sms_server_image:latest
     build:
       context: ../../../
       dockerfile: servers/sms/container/Dockerfile

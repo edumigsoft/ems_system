@@ -42,9 +42,16 @@ class AuthRoutes extends Routes {
   /// POST /auth/login
   Future<Response> _login(Request request) async {
     try {
-      final body = await request.readAsString();
-      final json = jsonDecode(body) as Map<String, dynamic>;
-      final loginRequest = LoginRequest.fromJson(json);
+      // Extrair credenciais do header Authorization
+      final loginRequest = _extractBasicAuthCredentials(request);
+
+      if (loginRequest == null) {
+        return Response(
+          401,
+          body: jsonEncode({'error': 'Credenciais inválidas'}),
+          headers: {'Content-Type': 'application/json'},
+        );
+      }
 
       final result = await _authService.login(loginRequest);
 
@@ -272,6 +279,60 @@ class AuthRoutes extends Routes {
         body: jsonEncode({'error': 'Erro ao processar mudança de senha: $e'}),
         headers: {'Content-Type': 'application/json'},
       );
+    }
+  }
+
+  /// Extrai e valida credenciais Basic Auth da requisição.
+  ///
+  /// Retorna LoginRequest se válido, null se ausente ou inválido.
+  /// NÃO loga credenciais por segurança.
+  LoginRequest? _extractBasicAuthCredentials(Request request) {
+    try {
+      // Obter header Authorization (Shelf sempre usa lowercase)
+      final authHeader = request.headers['authorization'];
+
+      if (authHeader == null || authHeader.isEmpty) {
+        return null;
+      }
+
+      // Validar formato: "Basic {base64}"
+      final trimmed = authHeader.trim();
+      if (!trimmed.toLowerCase().startsWith('basic ')) {
+        return null;
+      }
+
+      // Extrair porção base64 (pular prefixo "Basic ")
+      final encoded = trimmed.substring(6).trim();
+      if (encoded.isEmpty) {
+        return null;
+      }
+
+      // Decodificar base64 → bytes → UTF-8 string
+      final bytes = base64Decode(encoded);
+      final decoded = utf8.decode(bytes);
+
+      // Dividir no PRIMEIRO ':' (permite senhas com ':')
+      final separatorIndex = decoded.indexOf(':');
+      if (separatorIndex == -1) {
+        return null;
+      }
+
+      final email = decoded.substring(0, separatorIndex);
+      final password = decoded.substring(separatorIndex + 1);
+
+      // Validação básica de presença (LoginRequestValidator faz validação profunda)
+      if (email.isEmpty || password.isEmpty) {
+        return null;
+      }
+
+      return LoginRequest(email: email, password: password);
+
+    } on FormatException {
+      // Base64 inválido
+      return null;
+    } catch (e) {
+      // Outros erros de decodificação (UTF-8, etc.)
+      return null;
     }
   }
 }
