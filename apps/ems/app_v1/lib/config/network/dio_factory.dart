@@ -20,12 +20,21 @@ class DioFactory {
       ),
     );
 
-    // ⚠️ APENAS EM DEBUG: Aceita certificados SSL auto-assinados
-    if (kDebugMode) {
+    // ⚠️ APENAS EM DEBUG: Aceita certificados SSL autoassinados
+    // Necessário para desenvolvimento local com HTTPS (ems.local)
+    if (kDebugMode && baseUrl.startsWith('https://')) {
       (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
         final client = HttpClient();
-        client.badCertificateCallback =
-            (X509Certificate cert, String host, int port) => true;
+        client.badCertificateCallback = (cert, host, port) {
+          // Aceita apenas certificados do servidor local
+          if (host == 'ems.local' || host.contains('localhost')) {
+            if (kDebugMode) {
+              debugPrint('⚠️  Accepting self-signed certificate for $host');
+            }
+            return true;
+          }
+          return false;
+        };
         return client;
       };
     }
