@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
+import 'package:ems_app_v1/main.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import 'package:user_ui/view_models/settings_view_model.dart';
@@ -115,6 +116,7 @@ class _AppLayoutState extends State<AppLayout> {
       ]),
       builder: (context, child) {
         return MaterialApp(
+          navigatorKey: alice.getNavigatorKey(),
           title: 'EMS System',
           home: AppPage(
             viewModel: widget.viewModel,

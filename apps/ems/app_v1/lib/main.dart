@@ -1,8 +1,18 @@
+import 'package:alice/model/alice_configuration.dart';
 import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:ems_app_v1/app_layout.dart';
 import 'package:flutter/material.dart';
 
 import 'config/di/injector.dart';
+
+import 'package:alice/alice.dart';
+
+final alice = Alice(
+  configuration: AliceConfiguration(
+    showNotification: false,
+    showInspectorOnShake: true,
+  ),
+);
 
 /// Ponto de entrada principal do aplicativo EMS System.
 ///
