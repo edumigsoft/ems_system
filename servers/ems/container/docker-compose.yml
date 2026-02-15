@@ -1,7 +1,7 @@
 services:
   ems_server:
     container_name: ems_server_dev
-    image: ems_server_image:v1
+    image: ems_server_image:latest
     build:
       # Sobe até a raiz do projeto (ems_system)
       context: ../../../
