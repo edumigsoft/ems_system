@@ -2,8 +2,8 @@ services:
   sms_server:
     container_name: sms_server_prod
     image: ghcr.io/edumigsoft/sms-server:latest
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     env_file:
       - .env
     networks:
