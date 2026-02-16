@@ -74,7 +74,7 @@ void main() {
           // Assert
           expect(result, isA<Failure<NotebookDetails>>());
           final failure = result as Failure<NotebookDetails>;
-          expect(failure.error.toString(), contains('Dados inválidos'));
+          expect(failure.error.toString(), contains('Requisição inválida'));
         },
       );
 
@@ -104,7 +104,7 @@ void main() {
           // Assert
           expect(result, isA<Failure<NotebookDetails>>());
           final failure = result as Failure<NotebookDetails>;
-          expect(failure.error.toString(), contains('Erro no servidor'));
+          expect(failure.error.toString(), contains('Erro interno do servidor'));
         },
       );
 
@@ -292,7 +292,7 @@ void main() {
         // Assert
         expect(result, isA<Failure<List<NotebookDetails>>>());
         final failure = result as Failure<List<NotebookDetails>>;
-        expect(failure.error.toString(), contains('Erro de conexão'));
+        expect(failure.error.toString(), contains('Sem conexão com a internet'));
       });
     });
 
@@ -424,7 +424,7 @@ void main() {
       });
     });
 
-    group('_handleDioError', () {
+    group('error handling', () {
       test('should handle all DioExceptionType variants correctly', () async {
         // Test timeout variants
         when(mockApiService.create(any)).thenThrow(
@@ -439,7 +439,7 @@ void main() {
         );
         expect(
           (result as Failure).error.toString(),
-          contains('Tempo de conexão esgotado'),
+          contains('Tempo de envio esgotado'),
         );
 
         // Test cancel
@@ -468,7 +468,7 @@ void main() {
         );
         expect(
           (result as Failure).error.toString(),
-          contains('certificado SSL'),
+          contains('Certificado de segurança inválido'),
         );
 
         // Test unknown
@@ -485,7 +485,7 @@ void main() {
         );
         expect(
           (result as Failure).error.toString(),
-          contains('Erro inesperado'),
+          contains('Erro desconhecido na comunicação com o servidor'),
         );
       });
     });

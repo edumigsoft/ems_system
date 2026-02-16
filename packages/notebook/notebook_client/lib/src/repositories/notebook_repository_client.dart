@@ -1,4 +1,5 @@
 import 'package:core_shared/core_shared.dart';
+import 'package:core_client/core_client.dart' show DioErrorHandler;
 import 'package:dio/dio.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 import '../services/notebook_api_service.dart';
@@ -7,7 +8,8 @@ import '../services/notebook_api_service.dart';
 ///
 /// All methods return [Result] to enable explicit error handling
 /// without throwing exceptions (ADR-0001: Result Pattern).
-class NotebookRepositoryClient implements NotebookRepository {
+class NotebookRepositoryClient with Loggable, DioErrorHandler
+    implements NotebookRepository {
   final NotebookApiService _api;
 
   /// Creates a NotebookRepositoryClient instance.
@@ -20,9 +22,9 @@ class NotebookRepositoryClient implements NotebookRepository {
       final response = await _api.create(model.toJson());
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'NotebookRepository.create');
     } catch (e) {
-      return Failure(Exception('Erro ao criar notebook: $e'));
+      return handleError(e, 'NotebookRepository.create');
     }
   }
 
@@ -32,9 +34,9 @@ class NotebookRepositoryClient implements NotebookRepository {
       final response = await _api.getById(id);
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'NotebookRepository.getById');
     } catch (e) {
-      return Failure(Exception('Erro ao buscar notebook: $e'));
+      return handleError(e, 'NotebookRepository.getById');
     }
   }
 
@@ -61,9 +63,9 @@ class NotebookRepositoryClient implements NotebookRepository {
       final entities = response.map((model) => model.toDomain()).toList();
       return Success(entities);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'NotebookRepository.getAll');
     } catch (e) {
-      return Failure(Exception('Erro ao listar notebooks: $e'));
+      return handleError(e, 'NotebookRepository.getAll');
     }
   }
 
@@ -74,9 +76,9 @@ class NotebookRepositoryClient implements NotebookRepository {
       final response = await _api.update(data.id, model.toJson());
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'NotebookRepository.update');
     } catch (e) {
-      return Failure(Exception('Erro ao atualizar notebook: $e'));
+      return handleError(e, 'NotebookRepository.update');
     }
   }
 
@@ -86,9 +88,9 @@ class NotebookRepositoryClient implements NotebookRepository {
       await _api.delete(id);
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'NotebookRepository.delete');
     } catch (e) {
-      return Failure(Exception('Erro ao deletar notebook: $e'));
+      return handleError(e, 'NotebookRepository.delete');
     }
   }
 
@@ -98,51 +100,9 @@ class NotebookRepositoryClient implements NotebookRepository {
       await _api.restore(id);
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'NotebookRepository.restore');
     } catch (e) {
-      return Failure(Exception('Erro ao restaurar notebook: $e'));
-    }
-  }
-
-  /// Handles DioException and converts to meaningful error messages.
-  Exception _handleDioError(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return Exception('Tempo de conexão esgotado. Verifique sua internet.');
-
-      case DioExceptionType.badResponse:
-        final statusCode = e.response?.statusCode;
-        final data = e.response?.data;
-        final message =
-            (data is Map ? data['message'] as String? : null) ??
-            'Erro desconhecido';
-
-        switch (statusCode) {
-          case 400:
-            return Exception('Dados inválidos: $message');
-          case 404:
-            return Exception('Notebook não encontrado');
-          case 409:
-            return Exception('Conflito: $message');
-          case 500:
-            return Exception('Erro no servidor. Tente novamente mais tarde.');
-          default:
-            return Exception('Erro HTTP $statusCode: $message');
-        }
-
-      case DioExceptionType.cancel:
-        return Exception('Requisição cancelada');
-
-      case DioExceptionType.connectionError:
-        return Exception('Erro de conexão. Verifique sua internet.');
-
-      case DioExceptionType.badCertificate:
-        return Exception('Erro de certificado SSL');
-
-      case DioExceptionType.unknown:
-        return Exception('Erro inesperado: ${e.message}');
+      return handleError(e, 'NotebookRepository.restore');
     }
   }
 }
