@@ -218,6 +218,59 @@ Para adicionar um novo preset de tema:
 
 Consulte `ARCHITECTURE.md` para obter detalhes sobre o padrão **Dual Interface** (CoreValidator + FormValidationMixin) e exemplos de implementação.
 
+### Tratamento de Erros
+
+O sistema usa padrões centralizados para tratamento de erros (ADR-0002, ADR-0007):
+
+**Cliente (Repositórios e Services):**
+- ✅ **OBRIGATÓRIO:** Use o mixin `DioErrorHandler` em todos os repositórios/services que fazem chamadas HTTP
+- ✅ Converte exceções Dio em mensagens user-friendly automaticamente
+- ✅ Retorna `Result<T>` com `DataException` ao invés de `Exception` genérico
+
+```dart
+class MyRepositoryClient with Loggable, DioErrorHandler implements MyRepository {
+  @override
+  Future<Result<MyEntity>> getById(String id) async {
+    try {
+      final response = await _api.getById(id);
+      return Success(response.toDomain());
+    } on DioException catch (e) {
+      return handleDioError(e, context: 'MyRepository.getById');  // ✅ Use DioErrorHandler
+    } catch (e) {
+      return handleError(e, 'MyRepository.getById');
+    }
+  }
+}
+```
+
+**Servidor (Rotas REST API):**
+- ✅ **OBRIGATÓRIO:** Use `HttpResponseHelper.toResponse()` em todas as rotas que retornam `Result<T>`
+- ✅ Use `HttpResponseHelper.error()` em blocos `catch` para exceções
+- ✅ Aplica `ErrorMessageMapper` automaticamente para mensagens amigáveis
+
+```dart
+Future<Response> _myRoute(Request request) async {
+  try {
+    final result = await _service.doSomething();
+
+    return HttpResponseHelper.toResponse(
+      result,
+      successCode: 201,  // Opcional, padrão é 200
+      onSuccess: (value) => value.toJson(),
+    );
+  } catch (e) {
+    return HttpResponseHelper.error(
+      e is Exception ? e : Exception('Erro ao processar: $e'),
+    );
+  }
+}
+```
+
+**Mensagens de Erro (Servidor):**
+- Servidor retorna JSON estruturado: `{error, message, statusCode, details}`
+- Cliente extrai mensagens do JSON automaticamente via `DioErrorHandler`
+- Consulte ADR-0007 para detalhes do formato de resposta
+
 ## Estrutura do Projeto
 
 ```
@@ -318,6 +371,7 @@ ems_system/
 - `docs/adr/0004-form-validation-zard.md` - Validação de formulários com Zard
 - `docs/adr/0005-package-structure.md` - Estrutura padrão de pacotes
 - `docs/adr/0006-base-details-sync.md` - Sincronização base details
+- `docs/adr/0007-rest-api-error-messages.md` - Mensagens de erro REST API amigáveis
 
 **Guias de Arquitetura:**
 - `docs/architecture/architecture_patterns.md` - Padrões arquiteturais do sistema
@@ -379,6 +433,14 @@ O projeto mantém registros de decisões arquiteturais importantes em `docs/adr/
 6. **ADR-0006: Base Details Sync** (`docs/adr/0006-base-details-sync.md`)
    - Padrão de sincronização entre listagens e detalhes
    - Evita inconsistências de estado
+
+7. **ADR-0007: REST API Error Messages** (`docs/adr/0007-rest-api-error-messages.md`)
+   - Sistema padronizado de mensagens de erro amigáveis para API REST
+   - `ErrorMessageMapper` mapeia exceções de domínio em mensagens user-friendly
+   - Formato estruturado: `{error, message, statusCode, details}`
+   - Integra com `HttpResponseHelper` e `DioErrorHandler` (ADR-0002)
+   - Implementação em `packages/core/core_server/lib/src/utils/error_message_mapper.dart`
+   - **Use HttpResponseHelper.toResponse() em rotas** para aplicar automaticamente
 
 **Ao tomar decisões arquiteturais significativas**, considere criar um novo ADR seguindo o formato existente.
 
