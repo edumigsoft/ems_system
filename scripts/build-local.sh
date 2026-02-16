@@ -48,12 +48,12 @@ if [ "$SERVER" = "ems" ]; then
     SERVER_DIR="servers/ems"
     CONTAINER_DIR="servers/ems/container"
     PUBSPEC_PATH="servers/ems/server_v1/pubspec.yaml"
-    IMAGE_NAME="ems-server"
+    IMAGE_NAME="ems_server_image"
 elif [ "$SERVER" = "sms" ]; then
     SERVER_DIR="servers/sms"
     CONTAINER_DIR="servers/sms/container"
     PUBSPEC_PATH="servers/sms/server_v1/pubspec.yaml"
-    IMAGE_NAME="sms-server"
+    IMAGE_NAME="sms_server_image"
 fi
 
 # Ler versão do pubspec.yaml
