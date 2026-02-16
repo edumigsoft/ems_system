@@ -39,7 +39,20 @@ if [ $# -lt 1 ]; then
 fi
 
 SERVER=$1
-VERSION=${2:-latest}
+
+# Se versão não fornecida, pedir ao usuário
+if [ -z "$2" ]; then
+    echo ""
+    log_info "Versões disponíveis:"
+    echo "  • latest (mais recente)"
+    echo "  • Versão específica (ex: 1.1.0)"
+    echo "  • Série de versão (ex: v1.1)"
+    echo ""
+    read -p "Digite a versão [latest]: " VERSION_INPUT
+    VERSION=${VERSION_INPUT:-latest}
+else
+    VERSION=$2
+fi
 
 # Validar servidor
 if [[ ! "$SERVER" =~ ^(ems|sms)$ ]]; then

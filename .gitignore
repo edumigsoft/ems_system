@@ -57,6 +57,7 @@ servers/containers/proxy/letsencrypt/*.pem
 # Dados do Nginx Proxy Manager
 servers/containers/proxy/data/
 servers/containers/proxy/letsencrypt/
+servers/containers/proxy/auto-generate/
 
 # PostgreSQL - Dados persistidos
 servers/containers/postgres/data/
