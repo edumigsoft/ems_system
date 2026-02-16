@@ -17,7 +17,8 @@ void main() {
         expect(response.statusCode, 200);
         expect(response.headers['content-type'], contains('application/json'));
 
-        final body = json.decode(await response.readAsString());
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
         expect(body['data'], 'test data');
       });
 
@@ -46,74 +47,95 @@ void main() {
         );
 
         // Assert
-        final body = json.decode(await response.readAsString());
-        expect(body['transformed']['name'], 'Test');
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
+        final transformed = body['transformed'] as Map<String, dynamic>;
+        expect(transformed['name'], 'Test');
       });
 
-      test('should return 400 with ErrorResponse for ValidationException', () async {
-        // Arrange
-        final result = Failure<String>(
-          ValidationException({
-            'email': ['Email é obrigatório'],
-            'password': ['Senha muito curta'],
-          }),
-        );
+      test(
+        'should return 400 with ErrorResponse for ValidationException',
+        () async {
+          // Arrange
+          final result = Failure<String>(
+            ValidationException({
+              'email': ['Email é obrigatório'],
+              'password': ['Senha muito curta'],
+            }),
+          );
 
-        // Act
-        final response = HttpResponseHelper.toResponse(result);
+          // Act
+          final response = HttpResponseHelper.toResponse(result);
 
-        // Assert
-        expect(response.statusCode, 400);
-        expect(response.headers['content-type'], contains('application/json'));
+          // Assert
+          expect(response.statusCode, 400);
+          expect(
+            response.headers['content-type'],
+            contains('application/json'),
+          );
 
-        final body = json.decode(await response.readAsString());
-        expect(body['error'], 'Dados inválidos');
-        expect(body['message'], 'Verifique os campos e tente novamente');
-        expect(body['statusCode'], 400);
-        expect(body['details'], isNotNull);
-        expect(body['details']['email'], ['Email é obrigatório']);
-      });
+          final body =
+              json.decode(await response.readAsString())
+                  as Map<String, dynamic>;
+          expect(body['error'], 'Dados inválidos');
+          expect(body['message'], 'Verifique os campos e tente novamente');
+          expect(body['statusCode'], 400);
+          expect(body['details'], isNotNull);
+          final details = body['details'] as Map<String, dynamic>;
+          expect(details['email'], ['Email é obrigatório']);
+        },
+      );
 
-      test('should \1', () async {
-        // Arrange
-        final result = Failure<String>(
-          UnauthorizedException('Invalid token'),
-        );
+      test(
+        'should return 401 with ErrorResponse for UnauthorizedException',
+        () async {
+          // Arrange
+          final result = Failure<String>(
+            UnauthorizedException('Invalid token'),
+          );
 
-        // Act
-        final response = HttpResponseHelper.toResponse(result);
+          // Act
+          final response = HttpResponseHelper.toResponse(result);
 
-        // Assert
-        expect(response.statusCode, 401);
+          // Assert
+          expect(response.statusCode, 401);
 
-        final body = json.decode(await response.readAsString());
-        expect(body['error'], 'Não autorizado');
-        expect(body['message'], 'Faça login novamente');
-        expect(body['statusCode'], 401);
-      });
+          final body =
+              json.decode(await response.readAsString())
+                  as Map<String, dynamic>;
+          expect(body['error'], 'Não autorizado');
+          expect(body['message'], 'Faça login novamente');
+          expect(body['statusCode'], 401);
+        },
+      );
 
-      test('should \1', () async {
-        // Arrange
-        final result = Failure<String>(
-          StorageException('Database error'),
-        );
+      test(
+        'should return 500 with ErrorResponse for StorageException',
+        () async {
+          // Arrange
+          final result = Failure<String>(
+            StorageException('Database error'),
+          );
 
-        // Act
-        final response = HttpResponseHelper.toResponse(result);
+          // Act
+          final response = HttpResponseHelper.toResponse(result);
 
-        // Assert
-        expect(response.statusCode, 500);
+          // Assert
+          expect(response.statusCode, 500);
 
-        final body = json.decode(await response.readAsString());
-        expect(body['error'], 'Erro no servidor');
-        expect(
-          body['message'],
-          'Erro ao acessar dados. Tente novamente mais tarde.',
-        );
-        expect(body['statusCode'], 500);
-      });
+          final body =
+              json.decode(await response.readAsString())
+                  as Map<String, dynamic>;
+          expect(body['error'], 'Erro no servidor');
+          expect(
+            body['message'],
+            'Erro ao acessar dados. Tente novamente mais tarde.',
+          );
+          expect(body['statusCode'], 500);
+        },
+      );
 
-      test('should \1', () async {
+      test('should return custom statusCode from DataException', () async {
         // Arrange
         final result = Failure<String>(
           DataException('User not found', statusCode: 404),
@@ -125,7 +147,8 @@ void main() {
         // Assert
         expect(response.statusCode, 404);
 
-        final body = json.decode(await response.readAsString());
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
         expect(body['error'], 'Erro ao processar requisição');
         expect(body['message'], 'User not found');
         expect(body['statusCode'], 404);
@@ -133,7 +156,7 @@ void main() {
     });
 
     group('successList', () {
-      test('should \1', () async {
+      test('should return 200 with list data', () async {
         // Arrange
         final items = [
           {'id': '1', 'name': 'Item 1'},
@@ -147,12 +170,15 @@ void main() {
         expect(response.statusCode, 200);
         expect(response.headers['content-type'], contains('application/json'));
 
-        final body = json.decode(await response.readAsString());
-        expect(body['data'], hasLength(2));
-        expect(body['data'][0]['id'], '1');
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
+        final data = body['data'] as List;
+        expect(data, hasLength(2));
+        final firstItem = data[0] as Map<String, dynamic>;
+        expect(firstItem['id'], '1');
       });
 
-      test('should \1', () async {
+      test('should accept custom status code for empty list', () async {
         // Arrange
         final items = <Map<String, String>>[];
 
@@ -165,7 +191,7 @@ void main() {
     });
 
     group('error', () {
-      test('should \1', () async {
+      test('should map ValidationException to 400', () async {
         // Arrange
         final error = ValidationException({
           'field': ['Error message'],
@@ -177,13 +203,14 @@ void main() {
         // Assert
         expect(response.statusCode, 400);
 
-        final body = json.decode(await response.readAsString());
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
         expect(body['error'], 'Dados inválidos');
         expect(body['message'], 'Verifique os campos e tente novamente');
         expect(body['details'], isNotNull);
       });
 
-      test('should \1', () async {
+      test('should map UnauthorizedException to 401', () async {
         // Arrange
         final error = UnauthorizedException('Token expired');
 
@@ -193,14 +220,15 @@ void main() {
         // Assert
         expect(response.statusCode, 401);
 
-        final body = json.decode(await response.readAsString());
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
         expect(body['error'], 'Não autorizado');
         expect(body['message'], 'Faça login novamente');
       });
 
-      test('should \1', () async {
+      test('should handle string error', () async {
         // Arrange
-        final error = 'Simple error string';
+        const error = 'Simple error string';
 
         // Act
         final response = HttpResponseHelper.error(error);
@@ -208,13 +236,14 @@ void main() {
         // Assert
         expect(response.statusCode, 400);
 
-        final body = json.decode(await response.readAsString());
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
         expect(body['error'], 'Simple error string');
       });
 
-      test('should \1', () async {
+      test('should use custom message when provided', () async {
         // Arrange
-        final error = 'Error object';
+        const error = 'Error object';
 
         // Act
         final response = HttpResponseHelper.error(
@@ -223,7 +252,8 @@ void main() {
         );
 
         // Assert
-        final body = json.decode(await response.readAsString());
+        final body =
+            json.decode(await response.readAsString()) as Map<String, dynamic>;
         expect(body['error'], 'Custom message');
         expect(body['details'], 'Error object');
       });

@@ -146,8 +146,9 @@ void main() {
       expect(json['message'], 'Test message');
       expect(json['statusCode'], 400);
       expect(json['details'], isNotNull);
-      expect(json['details']['field1'], ['error1', 'error2']);
-      expect(json['details']['field2'], ['error3']);
+      final details = json['details'] as Map<String, dynamic>;
+      expect(details['field1'], ['error1', 'error2']);
+      expect(details['field2'], ['error3']);
     });
 
     test('should convert to JSON without details when null', () {
