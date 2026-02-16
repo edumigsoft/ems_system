@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:auth_shared/auth_shared.dart'
     show LoginRequest, RegisterRequest, AuthContext, ChangePasswordRequest;
-import 'package:core_server/core_server.dart' show Routes;
-import 'package:core_shared/core_shared.dart'
-    show ValidationException, Failure, Success, UnauthorizedException;
+import 'package:core_server/core_server.dart' show Routes, HttpResponseHelper;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 
@@ -55,19 +53,13 @@ class AuthRoutes extends Routes {
 
       final result = await _authService.login(loginRequest);
 
-      return switch (result) {
-        Success(value: final value) => Response.ok(
-          jsonEncode(value.toJson()),
-          headers: {'Content-Type': 'application/json'},
-        ),
-        Failure(error: final error) =>
-          error is ValidationException
-              ? Response(400, body: jsonEncode({'error': error.toString()}))
-              : Response(401, body: jsonEncode({'error': error.toString()})),
-      };
+      return HttpResponseHelper.toResponse(
+        result,
+        onSuccess: (value) => value.toJson(),
+      );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao processar login: $e'}),
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao processar login: $e'),
       );
     }
   }
@@ -81,21 +73,14 @@ class AuthRoutes extends Routes {
 
       final result = await _authService.register(registerRequest);
 
-      return switch (result) {
-        Success(value: final value) => Response(
-          201,
-          body: jsonEncode(value.toJson()),
-          headers: {'Content-Type': 'application/json'},
-        ),
-        Failure(error: final error) =>
-          error is ValidationException
-              ? Response(400, body: jsonEncode({'error': error.toString()}))
-              : Response(400, body: jsonEncode({'error': error.toString()})),
-        // Nota: Response 400 genérico para falha de registro
-      };
+      return HttpResponseHelper.toResponse(
+        result,
+        successCode: 201,
+        onSuccess: (value) => value.toJson(),
+      );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao processar registro: $e'}),
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao processar registro: $e'),
       );
     }
   }
@@ -116,19 +101,13 @@ class AuthRoutes extends Routes {
 
       final result = await _authService.refresh(refreshToken);
 
-      return switch (result) {
-        Success(value: final value) => Response.ok(
-          jsonEncode(value.toJson()),
-          headers: {'Content-Type': 'application/json'},
-        ),
-        Failure(error: final error) => Response(
-          401,
-          body: jsonEncode({'error': error.toString()}),
-        ),
-      };
+      return HttpResponseHelper.toResponse(
+        result,
+        onSuccess: (value) => value.toJson(),
+      );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao renovar token: $e'}),
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao renovar token: $e'),
       );
     }
   }
@@ -151,8 +130,8 @@ class AuthRoutes extends Routes {
         headers: {'Content-Type': 'application/json'},
       );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao processar logout: $e'}),
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao processar logout: $e'),
       );
     }
   }
@@ -176,8 +155,8 @@ class AuthRoutes extends Routes {
         headers: {'Content-Type': 'application/json'},
       );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao processar request: $e'}),
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao processar request: $e'),
       );
     }
   }
@@ -202,19 +181,13 @@ class AuthRoutes extends Routes {
         newPassword: newPassword,
       );
 
-      return switch (result) {
-        Success(value: final _) => Response.ok(
-          jsonEncode({'message': 'Password reset successfully'}),
-          headers: {'Content-Type': 'application/json'},
-        ),
-        Failure(error: final error) => Response(
-          400,
-          body: jsonEncode({'error': error.toString()}),
-        ),
-      };
+      return HttpResponseHelper.toResponse(
+        result,
+        onSuccess: (_) => {'message': 'Password reset successfully'},
+      );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao processar reset: $e'}),
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao processar reset: $e'),
       );
     }
   }
@@ -250,34 +223,13 @@ class AuthRoutes extends Routes {
         currentRefreshToken: currentRefreshToken,
       );
 
-      return switch (result) {
-        Success(value: final _) => Response.ok(
-          jsonEncode({'message': 'Password changed successfully'}),
-          headers: {'Content-Type': 'application/json'},
-        ),
-        Failure(error: final error) =>
-          error is ValidationException
-              ? Response(
-                  400,
-                  body: jsonEncode({'error': error.toString()}),
-                  headers: {'Content-Type': 'application/json'},
-                )
-              : error is UnauthorizedException
-              ? Response(
-                  401,
-                  body: jsonEncode({'error': error.toString()}),
-                  headers: {'Content-Type': 'application/json'},
-                )
-              : Response(
-                  500,
-                  body: jsonEncode({'error': error.toString()}),
-                  headers: {'Content-Type': 'application/json'},
-                ),
-      };
+      return HttpResponseHelper.toResponse(
+        result,
+        onSuccess: (_) => {'message': 'Password changed successfully'},
+      );
     } catch (e) {
-      return Response.internalServerError(
-        body: jsonEncode({'error': 'Erro ao processar mudança de senha: $e'}),
-        headers: {'Content-Type': 'application/json'},
+      return HttpResponseHelper.error(
+        e is Exception ? e : Exception('Erro ao processar mudança de senha: $e'),
       );
     }
   }
