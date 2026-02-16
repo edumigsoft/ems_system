@@ -1,0 +1,20 @@
+# Secrets e credenciais
+.secrets/
+*.token
+.github_token
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+
+# Docker volumes e dados
+volumes/
+data/
+
+# Build artifacts
+build/
+dist/

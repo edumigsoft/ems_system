@@ -83,10 +83,22 @@ fi
 
 # Verificar se GITHUB_TOKEN está definido
 if [ -z "$GITHUB_TOKEN" ]; then
+    # Tentar carregar de /root/apps/.secrets/github
+    GLOBAL_SECRETS_FILE="/root/apps/.secrets/github"
+    if [ -f "$GLOBAL_SECRETS_FILE" ]; then
+        log_info "Carregando GITHUB_TOKEN de $GLOBAL_SECRETS_FILE"
+        source "$GLOBAL_SECRETS_FILE"
+    fi
+fi
+
+# Se ainda não estiver definido, pedir interativamente
+if [ -z "$GITHUB_TOKEN" ]; then
     log_warning "GITHUB_TOKEN não definido"
     echo ""
     echo "Para autenticar no GHCR, defina a variável de ambiente:"
     echo "  export GITHUB_TOKEN=ghp_your_token_here"
+    echo ""
+    echo "Ou configure globalmente em: $GLOBAL_SECRETS_FILE"
     echo ""
     echo "Ou gere um token em: https://github.com/settings/tokens"
     echo "  Permissões necessárias: read:packages"

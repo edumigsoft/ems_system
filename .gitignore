@@ -18,8 +18,11 @@ build/
 **/coverage/
 *.lcov
 
-# Variáveis de ambiente
+# Variáveis de ambiente e secrets
 *.env
+.secrets/
+*.token
+.github_token
 
 # Arquivos gerados
 **/*.g.dart
