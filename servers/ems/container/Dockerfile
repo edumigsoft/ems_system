@@ -1,6 +1,10 @@
 # Estágio de Build
 FROM dart:stable AS build
 
+# Build ARGs (disponíveis no estágio de build)
+ARG VERSION=unknown
+ARG ENVIRONMENT=development
+
 WORKDIR /app
 
 # --- 1. CRIAR WORKSPACE MÍNIMO PARA EMS ---
@@ -93,9 +97,11 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Estágio de Produção (Imagem Mínima)
 FROM scratch
 
-# Build ARGs e ENVs
+# Build ARGs (re-declarados para este estágio)
 ARG VERSION=unknown
-ARG ENVIRONMENT=production
+ARG ENVIRONMENT=development
+
+# ENVs (runtime)
 ENV APP_VERSION=$VERSION
 ENV ENV=$ENVIRONMENT
 

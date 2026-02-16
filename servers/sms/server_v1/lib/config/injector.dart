@@ -78,6 +78,7 @@ Future<DependencyInjector> registryInjectors() async {
     () => HealthRoutes(
       backendBaseApi: Env.backendPathApi,
       version: Platform.environment['APP_VERSION'] ?? 'unknown',
+      environment: Platform.environment['ENV'] ?? Platform.environment['ENVIRONMENT'],
     ),
   );
   addRoutes(di, di.get<HealthRoutes>(), security: false);
