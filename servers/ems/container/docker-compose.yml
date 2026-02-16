@@ -9,8 +9,11 @@ services:
       dockerfile: servers/ems/container/Dockerfile
       args:
         VERSION: ${VERSION:-dev}
+        ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      - ENV=${ENVIRONMENT:-development}
     env_file:
       - .env
     restart: unless-stopped

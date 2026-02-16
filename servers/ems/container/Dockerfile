@@ -93,9 +93,11 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Estágio de Produção (Imagem Mínima)
 FROM scratch
 
-# Build ARG e ENV para versão
+# Build ARGs e ENVs
 ARG VERSION=unknown
+ARG ENVIRONMENT=production
 ENV APP_VERSION=$VERSION
+ENV ENV=$ENVIRONMENT
 
 # Metadados OCI
 LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
