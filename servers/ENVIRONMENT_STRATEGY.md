@@ -58,98 +58,106 @@ ENVIRONMENT=development  # ou staging, production
 ### **Desenvolvimento Local**
 
 ```bash
-cd servers/ems/container
-
-# Opção 1: Usar valor do .env (ENVIRONMENT=development)
-docker-compose up --build
-
-# Opção 2: Override via linha de comando
-ENVIRONMENT=development docker-compose up --build
+cd servers
+./dev.sh ems          # Build + test + health check (development)
+./dev.sh ems -f       # Com logs em tempo real
 ```
+
+**O que acontece:**
+- Build com `ENVIRONMENT=development`
+- Health check automático
+- Validação de versão e environment
 
 **Resultado:** `"env": "development"`
 
 ---
 
-### **Build para Staging/QA**
+### **Build e Publicação para GitHub Packages**
 
 ```bash
 cd servers
+export GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXXXXXX
+./publish.sh ems      # Build production + push GHCR
+./publish.sh ems 1.2.0  # Versão específica
+```
 
-# Build com ambiente staging
-./build_production.sh ems 1.1.0-staging
+**O que acontece:**
+1. Build com `ENVIRONMENT=production`
+2. Login no GHCR
+3. Criação de 3 tags:
+   - `ghcr.io/edumigsoft/ems-server:1.1.3` (versão completa)
+   - `ghcr.io/edumigsoft/ems-server:v1.1` (major.minor)
+   - `ghcr.io/edumigsoft/ems-server:latest`
+4. Push automático para GHCR
 
-# Ou manualmente:
+**Resultado:** Imagem no GHCR com `"env": "production"` hardcoded
+
+---
+
+### **Deploy em Produção (VPS)**
+
+```bash
+# SSH na VPS
+ssh user@vps
+cd /path/servers
+
+# Deploy versão específica (RECOMENDADO para produção)
+./update.sh ems 1.1.3         # Pull :1.1.3 (imutável)
+
+# Deploy série (staging/QA)
+./update.sh ems v1.1          # Pull :v1.1 (recebe patches)
+
+# Deploy latest (dev/test)
+./update.sh ems               # Pull :latest (pode mudar)
+```
+
+**Importante:** VPS **não faz build**. A imagem já vem pronta do GHCR com `ENVIRONMENT=production` hardcoded.
+
+**Recomendação:** Use versão **específica** (`:1.1.3`) em produção para garantir reprodutibilidade.
+
+**Resultado:** Container rodando com `"env": "production"`
+
+### **Estratégias de Versionamento por Ambiente**
+
+| Ambiente | Tag Recomendada | Motivo | Comando |
+|----------|----------------|--------|---------|
+| **Produção Estável** | `:1.1.3` (fixa) | Imutável, reproduzível | `./update.sh ems 1.1.3` |
+| **Staging/QA** | `:v1.1` (série) | Recebe patches automaticamente | `./update.sh ems v1.1` |
+| **Desenvolvimento VPS** | `:latest` | Sempre testa a mais nova | `./update.sh ems` |
+
+### **Rollback em Emergências**
+
+```bash
+cd /path/servers
+
+# Rollback para versão anterior
+./rollback.sh ems 1.1.2       # Volta para 1.1.2
+```
+
+**O que acontece:**
+1. Confirmação obrigatória
+2. Pull da versão anterior do GHCR
+3. Restart do container
+4. Health check pós-rollback
+
+---
+
+### **Build para Staging/QA (Manual)**
+
+Se necessário build manual para staging:
+
+```bash
+cd /path/to/project_root
+
 docker build \
   --build-arg VERSION="1.1.0-staging" \
   --build-arg ENVIRONMENT="staging" \
   -t ems-server:1.1.0-staging \
-  -f ems/container/Dockerfile \
+  -f servers/ems/container/Dockerfile \
   .
 ```
 
 **Resultado:** `"env": "staging"`
-
----
-
-### **Build para Produção**
-
-```bash
-cd servers
-
-# Build com versão da pasta VERSION
-./build_production.sh ems
-
-# Ou especificar versão manualmente:
-./build_production.sh ems 1.1.0
-
-# Ou build manual:
-docker build \
-  --build-arg VERSION="1.1.0" \
-  --build-arg ENVIRONMENT="production" \
-  -t ems-server:1.1.0 \
-  -f ems/container/Dockerfile \
-  .
-```
-
-**Resultado:** `"env": "production"`
-
----
-
-### **Push para GitHub Packages**
-
-```bash
-# 1. Tag a imagem para o registry
-docker tag ems-server:1.1.0 ghcr.io/SEU_ORG/ems-server:1.1.0
-docker tag ems-server:1.1.0 ghcr.io/SEU_ORG/ems-server:latest
-
-# 2. Login no GitHub Container Registry
-echo $GITHUB_TOKEN | docker login ghcr.io -u SEU_USERNAME --password-stdin
-
-# 3. Push
-docker push ghcr.io/SEU_ORG/ems-server:1.1.0
-docker push ghcr.io/SEU_ORG/ems-server:latest
-```
-
-**⚠️ Importante:** A imagem já contém `ENVIRONMENT=production` (definido no build). Não é necessário passar variável de ambiente no `docker run`.
-
----
-
-### **Deploy em Produção**
-
-```bash
-# A imagem já vem com ENVIRONMENT=production
-docker run -p 8080:8080 ghcr.io/SEU_ORG/ems-server:1.1.0
-
-# Ou via docker-compose em produção:
-services:
-  ems_server:
-    image: ghcr.io/SEU_ORG/ems-server:1.1.0
-    # Não precisa definir ENVIRONMENT - já está no build
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-```
 
 ---
 
