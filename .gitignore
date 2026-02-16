@@ -45,3 +45,4 @@ build/
 
 # Claude
 .claude/settings.local.json
+servers/containers/proxy/data/nginx/proxy_host/3.conf
