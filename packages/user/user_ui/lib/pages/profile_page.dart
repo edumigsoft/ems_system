@@ -230,7 +230,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Botão Logout
             OutlinedButton.icon(
-              onPressed: widget.onLogout,
+              onPressed: () async {
+                await widget.viewModel.logout();
+                if (widget.onLogout != null) {
+                  widget.onLogout!();
+                }
+              },
               icon: const Icon(Icons.logout),
               label: const Text('Sair'),
               style: OutlinedButton.styleFrom(

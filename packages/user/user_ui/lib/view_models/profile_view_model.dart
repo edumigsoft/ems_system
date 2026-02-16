@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:core_shared/core_shared.dart' show Loggable, Success, Failure;
 import 'package:user_shared/user_shared.dart'
     show UserDetails, UserUpdate, GetProfileUseCase, UpdateProfileUseCase;
+import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
 
 /// ViewModel para gerenciar perfil do usuário.
 ///
@@ -9,12 +10,15 @@ import 'package:user_shared/user_shared.dart'
 class ProfileViewModel extends ChangeNotifier with Loggable {
   final GetProfileUseCase _getProfileUseCase;
   final UpdateProfileUseCase _updateProfileUseCase;
+  final AuthViewModel _authViewModel;
 
   ProfileViewModel({
     required GetProfileUseCase getProfileUseCase,
     required UpdateProfileUseCase updateProfileUseCase,
+    required AuthViewModel authViewModel,
   }) : _getProfileUseCase = getProfileUseCase,
-       _updateProfileUseCase = updateProfileUseCase;
+       _updateProfileUseCase = updateProfileUseCase,
+       _authViewModel = authViewModel;
 
   UserDetails? _profile;
   UserDetails? get profile => _profile;
@@ -77,6 +81,15 @@ class ProfileViewModel extends ChangeNotifier with Loggable {
 
   /// Limpa erro atual.
   void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+
+  /// Realiza logout do usuário.
+  Future<void> logout() async {
+    logger.info('Logging out user');
+    await _authViewModel.logout();
+    _profile = null;
     _error = null;
     notifyListeners();
   }
