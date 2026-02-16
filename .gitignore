@@ -18,8 +18,11 @@ build/
 **/coverage/
 *.lcov
 
-# Variáveis de ambiente
+# Variáveis de ambiente e secrets
 *.env
+.secrets/
+*.token
+.github_token
 
 # Arquivos gerados
 **/*.g.dart
@@ -45,4 +48,19 @@ build/
 
 # Claude
 .claude/settings.local.json
-servers/containers/proxy/data/nginx/proxy_host/3.conf
+
+# Docker - Nginx Proxy Manager / Let's Encrypt
+# Dados gerados automaticamente pelo Let's Encrypt (certificados, contas)
+servers/containers/proxy/letsencrypt/accounts/
+servers/containers/proxy/letsencrypt/archive/
+servers/containers/proxy/letsencrypt/live/
+servers/containers/proxy/letsencrypt/renewal/
+servers/containers/proxy/letsencrypt/*.pem
+
+# Dados do Nginx Proxy Manager
+servers/containers/proxy/data/
+servers/containers/proxy/letsencrypt/
+servers/containers/proxy/auto-generate/
+
+# PostgreSQL - Dados persistidos
+servers/containers/postgres/data/

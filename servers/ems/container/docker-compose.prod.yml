@@ -1,7 +1,7 @@
 services:
   ems_server:
     container_name: ems_server_prod
-    image: ghcr.io/edumigsoft/ems-server:latest
+    image: ghcr.io/edumigsoft/ems-server:${IMAGE_TAG:-latest}
     # Porta removida - acessível apenas via NPM internamente
     expose:
       - "8181"

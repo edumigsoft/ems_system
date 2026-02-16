@@ -1,14 +1,19 @@
 services:
   ems_server:
     container_name: ems_server_dev
-    image: ems_server_image:v1
+    image: ems-server:latest
     build:
       # Sobe até a raiz do projeto (ems_system)
       context: ../../../
       # Aponta para o Dockerfile nesta pasta atual
       dockerfile: servers/ems/container/Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
+        ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      - ENV=${ENVIRONMENT:-development}
     env_file:
       - .env
     restart: unless-stopped

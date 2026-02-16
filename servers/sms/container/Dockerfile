@@ -1,6 +1,10 @@
 # Estágio de Build
 FROM dart:stable AS build
 
+# Build ARGs (disponíveis no estágio de build)
+ARG VERSION=unknown
+ARG ENVIRONMENT=development
+
 WORKDIR /app
 
 # --- 1. CÓPIA DE PACOTES COMPARTILHADOS ---
@@ -39,10 +43,19 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Estágio de Produção
 FROM scratch
 
+# Build ARGs (re-declarados para este estágio)
+ARG VERSION=unknown
+ARG ENVIRONMENT=development
+
+# ENVs (runtime)
+ENV APP_VERSION=$VERSION
+ENV ENV=$ENVIRONMENT
+
 # Metadados OCI
 LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
 LABEL org.opencontainers.image.description="SMS Server - Backend Dart/Shelf"
 LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.version="$VERSION"
 
 COPY --from=build /runtime/ /
 

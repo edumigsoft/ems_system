@@ -154,6 +154,34 @@ abstract class BaseNavigationViewModel extends ChangeNotifier with Loggable {
         .toList();
   }
 
+  /// Retorna uma lista plana de itens de navegação visíveis para mobile.
+  ///
+  /// Expande itens hierárquicos (com filhos) mostrando apenas os filhos
+  /// que têm rota definida. Ideal para BottomNavigationBar que não
+  /// suporta hierarquia.
+  List<AppNavigationItem> get flatVisibleNavigationItems {
+    if (_currentUserRole == null) {
+      return [];
+    }
+
+    final List<AppNavigationItem> flatItems = [];
+
+    for (final item in visibleNavigationItems) {
+      // Se o item tem filhos, adiciona apenas os filhos com rota
+      if (item.children.isNotEmpty) {
+        flatItems.addAll(
+          item.children.where((child) => child.hasRoute),
+        );
+      }
+      // Se o item não tem filhos mas tem rota, adiciona ele
+      else if (item.hasRoute) {
+        flatItems.add(item);
+      }
+    }
+
+    return flatItems;
+  }
+
   void addNavigationItem(AppNavigationItem item) {
     _navigationItems.add(item);
     notifyListeners();

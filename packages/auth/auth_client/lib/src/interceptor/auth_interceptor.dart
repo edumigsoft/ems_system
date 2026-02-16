@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:auth_shared/auth_shared.dart';
 import '../storage/token_storage.dart';
 
@@ -25,9 +27,14 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Pular adição de token para login/refresh/register/public e se já tiver header
-    if (options.path.contains('login') ||
-        options.path.contains('register') ||
+    // Interceptar login para adicionar Basic Auth
+    if (options.path.contains('login')) {
+      _addBasicAuthHeader(options);
+      return handler.next(options);
+    }
+
+    // Pular adição de token para rotas públicas
+    if (options.path.contains('register') ||
         options.path.contains('refresh') ||
         options.path.contains('forgot-password') ||
         options.path.contains('reset-password')) {
@@ -147,5 +154,46 @@ class AuthInterceptor extends Interceptor {
       // Refresh falhou
     }
     return false;
+  }
+
+  /// Adiciona header Basic Auth para endpoint de login.
+  ///
+  /// Extrai email e senha do body da requisição, codifica como base64,
+  /// e adiciona no header Authorization. Limpa o body por segurança.
+  void _addBasicAuthHeader(RequestOptions options) {
+    try {
+      final data = options.data;
+
+      // Extrair credenciais do body
+      String? email;
+      String? password;
+
+      if (data is Map<String, dynamic>) {
+        email = data['email'] as String?;
+        password = data['password'] as String?;
+      }
+
+      // Se credenciais ausentes, deixar o servidor validar
+      if (email == null || password == null) {
+        return;
+      }
+
+      // Codificar credenciais como "email:password" em base64
+      final credentials = '$email:$password';
+      final bytes = utf8.encode(credentials);
+      final encoded = base64Encode(bytes);
+
+      // Adicionar header Authorization
+      options.headers['Authorization'] = 'Basic $encoded';
+
+      // Limpar body para evitar enviar credenciais duas vezes (segurança)
+      options.data = <String, dynamic>{};
+
+    } catch (e) {
+      // Log erro mas não impedir requisição - servidor retornará 401
+      if (kDebugMode) {
+        print('Erro ao codificar Basic Auth: $e');
+      }
+    }
   }
 }
