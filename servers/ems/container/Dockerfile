@@ -93,10 +93,15 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Estágio de Produção (Imagem Mínima)
 FROM scratch
 
+# Build ARG e ENV para versão
+ARG VERSION=unknown
+ENV APP_VERSION=$VERSION
+
 # Metadados OCI
 LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
 LABEL org.opencontainers.image.description="EMS Server - Backend Dart/Shelf"
 LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.version="$VERSION"
 
 # Copia bibliotecas do sistema necessárias
 COPY --from=build /runtime/ /

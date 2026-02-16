@@ -82,6 +82,7 @@ docker build \
     -f "$CONTAINER_DIR/Dockerfile" \
     -t "$IMAGE_NAME:$VERSION" \
     -t "$IMAGE_NAME:latest" \
+    --build-arg VERSION=$VERSION \
     .
 
 echo ""

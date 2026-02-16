@@ -39,10 +39,15 @@ RUN dart compile exe bin/server.dart -o bin/server
 # Estágio de Produção
 FROM scratch
 
+# Build ARG e ENV para versão
+ARG VERSION=unknown
+ENV APP_VERSION=$VERSION
+
 # Metadados OCI
 LABEL org.opencontainers.image.source="https://github.com/edumigsoft/ems_system"
 LABEL org.opencontainers.image.description="SMS Server - Backend Dart/Shelf"
 LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.version="$VERSION"
 
 COPY --from=build /runtime/ /
 

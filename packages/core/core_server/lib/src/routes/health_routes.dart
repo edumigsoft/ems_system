@@ -7,9 +7,13 @@ import 'package:shelf_router/shelf_router.dart';
 /// Fornece endpoint de health check para monitoramento da API.
 class HealthRoutes extends Routes {
   final String _backendBaseApi;
+  final String _version;
 
-  HealthRoutes({required String backendBaseApi})
-    : _backendBaseApi = backendBaseApi;
+  HealthRoutes({
+    required String backendBaseApi,
+    required String version,
+  })  : _backendBaseApi = backendBaseApi,
+        _version = version;
 
   @override
   String get path => '$_backendBaseApi/health';
@@ -28,7 +32,7 @@ class HealthRoutes extends Routes {
         'timestamp': DateTime.now().toIso8601String(),
         'uptime': 'since startup',
         'env': 'development', // Em produção, mude
-        'version': '0.1.0',
+        'version': _version,
       };
 
       return Response.ok(
