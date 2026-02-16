@@ -7,6 +7,8 @@ services:
       context: ../../../
       # Aponta para o Dockerfile nesta pasta atual
       dockerfile: servers/ems/container/Dockerfile
+      args:
+        VERSION: ${VERSION:-dev}
     ports:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
