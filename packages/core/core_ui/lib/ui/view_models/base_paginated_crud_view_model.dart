@@ -159,8 +159,9 @@ abstract class BasePaginatedCRUDViewModel<T> extends BaseCRUDViewModel<T> {
   late final Command0<Unit> loadNextPageCommand = Command0(_loadNextPage);
 
   /// Comando para carregar página anterior
-  late final Command0<Unit> loadPreviousPageCommand =
-      Command0(_loadPreviousPage);
+  late final Command0<Unit> loadPreviousPageCommand = Command0(
+    _loadPreviousPage,
+  );
 
   /// Comando para ir para uma página específica
   late final Command1<Unit, int> goToPageCommand = Command1(_goToPage);

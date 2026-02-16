@@ -45,5 +45,6 @@ class Tag {
   int get hashCode => Object.hash(name, description, color);
 
   @override
-  String toString() => 'Tag(name: $name, description: $description, color: $color)';
+  String toString() =>
+      'Tag(name: $name, description: $description, color: $color)';
 }

@@ -22,7 +22,8 @@ class TabletPage extends StatelessWidget {
             // leading: Assets.images.schoolPilot.image(width: 80.0),
             selectedIndex: _getSelectedIndex(context),
             onDestinationSelected: (index) {
-              if (index >= 0 && index < viewModel.flatVisibleNavigationItems.length) {
+              if (index >= 0 &&
+                  index < viewModel.flatVisibleNavigationItems.length) {
                 final item = viewModel.flatVisibleNavigationItems[index];
                 if (item.hasRoute) {
                   viewModel.navigateTo(item.route!);

@@ -105,7 +105,9 @@ class TagRepositoryImpl implements TagRepository {
       case DioExceptionType.badResponse:
         final statusCode = e.response?.statusCode;
         final data = e.response?.data;
-        final message = (data is Map ? data['message'] as String? : null) ?? 'Erro desconhecido';
+        final message =
+            (data is Map ? data['message'] as String? : null) ??
+            'Erro desconhecido';
 
         switch (statusCode) {
           case 400:

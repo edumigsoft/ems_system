@@ -59,7 +59,8 @@ class TagUpdate {
           isDeleted == other.isDeleted;
 
   @override
-  int get hashCode => Object.hash(id, name, description, color, isActive, isDeleted);
+  int get hashCode =>
+      Object.hash(id, name, description, color, isActive, isDeleted);
 
   @override
   String toString() => 'TagUpdate(id: $id, hasChanges: $hasChanges)';

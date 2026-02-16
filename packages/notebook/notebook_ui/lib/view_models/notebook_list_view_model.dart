@@ -17,8 +17,8 @@ class NotebookListViewModel extends ChangeNotifier
   NotebookListViewModel({
     required NotebookApiService notebookService,
     required TagApiService tagService,
-  })  : _notebookService = notebookService,
-        _tagService = tagService;
+  }) : _notebookService = notebookService,
+       _tagService = tagService;
 
   List<NotebookDetails>? _notebooks;
   List<NotebookDetails>? get notebooks => _notebooks;

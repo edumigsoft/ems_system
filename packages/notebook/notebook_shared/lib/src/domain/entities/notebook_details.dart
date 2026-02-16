@@ -118,16 +118,18 @@ class NotebookDetails implements BaseDetails {
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      data: data ?? Notebook(
-        title: title ?? this.title,
-        content: content ?? this.content,
-        projectId: projectId ?? this.projectId,
-        parentId: parentId ?? this.parentId,
-        tags: tags ?? this.tags,
-        type: type ?? this.type,
-        reminderDate: reminderDate ?? this.reminderDate,
-        notifyOnReminder: notifyOnReminder ?? this.notifyOnReminder,
-      ),
+      data:
+          data ??
+          Notebook(
+            title: title ?? this.title,
+            content: content ?? this.content,
+            projectId: projectId ?? this.projectId,
+            parentId: parentId ?? this.parentId,
+            tags: tags ?? this.tags,
+            type: type ?? this.type,
+            reminderDate: reminderDate ?? this.reminderDate,
+            notifyOnReminder: notifyOnReminder ?? this.notifyOnReminder,
+          ),
       documentIds: documentIds ?? this.documentIds,
     );
   }

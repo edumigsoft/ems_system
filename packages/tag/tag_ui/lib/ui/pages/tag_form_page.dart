@@ -61,7 +61,8 @@ class _TagFormPageState extends State<TagFormPage> {
         name: _nameController.text.trim() != widget.existingTag!.name
             ? _nameController.text.trim()
             : null,
-        description: _descriptionController.text.trim() !=
+        description:
+            _descriptionController.text.trim() !=
                 (widget.existingTag!.description ?? '')
             ? _descriptionController.text.trim()
             : null,

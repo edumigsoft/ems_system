@@ -35,8 +35,8 @@ class TagRoutes extends Routes {
     this.authMiddleware,
     this.di, {
     required String backendBaseApi,
-  })  : _backendBaseApi = backendBaseApi,
-        super(security: true);
+  }) : _backendBaseApi = backendBaseApi,
+       super(security: true);
 
   @override
   String get path => '$_backendBaseApi/tags';

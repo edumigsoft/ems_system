@@ -25,7 +25,8 @@ class MobilePage extends StatelessWidget {
         }).toList(),
         currentIndex: _getSelectedIndex(context),
         onTap: (index) {
-          if (index >= 0 && index < viewModel.flatVisibleNavigationItems.length) {
+          if (index >= 0 &&
+              index < viewModel.flatVisibleNavigationItems.length) {
             final item = viewModel.flatVisibleNavigationItems[index];
             if (item.hasRoute) {
               viewModel.navigateTo(item.route!);

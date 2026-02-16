@@ -27,10 +27,10 @@ class FeatureUserRoleCreateModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'user_id': dto.userId,
-        'feature_id': dto.featureId,
-        'role': dto.role.name,
-      };
+    'user_id': dto.userId,
+    'feature_id': dto.featureId,
+    'role': dto.role.name,
+  };
 
   FeatureUserRoleCreate toDomain() => dto;
 

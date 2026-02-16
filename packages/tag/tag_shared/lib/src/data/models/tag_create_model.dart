@@ -22,17 +22,16 @@ class TagCreateModel {
 
   /// Serializes to JSON.
   Map<String, dynamic> toJson() => {
-        'name': dto.name,
-        'description': dto.description,
-        'color': dto.color,
-      };
+    'name': dto.name,
+    'description': dto.description,
+    'color': dto.color,
+  };
 
   /// Converts to domain DTO.
   TagCreate toDomain() => dto;
 
   /// Creates from domain DTO.
-  factory TagCreateModel.fromDomain(TagCreate create) =>
-      TagCreateModel(create);
+  factory TagCreateModel.fromDomain(TagCreate create) => TagCreateModel(create);
 
   @override
   bool operator ==(Object other) =>

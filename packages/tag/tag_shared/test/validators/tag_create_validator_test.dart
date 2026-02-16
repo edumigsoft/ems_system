@@ -239,7 +239,10 @@ void main() {
         expect(result.isValid, false);
         expect(result.errors, hasLength(1));
         expect(result.errors.first.field, 'name');
-        expect(result.errors.first.message, 'Nome deve ter no máximo 50 caracteres');
+        expect(
+          result.errors.first.message,
+          'Nome deve ter no máximo 50 caracteres',
+        );
       });
     });
 
@@ -259,7 +262,10 @@ void main() {
         expect(result.isValid, false);
         expect(result.errors, hasLength(1));
         expect(result.errors.first.field, 'description');
-        expect(result.errors.first.message, 'Descrição deve ter no máximo 200 caracteres');
+        expect(
+          result.errors.first.message,
+          'Descrição deve ter no máximo 200 caracteres',
+        );
       });
     });
 
@@ -279,7 +285,10 @@ void main() {
         expect(result.isValid, false);
         expect(result.errors, hasLength(1));
         expect(result.errors.first.field, 'color');
-        expect(result.errors.first.message, 'Cor deve ser um código hexadecimal válido (ex: #FF5722)');
+        expect(
+          result.errors.first.message,
+          'Cor deve ser um código hexadecimal válido (ex: #FF5722)',
+        );
       });
 
       test('should fail when color has invalid length (4 digits)', () {

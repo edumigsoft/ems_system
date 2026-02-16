@@ -16,12 +16,13 @@ class HealthRoutes extends Routes {
     required String backendBaseApi,
     required String version,
     String? environment,
-  })  : _backendBaseApi = backendBaseApi,
-        _version = version,
-        _environment = environment ??
-            Platform.environment['ENV'] ??
-            Platform.environment['ENVIRONMENT'] ??
-            'development';
+  }) : _backendBaseApi = backendBaseApi,
+       _version = version,
+       _environment =
+           environment ??
+           Platform.environment['ENV'] ??
+           Platform.environment['ENVIRONMENT'] ??
+           'development';
 
   @override
   String get path => '$_backendBaseApi/health';

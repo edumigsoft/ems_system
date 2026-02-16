@@ -333,8 +333,9 @@ void main() {
       test('adiciona Bearer token para endpoints protegidos', () async {
         // Arrange
         const accessToken = 'test_access_token';
-        when(() => mockTokenStorage.getAccessToken())
-            .thenAnswer((_) async => accessToken);
+        when(
+          () => mockTokenStorage.getAccessToken(),
+        ).thenAnswer((_) async => accessToken);
 
         final options = RequestOptions(
           path: '/users/me',

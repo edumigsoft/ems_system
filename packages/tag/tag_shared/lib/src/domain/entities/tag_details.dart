@@ -50,10 +50,10 @@ class TagDetails implements BaseDetails {
     String? color,
     this.usageCount = 0,
   }) : data = Tag(
-          name: name,
-          description: description,
-          color: color,
-        );
+         name: name,
+         description: description,
+         color: color,
+       );
 
   // Convenience getters to access domain fields
 
@@ -72,13 +72,12 @@ class TagDetails implements BaseDetails {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is TagDetails &&
-          runtimeType == other.runtimeType &&
-          id == other.id;
+      other is TagDetails && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;
 
   @override
-  String toString() => 'TagDetails(id: $id, name: $name, usageCount: $usageCount)';
+  String toString() =>
+      'TagDetails(id: $id, name: $name, usageCount: $usageCount)';
 }

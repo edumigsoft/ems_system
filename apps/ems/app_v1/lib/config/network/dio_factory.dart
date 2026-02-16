@@ -9,7 +9,8 @@ class DioFactory {
   ///
   /// [customBaseUrl] pode ser fornecida para substituir a URL padrão do .env
   static Dio create({String? customBaseUrl}) {
-    final baseUrl = customBaseUrl ?? '${Env.backendBaseUrl}${Env.backendPathApi}';
+    final baseUrl =
+        customBaseUrl ?? '${Env.backendBaseUrl}${Env.backendPathApi}';
 
     final dio = Dio(
       BaseOptions(

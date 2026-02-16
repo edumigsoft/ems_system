@@ -31,6 +31,6 @@ class TagTable extends Table with DriftTableMixinPostgres {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {name}, // Tag names must be unique
-      ];
+    {name}, // Tag names must be unique
+  ];
 }

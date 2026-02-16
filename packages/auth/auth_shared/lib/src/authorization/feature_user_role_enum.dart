@@ -87,7 +87,8 @@ enum FeatureUserRole {
   /// - Acesso somente leitura
   ///
   /// **Exemplo:** Observador, stakeholder ou auditor
-  viewer(1);
+  viewer(1)
+  ;
 
   final int level;
   const FeatureUserRole(this.level);

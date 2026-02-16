@@ -148,7 +148,9 @@ class _NotebookEditDialogState extends State<NotebookEditDialog> {
                           },
                           onSearchTags: (query) async {
                             // Retorna lista de nomes de tags disponíveis
-                            final availableTagNames = widget.viewModel.availableTags
+                            final availableTagNames = widget
+                                .viewModel
+                                .availableTags
                                 .map((tag) => tag.name)
                                 .toList();
                             return availableTagNames

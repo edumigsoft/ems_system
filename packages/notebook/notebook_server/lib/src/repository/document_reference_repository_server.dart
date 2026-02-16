@@ -14,8 +14,7 @@ import '../database/notebook_database.dart';
 /// Implementação server-side do DocumentReferenceRepository usando Drift.
 ///
 /// Gerencia a persistência de referências de documentos no banco de dados PostgreSQL.
-class DocumentReferenceRepositoryServer
-    implements DocumentReferenceRepository {
+class DocumentReferenceRepositoryServer implements DocumentReferenceRepository {
   final NotebookDatabase db;
 
   DocumentReferenceRepositoryServer(this.db);
@@ -97,8 +96,9 @@ class DocumentReferenceRepositoryServer
         storageType: data.storageType != null
             ? Value(data.storageType!)
             : const Value.absent(),
-        mimeType:
-            data.mimeType != null ? Value(data.mimeType) : const Value.absent(),
+        mimeType: data.mimeType != null
+            ? Value(data.mimeType)
+            : const Value.absent(),
         sizeBytes: data.sizeBytes != null
             ? Value(data.sizeBytes)
             : const Value.absent(),

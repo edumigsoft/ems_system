@@ -199,8 +199,8 @@ class _TagListPageState extends State<TagListPage> {
                   ? 'Tente outro termo de busca'
                   : 'Crie sua primeira tag',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

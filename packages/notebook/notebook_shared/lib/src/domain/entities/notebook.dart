@@ -76,15 +76,15 @@ class Notebook {
 
   @override
   int get hashCode => Object.hash(
-        title,
-        content,
-        projectId,
-        parentId,
-        Object.hashAll(tags ?? []),
-        type,
-        reminderDate,
-        notifyOnReminder,
-      );
+    title,
+    content,
+    projectId,
+    parentId,
+    Object.hashAll(tags ?? []),
+    type,
+    reminderDate,
+    notifyOnReminder,
+  );
 
   @override
   String toString() => 'Notebook(title: $title, type: $type)';

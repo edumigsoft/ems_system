@@ -17,8 +17,9 @@ class DocumentReferenceCreateModel {
       DocumentReferenceCreate(
         name: json['name'] as String,
         path: json['path'] as String,
-        storageType:
-            DocumentStorageType.values.byName(json['storage_type'] as String),
+        storageType: DocumentStorageType.values.byName(
+          json['storage_type'] as String,
+        ),
         mimeType: json['mime_type'] as String?,
         sizeBytes: json['size_bytes'] as int?,
         notebookId: json['notebook_id'] as String?,
@@ -28,13 +29,13 @@ class DocumentReferenceCreateModel {
 
   /// Serializes to JSON.
   Map<String, dynamic> toJson() => {
-        'name': dto.name,
-        'path': dto.path,
-        'storage_type': dto.storageType.name,
-        'mime_type': dto.mimeType,
-        'size_bytes': dto.sizeBytes,
-        'notebook_id': dto.notebookId,
-      };
+    'name': dto.name,
+    'path': dto.path,
+    'storage_type': dto.storageType.name,
+    'mime_type': dto.mimeType,
+    'size_bytes': dto.sizeBytes,
+    'notebook_id': dto.notebookId,
+  };
 
   /// Converts to domain DTO.
   DocumentReferenceCreate toDomain() => dto;
@@ -42,8 +43,7 @@ class DocumentReferenceCreateModel {
   /// Creates from domain DTO.
   factory DocumentReferenceCreateModel.fromDomain(
     DocumentReferenceCreate create,
-  ) =>
-      DocumentReferenceCreateModel(create);
+  ) => DocumentReferenceCreateModel(create);
 
   @override
   bool operator ==(Object other) =>

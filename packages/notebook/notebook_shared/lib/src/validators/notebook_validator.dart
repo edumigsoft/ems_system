@@ -16,13 +16,13 @@ class NotebookValidator extends CoreValidator<Map<String, dynamic>> {
   /// Schema de validação Zard para campos de notebook.
   static final schema = z.map({
     notebookTitleField: z.string().min(
-          1,
-          message: 'O título é obrigatório',
-        ),
+      1,
+      message: 'O título é obrigatório',
+    ),
     notebookContentField: z.string().min(
-          1,
-          message: 'O conteúdo é obrigatório',
-        ),
+      1,
+      message: 'O conteúdo é obrigatório',
+    ),
     // Tags é opcional, não precisa de validação
   });
 

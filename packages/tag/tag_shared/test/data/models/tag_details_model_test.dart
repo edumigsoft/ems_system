@@ -25,8 +25,14 @@ void main() {
         expect(model.entity.id, 'tag-123');
         expect(model.entity.isDeleted, false);
         expect(model.entity.isActive, true);
-        expect(model.entity.createdAt, DateTime.parse('2024-01-15T10:30:00.000Z'));
-        expect(model.entity.updatedAt, DateTime.parse('2024-01-20T15:45:00.000Z'));
+        expect(
+          model.entity.createdAt,
+          DateTime.parse('2024-01-15T10:30:00.000Z'),
+        );
+        expect(
+          model.entity.updatedAt,
+          DateTime.parse('2024-01-20T15:45:00.000Z'),
+        );
         expect(model.entity.name, 'Work');
         expect(model.entity.description, 'Work related tasks');
         expect(model.entity.color, '#FF5733');

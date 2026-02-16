@@ -75,7 +75,8 @@ void main() {
             tags: ['tag1', 'tag2'],
           );
 
-          final viewModel = NotebookFormViewModel(tagService: mockTagService, 
+          final viewModel = NotebookFormViewModel(
+            tagService: mockTagService,
             initialData: initialNotebook,
           );
 
@@ -99,7 +100,9 @@ void main() {
       );
 
       test('deve registrar todos os campos necessários', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Verificar que os controllers existem
         final titleController = viewModel.registerField(notebookTitleField);
@@ -116,7 +119,9 @@ void main() {
 
     group('Validação', () {
       test('deve validar com sucesso dados válidos', () async {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Preencher formulário com dados válidos
         viewModel.setFieldValue(notebookTitleField, 'Novo Notebook');
@@ -134,7 +139,9 @@ void main() {
       });
 
       test('deve falhar validação com dados inválidos', () async {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Preencher formulário com título vazio (inválido)
         viewModel.setFieldValue(notebookTitleField, '');
@@ -150,12 +157,13 @@ void main() {
 
         viewModel.dispose();
       });
-
     });
 
     group('Criar NotebookCreate', () {
       test('deve criar NotebookCreate com dados válidos', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Preencher formulário
         viewModel.setFieldValue(notebookTitleField, 'Novo Notebook');
@@ -176,7 +184,9 @@ void main() {
       });
 
       test('deve criar NotebookCreate sem tags quando campo está vazio', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         viewModel.setFieldValue(notebookTitleField, 'Notebook');
         viewModel.setFieldValue(notebookContentField, 'Conteúdo');
@@ -190,7 +200,9 @@ void main() {
       });
 
       test('deve fazer trim em espaços extras nas tags', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         viewModel.setFieldValue(notebookTitleField, 'Notebook');
         viewModel.setFieldValue(notebookContentField, 'Conteúdo');
@@ -215,7 +227,8 @@ void main() {
           type: NotebookType.organized,
         );
 
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, 
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
           initialData: initialNotebook,
         );
 
@@ -237,7 +250,9 @@ void main() {
       });
 
       test('deve lançar erro ao criar NotebookUpdate em modo criação', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Tentar criar NotebookUpdate sem initialData
         expect(
@@ -251,7 +266,9 @@ void main() {
 
     group('Reset', () {
       test('deve limpar campos em modo criação', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Preencher formulário
         viewModel.setFieldValue(notebookTitleField, 'Notebook Test');
@@ -284,7 +301,8 @@ void main() {
           tags: ['tag1'],
         );
 
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, 
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
           initialData: initialNotebook,
         );
 
@@ -293,7 +311,10 @@ void main() {
         viewModel.setFieldValue(notebookContentField, 'Conteúdo Modificado');
         viewModel.selectedType = NotebookType.reminder;
 
-        expect(viewModel.getFieldValue(notebookTitleField), equals('Modificado'));
+        expect(
+          viewModel.getFieldValue(notebookTitleField),
+          equals('Modificado'),
+        );
 
         // Reset
         viewModel.reset();
@@ -314,7 +335,9 @@ void main() {
 
     group('Dispose', () {
       test('deve liberar recursos ao fazer dispose', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         final controller = viewModel.registerField(notebookTitleField);
 
@@ -328,7 +351,9 @@ void main() {
 
     group('Gerenciamento de Tipo', () {
       test('deve notificar listeners ao mudar tipo', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         var notificationCount = 0;
         viewModel.addListener(() {
@@ -345,7 +370,9 @@ void main() {
       });
 
       test('não deve notificar ao definir o mesmo tipo', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         var notificationCount = 0;
         viewModel.addListener(() {
@@ -363,7 +390,9 @@ void main() {
 
     group('Edge Cases', () {
       test('deve lidar com título contendo emoji e unicode', () async {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Título com emoji e caracteres unicode
         viewModel.setFieldValue(
@@ -382,7 +411,9 @@ void main() {
       });
 
       test('deve lidar com tags contendo múltiplos espaços e vírgulas', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         viewModel.setFieldValue(notebookTitleField, 'Test');
         viewModel.setFieldValue(notebookContentField, 'Content');
@@ -400,7 +431,9 @@ void main() {
       });
 
       test('deve lidar com tags contendo apenas espaços', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         viewModel.setFieldValue(notebookTitleField, 'Test');
         viewModel.setFieldValue(notebookContentField, 'Content');
@@ -415,7 +448,9 @@ void main() {
       });
 
       test('deve lidar com conteúdo muito longo', () async {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Conteúdo com 10.000 caracteres
         final longContent = 'a' * 10000;
@@ -433,7 +468,9 @@ void main() {
       });
 
       test('deve lidar com múltiplas mudanças de tipo rapidamente', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         var notificationCount = 0;
         viewModel.addListener(() {
@@ -453,7 +490,9 @@ void main() {
       });
 
       test('deve falhar ao usar após dispose', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         final controller = viewModel.registerField(notebookTitleField);
         viewModel.dispose();
@@ -463,7 +502,9 @@ void main() {
       });
 
       test('deve lidar com validação após múltiplos resets', () async {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Preencher
         viewModel.setFieldValue(notebookTitleField, 'Título 1');
@@ -494,7 +535,9 @@ void main() {
       });
 
       test('deve lidar com tags contendo caracteres especiais', () {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         viewModel.setFieldValue(notebookTitleField, 'Test');
         viewModel.setFieldValue(notebookContentField, 'Content');
@@ -515,7 +558,9 @@ void main() {
       });
 
       test('deve validar título com espaços em branco', () async {
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, );
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
+        );
 
         // Título com apenas espaços (será trimmed no momento do createNotebookCreate)
         viewModel.setFieldValue(notebookTitleField, '     ');
@@ -544,7 +589,8 @@ void main() {
           type: NotebookType.reminder,
         );
 
-        final viewModel = NotebookFormViewModel(tagService: mockTagService, 
+        final viewModel = NotebookFormViewModel(
+          tagService: mockTagService,
           initialData: initialNotebook,
         );
 

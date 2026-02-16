@@ -353,7 +353,9 @@ class _LoginPageState extends State<LoginPage> {
                                     vertical: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: theme.colorScheme.surfaceContainerHighest
+                                    color: theme
+                                        .colorScheme
+                                        .surfaceContainerHighest
                                         .withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
@@ -371,18 +373,20 @@ class _LoginPageState extends State<LoginPage> {
                                           Icon(
                                             Icons.dns_outlined,
                                             size: 16,
-                                            color:
-                                                theme.colorScheme.onSurfaceVariant,
+                                            color: theme
+                                                .colorScheme
+                                                .onSurfaceVariant,
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
                                             'Servidor (Desenvolvimento)',
                                             style: theme.textTheme.labelSmall
                                                 ?.copyWith(
-                                              color: theme
-                                                  .colorScheme.onSurfaceVariant,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                           ),
                                         ],
                                       ),
@@ -392,7 +396,10 @@ class _LoginPageState extends State<LoginPage> {
                                           ButtonSegment<String>(
                                             value: 'local',
                                             label: Text('Local'),
-                                            icon: Icon(Icons.computer, size: 16),
+                                            icon: Icon(
+                                              Icons.computer,
+                                              size: 16,
+                                            ),
                                           ),
                                           ButtonSegment<String>(
                                             value: 'remote',
@@ -401,11 +408,14 @@ class _LoginPageState extends State<LoginPage> {
                                           ),
                                         ],
                                         selected: {
-                                          widget.settingsViewModel!.serverType
+                                          widget.settingsViewModel!.serverType,
                                         },
-                                        onSelectionChanged: (Set<String> selected) {
-                                          _handleServerChange(selected.first);
-                                        },
+                                        onSelectionChanged:
+                                            (Set<String> selected) {
+                                              _handleServerChange(
+                                                selected.first,
+                                              );
+                                            },
                                         showSelectedIcon: false,
                                       ),
                                     ],

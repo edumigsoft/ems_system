@@ -36,7 +36,8 @@ class TagViewModel extends ChangeNotifier {
   /// Filtered tags based on search and active status.
   List<TagDetails> get filteredTags {
     return _tags.where((tag) {
-      final matchesSearch = _searchQuery.isEmpty ||
+      final matchesSearch =
+          _searchQuery.isEmpty ||
           tag.name.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesActive = !_activeOnly || (tag.isActive && !tag.isDeleted);
       return matchesSearch && matchesActive;

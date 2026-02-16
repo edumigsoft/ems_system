@@ -41,8 +41,7 @@ class TagUpdateModel {
   TagUpdate toDomain() => dto;
 
   /// Creates from domain DTO.
-  factory TagUpdateModel.fromDomain(TagUpdate update) =>
-      TagUpdateModel(update);
+  factory TagUpdateModel.fromDomain(TagUpdate update) => TagUpdateModel(update);
 
   @override
   bool operator ==(Object other) =>

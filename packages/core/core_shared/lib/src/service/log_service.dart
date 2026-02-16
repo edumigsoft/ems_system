@@ -24,7 +24,8 @@ enum LogLevel {
   debug(Level.FINE),
   info(Level.INFO),
   warning(Level.WARNING),
-  error(Level.SEVERE);
+  error(Level.SEVERE)
+  ;
 
   const LogLevel(this.level);
   final Level level;

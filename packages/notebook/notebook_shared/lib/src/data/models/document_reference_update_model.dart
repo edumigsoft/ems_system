@@ -53,8 +53,7 @@ class DocumentReferenceUpdateModel {
   /// Creates from domain DTO.
   factory DocumentReferenceUpdateModel.fromDomain(
     DocumentReferenceUpdate update,
-  ) =>
-      DocumentReferenceUpdateModel(update);
+  ) => DocumentReferenceUpdateModel(update);
 
   @override
   bool operator ==(Object other) =>

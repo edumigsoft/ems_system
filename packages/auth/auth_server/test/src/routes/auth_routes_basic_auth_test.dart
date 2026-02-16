@@ -68,8 +68,9 @@ void main() {
 
         final expectedResponse = _createAuthResponse(email);
 
-        when(() => mockAuthService.login(any()))
-            .thenAnswer((_) async => Success(expectedResponse));
+        when(
+          () => mockAuthService.login(any()),
+        ).thenAnswer((_) async => Success(expectedResponse));
 
         // Act
         final response = await authRoutes.router.call(request);
@@ -94,8 +95,9 @@ void main() {
 
         final expectedResponse = _createAuthResponse(email);
 
-        when(() => mockAuthService.login(any()))
-            .thenAnswer((_) async => Success(expectedResponse));
+        when(
+          () => mockAuthService.login(any()),
+        ).thenAnswer((_) async => Success(expectedResponse));
 
         // Act
         final response = await authRoutes.router.call(request);
@@ -104,9 +106,9 @@ void main() {
         expect(response.statusCode, equals(200));
 
         // Verificar que o LoginRequest foi chamado com a senha completa
-        final capturedRequest = verify(() => mockAuthService.login(captureAny()))
-            .captured
-            .single as LoginRequest;
+        final capturedRequest =
+            verify(() => mockAuthService.login(captureAny())).captured.single
+                as LoginRequest;
         expect(capturedRequest.email, equals(email));
         expect(capturedRequest.password, equals(password));
       });
@@ -126,8 +128,9 @@ void main() {
 
         final expectedResponse = _createAuthResponse(email);
 
-        when(() => mockAuthService.login(any()))
-            .thenAnswer((_) async => Success(expectedResponse));
+        when(
+          () => mockAuthService.login(any()),
+        ).thenAnswer((_) async => Success(expectedResponse));
 
         // Act
         final response = await authRoutes.router.call(request);
@@ -135,46 +138,49 @@ void main() {
         // Assert
         expect(response.statusCode, equals(200));
 
-        final captured = verify(() => mockAuthService.login(captureAny()))
-            .captured
-            .single as LoginRequest;
+        final captured =
+            verify(() => mockAuthService.login(captureAny())).captured.single
+                as LoginRequest;
         expect(captured.email, equals(email));
         expect(captured.password, equals(password));
       });
 
-      test('case-insensitive para "Basic" (aceita "basic", "Basic", "BASIC")',
-          () async {
-        // Arrange
-        const email = 'test@example.com';
-        const password = 'password123';
-        const credentials = '$email:$password';
-        final encoded = base64Encode(utf8.encode(credentials));
+      test(
+        'case-insensitive para "Basic" (aceita "basic", "Basic", "BASIC")',
+        () async {
+          // Arrange
+          const email = 'test@example.com';
+          const password = 'password123';
+          const credentials = '$email:$password';
+          final encoded = base64Encode(utf8.encode(credentials));
 
-        final testCases = ['basic', 'Basic', 'BASIC', 'BaSiC'];
+          final testCases = ['basic', 'Basic', 'BASIC', 'BaSiC'];
 
-        for (final prefix in testCases) {
-          final request = Request(
-            'POST',
-            Uri.parse('http://localhost/login'),
-            headers: {'Authorization': '$prefix $encoded'},
-          );
+          for (final prefix in testCases) {
+            final request = Request(
+              'POST',
+              Uri.parse('http://localhost/login'),
+              headers: {'Authorization': '$prefix $encoded'},
+            );
 
-          final expectedResponse = _createAuthResponse(email);
+            final expectedResponse = _createAuthResponse(email);
 
-          when(() => mockAuthService.login(any()))
-              .thenAnswer((_) async => Success(expectedResponse));
+            when(
+              () => mockAuthService.login(any()),
+            ).thenAnswer((_) async => Success(expectedResponse));
 
-          // Act
-          final response = await authRoutes.router.call(request);
+            // Act
+            final response = await authRoutes.router.call(request);
 
-          // Assert
-          expect(
-            response.statusCode,
-            equals(200),
-            reason: 'Falhou com prefix: $prefix',
-          );
-        }
-      });
+            // Assert
+            expect(
+              response.statusCode,
+              equals(200),
+              reason: 'Falhou com prefix: $prefix',
+            );
+          }
+        },
+      );
     });
 
     group('_login - header inválido', () {
@@ -198,31 +204,33 @@ void main() {
         verifyNever(() => mockAuthService.login(any()));
       });
 
-      test('rejeita formato inválido ("Bearer" em vez de "Basic") (401)',
-          () async {
-        // Arrange
-        const email = 'test@example.com';
-        const password = 'password123';
-        const credentials = '$email:$password';
-        final encoded = base64Encode(utf8.encode(credentials));
+      test(
+        'rejeita formato inválido ("Bearer" em vez de "Basic") (401)',
+        () async {
+          // Arrange
+          const email = 'test@example.com';
+          const password = 'password123';
+          const credentials = '$email:$password';
+          final encoded = base64Encode(utf8.encode(credentials));
 
-        final request = Request(
-          'POST',
-          Uri.parse('http://localhost/login'),
-          headers: {'Authorization': 'Bearer $encoded'},
-        );
+          final request = Request(
+            'POST',
+            Uri.parse('http://localhost/login'),
+            headers: {'Authorization': 'Bearer $encoded'},
+          );
 
-        // Act
-        final response = await authRoutes.router.call(request);
+          // Act
+          final response = await authRoutes.router.call(request);
 
-        // Assert
-        expect(response.statusCode, equals(401));
-        final body = await response.readAsString();
-        final json = jsonDecode(body) as Map<String, dynamic>;
-        expect(json['error'], equals('Credenciais inválidas'));
+          // Assert
+          expect(response.statusCode, equals(401));
+          final body = await response.readAsString();
+          final json = jsonDecode(body) as Map<String, dynamic>;
+          expect(json['error'], equals('Credenciais inválidas'));
 
-        verifyNever(() => mockAuthService.login(any()));
-      });
+          verifyNever(() => mockAuthService.login(any()));
+        },
+      );
 
       test('rejeita base64 inválido (401)', () async {
         // Arrange
@@ -363,7 +371,7 @@ void main() {
         when(() => mockAuthService.login(any())).thenAnswer(
           (_) async => Failure(
             ValidationException({
-              'email': ['Email inválido']
+              'email': ['Email inválido'],
             }),
           ),
         );

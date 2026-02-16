@@ -81,16 +81,16 @@ class TagModule extends AppModule with Loggable {
 
   @override
   Map<String, Widget> get routes => {
-        routeName: di.get<TagListPage>(),
-      };
+    routeName: di.get<TagListPage>(),
+  };
 
   @override
   List<AppNavigationItem> get navigationItems => [
-        AppNavigationItem(
-          labelBuilder: (context) => 'Tags',
-          icon: Icons.label,
-          route: routeName,
-          section: AppNavigationSection.system,
-        ),
-      ];
+    AppNavigationItem(
+      labelBuilder: (context) => 'Tags',
+      icon: Icons.label,
+      route: routeName,
+      section: AppNavigationSection.system,
+    ),
+  ];
 }

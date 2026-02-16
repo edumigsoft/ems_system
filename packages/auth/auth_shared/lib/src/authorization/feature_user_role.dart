@@ -54,4 +54,3 @@ class FeatureUserRole {
   String toString() =>
       'FeatureUserRole(userId: $userId, featureId: $featureId, role: $role)';
 }
-

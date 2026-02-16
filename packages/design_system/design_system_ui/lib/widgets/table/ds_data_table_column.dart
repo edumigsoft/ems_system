@@ -68,10 +68,9 @@ class DSDataTableColumn<T> {
     this.numeric = false,
     this.tooltip,
   }) : assert(
-          (cell != null && builder == null) ||
-              (cell == null && builder != null),
-          'Deve fornecer exatamente um: cell ou builder',
-        );
+         (cell != null && builder == null) || (cell == null && builder != null),
+         'Deve fornecer exatamente um: cell ou builder',
+       );
 
   /// Renderiza a célula para o item fornecido.
   ///

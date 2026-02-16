@@ -474,8 +474,9 @@ class NotebookRoutes extends Routes {
       final storageTypeParam = queryParams['storage_type'];
       if (storageTypeParam != null) {
         try {
-          storageType = DocumentStorageType.values
-              .firstWhere((t) => t.name == storageTypeParam);
+          storageType = DocumentStorageType.values.firstWhere(
+            (t) => t.name == storageTypeParam,
+          );
         } catch (_) {
           return Response(
             400,
@@ -623,7 +624,8 @@ class NotebookRoutes extends Routes {
 
           return Response.internalServerError(
             body: jsonEncode({
-              'error': 'Failed to create document reference: ${exception.toString()}',
+              'error':
+                  'Failed to create document reference: ${exception.toString()}',
             }),
             headers: {'Content-Type': 'application/json'},
           );

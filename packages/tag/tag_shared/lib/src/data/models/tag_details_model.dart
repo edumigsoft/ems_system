@@ -29,16 +29,16 @@ class TagDetailsModel {
 
   /// Serializes to JSON.
   Map<String, dynamic> toJson() => {
-        'id': entity.id,
-        'is_deleted': entity.isDeleted,
-        'is_active': entity.isActive,
-        'created_at': entity.createdAt.toIso8601String(),
-        'updated_at': entity.updatedAt.toIso8601String(),
-        'name': entity.name,
-        'description': entity.description,
-        'color': entity.color,
-        'usage_count': entity.usageCount,
-      };
+    'id': entity.id,
+    'is_deleted': entity.isDeleted,
+    'is_active': entity.isActive,
+    'created_at': entity.createdAt.toIso8601String(),
+    'updated_at': entity.updatedAt.toIso8601String(),
+    'name': entity.name,
+    'description': entity.description,
+    'color': entity.color,
+    'usage_count': entity.usageCount,
+  };
 
   /// Converts to domain entity.
   TagDetails toDomain() => entity;

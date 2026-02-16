@@ -18,10 +18,7 @@ class StringListConverter extends TypeConverter<List<String>, String> {
       final decoded = jsonDecode(fromDb);
       if (decoded is List) {
         // Filtra valores não-nulos e não-vazios
-        return decoded
-            .whereType<String>()
-            .where((s) => s.isNotEmpty)
-            .toList();
+        return decoded.whereType<String>().where((s) => s.isNotEmpty).toList();
       }
       return [];
     } catch (_) {

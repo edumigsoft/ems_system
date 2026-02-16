@@ -118,7 +118,9 @@ class NotebookDetailViewModel extends ChangeNotifier
     final success = await updateNotebook(update);
     if (success) {
       // Atualiza estado local
-      _notebook = _notebook!.copyWith(tags: updatedTags.isEmpty ? null : updatedTags);
+      _notebook = _notebook!.copyWith(
+        tags: updatedTags.isEmpty ? null : updatedTags,
+      );
       notifyListeners();
     }
     return success;

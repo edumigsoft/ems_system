@@ -53,9 +53,9 @@ class SchoolFormViewModel extends ChangeNotifier with FormValidationMixin {
     required CreateUseCase createUseCase,
     required UpdateUseCase updateUseCase,
     SchoolDetails? initialData,
-  })  : _createUseCase = createUseCase,
-        _updateUseCase = updateUseCase,
-        _initialData = initialData {
+  }) : _createUseCase = createUseCase,
+       _updateUseCase = updateUseCase,
+       _initialData = initialData {
     _initializeFields();
   }
 

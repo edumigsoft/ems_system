@@ -188,7 +188,6 @@ class AuthInterceptor extends Interceptor {
 
       // Limpar body para evitar enviar credenciais duas vezes (segurança)
       options.data = <String, dynamic>{};
-
     } catch (e) {
       // Log erro mas não impedir requisição - servidor retornará 401
       if (kDebugMode) {

@@ -12,7 +12,8 @@ class ValidationResult {
   bool get isInvalid => errors.isNotEmpty;
 
   /// Gets the first error message, or null if valid.
-  String? get firstErrorMessage => errors.isNotEmpty ? errors.first.message : null;
+  String? get firstErrorMessage =>
+      errors.isNotEmpty ? errors.first.message : null;
 
   @override
   String toString() => 'ValidationResult(errors: ${errors.length})';

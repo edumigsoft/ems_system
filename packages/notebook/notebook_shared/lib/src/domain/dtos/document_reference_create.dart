@@ -23,9 +23,7 @@ class DocumentReferenceCreate {
 
   /// Validação básica de negócio
   bool get isValid =>
-      name.trim().isNotEmpty &&
-      path.trim().isNotEmpty &&
-      _validatePath();
+      name.trim().isNotEmpty && path.trim().isNotEmpty && _validatePath();
 
   /// Valida o caminho/URL conforme o tipo de armazenamento
   bool _validatePath() {

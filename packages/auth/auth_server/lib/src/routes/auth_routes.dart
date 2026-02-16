@@ -326,7 +326,6 @@ class AuthRoutes extends Routes {
       }
 
       return LoginRequest(email: email, password: password);
-
     } on FormatException {
       // Base64 inválido
       return null;

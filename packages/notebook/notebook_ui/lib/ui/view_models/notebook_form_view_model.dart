@@ -45,8 +45,8 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
   NotebookFormViewModel({
     NotebookDetails? initialData,
     required TagApiService tagService,
-  })  : _initialData = initialData,
-        _tagService = tagService {
+  }) : _initialData = initialData,
+       _tagService = tagService {
     _initializeFieldsSync();
   }
 
@@ -89,9 +89,7 @@ class NotebookFormViewModel extends ChangeNotifier with FormValidationMixin {
     try {
       final allTagsModels = await _tagService.getAll();
       final allTags = allTagsModels.map((model) => model.toDomain()).toList();
-      _selectedTags = allTags
-          .where((tag) => tagIds.contains(tag.id))
-          .toList();
+      _selectedTags = allTags.where((tag) => tagIds.contains(tag.id)).toList();
       notifyListeners();
     } catch (_) {
       // Silenciosamente ignora erro (tags não críticas)

@@ -33,23 +33,27 @@ class DSTableTextStyles {
   /// - paginationLabel: `bodyMedium` (14px, normal)
   factory DSTableTextStyles.fromTextTheme(TextTheme textTheme) {
     return DSTableTextStyles(
-      headerLabel: textTheme.labelMedium ??
+      headerLabel:
+          textTheme.labelMedium ??
           const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,
             letterSpacing: 0.5,
           ),
-      cellPrimary: textTheme.bodyMedium ??
+      cellPrimary:
+          textTheme.bodyMedium ??
           const TextStyle(
             fontSize: 14,
             letterSpacing: 0.25,
           ),
-      cellSecondary: textTheme.bodySmall ??
+      cellSecondary:
+          textTheme.bodySmall ??
           const TextStyle(
             fontSize: 12,
             letterSpacing: 0.4,
           ),
-      paginationLabel: textTheme.bodyMedium ??
+      paginationLabel:
+          textTheme.bodyMedium ??
           const TextStyle(
             fontSize: 14,
             letterSpacing: 0.25,
@@ -179,17 +183,32 @@ class DSTableThemeData extends ThemeExtension<DSTableThemeData> {
     }
 
     return DSTableThemeData(
-      headingRowHeight:
-          _lerpDouble(headingRowHeight, other.headingRowHeight, t),
-      dataRowMinHeight:
-          _lerpDouble(dataRowMinHeight, other.dataRowMinHeight, t),
-      dataRowMaxHeight:
-          _lerpDouble(dataRowMaxHeight, other.dataRowMaxHeight, t),
+      headingRowHeight: _lerpDouble(
+        headingRowHeight,
+        other.headingRowHeight,
+        t,
+      ),
+      dataRowMinHeight: _lerpDouble(
+        dataRowMinHeight,
+        other.dataRowMinHeight,
+        t,
+      ),
+      dataRowMaxHeight: _lerpDouble(
+        dataRowMaxHeight,
+        other.dataRowMaxHeight,
+        t,
+      ),
       columnSpacing: _lerpDouble(columnSpacing, other.columnSpacing, t),
-      horizontalMargin:
-          _lerpDouble(horizontalMargin, other.horizontalMargin, t),
-      dividerThickness:
-          _lerpDouble(dividerThickness, other.dividerThickness, t),
+      horizontalMargin: _lerpDouble(
+        horizontalMargin,
+        other.horizontalMargin,
+        t,
+      ),
+      dividerThickness: _lerpDouble(
+        dividerThickness,
+        other.dividerThickness,
+        t,
+      ),
       showBottomBorder: t < 0.5 ? showBottomBorder : other.showBottomBorder,
       textStyles: DSTableTextStyles.lerp(textStyles, other.textStyles, t),
     );

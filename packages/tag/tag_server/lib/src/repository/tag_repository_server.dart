@@ -36,9 +36,9 @@ class TagRepositoryServer implements TagRepository {
   @override
   Future<Result<TagDetails>> getById(String id) async {
     try {
-      final result = await (db.select(db.tagTable)
-            ..where((t) => t.id.equals(id)))
-          .getSingleOrNull();
+      final result = await (db.select(
+        db.tagTable,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
 
       if (result == null) {
         return Failure(StorageException('Tag not found'));
@@ -62,7 +62,9 @@ class TagRepositoryServer implements TagRepository {
       // Apply filters
       if (activeOnly) {
         query.where((t) => t.isActive.equals(1)); // BooleanConverter: 1 = true
-        query.where((t) => t.isDeleted.equals(0)); // BooleanConverter: 0 = false
+        query.where(
+          (t) => t.isDeleted.equals(0),
+        ); // BooleanConverter: 0 = false
       }
 
       if (search != null && search.isNotEmpty) {
@@ -101,9 +103,9 @@ class TagRepositoryServer implements TagRepository {
         updatedAt: Value(DateTime.now()),
       );
 
-      final result = await (db.update(db.tagTable)
-            ..where((t) => t.id.equals(data.id)))
-          .writeReturning(companion);
+      final result = await (db.update(
+        db.tagTable,
+      )..where((t) => t.id.equals(data.id))).writeReturning(companion);
 
       if (result.isEmpty) {
         return Failure(StorageException('Tag not found'));
@@ -126,9 +128,9 @@ class TagRepositoryServer implements TagRepository {
         updatedAt: Value(DateTime.now()),
       );
 
-      final affectedRows = await (db.update(db.tagTable)
-            ..where((t) => t.id.equals(id)))
-          .write(companion);
+      final affectedRows = await (db.update(
+        db.tagTable,
+      )..where((t) => t.id.equals(id))).write(companion);
 
       if (affectedRows == 0) {
         return Failure(StorageException('Tag not found'));
@@ -151,9 +153,9 @@ class TagRepositoryServer implements TagRepository {
         updatedAt: Value(DateTime.now()),
       );
 
-      final affectedRows = await (db.update(db.tagTable)
-            ..where((t) => t.id.equals(id)))
-          .write(companion);
+      final affectedRows = await (db.update(
+        db.tagTable,
+      )..where((t) => t.id.equals(id))).write(companion);
 
       if (affectedRows == 0) {
         return Failure(StorageException('Tag not found'));

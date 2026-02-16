@@ -14,7 +14,10 @@ void main() {
 
       test('should create ValidationResult with single error', () {
         // Arrange
-        final error = ValidationError(field: 'name', message: 'Name is required');
+        final error = ValidationError(
+          field: 'name',
+          message: 'Name is required',
+        );
 
         // Act
         final result = ValidationResult([error]);

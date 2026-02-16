@@ -44,8 +44,7 @@ class RoleGuard extends StatelessWidget {
         final currentUser = authViewModel.currentUser;
 
         // Se não há usuário autenticado ou role não permitida
-        if (currentUser == null ||
-            !allowedRoles.contains(currentUser.role)) {
+        if (currentUser == null || !allowedRoles.contains(currentUser.role)) {
           return fallback ?? _buildAccessDenied(context);
         }
 
@@ -74,8 +73,8 @@ class RoleGuard extends StatelessWidget {
             Text(
               'Esta página requer permissões de: ${allowedRoles.map((r) => r.name).join(', ')}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                color: Colors.grey[600],
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

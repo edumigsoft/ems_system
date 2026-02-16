@@ -34,16 +34,16 @@ class NotebookCreateModel {
 
   /// Serializes to JSON.
   Map<String, dynamic> toJson() => {
-        'title': dto.title,
-        'content': dto.content,
-        'project_id': dto.projectId,
-        'parent_id': dto.parentId,
-        'tags': dto.tags,
-        'type': dto.type?.name,
-        'reminder_date': dto.reminderDate?.toIso8601String(),
-        'notify_on_reminder': dto.notifyOnReminder,
-        'document_ids': dto.documentIds,
-      };
+    'title': dto.title,
+    'content': dto.content,
+    'project_id': dto.projectId,
+    'parent_id': dto.parentId,
+    'tags': dto.tags,
+    'type': dto.type?.name,
+    'reminder_date': dto.reminderDate?.toIso8601String(),
+    'notify_on_reminder': dto.notifyOnReminder,
+    'document_ids': dto.documentIds,
+  };
 
   /// Converts to domain DTO.
   NotebookCreate toDomain() => dto;

@@ -32,18 +32,19 @@ class FeatureUserRoleDetailsModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': entity.id,
-        'created_at': entity.createdAt.toIso8601String(),
-        'updated_at': entity.updatedAt.toIso8601String(),
-        'is_deleted': entity.isDeleted,
-        'is_active': entity.isActive,
-        'user_id': entity.userId,
-        'feature_id': entity.featureId,
-        'role': entity.role.name,
-      };
+    'id': entity.id,
+    'created_at': entity.createdAt.toIso8601String(),
+    'updated_at': entity.updatedAt.toIso8601String(),
+    'is_deleted': entity.isDeleted,
+    'is_active': entity.isActive,
+    'user_id': entity.userId,
+    'feature_id': entity.featureId,
+    'role': entity.role.name,
+  };
 
   FeatureUserRoleDetails toDomain() => entity;
 
-  factory FeatureUserRoleDetailsModel.fromDomain(FeatureUserRoleDetails details) =>
-      FeatureUserRoleDetailsModel(details);
+  factory FeatureUserRoleDetailsModel.fromDomain(
+    FeatureUserRoleDetails details,
+  ) => FeatureUserRoleDetailsModel(details);
 }
