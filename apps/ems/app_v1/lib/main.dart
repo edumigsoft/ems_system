@@ -1,18 +1,27 @@
 import 'package:alice/model/alice_configuration.dart';
 import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:ems_app_v1/app_layout.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import 'config/di/injector.dart';
 
 import 'package:alice/alice.dart';
 
-final alice = Alice(
-  configuration: AliceConfiguration(
-    showNotification: false,
-    showInspectorOnShake: true,
-  ),
-);
+// Alice é desabilitado em web devido a incompatibilidades
+final alice = kIsWeb
+    ? Alice(
+        configuration: AliceConfiguration(
+          showNotification: false,
+          showInspectorOnShake: false,
+        ),
+      )
+    : Alice(
+        configuration: AliceConfiguration(
+          showNotification: false,
+          showInspectorOnShake: true,
+        ),
+      );
 
 /// Ponto de entrada principal do aplicativo EMS System.
 ///
@@ -52,12 +61,64 @@ final alice = Alice(
 /// - Logs são categorizados por nível (INFO, WARNING, SEVERE)
 /// - Integração com serviços de monitoramento pode ser adicionada em [_reportError](cci:1://file:///home/anderson/Projects/Working/school_manager_system_fullstack/apps/app_v1/lib/main.dart:31:0-50:1)
 void main() async {
+  // Captura erros não tratados
+  FlutterError.onError = (details) {
+    debugPrint('❌ Flutter Error: ${details.exception}');
+    debugPrint('Stack: ${details.stack}');
+  };
+
   // Inicializa os bindings do Flutter
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inicializa injeção de dependências
-  await Injector().injector();
+  try {
+    debugPrint('🚀 main() iniciando (kIsWeb: $kIsWeb)...');
 
-  // Inicia o aplicativo
-  runApp(GetItInjector().get<AppLayout>());
+    // Inicializa injeção de dependências
+    debugPrint('📦 Chamando Injector()...');
+    await Injector().injector();
+    debugPrint('✅ Injector concluído');
+
+    // Inicia o aplicativo
+    debugPrint('🎯 Iniciando runApp...');
+    runApp(GetItInjector().get<AppLayout>());
+    debugPrint('✅ runApp concluído');
+  } catch (e, stackTrace) {
+    debugPrint('❌❌❌ ERRO FATAL em main(): $e');
+    debugPrint('Stack: $stackTrace');
+
+    // Mostra erro na tela
+    runApp(
+      MaterialApp(
+        home: Scaffold(
+          backgroundColor: Colors.red,
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, size: 100, color: Colors.white),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'ERRO FATAL',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    e.toString(),
+                    style: const TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

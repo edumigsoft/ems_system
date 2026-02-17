@@ -14,20 +14,21 @@ import 'package:user_shared/user_shared.dart' show UserSettings;
 /// Secure storage for user settings.
 ///
 /// Uses [FlutterSecureStorage] for encrypted storage of user preferences.
+///
+/// NOTA: Desde flutter_secure_storage 9.2.4+, todas as plataformas
+/// (Android, iOS, Linux, Windows, macOS, Web) são suportadas automaticamente.
+/// As opções específicas de plataforma são configuradas por quem instancia.
 class SettingsStorage with Loggable {
   static const _settingsKey = 'user_settings';
 
   final FlutterSecureStorage _storage;
 
+  /// Cria uma instância de SettingsStorage.
+  ///
+  /// [storage] - Opcional. Se não fornecido, usa configuração padrão
+  /// que funciona em todas as plataformas (Android, iOS, Desktop, Web).
   SettingsStorage([FlutterSecureStorage? storage])
-    : _storage =
-          storage ??
-          const FlutterSecureStorage(
-            aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            iOptions: IOSOptions(
-              accessibility: KeychainAccessibility.first_unlock,
-            ),
-          );
+      : _storage = storage ?? const FlutterSecureStorage();
 
   /// Saves user settings.
   ///

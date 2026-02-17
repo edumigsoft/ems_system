@@ -340,8 +340,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
 
-                        // Seletor de Servidor (DEBUG apenas)
-                        if (kDebugMode && widget.settingsViewModel != null)
+                        // Seletor de Servidor
+                        // Sempre visível em Web (para escolher local/remoto antes de logar)
+                        // Em mobile/desktop, só em debug mode
+                        if ((kDebugMode || kIsWeb) && widget.settingsViewModel != null)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 16),
                             child: ListenableBuilder(

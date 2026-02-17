@@ -6,6 +6,10 @@ import 'package:user_shared/user_shared.dart';
 /// Storage seguro para tokens de autenticação.
 ///
 /// Usa [FlutterSecureStorage] para armazenamento criptografado.
+///
+/// NOTA: Desde flutter_secure_storage 9.2.4+, todas as plataformas
+/// (Android, iOS, Linux, Windows, macOS, Web) são suportadas automaticamente.
+/// As opções específicas de plataforma são configuradas por quem instancia.
 class TokenStorage {
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
@@ -15,17 +19,12 @@ class TokenStorage {
 
   final FlutterSecureStorage _storage;
 
+  /// Cria uma instância de TokenStorage.
+  ///
+  /// [storage] - Opcional. Se não fornecido, usa configuração padrão
+  /// que funciona em todas as plataformas (Android, iOS, Desktop, Web).
   TokenStorage([FlutterSecureStorage? storage])
-    : _storage =
-          storage ??
-          const FlutterSecureStorage(
-            aOptions: AndroidOptions(encryptedSharedPreferences: true),
-            iOptions: IOSOptions(
-              accessibility: KeychainAccessibility.first_unlock,
-            ),
-            // Nota: Linux, Windows, macOS e Web são suportados automaticamente
-            // pela versão 9.2.4+ sem configuração explícita de opções
-          );
+      : _storage = storage ?? const FlutterSecureStorage();
 
   /// Salva um par de tokens.
   ///
