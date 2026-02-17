@@ -11,10 +11,13 @@ import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 import 'server.reflectable.dart';
 
 // -------------Somente para gerar Swagger---------------
+
+const version = String.fromEnvironment('APP_VERSION', defaultValue: 'unknown');
+
 @api
 @ApiInfo(
   title: 'EMS System API',
-  version: '1.0.0',
+  version: version,
   description: 'API para o EMS System',
 )
 class Document {}
@@ -63,13 +66,13 @@ void main() async {
     period: Duration(minutes: 1),
   );
 
-  final allowedOrigins = Env.allowedOrigins.split(',');
+  final allowedOrigins = Env.allowedOrigins.trim().split(',');
   final addRouters = di.get<AddRoutes>();
   final handler = Pipeline()
       .addMiddleware(
         corsHeaders(
+          originChecker: allowedOrigins.contains,
           headers: {
-            'Access-Control-Allow-Origin': allowedOrigins.join(','),
             'Access-Control-Allow-Headers': 'Authorization, Content-Type',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           },
