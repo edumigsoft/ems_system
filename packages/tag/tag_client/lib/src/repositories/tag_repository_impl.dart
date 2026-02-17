@@ -1,4 +1,5 @@
 import 'package:core_shared/core_shared.dart';
+import 'package:core_client/core_client.dart' show DioErrorHandler;
 import 'package:dio/dio.dart';
 import 'package:tag_shared/tag_shared.dart';
 import '../services/tag_api_service.dart';
@@ -7,7 +8,8 @@ import '../services/tag_api_service.dart';
 ///
 /// All methods return [Result] to enable explicit error handling
 /// without throwing exceptions (ADR-0001: Result Pattern).
-class TagRepositoryImpl implements TagRepository {
+class TagRepositoryImpl with Loggable, DioErrorHandler
+    implements TagRepository {
   final TagApiService _api;
 
   /// Creates a TagRepositoryImpl instance.
@@ -20,9 +22,9 @@ class TagRepositoryImpl implements TagRepository {
       final response = await _api.create(model.toJson());
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'TagRepository.create');
     } catch (e) {
-      return Failure(Exception('Erro ao criar tag: $e'));
+      return handleError(e, 'TagRepository.create');
     }
   }
 
@@ -32,9 +34,9 @@ class TagRepositoryImpl implements TagRepository {
       final response = await _api.getById(id);
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'TagRepository.getById');
     } catch (e) {
-      return Failure(Exception('Erro ao buscar tag: $e'));
+      return handleError(e, 'TagRepository.getById');
     }
   }
 
@@ -51,9 +53,9 @@ class TagRepositoryImpl implements TagRepository {
       final entities = response.map((model) => model.toDomain()).toList();
       return Success(entities);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'TagRepository.getAll');
     } catch (e) {
-      return Failure(Exception('Erro ao listar tags: $e'));
+      return handleError(e, 'TagRepository.getAll');
     }
   }
 
@@ -64,9 +66,9 @@ class TagRepositoryImpl implements TagRepository {
       final response = await _api.update(data.id, model.toJson());
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'TagRepository.update');
     } catch (e) {
-      return Failure(Exception('Erro ao atualizar tag: $e'));
+      return handleError(e, 'TagRepository.update');
     }
   }
 
@@ -76,9 +78,9 @@ class TagRepositoryImpl implements TagRepository {
       await _api.delete(id);
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'TagRepository.delete');
     } catch (e) {
-      return Failure(Exception('Erro ao deletar tag: $e'));
+      return handleError(e, 'TagRepository.delete');
     }
   }
 
@@ -88,51 +90,9 @@ class TagRepositoryImpl implements TagRepository {
       await _api.restore(id);
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'TagRepository.restore');
     } catch (e) {
-      return Failure(Exception('Erro ao restaurar tag: $e'));
-    }
-  }
-
-  /// Handles DioException and converts to meaningful error messages.
-  Exception _handleDioError(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return Exception('Tempo de conexão esgotado. Verifique sua internet.');
-
-      case DioExceptionType.badResponse:
-        final statusCode = e.response?.statusCode;
-        final data = e.response?.data;
-        final message =
-            (data is Map ? data['message'] as String? : null) ??
-            'Erro desconhecido';
-
-        switch (statusCode) {
-          case 400:
-            return Exception('Dados inválidos: $message');
-          case 404:
-            return Exception('Tag não encontrada');
-          case 409:
-            return Exception('Tag já existe: $message');
-          case 500:
-            return Exception('Erro no servidor. Tente novamente mais tarde.');
-          default:
-            return Exception('Erro HTTP $statusCode: $message');
-        }
-
-      case DioExceptionType.cancel:
-        return Exception('Requisição cancelada');
-
-      case DioExceptionType.connectionError:
-        return Exception('Erro de conexão. Verifique sua internet.');
-
-      case DioExceptionType.badCertificate:
-        return Exception('Erro de certificado SSL');
-
-      case DioExceptionType.unknown:
-        return Exception('Erro inesperado: ${e.message}');
+      return handleError(e, 'TagRepository.restore');
     }
   }
 }

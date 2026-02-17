@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:auth_shared/auth_shared.dart';
 import '../storage/token_storage.dart';
 
@@ -190,9 +189,12 @@ class AuthInterceptor extends Interceptor {
       options.data = <String, dynamic>{};
     } catch (e) {
       // Log erro mas não impedir requisição - servidor retornará 401
-      if (kDebugMode) {
+      // Em modo debug, assert executará o print
+      assert(() {
+        // ignore: avoid_print
         print('Erro ao codificar Basic Auth: $e');
-      }
+        return true;
+      }());
     }
   }
 }

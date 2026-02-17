@@ -11,6 +11,8 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
+  # NOTA: Flutter SDK é necessário apenas para plugins (flutter_secure_storage)
+  # O código em si é Dart puro (sem widgets, sem UI)
   flutter:
     sdk: flutter
   dio: ^5.0.0

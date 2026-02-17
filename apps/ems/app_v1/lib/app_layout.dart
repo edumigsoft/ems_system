@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
 import 'package:ems_app_v1/main.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import 'package:user_ui/view_models/settings_view_model.dart';
@@ -88,6 +89,9 @@ class AppLayout extends StatefulWidget {
 /// - Gerencia o estado de autenticação
 /// - Controla o tema e localização
 class _AppLayoutState extends State<AppLayout> {
+  bool _isInitialized = false;
+  String? _initError;
+
   @override
   void initState() {
     super.initState();
@@ -98,17 +102,80 @@ class _AppLayoutState extends State<AppLayout> {
   }
 
   Future<void> _initializeApp() async {
-    // Inicialização assíncrona de recursos
-    await widget.viewModel.init();
+    if (_isInitialized) {
+      // Evita reinicialização múltipla (importante para hot reload em web)
+      debugPrint('⚠️ App já inicializado, ignorando nova inicialização');
+      return;
+    }
 
-    // Inicializar AuthViewModel para verificar sessão persistida
-    await widget.authViewModel.initialize();
+    try {
+      debugPrint('🚀 Iniciando app (kIsWeb: $kIsWeb)...');
 
-    await widget.settingsViewModel.loadSettings();
+      // Inicialização assíncrona de recursos
+      debugPrint('📦 Inicializando viewModel...');
+      await widget.viewModel.init();
+
+      // Inicializar AuthViewModel para verificar sessão persistida
+      debugPrint('🔐 Inicializando authViewModel...');
+      await widget.authViewModel.initialize();
+
+      debugPrint('⚙️ Carregando settings...');
+      await widget.settingsViewModel.loadSettings();
+
+      _isInitialized = true;
+      debugPrint('✅ App inicializado com sucesso!');
+    } catch (e, stackTrace) {
+      debugPrint('❌ Erro ao inicializar app: $e');
+      debugPrint('Stack trace: $stackTrace');
+      setState(() {
+        _initError = e.toString();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Se houver erro de inicialização, mostra tela de erro
+    if (_initError != null) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Erro ao Inicializar',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    _initError!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _initError = null;
+                        _isInitialized = false;
+                      });
+                      _initializeApp();
+                    },
+                    child: const Text('Tentar Novamente'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return ListenableBuilder(
       listenable: Listenable.merge([
         widget.viewModel, // Para mudanças no estado do aplicativo
@@ -116,7 +183,8 @@ class _AppLayoutState extends State<AppLayout> {
       ]),
       builder: (context, child) {
         return MaterialApp(
-          navigatorKey: alice.getNavigatorKey(),
+          // Alice navigator key é desabilitado em web
+          navigatorKey: kIsWeb ? null : alice.getNavigatorKey(),
           title: 'EMS System',
           home: AppPage(
             viewModel: widget.viewModel,

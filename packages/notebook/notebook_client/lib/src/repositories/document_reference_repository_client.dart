@@ -1,4 +1,5 @@
 import 'package:core_shared/core_shared.dart';
+import 'package:core_client/core_client.dart' show DioErrorHandler;
 import 'package:dio/dio.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 import '../services/document_reference_api_service.dart';
@@ -8,7 +9,8 @@ import '../services/notebook_api_service.dart';
 ///
 /// All methods return [Result] to enable explicit error handling
 /// without throwing exceptions (ADR-0001: Result Pattern).
-class DocumentReferenceRepositoryClient implements DocumentReferenceRepository {
+class DocumentReferenceRepositoryClient with Loggable, DioErrorHandler
+    implements DocumentReferenceRepository {
   final DocumentReferenceApiService _api;
   final NotebookApiService _notebookApi;
 
@@ -24,9 +26,9 @@ class DocumentReferenceRepositoryClient implements DocumentReferenceRepository {
       final response = await _api.create(model.toJson());
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'DocumentReferenceRepository.create');
     } catch (e) {
-      return Failure(Exception('Erro ao criar referência de documento: $e'));
+      return handleError(e, 'DocumentReferenceRepository.create');
     }
   }
 
@@ -36,9 +38,9 @@ class DocumentReferenceRepositoryClient implements DocumentReferenceRepository {
       final response = await _api.getById(id);
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'DocumentReferenceRepository.getById');
     } catch (e) {
-      return Failure(Exception('Erro ao buscar referência de documento: $e'));
+      return handleError(e, 'DocumentReferenceRepository.getById');
     }
   }
 
@@ -56,11 +58,12 @@ class DocumentReferenceRepositoryClient implements DocumentReferenceRepository {
       final entities = response.map((model) => model.toDomain()).toList();
       return Success(entities);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
-    } catch (e) {
-      return Failure(
-        Exception('Erro ao listar documentos do notebook: $e'),
+      return handleDioError(
+        e,
+        context: 'DocumentReferenceRepository.getByNotebookId',
       );
+    } catch (e) {
+      return handleError(e, 'DocumentReferenceRepository.getByNotebookId');
     }
   }
 
@@ -73,11 +76,9 @@ class DocumentReferenceRepositoryClient implements DocumentReferenceRepository {
       final response = await _api.update(data.id, model.toJson());
       return Success(response.toDomain());
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'DocumentReferenceRepository.update');
     } catch (e) {
-      return Failure(
-        Exception('Erro ao atualizar referência de documento: $e'),
-      );
+      return handleError(e, 'DocumentReferenceRepository.update');
     }
   }
 
@@ -87,51 +88,9 @@ class DocumentReferenceRepositoryClient implements DocumentReferenceRepository {
       await _api.delete(id);
       return const Success(null);
     } on DioException catch (e) {
-      return Failure(_handleDioError(e));
+      return handleDioError(e, context: 'DocumentReferenceRepository.delete');
     } catch (e) {
-      return Failure(Exception('Erro ao deletar referência de documento: $e'));
-    }
-  }
-
-  /// Handles DioException and converts to meaningful error messages.
-  Exception _handleDioError(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.sendTimeout:
-      case DioExceptionType.receiveTimeout:
-        return Exception('Tempo de conexão esgotado. Verifique sua internet.');
-
-      case DioExceptionType.badResponse:
-        final statusCode = e.response?.statusCode;
-        final data = e.response?.data;
-        final message =
-            (data is Map ? data['message'] as String? : null) ??
-            'Erro desconhecido';
-
-        switch (statusCode) {
-          case 400:
-            return Exception('Dados inválidos: $message');
-          case 404:
-            return Exception('Documento não encontrado');
-          case 409:
-            return Exception('Conflito: $message');
-          case 500:
-            return Exception('Erro no servidor. Tente novamente mais tarde.');
-          default:
-            return Exception('Erro HTTP $statusCode: $message');
-        }
-
-      case DioExceptionType.cancel:
-        return Exception('Requisição cancelada');
-
-      case DioExceptionType.connectionError:
-        return Exception('Erro de conexão. Verifique sua internet.');
-
-      case DioExceptionType.badCertificate:
-        return Exception('Erro de certificado SSL');
-
-      case DioExceptionType.unknown:
-        return Exception('Erro inesperado: ${e.message}');
+      return handleError(e, 'DocumentReferenceRepository.delete');
     }
   }
 }

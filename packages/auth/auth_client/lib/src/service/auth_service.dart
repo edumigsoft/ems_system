@@ -6,7 +6,8 @@ import 'package:auth_shared/auth_shared.dart'
         PasswordResetConfirm;
 import 'package:dio/dio.dart';
 import 'package:core_shared/core_shared.dart'
-    show Result, Failure, Success, successOfUnit;
+    show Result, Failure, Success, successOfUnit, Loggable;
+import 'package:core_client/core_client.dart' show DioErrorHandler;
 import 'package:user_shared/user_shared.dart' show UserDetails;
 
 import '../storage/token_storage.dart';
@@ -17,7 +18,7 @@ import 'token_refresh_service.dart';
 ///
 /// Orquestra chamadas via [AuthApiService] com gerenciamento de
 /// tokens via [TokenStorage] e refresh proativo via [TokenRefreshService].
-class AuthService {
+class AuthService with Loggable, DioErrorHandler {
   final AuthApiService _api;
   final TokenStorage _tokenStorage;
   final TokenRefreshService _refreshService;
@@ -83,9 +84,9 @@ class AuthService {
       _refreshService.startMonitoring();
       return Success(authResponse.user);
     } on DioException catch (e) {
-      return Failure(Exception(e.message ?? 'Login failed'));
+      return handleDioError(e, context: 'AuthService.login');
     } catch (e) {
-      return Failure(Exception('Login failed: $e'));
+      return handleError(e, 'AuthService.login');
     }
   }
 
@@ -95,9 +96,9 @@ class AuthService {
       await _api.register(request);
       return successOfUnit();
     } on DioException catch (e) {
-      return Failure(Exception(e.message ?? 'Registration failed'));
+      return handleDioError(e, context: 'AuthService.register');
     } catch (e) {
-      return Failure(Exception('Registration failed: $e'));
+      return handleError(e, 'AuthService.register');
     }
   }
 
@@ -128,9 +129,9 @@ class AuthService {
     } on DioException catch (e) {
       await _tokenStorage.clearTokens();
       _currentUser = null;
-      return Failure(Exception(e.message ?? 'Token refresh failed'));
+      return handleDioError(e, context: 'AuthService.refreshToken');
     } catch (e) {
-      return Failure(Exception('Token refresh failed: $e'));
+      return handleError(e, 'AuthService.refreshToken');
     }
   }
 
@@ -156,9 +157,9 @@ class AuthService {
       await _api.forgotPassword(PasswordResetRequest(email: email));
       return successOfUnit();
     } on DioException catch (e) {
-      return Failure(Exception(e.message ?? 'Password reset request failed'));
+      return handleDioError(e, context: 'AuthService.requestPasswordReset');
     } catch (e) {
-      return Failure(Exception('Password reset request failed: $e'));
+      return handleError(e, 'AuthService.requestPasswordReset');
     }
   }
 
@@ -173,9 +174,9 @@ class AuthService {
       );
       return successOfUnit();
     } on DioException catch (e) {
-      return Failure(Exception(e.message ?? 'Password reset failed'));
+      return handleDioError(e, context: 'AuthService.confirmPasswordReset');
     } catch (e) {
-      return Failure(Exception('Password reset failed: $e'));
+      return handleError(e, 'AuthService.confirmPasswordReset');
     }
   }
 
@@ -202,12 +203,9 @@ class AuthService {
       await _api.changePassword(requestData);
       return successOfUnit();
     } on DioException catch (e) {
-      // Parse error message
-      final data = e.response?.data;
-      final errorMessage = (data is Map ? data['error'] : null) ?? e.message;
-      return Failure(Exception(errorMessage ?? 'Password change failed'));
+      return handleDioError(e, context: 'AuthService.changePassword');
     } catch (e) {
-      return Failure(Exception('Password change failed: $e'));
+      return handleError(e, 'AuthService.changePassword');
     }
   }
 

@@ -116,8 +116,10 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               const Divider(),
 
-              // Seção Conexão (DEBUG apenas)
-              if (kDebugMode) ...[
+              // Seção Conexão (DEBUG ou WEB)
+              // Em web, sempre mostra para permitir trocar entre local/remoto
+              // Em mobile/desktop, só mostra em debug mode
+              if (kDebugMode || kIsWeb) ...[
                 _buildSectionHeader(theme, 'Conexão'),
                 _buildListTile(
                   icon: Icons.dns,

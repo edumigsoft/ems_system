@@ -21,6 +21,7 @@ export 'src/security/implementation/generate_tokens.dart';
 export 'src/security/implementation/jwt_security_service.dart';
 export 'src/security/security_service.dart';
 export 'src/servers/server.dart';
+export 'src/utils/error_message_mapper.dart';
 export 'src/utils/http_response_helper.dart';
 
 //

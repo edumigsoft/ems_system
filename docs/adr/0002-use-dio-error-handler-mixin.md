@@ -425,9 +425,38 @@ class FinanceViewModel extends ChangeNotifier {
 
 ---
 
+---
+
+## Notas de Implementação
+
+> [!IMPORTANT]
+> **Uso Obrigatório**
+>
+> **TODOS** os repositórios e services que fazem chamadas HTTP **DEVEM** usar o mixin `DioErrorHandler`.
+> Não implemente tratamento manual de `DioException` - sempre delegue para `handleDioError()`.
+>
+> **Implementação Atual (2026-02-16):**
+> - ✅ AuthService - Usa DioErrorHandler
+> - ✅ NotebookRepositoryClient - Usa DioErrorHandler
+> - ✅ TagRepositoryImpl - Usa DioErrorHandler
+> - ✅ DocumentReferenceRepositoryClient - Usa DioErrorHandler
+> - ✅ Repositórios que estendem BaseRepositoryLocal já têm DioErrorHandler integrado
+
+> [!TIP]
+> **Integração com Servidor**
+>
+> Este ADR trata o lado do **cliente**. Para o lado do **servidor**, veja:
+> - [ADR-0007: REST API Error Messages](./0007-rest-api-error-messages.md) - Mensagens amigáveis no backend
+> - O servidor usa `ErrorMessageMapper` para gerar respostas estruturadas
+> - O cliente extrai essas mensagens via `DioErrorHandler` automaticamente
+> - Juntos, formam um sistema completo de tratamento de erros user-friendly
+
+---
+
 ## Referências
 
 - [ADR-0001: Padrão Result para Tratamento de Erros](./0001-use-result-pattern-for-error-handling.md)
 - [ADR-0003: BaseRepository Pattern](./0003-use-base-repository-pattern.md)
+- [ADR-0007: REST API Error Messages](./0007-rest-api-error-messages.md)
 - [Padrões Arquiteturais](../architecture/architecture_patterns.md)
 - [Flutter & Dart Rules - Tratamento de Erros](../rules/flutter_dart_rules.md#tratamento-de-erros)
