@@ -121,6 +121,6 @@ COPY --from=build /app/servers/ems/server_v1/bin/server /app/bin/server
 ENV PORT=8181
 ENV INTERFACE=0.0.0.0
 
-EXPOSE 8080
+EXPOSE 8181
 
 CMD ["/app/bin/server"]
