@@ -68,8 +68,8 @@ void main() async {
   final handler = Pipeline()
       .addMiddleware(
         corsHeaders(
+          originChecker: allowedOrigins.contains,
           headers: {
-            'Access-Control-Allow-Origin': allowedOrigins.join(','),
             'Access-Control-Allow-Headers': 'Authorization, Content-Type',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           },
