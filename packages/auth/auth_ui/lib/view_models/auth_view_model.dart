@@ -171,6 +171,36 @@ class AuthViewModel extends ChangeNotifier {
     return false;
   }
 
+  /// Altera a senha do usuário autenticado.
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    _state = AuthState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    final result = await _authService.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+    );
+
+    if (result case Success()) {
+      _state = AuthState.authenticated;
+      notifyListeners();
+      return true;
+    } else if (result case Failure(error: final error)) {
+      _errorMessage = error.toString();
+      _state = AuthState.error;
+      notifyListeners();
+      return false;
+    }
+
+    return false;
+  }
+
   /// Realiza logout.
   Future<void> logout() async {
     _state = AuthState.loading;
