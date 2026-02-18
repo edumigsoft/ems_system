@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:core_shared/core_shared.dart';
-import 'package:core_ui/core_ui.dart' show UserRoleExtension;
 import 'package:user_shared/user_shared.dart';
 import '../../../../view_models/manage_users_view_model.dart';
+import '../../../../pages/manage_users_form_page.dart';
 import '../../../../widgets/shared/shared.dart';
+import '../../dialogs/dialogs.dart';
 
 /// Widget para layout tablet do gerenciamento de usuários.
 ///
-/// Usa GridView com UserGridCard e bottom sheet para detalhes.
+/// Scaffold + FAB + GridView. Ações de edit/delete nos cards.
 class TabletWidget extends StatefulWidget {
   final ManageUsersViewModel viewModel;
 
@@ -18,60 +18,92 @@ class TabletWidget extends StatefulWidget {
 }
 
 class _TabletWidgetState extends State<TabletWidget> {
-  String? _searchQuery;
-  UserRole? _selectedRole;
-  bool? _selectedActive;
+  Future<void> _navigateToCreate() async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) =>
+            ManageUsersFormPage(viewModel: widget.viewModel),
+      ),
+    );
+    if (mounted) widget.viewModel.loadUsers(refresh: true);
+  }
+
+  Future<void> _navigateToEdit(UserDetails user) async {
+    await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (context) => ManageUsersFormPage(
+          viewModel: widget.viewModel,
+          user: user,
+        ),
+      ),
+    );
+    if (mounted) widget.viewModel.loadUsers(refresh: true);
+  }
+
+  Future<void> _confirmDelete(UserDetails user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => UserDeleteConfirmDialog(user: user),
+    );
+    if (confirmed == true && mounted) {
+      final success = await widget.viewModel.deleteUser(user.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Usuário deletado com sucesso'
+                  : widget.viewModel.error ?? 'Erro ao deletar usuário',
+            ),
+            backgroundColor: success ? Colors.green : Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _confirmResetPassword(UserDetails user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => UserResetPasswordDialog(user: user),
+    );
+    if (confirmed == true && mounted) {
+      final success = await widget.viewModel.resetUserPassword(user.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'Senha resetada. ${user.name} deverá alterar a senha no próximo login.'
+                  : widget.viewModel.error ?? 'Erro ao resetar senha',
+            ),
+            backgroundColor: success ? Colors.green : Colors.red,
+            duration: Duration(seconds: success ? 4 : 3),
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Barra de Busca e Filtros
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              // Busca
-              UserSearchField(
-                value: _searchQuery,
-                onChanged: (value) {
-                  setState(() => _searchQuery = value);
-                  widget.viewModel.searchUsers(value.isEmpty ? null : value);
-                },
-                onClear: () {
-                  setState(() => _searchQuery = null);
-                  widget.viewModel.searchUsers(null);
-                },
-              ),
-
-              const SizedBox(height: 12),
-
-              // Filtros
-              UserFiltersBar(
-                selectedRole: _selectedRole,
-                selectedActive: _selectedActive,
-                onRoleChanged: (role) {
-                  setState(() => _selectedRole = role);
-                  widget.viewModel.filterByRole(role);
-                },
-                onActiveChanged: (active) {
-                  setState(() => _selectedActive = active);
-                  widget.viewModel.loadUsers(refresh: true);
-                },
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 8),
-
-        // Grid de Usuários
-        Expanded(child: _buildUsersGrid()),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Gerenciar Usuários'),
+        elevation: 0,
+      ),
+      floatingActionButton: widget.viewModel.isOwner
+          ? FloatingActionButton(
+              onPressed: _navigateToCreate,
+              tooltip: 'Adicionar Usuário',
+              child: const Icon(Icons.person_add),
+            )
+          : null,
+      body: _buildBody(context),
     );
   }
 
-  Widget _buildUsersGrid() {
+  Widget _buildBody(BuildContext context) {
     if (widget.viewModel.error != null) {
       return Center(
         child: Column(
@@ -104,9 +136,7 @@ class _TabletWidgetState extends State<TabletWidget> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final filteredUsers = _applyLocalFilters(widget.viewModel.users);
-
-    if (filteredUsers.isEmpty) {
+    if (widget.viewModel.users.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -132,14 +162,35 @@ class _TabletWidgetState extends State<TabletWidget> {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        itemCount: filteredUsers.length,
+        itemCount: widget.viewModel.users.length,
         itemBuilder: (context, index) {
-          final user = filteredUsers[index];
+          final user = widget.viewModel.users[index];
           return UserGridCard(
             user: user,
-            onTap: () => _showUserDetails(user),
+            onTap: () => UserDetailsBottomSheet.show(
+              context: context,
+              user: user,
+              onEdit: widget.viewModel.isOwner
+                  ? () {
+                      Navigator.pop(context);
+                      _navigateToEdit(user);
+                    }
+                  : null,
+              onDelete: widget.viewModel.isOwner && !user.isDeleted
+                  ? () {
+                      Navigator.pop(context);
+                      _confirmDelete(user);
+                    }
+                  : null,
+              onResetPassword: widget.viewModel.canResetPassword(user)
+                  ? () {
+                      Navigator.pop(context);
+                      _confirmResetPassword(user);
+                    }
+                  : null,
+            ),
             onEdit: widget.viewModel.isOwner
-                ? () => _showEditDialog(user)
+                ? () => _navigateToEdit(user)
                 : null,
             onDelete: widget.viewModel.isOwner && !user.isDeleted
                 ? () => _confirmDelete(user)
@@ -148,324 +199,5 @@ class _TabletWidgetState extends State<TabletWidget> {
         },
       ),
     );
-  }
-
-  List<UserDetails> _applyLocalFilters(List<UserDetails> users) {
-    var filtered = users;
-
-    // Filtro por status ativo
-    if (_selectedActive != null) {
-      filtered = filtered.where((u) => u.isActive == _selectedActive).toList();
-    }
-
-    return filtered;
-  }
-
-  Future<void> _showUserDetails(UserDetails user) async {
-    await UserDetailsBottomSheet.show(
-      context: context,
-      user: user,
-      onEdit: widget.viewModel.isOwner
-          ? () {
-              Navigator.pop(context);
-              _showEditDialog(user);
-            }
-          : null,
-      onDelete: widget.viewModel.isOwner && !user.isDeleted
-          ? () {
-              Navigator.pop(context);
-              _confirmDelete(user);
-            }
-          : null,
-      onResetPassword: widget.viewModel.canResetPassword(user)
-          ? () {
-              Navigator.pop(context);
-              _confirmResetPassword(user);
-            }
-          : null,
-    );
-  }
-
-  void _showEditDialog(UserDetails user) {
-    final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController(text: user.name);
-    final phoneController = TextEditingController(text: user.phone ?? '');
-    UserRole selectedRole = user.role;
-    bool isActive = user.isActive;
-
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          return AlertDialog(
-            title: const Text('Editar Usuário'),
-            content: SingleChildScrollView(
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Nome
-                    TextFormField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nome',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().length < 2) {
-                          return 'Nome deve ter no mínimo 2 caracteres';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Telefone
-                    TextFormField(
-                      controller: phoneController,
-                      decoration: const InputDecoration(
-                        labelText: 'Telefone',
-                        border: OutlineInputBorder(),
-                      ),
-                      keyboardType: TextInputType.phone,
-                      validator: (value) {
-                        if (value != null &&
-                            value.isNotEmpty &&
-                            value.length < 10) {
-                          return 'Telefone inválido (mínimo 10 dígitos)';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Role (apenas para owners)
-                    if (widget.viewModel.isOwner)
-                      DropdownButtonFormField<UserRole>(
-                        initialValue: selectedRole,
-                        decoration: const InputDecoration(
-                          labelText: 'Função',
-                          border: OutlineInputBorder(),
-                        ),
-                        items: UserRole.values.map((role) {
-                          return DropdownMenuItem(
-                            value: role,
-                            child: Text(role.label),
-                          );
-                        }).toList(),
-                        onChanged: (newRole) {
-                          if (newRole != null) {
-                            setDialogState(() {
-                              selectedRole = newRole;
-                            });
-                          }
-                        },
-                      ),
-                    if (widget.viewModel.isOwner) const SizedBox(height: 12),
-
-                    // Status Ativo
-                    SwitchListTile(
-                      title: const Text('Usuário Ativo'),
-                      value: isActive,
-                      onChanged: (value) {
-                        setDialogState(() {
-                          isActive = value;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(dialogContext).pop(),
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  if (formKey.currentState!.validate()) {
-                    // Capturar ScaffoldMessenger antes de operações async
-                    final scaffold = ScaffoldMessenger.of(context);
-
-                    // Atualizar informações básicas se mudaram
-                    if (nameController.text != user.name ||
-                        phoneController.text != user.phone) {
-                      await widget.viewModel.updateUserBasicInfo(
-                        userId: user.id,
-                        name: nameController.text.trim(),
-                        phone: phoneController.text.trim(),
-                      );
-                    }
-
-                    // Atualizar role se mudou
-                    if (selectedRole != user.role && widget.viewModel.isOwner) {
-                      await widget.viewModel.updateUserRole(
-                        user.id,
-                        selectedRole,
-                      );
-                    }
-
-                    // Atualizar status se mudou
-                    if (isActive != user.isActive) {
-                      await widget.viewModel.toggleUserStatus(
-                        user.id,
-                        isActive,
-                      );
-                    }
-
-                    if (dialogContext.mounted) {
-                      Navigator.of(dialogContext).pop();
-                    }
-
-                    scaffold.showSnackBar(
-                      const SnackBar(
-                        content: Text('Usuário atualizado com sucesso'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
-                },
-                child: const Text('Salvar'),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _confirmDelete(UserDetails user) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Deletar Usuário'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tem certeza que deseja deletar ${user.name}?'),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.warning, color: Colors.red, size: 20),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Esta ação não pode ser desfeita.',
-                      style: TextStyle(color: Colors.red, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: FilledButton.styleFrom(backgroundColor: Colors.red[700]),
-            child: const Text('Deletar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      final success = await widget.viewModel.deleteUser(user.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Usuário deletado com sucesso'
-                  : widget.viewModel.error ?? 'Erro ao deletar usuário',
-            ),
-            backgroundColor: success ? Colors.green : Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _confirmResetPassword(UserDetails user) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Resetar Senha'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Tem certeza que deseja resetar a senha de ${user.name}?'),
-            const SizedBox(height: 12),
-            const Text(
-              'O usuário será obrigado a alterar a senha no próximo login.',
-              style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.shade200),
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.info_outline, color: Colors.orange, size: 20),
-                  SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Esta ação não pode ser desfeita.',
-                      style: TextStyle(color: Colors.orange, fontSize: 12),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirmar'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && mounted) {
-      final success = await widget.viewModel.resetUserPassword(user.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Senha resetada com sucesso. ${user.name} deverá alterar a senha no próximo login.'
-                  : widget.viewModel.error ?? 'Erro ao resetar senha',
-            ),
-            backgroundColor: success ? Colors.green : Colors.red,
-            duration: Duration(seconds: success ? 4 : 3),
-          ),
-        );
-      }
-    }
   }
 }
