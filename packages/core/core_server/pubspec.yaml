@@ -20,6 +20,8 @@ dependencies:
   drift_postgres: ^1.3.1
   postgres: ^3.5.9
   pointycastle: ^4.0.0
+  path: ^1.9.0
+  auth_server: ^1.1.0
   core_shared: ^1.1.0
 
 dev_dependencies:

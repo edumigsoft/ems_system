@@ -25,3 +25,6 @@ export 'src/routes/auth_routes.dart';
 
 // Module
 export 'src/module/init_auth_module.dart';
+
+// AuthContext from auth_shared
+export 'package:auth_shared/auth_shared.dart' show AuthContext;

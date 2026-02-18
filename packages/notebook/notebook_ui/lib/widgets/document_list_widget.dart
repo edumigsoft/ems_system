@@ -10,11 +10,13 @@ import 'pdf_viewer_page.dart';
 class DocumentListWidget extends StatelessWidget {
   final List<DocumentReferenceDetails> documents;
   final void Function(String documentId)? onDelete;
+  final Dio? dio;
 
   const DocumentListWidget({
     super.key,
     required this.documents,
     this.onDelete,
+    this.dio,
   });
 
   @override
@@ -49,6 +51,7 @@ class DocumentListWidget extends StatelessWidget {
         return _DocumentItem(
           document: doc,
           onDelete: onDelete != null ? () => onDelete!(doc.id) : null,
+          dio: dio,
         );
       }).toList(),
     );
@@ -58,10 +61,12 @@ class DocumentListWidget extends StatelessWidget {
 class _DocumentItem extends StatelessWidget {
   final DocumentReferenceDetails document;
   final VoidCallback? onDelete;
+  final Dio? dio;
 
   const _DocumentItem({
     required this.document,
     this.onDelete,
+    this.dio,
   });
 
   @override
@@ -239,10 +244,18 @@ class _DocumentItem extends StatelessWidget {
     }
 
     try {
+      // Build full URL for server documents
+      String fullUrl = document.path;
+      if (document.storageType == DocumentStorageType.server &&
+          dio != null &&
+          dio!.options.baseUrl.isNotEmpty) {
+        fullUrl = '${dio!.options.baseUrl}${document.path}';
+      }
+
       await Navigator.of(context).push<void>(
         MaterialPageRoute<void>(
           builder: (context) => PdfViewerPage(
-            url: document.path,
+            url: fullUrl,
             documentName: document.name,
           ),
         ),

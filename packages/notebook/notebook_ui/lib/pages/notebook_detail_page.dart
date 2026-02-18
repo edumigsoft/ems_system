@@ -101,8 +101,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
-              onPressed: () =>
-                  widget.viewModel.loadNotebook(widget.notebookId),
+              onPressed: () => widget.viewModel.loadNotebook(widget.notebookId),
               icon: const Icon(Icons.refresh),
               label: const Text('Tentar novamente'),
             ),
@@ -333,9 +332,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Text(
-                notebook.content.isNotEmpty
-                    ? notebook.content
-                    : 'Sem conteúdo',
+                notebook.content.isNotEmpty ? notebook.content : 'Sem conteúdo',
                 style: theme.textTheme.bodyLarge,
               ),
             ),
@@ -362,6 +359,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           DocumentListWidget(
             documents: widget.viewModel.documents ?? [],
             onDelete: _handleDeleteDocument,
+            dio: widget.viewModel.dio,
           ),
         ],
       ),

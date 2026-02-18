@@ -12,6 +12,7 @@ export 'src/middleware/rate_limit.dart';
 export 'src/routes/add_routes.dart';
 export 'src/routes/health_routes.dart';
 export 'src/routes/routes.dart';
+export 'src/routes/file_routes.dart';
 export 'src/security/crypt_service.dart';
 export 'src/security/dtos/generate_tokens_dto.dart';
 export 'src/security/implementation/bcrypt_service.dart';
@@ -22,6 +23,7 @@ export 'src/security/implementation/generate_tokens.dart';
 export 'src/security/implementation/jwt_security_service.dart';
 export 'src/security/security_service.dart';
 export 'src/servers/server.dart';
+export 'src/storage/local_storage_service.dart';
 export 'src/utils/error_message_mapper.dart';
 export 'src/utils/http_response_helper.dart';
 

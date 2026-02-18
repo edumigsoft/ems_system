@@ -10,13 +10,14 @@ import 'package:core_server/core_server.dart'
         DatabaseProvider,
         EmailConfig,
         EmailService,
+        FileRoutes,
         HealthRoutes,
         HttpEmailService,
         JWTSecurityService,
         SecurityService,
         addRoutes;
 import 'package:core_shared/core_shared.dart'
-    show DependencyInjector, GetItInjector, LogService;
+    show DependencyInjector, GetItInjector, LogService, StorageService;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart' show JWT;
 import 'package:notebook_server/notebook_server.dart'
     show InitNotebookModuleToServer;
@@ -129,6 +130,15 @@ Future<DependencyInjector> registryInjectors() async {
     backendBaseApi: Env.backendPathApi,
     security: false,
   );
+
+  // 5. File Routes
+  di.registerLazySingleton<FileRoutes>(
+    () => FileRoutes(
+      di.get<StorageService>(),
+      di.get<AuthMiddleware>(),
+    ),
+  );
+  addRoutes(di, di.get<FileRoutes>(), security: false);
 
   logger.info('Injeção de dependência concluída.');
   return di;

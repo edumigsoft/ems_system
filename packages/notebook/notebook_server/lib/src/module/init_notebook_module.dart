@@ -1,9 +1,15 @@
 import 'package:auth_server/auth_server.dart' show AuthMiddleware;
 import 'package:core_server/core_server.dart'
-    show InitServerModule, DatabaseProvider, addRoutes;
+    show
+        InitServerModule,
+        DatabaseProvider,
+        addRoutes,
+        StorageService,
+        LocalStorageService;
 import 'package:core_shared/core_shared.dart' show DependencyInjector;
 import 'package:notebook_shared/notebook_shared.dart'
     show NotebookRepository, DocumentReferenceRepository;
+import 'dart:io';
 
 import '../repository/notebook_repository_server.dart';
 import '../repository/document_reference_repository_server.dart';
@@ -38,7 +44,13 @@ class InitNotebookModuleToServer implements InitServerModule {
 
     di.registerSingleton<NotebookDatabase>(notebookDb);
 
-    // 2. Repositories
+    // 2. Storage Service
+    final storagePath = Platform.environment['UPLOAD_PATH'] ?? uploadsPath;
+    di.registerLazySingleton<StorageService>(
+      () => LocalStorageService(basePath: storagePath),
+    );
+
+    // 3. Repositories
     di.registerLazySingleton<NotebookRepository>(
       () => NotebookRepositoryServer(notebookDb),
     );
@@ -47,15 +59,15 @@ class InitNotebookModuleToServer implements InitServerModule {
       () => DocumentReferenceRepositoryServer(notebookDb),
     );
 
-    // 3. Routes
+    // 4. Routes
     di.registerLazySingleton<NotebookRoutes>(
       () => NotebookRoutes(
         di.get<NotebookRepository>(),
         di.get<DocumentReferenceRepository>(),
+        di.get<StorageService>(),
         di.get<AuthMiddleware>(),
         di, // Passa DI para lazy resolution de AuthService
         backendBaseApi: backendBaseApi,
-        uploadsPath: uploadsPath,
       ),
     );
 

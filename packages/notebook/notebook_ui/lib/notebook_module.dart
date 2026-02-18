@@ -50,6 +50,7 @@ class NotebookModule extends AppModule with Loggable {
         notebookService: di.get<NotebookApiService>(),
         documentService: di.get<DocumentReferenceApiService>(),
         tagService: di.get<TagApiService>(),
+        dio: di.get<Dio>(),
       ),
     );
 

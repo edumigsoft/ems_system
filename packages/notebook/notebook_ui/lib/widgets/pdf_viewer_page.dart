@@ -1,7 +1,26 @@
-import 'dart:typed_data';
+import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+
+class _HttpOverrides extends HttpOverrides {
+  final bool isDevelopment;
+
+  _HttpOverrides(this.isDevelopment);
+
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    final client = super.createHttpClient(context);
+    // Ignorar certificado autoassinado apenas em desenvolvimento
+    if (isDevelopment) {
+      client.badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+    }
+    return client;
+  }
+}
 
 /// Page for viewing PDF documents inline.
 class PdfViewerPage extends StatefulWidget {
@@ -19,11 +38,12 @@ class PdfViewerPage extends StatefulWidget {
 }
 
 class _PdfViewerPageState extends State<PdfViewerPage> {
-  late PdfControllerPinch _pdfController;
   bool _isLoading = true;
   String? _error;
   int _currentPage = 1;
+  // ignore: prefer_final_fields
   int _totalPages = 0;
+  File? _downloadedFile;
 
   @override
   void initState() {
@@ -38,59 +58,70 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     });
 
     try {
-      // Download PDF from URL
-      final pdfData = await _downloadPdf(widget.url);
+      // Verificar se está em ambiente de desenvolvimento
+      final uri = Uri.parse(widget.url);
+      final host = uri.host;
+      final isDevelopment =
+          host.contains('localhost') ||
+          host.contains('127.0.0.1') ||
+          host.contains('192.168.') ||
+          host.endsWith('.local');
 
-      // Initialize PDF controller with downloaded data
-      _pdfController = PdfControllerPinch(
-        document: PdfDocument.openData(pdfData),
-      );
+      // Configurar HttpOverrides global para aceitar certificados autoassinados
+      HttpOverrides.global = _HttpOverrides(isDevelopment);
 
-      // Wait for document to load and get page count
-      final document = await _pdfController.document;
-      final pagesCount = document.pagesCount;
-
-      if (mounted) {
-        setState(() {
-          _totalPages = pagesCount;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _error = 'Erro ao carregar PDF: $e';
-          _isLoading = false;
-        });
-      }
-    }
-  }
-
-  Future<Uint8List> _downloadPdf(String url) async {
-    try {
+      // Baixar PDF manualmente para evitar problemas de rede/WASM
       final dio = Dio();
-      final response = await dio.get<List<int>>(
-        url,
+
+      final tempDir = await getTemporaryDirectory();
+      final fileName =
+          '${widget.documentName}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final filePath = '${tempDir.path}/$fileName';
+
+      await dio.download(
+        widget.url,
+        filePath,
         options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: true,
-          validateStatus: (status) => status! < 500,
+          headers: {
+            'User-Agent': 'EMS-System-PDF-Viewer/1.0',
+          },
         ),
       );
 
-      if (response.statusCode != 200) {
-        throw Exception('Falha ao baixar PDF: HTTP ${response.statusCode}');
-      }
+      _downloadedFile = File(filePath);
 
-      return Uint8List.fromList(response.data!);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      throw Exception('Erro ao baixar PDF: $e');
+      if (mounted) {
+        setState(() {
+          _error = 'Erro ao baixar PDF: $e';
+          _isLoading = false;
+        });
+      }
+    } finally {
+      // Restaurar HttpOverrides global
+      HttpOverrides.global = null;
     }
   }
 
   @override
   void dispose() {
-    _pdfController.dispose();
+    // Limpar arquivo temporário baixado
+    if (_downloadedFile != null) {
+      Future.microtask(() async {
+        try {
+          if (await _downloadedFile!.exists()) {
+            await _downloadedFile!.delete();
+          }
+        } catch (e) {
+          // Ignorar erro ao deletar arquivo temporário
+        }
+      });
+    }
     super.dispose();
   }
 
@@ -130,7 +161,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text('Carregando PDF...'),
+            Text('Baixando PDF...'),
           ],
         ),
       );
@@ -166,30 +197,20 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       );
     }
 
-    return PdfViewPinch(
-      controller: _pdfController,
-      onPageChanged: (page) {
-        setState(() {
-          _currentPage = page;
-        });
-      },
-      builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
-        options: const DefaultBuilderOptions(),
-        documentLoaderBuilder: (_) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        pageLoaderBuilder: (_) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorBuilder: (_, error) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'Erro ao renderizar página: $error',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
+    if (_downloadedFile == null) {
+      return const Center(
+        child: Text('Arquivo PDF não disponível'),
+      );
+    }
+
+    return PdfViewer.file(
+      _downloadedFile!.path,
+      params: PdfViewerParams(
+        onPageChanged: (page) {
+          setState(() {
+            _currentPage = (page ?? 0) + 1; // pdfrx uses 0-based indexing
+          });
+        },
       ),
     );
   }
