@@ -118,6 +118,100 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void _showChangePasswordDialog(BuildContext context) {
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => ListenableBuilder(
+        listenable: widget.viewModel,
+        builder: (_, _) => AlertDialog(
+          title: const Text('Alterar Senha'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.viewModel.authErrorMessage != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    widget.viewModel.authErrorMessage!,
+                    style: TextStyle(
+                      color: Theme.of(dialogContext).colorScheme.error,
+                    ),
+                  ),
+                ),
+              TextField(
+                controller: currentPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Senha Atual',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: newPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Nova Senha',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: confirmPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirmar Nova Senha',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: widget.viewModel.isAuthLoading
+                  ? null
+                  : () => Navigator.pop(dialogContext),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: widget.viewModel.isAuthLoading
+                  ? null
+                  : () async {
+                      final success = await widget.viewModel.changePassword(
+                        currentPassword: currentPasswordController.text,
+                        newPassword: newPasswordController.text,
+                        confirmPassword: confirmPasswordController.text,
+                      );
+                      if (success && dialogContext.mounted) {
+                        Navigator.pop(dialogContext);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Senha alterada com sucesso!'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      }
+                    },
+              child: widget.viewModel.isAuthLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Salvar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBody(BuildContext context, ThemeData theme) {
     if (widget.viewModel.isLoading && widget.viewModel.profile == null) {
       return const Center(child: CircularProgressIndicator());
@@ -227,6 +321,14 @@ class _ProfilePageState extends State<ProfilePage> {
             // Informações
             _buildInfoCard(theme, profile),
             const SizedBox(height: 24),
+
+            // Botão Alterar Senha
+            OutlinedButton.icon(
+              onPressed: () => _showChangePasswordDialog(context),
+              icon: const Icon(Icons.lock_outline),
+              label: const Text('Alterar Senha'),
+            ),
+            const SizedBox(height: 12),
 
             // Botão Logout
             OutlinedButton.icon(

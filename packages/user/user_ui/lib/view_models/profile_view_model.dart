@@ -85,6 +85,25 @@ class ProfileViewModel extends ChangeNotifier with Loggable {
     notifyListeners();
   }
 
+  /// Altera a senha do usuário autenticado.
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
+    return _authViewModel.changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      confirmPassword: confirmPassword,
+    );
+  }
+
+  /// Mensagem de erro do AuthViewModel (usada durante troca de senha).
+  String? get authErrorMessage => _authViewModel.errorMessage;
+
+  /// Indica se o AuthViewModel está carregando.
+  bool get isAuthLoading => _authViewModel.isLoading;
+
   /// Realiza logout do usuário.
   Future<void> logout() async {
     logger.info('Logging out user');
