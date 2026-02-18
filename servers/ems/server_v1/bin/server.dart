@@ -6,7 +6,6 @@ import 'package:ems_server_v1/config/env/env.dart';
 import 'package:ems_server_v1/config/injector.dart';
 import 'package:open_api_shared/open_api_shared.dart' show api, ApiInfo;
 import 'package:shelf/shelf.dart' hide Server;
-import 'package:shelf_cors_headers/shelf_cors_headers.dart';
 
 import 'server.reflectable.dart';
 
@@ -66,18 +65,8 @@ void main() async {
     period: Duration(minutes: 1),
   );
 
-  final allowedOrigins = Env.allowedOrigins.trim().split(',');
   final addRouters = di.get<AddRoutes>();
   final handler = Pipeline()
-      .addMiddleware(
-        corsHeaders(
-          originChecker: allowedOrigins.contains,
-          headers: {
-            'Access-Control-Allow-Headers': 'Authorization, Content-Type',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          },
-        ),
-      )
       .addMiddleware(rateLimit.middleware)
       .addMiddleware(logRequests())
       .addHandler(addRouters.call);
