@@ -1,7 +1,11 @@
 import 'package:core_shared/core_shared.dart'
     show DependencyInjector, Loggable, UserRole;
 import 'package:core_ui/core_ui.dart'
-    show AppModule, AppNavigationItem, AppNavigationSection;
+    show
+        AppModule,
+        AppNavigationItem,
+        AppNavigationSection,
+        FlutterSecureStorageAdapter;
 import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart' show AppLocalizations;
@@ -43,7 +47,9 @@ class UserModule extends AppModule with Loggable {
     di.registerLazySingleton<UserService>(() => UserService(di.get()));
 
     // Register SettingsStorage
-    di.registerLazySingleton<SettingsStorage>(() => SettingsStorage());
+    di.registerLazySingleton<SettingsStorage>(
+      () => SettingsStorage(FlutterSecureStorageAdapter()),
+    );
 
     // Repository
     di.registerLazySingleton<UserRepository>(

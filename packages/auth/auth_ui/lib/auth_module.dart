@@ -1,7 +1,8 @@
 import 'package:auth_client/auth_client.dart'
     show AuthService, AuthApiService, TokenStorage, TokenRefreshService;
 import 'package:core_shared/core_shared.dart' show Loggable, DependencyInjector;
-import 'package:core_ui/core_ui.dart' show AppModule, AppNavigationItem;
+import 'package:core_ui/core_ui.dart'
+    show AppModule, AppNavigationItem, FlutterSecureStorageAdapter;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -25,7 +26,9 @@ class AuthModule extends AppModule with Loggable {
     );
 
     // Register TokenStorage
-    di.registerLazySingleton<TokenStorage>(() => TokenStorage());
+    di.registerLazySingleton<TokenStorage>(
+      () => TokenStorage(FlutterSecureStorageAdapter()),
+    );
 
     // Register TokenRefreshService
     di.registerLazySingleton<TokenRefreshService>(

@@ -5,7 +5,7 @@ import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
 import 'package:core_client/core_client.dart' show ApiKeyInterceptor;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
-import 'package:core_ui/core_ui.dart' show AppModule;
+import 'package:core_ui/core_ui.dart' show AppModule, FlutterSecureStorageAdapter;
 import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -79,7 +79,7 @@ class Injector with Loggable {
 
   Future<void> _registerCoreServices(DependencyInjector di) async {
     // Registra SettingsStorage para carregar configurações de servidor
-    final settingsStorage = SettingsStorage();
+    final settingsStorage = SettingsStorage(FlutterSecureStorageAdapter());
 
     logger.info('🔍 Starting server configuration...');
     logger.info('ENV - backendBaseUrl: ${Env.backendBaseUrl}');
