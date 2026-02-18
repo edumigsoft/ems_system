@@ -5,6 +5,7 @@ import '../view_models/tag_view_model.dart';
 import '../widgets/components/mobile/mobile_widget.dart';
 import '../widgets/components/tablet/tablet_widget.dart';
 import '../widgets/components/desktop/desktop_widget.dart';
+import '../widgets/dialogs/dialogs.dart';
 
 /// Página de listagem de tags.
 ///
@@ -54,14 +55,29 @@ class _TagListPageState extends State<TagListPage> {
     }
   }
 
+  Future<void> _showCreateDialog() async {
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (context) => TagCreateDialog(viewModel: widget.viewModel),
+    );
+    if (created == true && mounted) {
+      widget.viewModel.loadTags();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const DSCardHeader(
+        DSCardHeader(
           title: 'Tags',
           subtitle: 'Gestão de Tags',
           showSearch: false,
+          actionButton: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showCreateDialog,
+            tooltip: 'Nova Tag',
+          ),
         ),
         Expanded(
           child: DSCard(

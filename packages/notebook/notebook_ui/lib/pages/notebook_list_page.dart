@@ -5,6 +5,7 @@ import '../view_models/notebook_list_view_model.dart';
 import '../ui/widgets/components/mobile/mobile_widget.dart';
 import '../ui/widgets/components/tablet/tablet_widget.dart';
 import '../ui/widgets/components/desktop/desktop_widget.dart';
+import '../widgets/notebook_create_dialog.dart';
 
 /// Página de listagem de cadernos.
 ///
@@ -52,14 +53,29 @@ class _NotebookListPageState extends State<NotebookListPage> {
     }
   }
 
+  Future<void> _showCreateDialog() async {
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (context) => const NotebookCreateDialog(),
+    );
+    if (created == true && mounted) {
+      widget.viewModel.loadNotebooks();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const DSCardHeader(
+        DSCardHeader(
           title: 'Cadernos',
           subtitle: 'Gestão de Cadernos',
           showSearch: false,
+          actionButton: IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _showCreateDialog,
+            tooltip: 'Novo Caderno',
+          ),
         ),
         Expanded(
           child: DSCard(
