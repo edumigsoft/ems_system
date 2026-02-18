@@ -11,21 +11,14 @@ environment:
   sdk: ^3.10.7
 
 dependencies:
-  # NOTA: Flutter SDK é necessário apenas para plugins (flutter_secure_storage)
-  # O código em si é Dart puro (sem widgets, sem UI)
-  flutter:
-    sdk: flutter
   dio: ^5.0.0
   retrofit: 4.9.1
-  flutter_secure_storage: ^9.2.4
   core_shared: ^1.1.0
   core_client: ^1.1.0
   auth_shared: ^1.1.0
   user_shared: ^1.1.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   lints: ^6.0.0
   test: ^1.26.0
   mocktail: ^1.0.0

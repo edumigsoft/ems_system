@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:auth_client/src/interceptor/auth_interceptor.dart';
 import 'package:auth_client/src/storage/token_storage.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTokenStorage extends Mock implements TokenStorage {}
