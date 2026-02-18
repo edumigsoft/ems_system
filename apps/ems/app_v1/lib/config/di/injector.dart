@@ -95,14 +95,11 @@ class Injector with Loggable {
         // Log modo de execução
         logger.info('═══════════════════════════════════════════════════');
         logger.info('Build Mode: ${kReleaseMode ? "RELEASE" : "DEBUG"}');
-        logger.info('Platform: ${kIsWeb ? "WEB" : "NATIVE"}');
+        logger.info('Platform: NATIVE');
         logger.info('User Settings - Server Type: ${settings.serverType}');
 
-        // ⚠️ SEGURANÇA: Em RELEASE mobile/desktop, FORÇA servidor remoto
-        // Em WEB, sempre respeita a escolha do usuário (permite local em dev)
-        final effectiveServerType = (kReleaseMode && !kIsWeb)
-            ? 'remote'
-            : settings.serverType;
+        // ⚠️ SEGURANÇA: Em RELEASE, FORÇA servidor remoto
+        final effectiveServerType = kReleaseMode ? 'remote' : settings.serverType;
         logger.info('Effective Server Type: $effectiveServerType');
 
         if (effectiveServerType == 'remote') {
@@ -175,26 +172,15 @@ class Injector with Loggable {
       ),
     );
 
-    // Configura Alice Dio Adapter apenas se não for web
-    if (!kIsWeb) {
-      final aliceDioAdapter = AliceDioAdapter();
-      alice.addAdapter(aliceDioAdapter);
+    final aliceDioAdapter = AliceDioAdapter();
+    alice.addAdapter(aliceDioAdapter);
 
-      if (!dio.interceptors.any((i) => i is AuthInterceptor)) {
-        dio.interceptors.addAll([
-          di.get<AuthInterceptor>(),
-          SafeLogInterceptor(), // Interceptor seguro que filtra dados sensíveis
-          aliceDioAdapter,
-        ]);
-      }
-    } else {
-      // Em web, registra apenas os interceptors essenciais
-      if (!dio.interceptors.any((i) => i is AuthInterceptor)) {
-        dio.interceptors.addAll([
-          di.get<AuthInterceptor>(),
-          SafeLogInterceptor(), // Interceptor seguro que filtra dados sensíveis
-        ]);
-      }
+    if (!dio.interceptors.any((i) => i is AuthInterceptor)) {
+      dio.interceptors.addAll([
+        di.get<AuthInterceptor>(),
+        SafeLogInterceptor(), // Interceptor seguro que filtra dados sensíveis
+        aliceDioAdapter,
+      ]);
     }
   }
 }

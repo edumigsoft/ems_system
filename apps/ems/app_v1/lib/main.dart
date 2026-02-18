@@ -1,27 +1,18 @@
 import 'package:alice/model/alice_configuration.dart';
 import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:ems_app_v1/app_layout.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import 'config/di/injector.dart';
 
 import 'package:alice/alice.dart';
 
-// Alice é desabilitado em web devido a incompatibilidades
-final alice = kIsWeb
-    ? Alice(
-        configuration: AliceConfiguration(
-          showNotification: false,
-          showInspectorOnShake: false,
-        ),
-      )
-    : Alice(
-        configuration: AliceConfiguration(
-          showNotification: false,
-          showInspectorOnShake: true,
-        ),
-      );
+final alice = Alice(
+  configuration: AliceConfiguration(
+    showNotification: false,
+    showInspectorOnShake: true,
+  ),
+);
 
 /// Ponto de entrada principal do aplicativo EMS System.
 ///
@@ -71,7 +62,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    debugPrint('🚀 main() iniciando (kIsWeb: $kIsWeb)...');
+    debugPrint('🚀 main() iniciando...');
 
     // Inicializa injeção de dependências
     debugPrint('📦 Chamando Injector()...');

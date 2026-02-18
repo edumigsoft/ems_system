@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:auth_ui/auth_ui.dart' show AuthViewModel;
 import 'package:ems_app_v1/main.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:localizations_ui/localizations_ui.dart';
 import 'package:user_ui/view_models/settings_view_model.dart';
@@ -103,13 +102,12 @@ class _AppLayoutState extends State<AppLayout> {
 
   Future<void> _initializeApp() async {
     if (_isInitialized) {
-      // Evita reinicialização múltipla (importante para hot reload em web)
       debugPrint('⚠️ App já inicializado, ignorando nova inicialização');
       return;
     }
 
     try {
-      debugPrint('🚀 Iniciando app (kIsWeb: $kIsWeb)...');
+      debugPrint('🚀 Iniciando app...');
 
       // Inicialização assíncrona de recursos
       debugPrint('📦 Inicializando viewModel...');
@@ -183,8 +181,7 @@ class _AppLayoutState extends State<AppLayout> {
       ]),
       builder: (context, child) {
         return MaterialApp(
-          // Alice navigator key é desabilitado em web
-          navigatorKey: kIsWeb ? null : alice.getNavigatorKey(),
+          navigatorKey: alice.getNavigatorKey(),
           title: 'EMS System',
           home: AppPage(
             viewModel: widget.viewModel,

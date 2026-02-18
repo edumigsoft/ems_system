@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -49,7 +48,7 @@ class _DocumentUploadWidgetState extends State<DocumentUploadWidget> {
       final result = await FilePicker.platform.pickFiles(
         type: widget.allowedExtensions != null ? FileType.custom : FileType.any,
         allowedExtensions: widget.allowedExtensions,
-        withData: kIsWeb, // Carregar bytes apenas na web
+        withData: false,
       );
 
       if (result != null) {

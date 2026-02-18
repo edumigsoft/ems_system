@@ -13,7 +13,6 @@ environment:
 dependencies:
   shelf: ^1.4.2
   shelf_router: ^1.1.4
-  shelf_cors_headers: ^0.1.5
   envied: ^1.3.2
   reflectable: ^5.1.0
   dart_jsonwebtoken: ^3.3.1

@@ -41,12 +41,6 @@ final class Env {
   @EnviedField()
   static const String backendPathApi = _Env.backendPathApi;
 
-  @EnviedField(
-    defaultValue: 'http://localhost:${_Env.serverPort}',
-  )
-  static const String allowedOrigins =
-      '${_Env.allowedOrigins}:${_Env.serverPort}';
-
   @EnviedField()
   static const int accessTokenExpiresMinutes = _Env.accessTokenExpiresMinutes;
 
