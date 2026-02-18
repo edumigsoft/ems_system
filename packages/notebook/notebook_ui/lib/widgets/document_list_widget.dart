@@ -257,6 +257,9 @@ class _DocumentItem extends StatelessWidget {
           builder: (context) => PdfViewerPage(
             url: fullUrl,
             documentName: document.name,
+            authToken: dio?.options.headers['Authorization']
+                ?.toString()
+                .replaceAll('Bearer ', ''),
           ),
         ),
       );

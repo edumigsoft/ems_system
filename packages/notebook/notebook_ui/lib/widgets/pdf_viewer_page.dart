@@ -26,11 +26,13 @@ class _HttpOverrides extends HttpOverrides {
 class PdfViewerPage extends StatefulWidget {
   final String url;
   final String documentName;
+  final String? authToken; // Adicionado parâmetro de token
 
   const PdfViewerPage({
     super.key,
     required this.url,
     required this.documentName,
+    this.authToken, // Parâmetro opcional de token
   });
 
   @override
@@ -82,8 +84,10 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
         widget.url,
         filePath,
         options: Options(
-          headers: {
+          headers: <String, dynamic>{
             'User-Agent': 'EMS-System-PDF-Viewer/1.0',
+            if (widget.authToken != null)
+              'Authorization': 'Bearer ${widget.authToken}',
           },
         ),
       );

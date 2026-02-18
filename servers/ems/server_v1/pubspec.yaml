@@ -1,7 +1,7 @@
 name: ems_server_v1
 description: EMS System Server V1
 publish_to: none
-version: 1.1.9
+version: 1.1.10
 
 # repository: https://github.com/edumigsoft/ems_system_core
 

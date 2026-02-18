@@ -64,3 +64,5 @@ servers/containers/proxy/auto-generate/
 
 # PostgreSQL - Dados persistidos
 servers/containers/postgres/data/
+
+uploads/
