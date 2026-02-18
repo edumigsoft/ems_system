@@ -1,14 +1,17 @@
 services:
   sms_server:
     container_name: sms_server_dev
-    image: sms_server_image:latest
+    image: sms-server:latest
     build:
       context: ../../../
       dockerfile: servers/sms/container/Dockerfile
       args:
         VERSION: ${VERSION:-dev}
+        ENVIRONMENT: ${ENVIRONMENT:-development}
     ports:
-      - "8080:8080"
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    environment:
+      - ENV=${ENVIRONMENT:-development}
     env_file:
       - .env
     restart: unless-stopped
