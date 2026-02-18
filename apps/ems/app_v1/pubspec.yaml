@@ -19,6 +19,7 @@ dependencies:
   alice: ^1.0.0
   alice_dio: ^1.0.7
   core_shared: ^1.1.0
+  core_client: ^1.1.0
   core_ui: ^1.1.0
   localizations_ui: ^1.1.0
   design_system_shared: ^1.1.0

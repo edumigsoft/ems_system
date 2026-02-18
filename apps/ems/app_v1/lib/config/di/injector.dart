@@ -2,6 +2,7 @@ import 'package:alice_dio/alice_dio_adapter.dart';
 import 'package:auth_client/auth_client.dart'
     show TokenStorage, AuthInterceptor;
 import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
+import 'package:core_client/core_client.dart' show ApiKeyInterceptor;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
 import 'package:core_ui/core_ui.dart' show AppModule;
@@ -177,6 +178,7 @@ class Injector with Loggable {
 
     if (!dio.interceptors.any((i) => i is AuthInterceptor)) {
       dio.interceptors.addAll([
+        ApiKeyInterceptor(apiKey: Env.apiKey),
         di.get<AuthInterceptor>(),
         SafeLogInterceptor(), // Interceptor seguro que filtra dados sensíveis
         aliceDioAdapter,

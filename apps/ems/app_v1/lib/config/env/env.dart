@@ -10,4 +10,6 @@ abstract class Env {
   static const String backendRemoteUrl = _Env.backendRemoteUrl;
   @EnviedField(varName: 'BACKEND_PATH_API')
   static const String backendPathApi = _Env.backendPathApi;
+  @EnviedField(varName: 'API_KEY', obfuscate: true)
+  static final String apiKey = _Env.apiKey;
 }
