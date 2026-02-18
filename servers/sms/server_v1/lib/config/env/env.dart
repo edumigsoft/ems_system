@@ -42,6 +42,9 @@ final class Env {
   static const String backendPathApi = _Env.backendPathApi;
 
   @EnviedField()
+  static const String apiKey = _Env.apiKey;
+
+  @EnviedField()
   static const int accessTokenExpiresMinutes = _Env.accessTokenExpiresMinutes;
 
   @EnviedField()

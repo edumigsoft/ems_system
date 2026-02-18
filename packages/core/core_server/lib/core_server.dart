@@ -5,6 +5,7 @@ export 'src/database/drift/date_time_converter_non_null.dart';
 export 'src/database/drift/drift_table_mixin.dart';
 export 'src/email/email_service.dart';
 export 'src/email/implementation/http_email_service.dart';
+export 'src/middleware/api_key_middleware.dart';
 export 'src/middleware/auth_required.dart';
 export 'src/middleware/cors_middleware.dart';
 export 'src/middleware/rate_limit.dart';

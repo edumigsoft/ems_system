@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:core_server/core_server.dart' show AddRoutes, RateLimit, Server;
+import 'package:core_server/core_server.dart'
+    show AddRoutes, ApiKeyMiddleware, RateLimit, Server;
 import 'package:core_shared/core_shared.dart' show LogService, LogLevel;
 import 'package:sms_server_v1/config/env/env.dart';
 import 'package:sms_server_v1/config/injector.dart';
@@ -61,10 +62,12 @@ void main() async {
     requestsPerPeriod: 20,
     period: Duration(minutes: 1),
   );
+  final apiKeyMiddleware = ApiKeyMiddleware(apiKey: Env.apiKey);
 
   final addRouters = di.get<AddRoutes>();
   final handler = Pipeline()
       .addMiddleware(rateLimit.middleware)
+      .addMiddleware(apiKeyMiddleware.middleware)
       .addMiddleware(logRequests())
       .addHandler(addRouters.call);
 
