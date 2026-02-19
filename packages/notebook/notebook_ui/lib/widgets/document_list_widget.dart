@@ -249,7 +249,13 @@ class _DocumentItem extends StatelessWidget {
       if (document.storageType == DocumentStorageType.server &&
           dio != null &&
           dio!.options.baseUrl.isNotEmpty) {
-        fullUrl = '${dio!.options.baseUrl}${document.path}';
+        final base = dio!.options.baseUrl.endsWith('/')
+            ? dio!.options.baseUrl
+            : '${dio!.options.baseUrl}/';
+        final relativePath = document.path.startsWith('/')
+            ? document.path.substring(1)
+            : document.path;
+        fullUrl = '$base$relativePath';
       }
 
       await Navigator.of(context).push<void>(
@@ -257,9 +263,7 @@ class _DocumentItem extends StatelessWidget {
           builder: (context) => PdfViewerPage(
             url: fullUrl,
             documentName: document.name,
-            authToken: dio?.options.headers['Authorization']
-                ?.toString()
-                .replaceAll('Bearer ', ''),
+            dio: dio,
           ),
         ),
       );

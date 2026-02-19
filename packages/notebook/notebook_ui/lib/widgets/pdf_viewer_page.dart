@@ -5,34 +5,17 @@ import 'package:pdfrx/pdfrx.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 
-class _HttpOverrides extends HttpOverrides {
-  final bool isDevelopment;
-
-  _HttpOverrides(this.isDevelopment);
-
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context);
-    // Ignorar certificado autoassinado apenas em desenvolvimento
-    if (isDevelopment) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
-    }
-    return client;
-  }
-}
-
 /// Page for viewing PDF documents inline.
 class PdfViewerPage extends StatefulWidget {
   final String url;
   final String documentName;
-  final String? authToken; // Adicionado parâmetro de token
+  final Dio? dio;
 
   const PdfViewerPage({
     super.key,
     required this.url,
     required this.documentName,
-    this.authToken, // Parâmetro opcional de token
+    this.dio,
   });
 
   @override
@@ -60,37 +43,15 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     });
 
     try {
-      // Verificar se está em ambiente de desenvolvimento
-      final uri = Uri.parse(widget.url);
-      final host = uri.host;
-      final isDevelopment =
-          host.contains('localhost') ||
-          host.contains('127.0.0.1') ||
-          host.contains('192.168.') ||
-          host.endsWith('.local');
-
-      // Configurar HttpOverrides global para aceitar certificados autoassinados
-      HttpOverrides.global = _HttpOverrides(isDevelopment);
-
-      // Baixar PDF manualmente para evitar problemas de rede/WASM
-      final dio = Dio();
+      // Usar Dio fornecido (com interceptors de autenticação) ou criar um simples como fallback
+      final dioClient = widget.dio ?? Dio();
 
       final tempDir = await getTemporaryDirectory();
       final fileName =
           '${widget.documentName}_${DateTime.now().millisecondsSinceEpoch}.pdf';
       final filePath = '${tempDir.path}/$fileName';
 
-      await dio.download(
-        widget.url,
-        filePath,
-        options: Options(
-          headers: <String, dynamic>{
-            'User-Agent': 'EMS-System-PDF-Viewer/1.0',
-            if (widget.authToken != null)
-              'Authorization': 'Bearer ${widget.authToken}',
-          },
-        ),
-      );
+      await dioClient.download(widget.url, filePath);
 
       _downloadedFile = File(filePath);
 
@@ -106,9 +67,6 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           _isLoading = false;
         });
       }
-    } finally {
-      // Restaurar HttpOverrides global
-      HttpOverrides.global = null;
     }
   }
 
