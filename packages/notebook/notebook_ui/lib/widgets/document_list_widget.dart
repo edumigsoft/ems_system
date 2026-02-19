@@ -244,7 +244,9 @@ class _DocumentItem extends StatelessWidget {
     }
 
     try {
-      // Build full URL for server documents
+      // Build full URL for server documents.
+      // Files are served at /uploads/<key> (e.g. https://ems.local/uploads/2026/02/file.pdf).
+      // The baseUrl points to the API path (e.g. /api/v1), so we extract only the origin.
       String fullUrl = document.path;
       if (document.storageType == DocumentStorageType.server &&
           dio != null &&
@@ -255,7 +257,7 @@ class _DocumentItem extends StatelessWidget {
         final relativePath = document.path.startsWith('/')
             ? document.path.substring(1)
             : document.path;
-        fullUrl = '$base$relativePath';
+        fullUrl = '${base}uploads/$relativePath';
       }
 
       await Navigator.of(context).push<void>(
