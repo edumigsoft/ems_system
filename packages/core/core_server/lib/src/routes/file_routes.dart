@@ -12,20 +12,25 @@ import 'package:shelf_router/shelf_router.dart';
 class FileRoutes extends Routes {
   final StorageService _storageService;
   final AuthMiddleware _authMiddleware;
+  final String _backendBaseApi;
 
-  FileRoutes(this._storageService, this._authMiddleware)
-    : super(security: true);
+  FileRoutes(
+    this._storageService,
+    this._authMiddleware, {
+    required String backendBaseApi,
+  }) : _backendBaseApi = backendBaseApi,
+       super(security: true);
 
   @override
-  String get path => '/files';
+  String get path => '$_backendBaseApi/uploads';
 
   @override
   Router get router {
     final router = Router();
 
-    // GET /files/:key - Download de arquivo com autenticação
+    // GET /api/v1/uploads/:year/:month/:filename - Download de arquivo com autenticação
     router.get(
-      '/<key>',
+      '/<year>/<month>/<filename>',
       Pipeline()
           .addMiddleware(_authMiddleware.verifyJwt)
           .addHandler(_downloadFile),
@@ -38,7 +43,10 @@ class FileRoutes extends Routes {
   ///
   /// [request] - Requisição HTTP
   Future<Response> _downloadFile(Request request) async {
-    final key = request.params['key'] ?? '';
+    final year = request.params['year'] ?? '';
+    final month = request.params['month'] ?? '';
+    final filename = request.params['filename'] ?? '';
+    final key = '$year/$month/$filename';
     final authContext = request.context['authContext'];
     if (authContext == null) {
       return Response.forbidden(

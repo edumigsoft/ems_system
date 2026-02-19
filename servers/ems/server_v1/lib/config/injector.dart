@@ -136,6 +136,7 @@ Future<DependencyInjector> registryInjectors() async {
     () => FileRoutes(
       di.get<StorageService>(),
       di.get<AuthMiddleware>(),
+      backendBaseApi: Env.backendPathApi,
     ),
   );
   addRoutes(di, di.get<FileRoutes>(), security: false);
