@@ -15,6 +15,7 @@ import '../repository/notebook_repository_server.dart';
 import '../repository/document_reference_repository_server.dart';
 import '../database/notebook_database.dart';
 import '../routes/notebook_routes.dart';
+import '../routes/document_routes.dart';
 
 /// Inicializa o módulo de notebooks no servidor.
 ///
@@ -71,9 +72,19 @@ class InitNotebookModuleToServer implements InitServerModule {
       ),
     );
 
+    di.registerLazySingleton<DocumentRoutes>(
+      () => DocumentRoutes(
+        di.get<DocumentReferenceRepository>(),
+        di.get<StorageService>(),
+        di.get<AuthMiddleware>(),
+        backendBaseApi: backendBaseApi,
+      ),
+    );
+
     // 4. Mount Routes
-    // Nota: security=false porque NotebookRoutes gerencia sua própria autenticação
+    // Nota: security=false porque as rotas gerenciam sua própria autenticação
     // internamente via AuthMiddleware, não dependendo do authRequired global
     addRoutes(di, di.get<NotebookRoutes>(), security: false);
+    addRoutes(di, di.get<DocumentRoutes>(), security: false);
   }
 }

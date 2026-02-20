@@ -15,6 +15,7 @@ export 'src/repository/document_reference_repository_server.dart';
 
 // Routes
 export 'src/routes/notebook_routes.dart';
+export 'src/routes/document_routes.dart';
 
 // Module
 export 'src/module/init_notebook_module.dart';
