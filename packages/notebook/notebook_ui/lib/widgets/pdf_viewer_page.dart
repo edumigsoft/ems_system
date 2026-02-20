@@ -1,17 +1,21 @@
-import 'dart:typed_data';
+import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:pdfrx/pdfrx.dart';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Page for viewing PDF documents inline.
 class PdfViewerPage extends StatefulWidget {
   final String url;
   final String documentName;
+  final Dio? dio;
 
   const PdfViewerPage({
     super.key,
     required this.url,
     required this.documentName,
+    this.dio,
   });
 
   @override
@@ -19,11 +23,12 @@ class PdfViewerPage extends StatefulWidget {
 }
 
 class _PdfViewerPageState extends State<PdfViewerPage> {
-  late PdfControllerPinch _pdfController;
   bool _isLoading = true;
   String? _error;
   int _currentPage = 1;
+  // ignore: prefer_final_fields
   int _totalPages = 0;
+  File? _downloadedFile;
 
   @override
   void initState() {
@@ -38,59 +43,47 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
     });
 
     try {
-      // Download PDF from URL
-      final pdfData = await _downloadPdf(widget.url);
+      // Usar Dio fornecido (com interceptors de autenticação) ou criar um simples como fallback
+      final dioClient = widget.dio ?? Dio();
 
-      // Initialize PDF controller with downloaded data
-      _pdfController = PdfControllerPinch(
-        document: PdfDocument.openData(pdfData),
-      );
+      final tempDir = await getTemporaryDirectory();
+      final fileName =
+          '${widget.documentName}_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final filePath = '${tempDir.path}/$fileName';
 
-      // Wait for document to load and get page count
-      final document = await _pdfController.document;
-      final pagesCount = document.pagesCount;
+      await dioClient.download(widget.url, filePath);
+
+      _downloadedFile = File(filePath);
 
       if (mounted) {
         setState(() {
-          _totalPages = pagesCount;
           _isLoading = false;
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
-          _error = 'Erro ao carregar PDF: $e';
+          _error = 'Erro ao baixar PDF: $e';
           _isLoading = false;
         });
       }
-    }
-  }
-
-  Future<Uint8List> _downloadPdf(String url) async {
-    try {
-      final dio = Dio();
-      final response = await dio.get<List<int>>(
-        url,
-        options: Options(
-          responseType: ResponseType.bytes,
-          followRedirects: true,
-          validateStatus: (status) => status! < 500,
-        ),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Falha ao baixar PDF: HTTP ${response.statusCode}');
-      }
-
-      return Uint8List.fromList(response.data!);
-    } catch (e) {
-      throw Exception('Erro ao baixar PDF: $e');
     }
   }
 
   @override
   void dispose() {
-    _pdfController.dispose();
+    // Limpar arquivo temporário baixado
+    if (_downloadedFile != null) {
+      Future.microtask(() async {
+        try {
+          if (await _downloadedFile!.exists()) {
+            await _downloadedFile!.delete();
+          }
+        } catch (e) {
+          // Ignorar erro ao deletar arquivo temporário
+        }
+      });
+    }
     super.dispose();
   }
 
@@ -130,7 +123,7 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
           children: [
             CircularProgressIndicator(),
             SizedBox(height: 16),
-            Text('Carregando PDF...'),
+            Text('Baixando PDF...'),
           ],
         ),
       );
@@ -166,30 +159,20 @@ class _PdfViewerPageState extends State<PdfViewerPage> {
       );
     }
 
-    return PdfViewPinch(
-      controller: _pdfController,
-      onPageChanged: (page) {
-        setState(() {
-          _currentPage = page;
-        });
-      },
-      builders: PdfViewPinchBuilders<DefaultBuilderOptions>(
-        options: const DefaultBuilderOptions(),
-        documentLoaderBuilder: (_) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        pageLoaderBuilder: (_) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-        errorBuilder: (_, error) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'Erro ao renderizar página: $error',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
+    if (_downloadedFile == null) {
+      return const Center(
+        child: Text('Arquivo PDF não disponível'),
+      );
+    }
+
+    return PdfViewer.file(
+      _downloadedFile!.path,
+      params: PdfViewerParams(
+        onPageChanged: (page) {
+          setState(() {
+            _currentPage = (page ?? 0) + 1; // pdfrx uses 0-based indexing
+          });
+        },
       ),
     );
   }

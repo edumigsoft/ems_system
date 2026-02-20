@@ -1,12 +1,8 @@
 import 'dart:convert';
-import 'package:auth_server/auth_server.dart' show AuthMiddleware;
-import 'package:auth_shared/auth_shared.dart' show AuthContext;
-import 'package:core_server/core_server.dart' show Routes;
+import 'package:auth_server/auth_server.dart' show AuthMiddleware, AuthContext;
+import 'package:core_server/core_server.dart' show Routes, StorageService;
 import 'package:core_shared/core_shared.dart'
-    show DependencyInjector, DataException;
-import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
-import 'dart:io';
+    show DependencyInjector, DataException, StorageValidation;
 import 'package:notebook_shared/notebook_shared.dart'
     show
         NotebookDetailsModel,
@@ -18,9 +14,10 @@ import 'package:notebook_shared/notebook_shared.dart'
         DocumentReferenceCreate,
         DocumentStorageType,
         NotebookType;
+import 'package:shelf/shelf.dart';
+import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_multipart/form_data.dart';
 import 'package:mime/mime.dart';
-import 'package:path/path.dart' as p;
 
 /// Rotas de gerenciamento de notebooks.
 ///
@@ -38,20 +35,19 @@ import 'package:path/path.dart' as p;
 class NotebookRoutes extends Routes {
   final NotebookRepository notebookRepository;
   final DocumentReferenceRepository documentRepository;
+  final StorageService storageService;
   final AuthMiddleware authMiddleware;
   final DependencyInjector di;
   final String _backendBaseApi;
-  final String _uploadsPath;
 
   NotebookRoutes(
     this.notebookRepository,
     this.documentRepository,
+    this.storageService,
     this.authMiddleware,
     this.di, {
     required String backendBaseApi,
-    required String uploadsPath,
   }) : _backendBaseApi = backendBaseApi,
-       _uploadsPath = uploadsPath,
        super(security: true);
 
   @override
@@ -518,7 +514,7 @@ class NotebookRoutes extends Routes {
 
   /// POST /notebooks/:id/documents/upload - Upload de arquivo.
   ///
-  /// Recebe um arquivo via multipart/form-data, salva no diretório de uploads
+  /// Recebe um arquivo via multipart/form-data, valida e salva usando StorageService,
   /// e cria uma referência no banco de dados.
   Future<Response> _uploadDocument(Request request, String id) async {
     final authContext = request.context['authContext'] as AuthContext?;
@@ -542,14 +538,8 @@ class NotebookRoutes extends Routes {
         );
       }
 
-      // Criar diretório de uploads se não existir
-      final uploadsDir = Directory(_uploadsPath);
-      if (!await uploadsDir.exists()) {
-        await uploadsDir.create(recursive: true);
-      }
-
       String? fileName;
-      String? savedFilePath;
+      String? storageKey;
       int? fileSize;
       String? mimeType;
 
@@ -560,32 +550,41 @@ class NotebookRoutes extends Routes {
           // Extrair nome do arquivo
           fileName = formData.filename ?? 'unnamed_file';
 
-          // Gerar nome único para evitar colisões
-          final timestamp = DateTime.now().millisecondsSinceEpoch;
-          final extension = p.extension(fileName);
-          final baseName = p.basenameWithoutExtension(fileName);
-          final uniqueFileName = '${baseName}_$timestamp$extension';
-
-          // Caminho completo do arquivo
-          final filePath = p.join(_uploadsPath, uniqueFileName);
-          final file = File(filePath);
-
-          // Ler bytes do stream e salvar
+          // Ler bytes do arquivo
           final bytes = await formData.part.readBytes();
-          await file.writeAsBytes(bytes);
 
-          savedFilePath = filePath;
+          // Validar arquivo usando StorageValidation
+          final validation = StorageValidation.validateFile(
+            bytes,
+            fileName,
+            lookupMimeType(fileName) ?? 'application/octet-stream',
+          );
+
+          if (!validation.isValid) {
+            return Response(
+              400,
+              body: jsonEncode({
+                'error': validation.errorMessage,
+              }),
+              headers: {'Content-Type': 'application/json'},
+            );
+          }
+
+          // Armazenar arquivo usando StorageService
+          storageKey = await storageService.storeFile(
+            bytes,
+            fileName,
+            lookupMimeType(fileName) ?? 'application/octet-stream',
+          );
+
           fileSize = bytes.length;
-
-          // Detectar MIME type
           mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
-
           break; // Processar apenas o primeiro arquivo
         }
       }
 
       // Verificar se arquivo foi recebido
-      if (fileName == null || savedFilePath == null) {
+      if (fileName == null || storageKey == null) {
         return Response(
           400,
           body: jsonEncode({'error': 'No file provided in upload'}),
@@ -596,7 +595,7 @@ class NotebookRoutes extends Routes {
       // Criar referência no banco de dados
       final createDto = DocumentReferenceCreate(
         name: fileName,
-        path: savedFilePath,
+        path: storageKey, // Armazenar apenas a chave do StorageService
         storageType: DocumentStorageType.server,
         mimeType: mimeType,
         sizeBytes: fileSize,
@@ -614,12 +613,14 @@ class NotebookRoutes extends Routes {
             headers: {'Content-Type': 'application/json'},
           );
         },
-        failure: (exception) {
+        failure: (exception) async {
           // Limpar arquivo em caso de erro ao criar referência
-          try {
-            File(savedFilePath!).deleteSync();
-          } catch (_) {
-            // Ignorar erro ao deletar arquivo
+          if (storageKey != null) {
+            try {
+              await storageService.deleteFile(storageKey);
+            } catch (_) {
+              // Ignorar erro ao deletar arquivo
+            }
           }
 
           return Response.internalServerError(

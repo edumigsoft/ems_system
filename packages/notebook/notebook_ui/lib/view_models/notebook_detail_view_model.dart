@@ -14,14 +14,17 @@ class NotebookDetailViewModel extends ChangeNotifier
   final NotebookApiService _notebookService;
   final DocumentReferenceApiService _documentService;
   final TagApiService _tagService;
+  final Dio _dio;
 
   NotebookDetailViewModel({
     required NotebookApiService notebookService,
     required DocumentReferenceApiService documentService,
     required TagApiService tagService,
+    required Dio dio,
   }) : _notebookService = notebookService,
        _documentService = documentService,
-       _tagService = tagService;
+       _tagService = tagService,
+       _dio = dio;
 
   NotebookDetails? _notebook;
   NotebookDetails? get notebook => _notebook;
@@ -315,6 +318,9 @@ class NotebookDetailViewModel extends ChangeNotifier
   double _uploadProgress = 0.0;
   double get uploadProgress => _uploadProgress;
 
+  /// Dio instance configured with base URL for API calls
+  Dio get dio => _dio;
+
   /// Adiciona referência de documento (URL ou caminho local).
   Future<bool> addDocumentReference({
     required String name,
@@ -385,7 +391,7 @@ class NotebookDetailViewModel extends ChangeNotifier
         ),
       });
 
-      final dio = Dio();
+      final dio = _dio;
       final response = await dio.post<Map<String, dynamic>>(
         '/notebooks/${_notebook!.id}/documents/upload',
         data: formData,

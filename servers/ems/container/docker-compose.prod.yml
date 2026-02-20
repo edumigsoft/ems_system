@@ -6,6 +6,9 @@ services:
       - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - .env
+    volumes:
+      - ${UPLOADS_HOST_PATH:-../../../uploads}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
+      - ${LOGS_HOST_PATH:-./logs}:${LOGS_CONTAINER_PATH:-/app/logs}
     networks:
       - ems_system_net
     restart: unless-stopped

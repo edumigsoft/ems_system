@@ -63,3 +63,5 @@ devtools_options.yaml
 # Outros arquivos de configuração
 pubspec.lock
 melos.yaml
+
+uploads/

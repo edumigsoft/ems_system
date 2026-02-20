@@ -1,3 +1,4 @@
+import 'package:design_system_ui/design_system_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:notebook_shared/notebook_shared.dart';
 import 'package:tag_ui/tag_ui.dart';
@@ -9,11 +10,10 @@ import '../widgets/expansion_card_widget.dart';
 import '../widgets/notebook_hierarchy_widget.dart';
 import '../widgets/document_upload_widget.dart';
 import '../widgets/notebook_edit_dialog.dart';
-// O DocumentUploadWidget usa DocumentAddResult que deve estar acessível.
 
 /// Página de detalhes de um caderno.
 ///
-/// Recebe ViewModel via construtor (DI).
+/// Sem Scaffold/AppBar — usa DSCardHeader com botão de voltar.
 class NotebookDetailPage extends StatefulWidget {
   final NotebookDetailViewModel viewModel;
   final String notebookId;
@@ -34,13 +34,10 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Carrega caderno ao inicializar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.viewModel.loadNotebook(widget.notebookId).then((_) {
-        // Carrega hierarquia após carregar o caderno
         widget.viewModel.loadParent();
         widget.viewModel.loadChildren();
-        // Carrega tags disponíveis para resolver nomes e cores
         widget.viewModel.loadAvailableTags();
       });
     });
@@ -50,40 +47,37 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Detalhes do Caderno'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: _navigateToEdit,
-            tooltip: 'Editar',
+    return Column(
+      children: [
+        DSCardHeader(
+          title: 'Detalhes do Caderno',
+          subtitle: widget.viewModel.notebook?.title,
+          showSearch: false,
+          actionButton: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+            tooltip: 'Voltar',
           ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: _handleDelete,
-            tooltip: 'Excluir',
+        ),
+        Expanded(
+          child: DSCard(
+            child: ListenableBuilder(
+              listenable: widget.viewModel,
+              builder: (context, _) {
+                return _buildBody(context, theme);
+              },
+            ),
           ),
-        ],
-      ),
-      body: ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) {
-          return _buildBody(context, theme);
-        },
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildBody(BuildContext context, ThemeData theme) {
-    // Estado de loading
     if (widget.viewModel.isLoading && widget.viewModel.notebook == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
-    // Estado de erro
     if (widget.viewModel.error != null && widget.viewModel.notebook == null) {
       return Center(
         child: Column(
@@ -117,34 +111,45 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     }
 
     final notebook = widget.viewModel.notebook;
-    if (notebook == null) {
-      return const SizedBox.shrink();
-    }
+    if (notebook == null) return const SizedBox.shrink();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título
-          Text(
-            notebook.title,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Título e ações
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  notebook.title,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: _navigateToEdit,
+                tooltip: 'Editar',
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: _handleDelete,
+                tooltip: 'Excluir',
+              ),
+            ],
           ),
           const SizedBox(height: 8),
 
-          // Metadata (tipo, data)
+          // Metadata
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
               Chip(
-                avatar: Icon(
-                  _getIconForType(notebook.type),
-                  size: 18,
-                ),
+                avatar: Icon(_getIconForType(notebook.type), size: 18),
                 label: Text(_getLabelForType(notebook.type)),
               ),
               Chip(
@@ -161,7 +166,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           ),
           const SizedBox(height: 16),
 
-          // Card de Expansão (Campos faltantes)
+          // Campos faltantes
           if (_getMissingFields(notebook).isNotEmpty &&
               !_isMissingFieldsDismissed) ...[
             const SizedBox(height: 8),
@@ -183,10 +188,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Tags',
-                  style: theme.textTheme.titleMedium,
-                ),
+                Text('Tags', style: theme.textTheme.titleMedium),
                 TextButton.icon(
                   onPressed: _showManageTagsDialog,
                   icon: const Icon(Icons.edit, size: 16),
@@ -204,7 +206,6 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 ...notebook.tags!.map((tagId) {
-                  // Tenta encontrar detalhes da tag
                   final tagDetails = widget.viewModel.availableTags
                       .where((t) => t.id == tagId)
                       .firstOrNull;
@@ -218,15 +219,12 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
                     );
                   }
 
-                  // Fallback para ID se não encontrar detalhes
                   return Chip(
-                    // Using generic Chip from material
                     label: Text(tagId),
                     onDeleted: () =>
                         widget.viewModel.removeTagFromNotebook(tagId),
                   );
                 }),
-                // Botão rápido de adicionar
                 ActionChip(
                   avatar: const Icon(Icons.add, size: 18),
                   label: const Text('Adicionar'),
@@ -236,14 +234,10 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             ),
             const SizedBox(height: 16),
           ] else ...[
-            // Caso sem tags, mostra botão para adicionar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Tags',
-                  style: theme.textTheme.titleMedium,
-                ),
+                Text('Tags', style: theme.textTheme.titleMedium),
                 TextButton.icon(
                   onPressed: _showManageTagsDialog,
                   icon: const Icon(Icons.add, size: 16),
@@ -254,7 +248,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             const SizedBox(height: 16),
           ],
 
-          // Lembrete Destacado
+          // Lembrete
           if (notebook.type == NotebookType.reminder &&
               notebook.reminderDate != null) ...[
             Card(
@@ -316,12 +310,10 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
               currentNotebookId: notebook.id,
               onNotebookTap: (id) {
                 if (id != notebook.id) {
-                  // Navega para o outro caderno
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute<void>(
                       builder: (context) => NotebookDetailPage(
-                        viewModel: widget
-                            .viewModel, // Ideal seria nova instancia ou reset, mas ok por agora
+                        viewModel: widget.viewModel,
                         notebookId: id,
                       ),
                     ),
@@ -334,10 +326,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           ],
 
           // Conteúdo
-          Text(
-            'Conteúdo',
-            style: theme.textTheme.titleMedium,
-          ),
+          Text('Conteúdo', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Card(
             child: Padding(
@@ -350,14 +339,9 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
           ),
           const SizedBox(height: 16),
 
-          // Documentos anexados
-          Text(
-            'Documentos Anexados',
-            style: theme.textTheme.titleMedium,
-          ),
+          // Documentos
+          Text('Documentos Anexados', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
-
-          // Upload de Documentos
           DocumentUploadWidget(
             onDocumentAdded: _handleDocumentAdded,
             maxSizeMB: 50,
@@ -371,12 +355,11 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             ],
             enabled: !widget.viewModel.isUploadingDocument,
           ),
-
           const SizedBox(height: 16),
-
           DocumentListWidget(
             documents: widget.viewModel.documents ?? [],
             onDelete: _handleDeleteDocument,
+            dio: widget.viewModel.dio,
           ),
         ],
       ),
@@ -405,6 +388,13 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
+  String _formatDateTime(DateTime dateTime) {
+    final date = _formatDate(dateTime);
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$date às $hour:$minute';
+  }
+
   Future<void> _navigateToEdit() async {
     final updated = await showDialog<bool>(
       context: context,
@@ -427,9 +417,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Confirmar exclusão'),
-        content: const Text(
-          'Tem certeza que deseja excluir este caderno?',
-        ),
+        content: const Text('Tem certeza que deseja excluir este caderno?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -447,14 +435,11 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     );
 
     if (confirmed == true && mounted) {
-      // Navega de volta antes de deletar
       Navigator.of(context).pop();
     }
   }
 
-  Future<void> _handleDeleteDocument(
-    String documentId,
-  ) async {
+  Future<void> _handleDeleteDocument(String documentId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -497,56 +482,34 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
 
   List<String> _getMissingFields(NotebookDetails notebook) {
     final missing = <String>[];
-
-    if (notebook.tags == null || notebook.tags!.isEmpty) {
-      missing.add('Tags');
-    }
-    if (notebook.projectId == null) {
-      missing.add('Projeto');
-    }
-    if (notebook.parentId == null) {
-      missing.add('Caderno Pai');
-    }
+    if (notebook.tags == null || notebook.tags!.isEmpty) missing.add('Tags');
+    if (notebook.projectId == null) missing.add('Projeto');
+    if (notebook.parentId == null) missing.add('Caderno Pai');
     if (notebook.reminderDate == null &&
         notebook.type == NotebookType.reminder) {
       missing.add('Data do Lembrete');
     }
-
     return missing;
   }
 
   List<NotebookDetails> _buildHierarchyList() {
     final list = <NotebookDetails>[];
-
     if (widget.viewModel.parentNotebook != null) {
       list.add(widget.viewModel.parentNotebook!);
     }
-
     if (widget.viewModel.notebook != null) {
       list.add(widget.viewModel.notebook!);
     }
-
     if (widget.viewModel.childNotebooks != null) {
       list.addAll(widget.viewModel.childNotebooks!);
     }
-
     return list;
   }
 
-  String _formatDateTime(DateTime dateTime) {
-    final date = _formatDate(dateTime);
-    final hour = dateTime.hour.toString().padLeft(2, '0');
-    final minute = dateTime.minute.toString().padLeft(2, '0');
-    return '$date às $hour:$minute';
-  }
-
-  Future<void> _handleDocumentAdded(
-    DocumentAddResult result,
-  ) async {
+  Future<void> _handleDocumentAdded(DocumentAddResult result) async {
     bool success = false;
 
     if (result.type == DocumentAddType.upload) {
-      // Upload de arquivo
       final file = result.file!.files.single;
       success = await widget.viewModel.uploadDocument(
         filePath: file.path!,
@@ -556,14 +519,12 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
             : null,
       );
     } else if (result.type == DocumentAddType.url) {
-      // Link externo
       success = await widget.viewModel.addDocumentReference(
         name: result.name,
         path: result.url!,
         storageType: DocumentStorageType.url,
       );
     } else if (result.type == DocumentAddType.localPath) {
-      // Caminho local
       success = await widget.viewModel.addDocumentReference(
         name: result.name,
         path: result.path!,
@@ -593,20 +554,7 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     final notebook = widget.viewModel.notebook;
     if (notebook == null) return;
 
-    // Resolve tags atuais para objetos TagDetails
-    // Necessário para o TagSelector saber o que está selecionado
     final currentTags = widget.viewModel.notebookTagsWithDetails;
-
-    // Se houver tags que não foram resolvidas (IDs sem detalhes),
-    // elas infelizmente não aparecerão como selecionadas no Selector
-    // pois o Selector trabalha com objetos TagDetails.
-    // Mas ao salvar, pegamos a lista completa do Selector.
-    // *Nota:* Tags perdidas (sem ID na lista de disponíveis) seriam removidas
-    // se o usuário salvar o diálogo. Isso é comportamento aceitável para "limpeza",
-    // ou deveríamos mesclar?
-    // Dado que TagSelector é "o estado da verdade", vamos assumir que apenas
-    // tags disponíveis podem ser selecionadas.
-
     List<TagDetails> newSelection = List.from(currentTags);
 
     final confirmed = await showDialog<bool>(
@@ -655,13 +603,9 @@ class _NotebookDetailPageState extends State<NotebookDetailPage> {
     );
 
     if (confirmed == true) {
-      // Atualiza o notebook com a nova lista de IDs
       final newTagIds = newSelection.map((t) => t.id).toList();
       await widget.viewModel.updateNotebook(
-        NotebookUpdate(
-          id: notebook.id,
-          tags: newTagIds,
-        ),
+        NotebookUpdate(id: notebook.id, tags: newTagIds),
       );
     }
   }
