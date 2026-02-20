@@ -1,5 +1,7 @@
 export 'core/commands/command.dart';
 export 'core/mixins/form_validation_mixin.dart';
+export 'core/dashboard/dashboard_widget_entry.dart';
+export 'core/dashboard/dashboard_registry.dart';
 export 'src/storage/flutter_secure_storage_adapter.dart';
 export 'ui/mixins/secure_page_mixin.dart';
 export 'core/commons/app_module.dart';

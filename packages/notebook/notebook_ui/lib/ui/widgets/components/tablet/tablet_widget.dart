@@ -3,15 +3,15 @@ import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:notebook_shared/notebook_shared.dart';
 import '../../../../view_models/notebook_list_view_model.dart';
 import '../../../../view_models/notebook_detail_view_model.dart';
-import '../../../../view_models/notebook_create_view_model.dart';
 import '../../../../widgets/notebook_card.dart';
 import '../../../../pages/notebook_detail_page.dart';
-import '../../../../pages/notebook_form_page.dart';
+import '../../../../widgets/notebook_create_dialog.dart';
 import '../../dialogs/dialogs.dart';
 
-/// Widget tablet para listagem e gerenciamento de cadernos.
+/// Widget tablet para listagem de cadernos — sem Scaffold/AppBar.
 ///
-/// Scaffold + AppBar + FAB. GridView 2 colunas com ações de edição.
+/// Toolbar inline com busca, sort e botão "Novo Caderno".
+/// CRUD via dialogs. GridView 2 colunas com NotebookCard.
 class TabletWidget extends StatefulWidget {
   final NotebookListViewModel viewModel;
 
@@ -24,11 +24,41 @@ class TabletWidget extends StatefulWidget {
 class _TabletWidgetState extends State<TabletWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadernos'),
-        automaticallyImplyLeading: false,
-        actions: [
+    return Column(
+      children: [
+        _buildToolbar(context),
+        const Divider(height: 1),
+        Expanded(
+          child: ListenableBuilder(
+            listenable: widget.viewModel,
+            builder: (context, _) => _buildBody(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolbar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Buscar cadernos...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
+              onChanged: widget.viewModel.setSearchQuery,
+            ),
+          ),
+          const SizedBox(width: 8),
           PopupMenuButton<NotebookSortOrder>(
             icon: const Icon(Icons.sort),
             tooltip: 'Ordenar',
@@ -57,21 +87,19 @@ class _TabletWidgetState extends State<TabletWidget> {
               ),
             ],
           ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: widget.viewModel.loadNotebooks,
             tooltip: 'Atualizar',
           ),
+          const SizedBox(width: 8),
+          ElevatedButton.icon(
+            onPressed: _showCreateDialog,
+            icon: const Icon(Icons.add),
+            label: const Text('Novo Caderno'),
+          ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToCreate,
-        icon: const Icon(Icons.add),
-        label: const Text('Novo Caderno'),
-      ),
-      body: ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) => _buildBody(context),
       ),
     );
   }
@@ -150,7 +178,7 @@ class _TabletWidgetState extends State<TabletWidget> {
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            const Text('Clique no botão + para criar seu primeiro caderno'),
+            const Text('Clique em "Novo Caderno" para criar o primeiro'),
           ],
         ),
       );
@@ -177,18 +205,12 @@ class _TabletWidgetState extends State<TabletWidget> {
     );
   }
 
-  Future<void> _navigateToCreate() async {
-    NotebookCreate? toCreate;
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => NotebookFormPage(
-          onCreate: (create) => toCreate = create,
-        ),
-      ),
+  Future<void> _showCreateDialog() async {
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (context) => const NotebookCreateDialog(),
     );
-    if (result == true && toCreate != null && mounted) {
-      final createVm = GetItInjector().get<NotebookCreateViewModel>();
-      await createVm.createNotebook(toCreate!);
+    if (created == true && mounted) {
       widget.viewModel.loadNotebooks();
     }
   }
@@ -222,8 +244,9 @@ class _TabletWidgetState extends State<TabletWidget> {
                   ? 'Caderno excluído com sucesso'
                   : (widget.viewModel.error ?? 'Erro ao excluir caderno'),
             ),
-            backgroundColor:
-                success ? null : Theme.of(context).colorScheme.error,
+            backgroundColor: success
+                ? null
+                : Theme.of(context).colorScheme.error,
           ),
         );
       }

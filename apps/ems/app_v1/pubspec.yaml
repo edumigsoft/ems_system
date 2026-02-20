@@ -32,6 +32,7 @@ dependencies:
   tag_client: ^1.1.0
   notebook_ui: ^1.1.0
   notebook_client: ^1.1.0
+  dashboard_ui: ^1.1.0
 
 dev_dependencies:
   flutter_test:

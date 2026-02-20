@@ -22,5 +22,9 @@ export 'widgets/expansion_card_widget.dart';
 export 'widgets/document_upload_widget.dart';
 export 'widgets/notebook_hierarchy_widget.dart';
 
+// Dashboard entries
+export 'dashboard/notebook_reminders_entry.dart';
+export 'dashboard/notebook_quick_notes_entry.dart';
+
 // Module
 export 'notebook_module.dart';
