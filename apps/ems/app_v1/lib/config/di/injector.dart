@@ -78,6 +78,10 @@ class Injector with Loggable {
     // 5. Registra Módulos e Configura Navegação
     appViewModel.registerModules(appModules);
 
+    // Navega para o dashboard como rota inicial (seção de menor prioridade = 0).
+    // registerModules usa ordem de registro, não de prioridade de seção.
+    appViewModel.navigateTo(DashboardModule.routeName);
+
     // Configura os interceptors do Dio após tudo ser registrado.
     _setupDioInterceptors(_diMain);
   }

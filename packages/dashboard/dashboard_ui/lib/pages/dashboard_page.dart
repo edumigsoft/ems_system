@@ -7,9 +7,12 @@ import '../widgets/dashboard_widget_card.dart';
 
 /// Página de Dashboard — agrega widgets de todos os módulos registrados.
 ///
-/// Mobile (< 600 px): ListView de cards (largura total, um por linha).
-/// Tablet (600-899 px): GridView com 2 colunas.
-/// Desktop (≥ 900 px): GridView com 3 colunas.
+/// Mobile (< 600 px): 1 coluna.
+/// Tablet (600-899 px): 2 colunas.
+/// Desktop (≥ 900 px): 3 colunas.
+///
+/// Usa LayoutBuilder + Wrap ao invés de GridView com childAspectRatio fixo,
+/// permitindo que os cards cresçam para o tamanho do seu conteúdo.
 class DashboardPage extends StatelessWidget {
   final DashboardViewModel viewModel;
 
@@ -28,9 +31,9 @@ class DashboardPage extends StatelessWidget {
         Expanded(
           child: DSCard(
             child: ResponsiveLayout(
-              mobile: _DashboardGrid(viewModel: viewModel, columns: 1),
-              tablet: _DashboardGrid(viewModel: viewModel, columns: 2),
-              desktop: _DashboardGrid(viewModel: viewModel, columns: 3),
+              mobile: _DashboardLayout(viewModel: viewModel, columns: 1),
+              tablet: _DashboardLayout(viewModel: viewModel, columns: 2),
+              desktop: _DashboardLayout(viewModel: viewModel, columns: 3),
             ),
           ),
         ),
@@ -39,11 +42,11 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-class _DashboardGrid extends StatelessWidget {
+class _DashboardLayout extends StatelessWidget {
   final DashboardViewModel viewModel;
   final int columns;
 
-  const _DashboardGrid({required this.viewModel, required this.columns});
+  const _DashboardLayout({required this.viewModel, required this.columns});
 
   @override
   Widget build(BuildContext context) {
@@ -71,17 +74,32 @@ class _DashboardGrid extends StatelessWidget {
       );
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: columns,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: columns == 1 ? 2.5 : 1.4,
-      ),
-      itemCount: entries.length,
-      itemBuilder: (context, index) =>
-          DashboardWidgetCard(entry: entries[index]),
+    const padding = 16.0;
+    const spacing = 12.0;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Largura disponível descontando padding horizontal e espaços entre colunas
+        final totalSpacing = spacing * (columns - 1);
+        final itemWidth =
+            (constraints.maxWidth - padding * 2 - totalSpacing) / columns;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(padding),
+          child: Wrap(
+            spacing: spacing,
+            runSpacing: spacing,
+            children: entries
+                .map(
+                  (entry) => SizedBox(
+                    width: itemWidth,
+                    child: DashboardWidgetCard(entry: entry),
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      },
     );
   }
 }
