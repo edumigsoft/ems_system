@@ -1,0 +1,62 @@
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.dashboard=true" # Ativa o dashboard
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Forçar HTTPS automático
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      # Configuração SSL
+      - "--certificatesresolvers.ems_system_resolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.ems_system_resolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.ems_system_resolver.acme.email=admin@edumigsoft.com.br"
+      - "--certificatesresolvers.ems_system_resolver.acme.storage=/letsencrypt/ems_system.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - ems_system_net
+    labels:
+      - "traefik.enable=true"
+      # URL Segura para o Dashboard do Traefik
+      - "traefik.http.routers.traefik_dash.rule=Host(`traefik.edumigsoft.com.br`)"
+      - "traefik.http.routers.traefik_dash.entrypoints=websecure"
+      - "traefik.http.routers.traefik_dash.tls.certresolver=ems_system_resolver"
+      - "traefik.http.routers.traefik_dash.service=api@internal"
+      # --- CONFIGURAÇÃO DE SENHA (BASIC AUTH) ---
+      # 1. Define o middleware chamado 'auth-traefik'
+      - "traefik.http.middlewares.auth-traefik.basicauth.users=admin:$$2a$$10$$5rJHa/zUN4xHr9/.2m4XnOju/jh6lBy/W7RuV62hga1T.Oq0KpBMK"
+      # 2. Atribui o middleware ao router do dashboard
+      - "traefik.http.routers.traefik_dash.middlewares=auth-traefik"
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data:/data
+    networks:
+      - ems_system_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.edumigsoft.com.br`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls.certresolver=ems_system_resolver"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+
+networks:
+  ems_system_net:
+    external: true
+
+volumes:
+  portainer_data:
