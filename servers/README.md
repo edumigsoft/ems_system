@@ -120,7 +120,7 @@ cd servers
 
 **Health check testado automaticamente:**
 - `https://ems.local/api/v1/health`
-- `http://localhost:8181/api/v1/health`
+- `http://localhost:${SERVER_PORT}/health`
 
 ---
 
@@ -272,10 +272,11 @@ Todos os scripts fazem health check automático:
 ```bash
 # Local (desenvolvimento)
 curl -k https://ems.local/api/v1/health
-curl http://localhost:8181/api/v1/health
+curl http://localhost:${SERVER_PORT}/health
 
-# VPS (produção)
-curl https://ems.production.com/api/v1/health
+# VPS (produção) — roteado via Traefik com TLS automático
+curl https://api.ems.edumigsoft.com.br/health
+curl https://api.sms.edumigsoft.com.br/health
 ```
 
 **Resposta esperada:**
@@ -284,10 +285,12 @@ curl https://ems.production.com/api/v1/health
   "status": "OK",
   "timestamp": "2026-02-16T16:10:07.401998",
   "uptime": "since startup",
-  "env": "development",  // ou "production" na VPS
+  "env": "development",
   "version": "1.1.3"
 }
 ```
+
+> **Nota produção:** Em ambiente VPS, o Traefik faz o roteamento externo e TLS. Os containers não expõem portas diretamente no host — o acesso externo ocorre exclusivamente pelos domínios `api.ems.edumigsoft.com.br` e `api.sms.edumigsoft.com.br`.
 
 ## Solução de Problemas
 

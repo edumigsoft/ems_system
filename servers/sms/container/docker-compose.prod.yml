@@ -1,9 +1,7 @@
 services:
-  sms_server:
-    container_name: sms_server_prod
+  sms_server_prod:
     image: ghcr.io/edumigsoft/sms-server:${IMAGE_TAG:-latest}
-    expose:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+    container_name: sms_server_prod
     env_file:
       - .env
     networks:
@@ -14,11 +12,18 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
     labels:
-      com.ems.service: "sms-server"
-      com.ems.environment: "production"
-
+      - "com.sms.service=sms-server"
+      - "com.sms.environment=production"
+      - "traefik.enable=true"
+      - "traefik.http.routers.sms-api.rule=Host(`api.sms.edumigsoft.com.br`)"
+      - "traefik.http.routers.sms-api.entrypoints=websecure"
+      - "traefik.http.routers.sms-api.tls.certresolver=ems_system_resolver"
+      - "traefik.http.services.sms-api.loadbalancer.server.port=${SERVER_PORT}"
+    volumes:
+      - ${UPLOADS_HOST_PATH:-../../../uploads}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
+      - ${LOGS_HOST_PATH:-./logs}:${LOGS_CONTAINER_PATH:-/app/logs}
+      
 networks:
   ems_system_net:
     external: true

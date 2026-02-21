@@ -1,5 +1,5 @@
 services:
-  sms_server:
+  sms_server_dev:
     container_name: sms_server_dev
     image: sms-server:latest
     build:

@@ -1,5 +1,5 @@
 services:
-  ems_server:
+  ems_server_dev:
     container_name: ems_server_dev
     image: ems-server:latest
     build:

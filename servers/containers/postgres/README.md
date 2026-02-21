@@ -1,11 +1,12 @@
 # PostgreSQL Container - EMS System
 
-Container PostgreSQL 17 Alpine compartilhado para EMS e SMS, configurado para rodar em VPS com rede Docker compartilhada (nginx proxy reverso).
+Container PostgreSQL 17 Alpine compartilhado para EMS e SMS, configurado para rodar em VPS com rede Docker compartilhada (Traefik proxy reverso).
 
 ## Arquitetura
 
 - **Container**: Uma instância PostgreSQL compartilhada
-- **Rede**: `ems_system_net` (externa, compartilhada com nginx e outros serviços)
+- **Rede**: `ems_system_net` (externa, compartilhada com Traefik, Portainer e outros serviços)
+- **Traefik**: `traefik.enable: "false"` — PostgreSQL não é exposto pelo proxy reverso
 - **Acesso**: Apenas via rede interna Docker (sem exposição de portas públicas)
 - **Persistência**: Um volume Docker único (`postgres_ems_system_data`)
 - **Databases**: Múltiplas databases isoladas (EMS, SMS, etc.) no mesmo PostgreSQL
@@ -264,7 +265,8 @@ docker exec postgres_ems_system tail -f /var/lib/postgresql/data/log/postgresql-
 ✅ **Isolamento de databases**: Cada serviço (EMS/SMS) tem sua própria database e usuário
 ✅ **Sem exposição pública**: Acesso apenas via rede Docker interna
 ✅ **Firewall VPS**: Proteção adicional no host
-✅ **Nginx proxy**: Apps acessam via proxy reverso
+✅ **Traefik excluído**: Label `traefik.enable: "false"` garante que o PostgreSQL nunca seja roteado pelo proxy
+✅ **Traefik proxy**: Servidores EMS/SMS acessam via rede interna Docker; clientes externos passam pelo Traefik com TLS
 ✅ **Healthcheck**: Detecta problemas automaticamente
 
 ⚠️ **Checklist de produção:**

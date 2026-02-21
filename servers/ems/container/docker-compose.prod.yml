@@ -1,14 +1,9 @@
 services:
-  ems_server:
+  ems_server_prod:
     container_name: ems_server_prod
     image: ghcr.io/edumigsoft/ems-server:${IMAGE_TAG:-latest}
-    expose:
-      - "${SERVER_PORT}:${SERVER_PORT}"
     env_file:
       - .env
-    volumes:
-      - ${UPLOADS_HOST_PATH:-../../../uploads}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
-      - ${LOGS_HOST_PATH:-./logs}:${LOGS_CONTAINER_PATH:-/app/logs}
     networks:
       - ems_system_net
     restart: unless-stopped
@@ -17,10 +12,17 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
     labels:
-      com.ems.service: "ems-server"
-      com.ems.environment: "production"
+      - "com.ems.service=ems-server"
+      - "com.ems.environment=production"
+      - "traefik.enable=true"
+      - "traefik.http.routers.ems-api.rule=Host(`api.ems.edumigsoft.com.br`)"
+      - "traefik.http.routers.ems-api.entrypoints=websecure"
+      - "traefik.http.routers.ems-api.tls.certresolver=ems_system_resolver"
+      - "traefik.http.services.ems-api.loadbalancer.server.port=${SERVER_PORT}"
+    volumes:
+      - ${UPLOADS_HOST_PATH:-../../../uploads}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
+      - ${LOGS_HOST_PATH:-./logs}:${LOGS_CONTAINER_PATH:-/app/logs}
 
 networks:
   ems_system_net:
