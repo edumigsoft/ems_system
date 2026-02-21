@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import '../view_models/notebook_list_view_model.dart';
 import '../ui/widgets/components/mobile/mobile_widget.dart';
 import '../ui/widgets/components/tablet/tablet_widget.dart';
-import '../ui/widgets/components/desktop/desktop_widget.dart';
-import '../widgets/notebook_create_dialog.dart';
+import '../ui/widgets/components/desktop/desktop_page_widget.dart';
 
 /// Página de listagem de cadernos.
 ///
 /// Sem Scaffold/AppBar — usa DSCardHeader + DSCard + ResponsiveLayout.
-/// Mobile: read-only. Tablet/Desktop: edição completa.
+/// Mobile: read-only. Tablet: grid 2 colunas ↔ detalhe inline.
+/// Desktop: tabela ↔ detalhe inline (sem split panel).
 class NotebookListPage extends StatefulWidget {
   final NotebookListViewModel viewModel;
 
@@ -53,36 +53,21 @@ class _NotebookListPageState extends State<NotebookListPage> {
     }
   }
 
-  Future<void> _showCreateDialog() async {
-    final created = await showDialog<bool>(
-      context: context,
-      builder: (context) => const NotebookCreateDialog(),
-    );
-    if (created == true && mounted) {
-      widget.viewModel.loadNotebooks();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        DSCardHeader(
+        const DSCardHeader(
           title: 'Cadernos',
           subtitle: 'Gestão de Cadernos',
           showSearch: false,
-          actionButton: IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showCreateDialog,
-            tooltip: 'Novo Caderno',
-          ),
         ),
         Expanded(
           child: DSCard(
             child: ResponsiveLayout(
               mobile: MobileWidget(viewModel: widget.viewModel),
               tablet: TabletWidget(viewModel: widget.viewModel),
-              desktop: DesktopWidget(viewModel: widget.viewModel),
+              desktop: DesktopPageWidget(viewModel: widget.viewModel),
             ),
           ),
         ),

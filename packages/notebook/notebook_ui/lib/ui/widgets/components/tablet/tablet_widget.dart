@@ -3,15 +3,17 @@ import 'package:core_shared/core_shared.dart' show GetItInjector;
 import 'package:notebook_shared/notebook_shared.dart';
 import '../../../../view_models/notebook_list_view_model.dart';
 import '../../../../view_models/notebook_detail_view_model.dart';
-import '../../../../view_models/notebook_create_view_model.dart';
 import '../../../../widgets/notebook_card.dart';
-import '../../../../pages/notebook_detail_page.dart';
-import '../../../../pages/notebook_form_page.dart';
+import '../../../../widgets/notebook_create_dialog.dart';
+import '../../../../widgets/notebook_edit_dialog.dart';
 import '../../dialogs/dialogs.dart';
+import '../shared/notebook_inline_detail.dart';
 
-/// Widget tablet para listagem e gerenciamento de cadernos.
+/// Widget tablet com navegação in-page: grid ↔ detalhe.
 ///
-/// Scaffold + AppBar + FAB. GridView 2 colunas com ações de edição.
+/// Toda a área do DSCard troca de conteúdo — sem Navigator.push,
+/// sem Scaffold. Toolbar inline (busca + sort + "Novo Caderno").
+/// CRUD via dialogs. Grid 2 colunas com NotebookCard.
 class TabletWidget extends StatefulWidget {
   final NotebookListViewModel viewModel;
 
@@ -22,18 +24,141 @@ class TabletWidget extends StatefulWidget {
 }
 
 class _TabletWidgetState extends State<TabletWidget> {
+  NotebookDetails? _selected;
+  NotebookDetailViewModel? _detailVm;
+
+  // ── Navegação ──────────────────────────────────────────────────
+
+  void _openDetail(String notebookId) {
+    final notebooks = widget.viewModel.notebooks ?? [];
+    final notebook = notebooks.where((n) => n.id == notebookId).firstOrNull;
+    if (notebook == null) return;
+
+    final vm = GetItInjector().get<NotebookDetailViewModel>();
+    setState(() {
+      _selected = notebook;
+      _detailVm = vm;
+    });
+    vm.loadNotebook(notebookId).then((_) {
+      if (mounted) vm.loadAvailableTags();
+    });
+  }
+
+  void _backToList() {
+    setState(() {
+      _selected = null;
+      _detailVm = null;
+    });
+    widget.viewModel.loadNotebooks();
+  }
+
+  // ── CRUD via dialogs ────────────────────────────────────────────
+
+  Future<void> _onCreate() async {
+    final created = await showDialog<bool>(
+      context: context,
+      builder: (_) => const NotebookCreateDialog(),
+    );
+    if (created == true && mounted) widget.viewModel.loadNotebooks();
+  }
+
+  Future<void> _onEdit(NotebookDetails notebook) async {
+    final vm =
+        (_selected?.id == notebook.id ? _detailVm : null) ??
+        GetItInjector().get<NotebookDetailViewModel>();
+
+    if (vm.notebook == null) await vm.loadNotebook(notebook.id);
+    if (!mounted) return;
+
+    final updated = await showDialog<bool>(
+      context: context,
+      builder: (_) => NotebookEditDialog(notebook: notebook, viewModel: vm),
+    );
+    if (updated == true && mounted) {
+      widget.viewModel.loadNotebooks();
+      if (_selected?.id == notebook.id) vm.loadNotebook(notebook.id);
+    }
+  }
+
+  Future<void> _onDelete(NotebookDetails notebook) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) =>
+          NotebookDeleteConfirmDialog(notebookTitle: notebook.title),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final success = await widget.viewModel.deleteNotebook(notebook.id);
+    if (!mounted) return;
+
+    if (success && _selected?.id == notebook.id) _backToList();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success
+              ? 'Caderno excluído com sucesso'
+              : (widget.viewModel.error ?? 'Erro ao excluir caderno'),
+        ),
+        backgroundColor: success ? null : Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
+  // ── Build ───────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cadernos'),
-        automaticallyImplyLeading: false,
-        actions: [
+    if (_selected != null && _detailVm != null) {
+      return NotebookInlineDetail(
+        notebook: _selected!,
+        viewModel: _detailVm!,
+        onBack: _backToList,
+        onEdit: () => _onEdit(_selected!),
+        onDelete: () => _onDelete(_selected!),
+      );
+    }
+
+    return Column(
+      children: [
+        _buildToolbar(context),
+        const Divider(height: 1),
+        Expanded(
+          child: ListenableBuilder(
+            listenable: widget.viewModel,
+            builder: (context, _) => _buildGrid(context),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolbar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Buscar cadernos...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+                isDense: true,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+              ),
+              onChanged: widget.viewModel.setSearchQuery,
+            ),
+          ),
+          const SizedBox(width: 8),
           PopupMenuButton<NotebookSortOrder>(
             icon: const Icon(Icons.sort),
             tooltip: 'Ordenar',
-            onSelected: (order) => widget.viewModel.setSortOrder(order),
-            itemBuilder: (context) => [
+            onSelected: widget.viewModel.setSortOrder,
+            itemBuilder: (_) => [
               _sortItem(
                 NotebookSortOrder.recentFirst,
                 'Mais Recentes',
@@ -57,21 +182,19 @@ class _TabletWidgetState extends State<TabletWidget> {
               ),
             ],
           ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: widget.viewModel.loadNotebooks,
             tooltip: 'Atualizar',
           ),
+          const SizedBox(width: 8),
+          ElevatedButton.icon(
+            onPressed: _onCreate,
+            icon: const Icon(Icons.add),
+            label: const Text('Novo Caderno'),
+          ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _navigateToCreate,
-        icon: const Icon(Icons.add),
-        label: const Text('Novo Caderno'),
-      ),
-      body: ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) => _buildBody(context),
       ),
     );
   }
@@ -94,7 +217,7 @@ class _TabletWidgetState extends State<TabletWidget> {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
+  Widget _buildGrid(BuildContext context) {
     final theme = Theme.of(context);
 
     if (widget.viewModel.isLoading && widget.viewModel.notebooks == null) {
@@ -106,11 +229,7 @@ class _TabletWidgetState extends State<TabletWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
+            Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(
               'Erro ao carregar cadernos',
@@ -150,7 +269,7 @@ class _TabletWidgetState extends State<TabletWidget> {
               style: theme.textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            const Text('Clique no botão + para criar seu primeiro caderno'),
+            const Text('Clique em "Novo Caderno" para criar o primeiro'),
           ],
         ),
       );
@@ -170,63 +289,10 @@ class _TabletWidgetState extends State<TabletWidget> {
         return NotebookCard(
           notebook: notebook,
           tagsMap: tagsMap,
-          onTap: () => _navigateToDetail(notebook.id),
-          onDelete: () => _confirmDelete(notebook),
+          onTap: () => _openDetail(notebook.id),
+          onDelete: () => _onDelete(notebook),
         );
       },
     );
-  }
-
-  Future<void> _navigateToCreate() async {
-    NotebookCreate? toCreate;
-    final result = await Navigator.of(context).push<bool>(
-      MaterialPageRoute(
-        builder: (context) => NotebookFormPage(
-          onCreate: (create) => toCreate = create,
-        ),
-      ),
-    );
-    if (result == true && toCreate != null && mounted) {
-      final createVm = GetItInjector().get<NotebookCreateViewModel>();
-      await createVm.createNotebook(toCreate!);
-      widget.viewModel.loadNotebooks();
-    }
-  }
-
-  Future<void> _navigateToDetail(String notebookId) async {
-    final detailVm = GetItInjector().get<NotebookDetailViewModel>();
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (context) => NotebookDetailPage(
-          viewModel: detailVm,
-          notebookId: notebookId,
-        ),
-      ),
-    );
-    if (mounted) widget.viewModel.loadNotebooks();
-  }
-
-  Future<void> _confirmDelete(NotebookDetails notebook) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) =>
-          NotebookDeleteConfirmDialog(notebookTitle: notebook.title),
-    );
-    if (confirmed == true && mounted) {
-      final success = await widget.viewModel.deleteNotebook(notebook.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Caderno excluído com sucesso'
-                  : (widget.viewModel.error ?? 'Erro ao excluir caderno'),
-            ),
-            backgroundColor:
-                success ? null : Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
   }
 }

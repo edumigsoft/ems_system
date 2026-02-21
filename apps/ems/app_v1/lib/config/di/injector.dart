@@ -5,7 +5,9 @@ import 'package:auth_ui/auth_ui.dart' show AuthModule, AuthViewModel;
 import 'package:core_client/core_client.dart' show ApiKeyInterceptor;
 import 'package:core_shared/core_shared.dart'
     show Loggable, GetItInjector, DependencyInjector;
-import 'package:core_ui/core_ui.dart' show AppModule, FlutterSecureStorageAdapter;
+import 'package:core_ui/core_ui.dart'
+    show AppModule, FlutterSecureStorageAdapter, DashboardRegistry;
+import 'package:dashboard_ui/dashboard_ui.dart' show DashboardModule;
 import 'package:design_system_ui/design_system_ui.dart' show DSCard;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -30,9 +32,11 @@ class Injector with Loggable {
     // 1. Registra serviços core (Dio, Storage, etc) - SEM AppViewModel ainda
     await _registerCoreServices(_diMain);
 
-    // 2. Registra módulos (que registram AuthViewModel, etc)
+    // 2. Registra DashboardRegistry antes dos módulos de feature
+    _diMain.registerSingleton<DashboardRegistry>(DashboardRegistry());
+
+    // 3. Registra módulos (que registram AuthViewModel, etc)
     final List<AppModule> appModules = [
-      // DashboardModule(di: _diMain),
       // AuraModule(di: _diMain),
       // SchoolModule(di: _diMain),
       UserModule(di: _diMain),
@@ -42,6 +46,7 @@ class Injector with Loggable {
       AuthModule(di: _diMain),
       TagModule(di: _diMain),
       NotebookModule(di: _diMain),
+      DashboardModule(di: _diMain), // ← registrar por último (após features)
     ];
 
     // Registra as dependências de cada módulo.
@@ -73,6 +78,10 @@ class Injector with Loggable {
     // 5. Registra Módulos e Configura Navegação
     appViewModel.registerModules(appModules);
 
+    // Navega para o dashboard como rota inicial (seção de menor prioridade = 0).
+    // registerModules usa ordem de registro, não de prioridade de seção.
+    appViewModel.navigateTo(DashboardModule.routeName);
+
     // Configura os interceptors do Dio após tudo ser registrado.
     _setupDioInterceptors(_diMain);
   }
@@ -100,7 +109,9 @@ class Injector with Loggable {
         logger.info('User Settings - Server Type: ${settings.serverType}');
 
         // ⚠️ SEGURANÇA: Em RELEASE, FORÇA servidor remoto
-        final effectiveServerType = kReleaseMode ? 'remote' : settings.serverType;
+        final effectiveServerType = kReleaseMode
+            ? 'remote'
+            : settings.serverType;
         logger.info('Effective Server Type: $effectiveServerType');
 
         if (effectiveServerType == 'remote') {

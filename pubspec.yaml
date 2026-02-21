@@ -91,3 +91,6 @@ workspace:
   - packages/school/school_server
   - packages/school/school_shared
   - packages/school/school_ui
+
+  # Dashboard
+  - packages/dashboard/dashboard_ui

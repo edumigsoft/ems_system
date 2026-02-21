@@ -1,6 +1,6 @@
 import 'package:core_shared/core_shared.dart' show DependencyInjector, Loggable;
 import 'package:core_ui/core_ui.dart'
-    show AppModule, AppNavigationItem, AppNavigationSection;
+    show AppModule, AppNavigationItem, AppNavigationSection, DashboardRegistry;
 
 import 'package:flutter/material.dart';
 
@@ -16,6 +16,9 @@ import 'pages/notebook_list_page.dart';
 import 'view_models/notebook_list_view_model.dart';
 import 'view_models/notebook_detail_view_model.dart';
 import 'view_models/notebook_create_view_model.dart';
+
+import 'dashboard/notebook_reminders_entry.dart';
+import 'dashboard/notebook_quick_notes_entry.dart';
 
 class NotebookModule extends AppModule with Loggable {
   final DependencyInjector di;
@@ -69,6 +72,19 @@ class NotebookModule extends AppModule with Loggable {
 
     // NotebookDetailPage e NotebookFormPage são criadas via factory
     // pois precisam de argumentos dinâmicos (notebookId)
+
+    // Registra widgets no DashboardRegistry (se disponível)
+    try {
+      final registry = di.get<DashboardRegistry>();
+      registry.register(
+        NotebookRemindersEntry(service: di.get<NotebookApiService>()),
+      );
+      registry.register(
+        NotebookQuickNotesEntry(service: di.get<NotebookApiService>()),
+      );
+    } catch (_) {
+      // DashboardRegistry não registrado — sem integração com dashboard
+    }
   }
 
   @override

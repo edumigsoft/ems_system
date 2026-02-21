@@ -12,11 +12,27 @@ import '../../dialogs/dialogs.dart';
 /// Tabela desktop para gerenciamento de cadernos.
 ///
 /// DSDataTableContainer com sorting, filtros por tipo, paginação.
-/// Criar via NotebookFormPage; editar via NotebookFormPage; detalhe via NotebookDetailPage.
+/// Callbacks opcionais para criar/editar/visualizar — se não fornecidos,
+/// usa Navigator.push (comportamento original, retro-compatível).
 class DesktopTableWidget extends StatefulWidget {
   final NotebookListViewModel viewModel;
 
-  const DesktopTableWidget({super.key, required this.viewModel});
+  /// Se fornecido, chamado ao clicar em "Novo Caderno" (ao invés de push).
+  final VoidCallback? onCreateTap;
+
+  /// Se fornecido, chamado ao clicar em "Editar" (ao invés de push).
+  final void Function(NotebookDetails)? onEditTap;
+
+  /// Se fornecido, chamado ao clicar em "Ver detalhes" (ao invés de push).
+  final void Function(NotebookDetails)? onViewTap;
+
+  const DesktopTableWidget({
+    super.key,
+    required this.viewModel,
+    this.onCreateTap,
+    this.onEditTap,
+    this.onViewTap,
+  });
 
   @override
   State<DesktopTableWidget> createState() => _DesktopTableWidgetState();
@@ -129,8 +145,7 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
         case 0:
           comparison = a.title.compareTo(b.title);
         case 1:
-          comparison =
-              (a.type?.name ?? '').compareTo(b.type?.name ?? '');
+          comparison = (a.type?.name ?? '').compareTo(b.type?.name ?? '');
         case 2:
           comparison = a.createdAt.compareTo(b.createdAt);
         default:
@@ -141,6 +156,10 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
   }
 
   Future<void> _navigateToCreate() async {
+    if (widget.onCreateTap != null) {
+      widget.onCreateTap!();
+      return;
+    }
     NotebookCreate? toCreate;
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
@@ -157,6 +176,10 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
   }
 
   Future<void> _navigateToDetail(NotebookDetails notebook) async {
+    if (widget.onViewTap != null) {
+      widget.onViewTap!(notebook);
+      return;
+    }
     final detailVm = GetItInjector().get<NotebookDetailViewModel>();
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
@@ -170,6 +193,10 @@ class _DesktopTableWidgetState extends State<DesktopTableWidget> {
   }
 
   Future<void> _navigateToEdit(NotebookDetails notebook) async {
+    if (widget.onEditTap != null) {
+      widget.onEditTap!(notebook);
+      return;
+    }
     NotebookUpdate? toUpdate;
     final result = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
