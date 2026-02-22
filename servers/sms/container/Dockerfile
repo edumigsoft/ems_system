@@ -1,5 +1,5 @@
 # Estágio de Build
-FROM dart:stable AS build
+FROM dart:3.10.7 AS build
 
 # Build ARGs (disponíveis no estágio de build)
 ARG VERSION=unknown
@@ -16,6 +16,7 @@ RUN echo 'name: sms_system_build' > /app/pubspec.yaml && \
     echo '  sdk: ^3.10.7' >> /app/pubspec.yaml && \
     echo '' >> /app/pubspec.yaml && \
     echo 'workspace:' >> /app/pubspec.yaml && \
+    echo '  - servers/shared/server_base' >> /app/pubspec.yaml && \
     echo '  - servers/sms/server_v1' >> /app/pubspec.yaml && \
     echo '  - packages/core/core_server' >> /app/pubspec.yaml && \
     echo '  - packages/core/core_shared' >> /app/pubspec.yaml && \
@@ -51,6 +52,9 @@ COPY packages/user/user_server/pubspec.yaml /app/packages/user/user_server/pubsp
 COPY packages/school/school_shared/pubspec.yaml /app/packages/school/school_shared/pubspec.yaml
 COPY packages/school/school_server/pubspec.yaml /app/packages/school/school_server/pubspec.yaml
 
+# Server Base (shared)
+COPY servers/shared/server_base/pubspec.yaml /app/servers/shared/server_base/pubspec.yaml
+
 # Server pubspec
 COPY servers/sms/server_v1/pubspec.yaml /app/servers/sms/server_v1/pubspec.yaml
 
@@ -78,6 +82,7 @@ COPY packages/school/school_shared /app/packages/school/school_shared
 COPY packages/school/school_server /app/packages/school/school_server
 
 # --- 5. COPIAR CÓDIGO FONTE DO SERVIDOR ---
+COPY servers/shared/server_base /app/servers/shared/server_base
 COPY servers/sms/server_v1 /app/servers/sms/server_v1
 
 # --- 6. COMPILAÇÃO ---
