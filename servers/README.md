@@ -330,6 +330,75 @@ curl https://ems.production.com/api/v1/health
      -t test .
    ```
 
+## Pacote Compartilhado: `server_base`
+
+O pacote `servers/shared/server_base/` centraliza toda a infraestrutura comum entre EMS e SMS, eliminando duplicação.
+
+### Estrutura
+
+```
+servers/shared/server_base/lib/src/
+├── config/
+│   └── server_base_config.dart            # Value object com toda a configuração (DB, JWT, tokens…)
+└── infrastructure/
+    ├── registry_base_infrastructure.dart  # DB, segurança, rotas base, AuthMiddleware
+    ├── registry_common_modules.dart       # Módulos comuns: User + Auth
+    └── run_server.dart                    # Pipeline HTTP + startup do servidor
+```
+
+### Funções exportadas
+
+| Símbolo | O que faz |
+|---|---|
+| `ServerBaseConfig` | Value object com todos os parâmetros de configuração |
+| `registryBaseInfrastructure(config, {loggerName})` | Cria DI, conecta DB, registra segurança, rotas base e `AuthMiddleware` |
+| `registryCommonModules(di, config)` | Registra módulos User e Auth (presentes em todos os servidores) |
+| `runServer({di, apiKey, backendPathApi, port, urlDoc})` | Monta pipeline HTTP e inicia o servidor |
+
+### Template de `bin/server.dart`
+
+```dart
+void main() async {
+  // 1. Log antes de tudo — registryBaseInfrastructure já usa o logger
+  //    LogLevel: .verbose = dev | .info = staging | .warning = produção
+  await LogService.init(LogLevel.verbose, writeToFile: true);
+
+  // 2. Obrigatório: gerado por reflectable_builder, específico por servidor
+  initializeReflectable();
+
+  // 3. Configuração de módulos específicos do serviço (Tag, School…)
+  final di = await registryInjectors();
+
+  // 4. Infraestrutura HTTP compartilhada via server_base
+  await runServer(
+    di: di,
+    apiKey: Env.apiKey,
+    backendPathApi: Env.backendPathApi,
+    port: Env.serverPort,
+    urlDoc: Env.enableDocs,
+  );
+}
+```
+
+### O que DEVE permanecer local em cada servidor
+
+| Item | Motivo |
+|---|---|
+| `initializeReflectable()` | Gerado por `reflectable_builder` para o entry point específico |
+| `@api` / `@ApiInfo` | Anotações Swagger, também processadas por reflectable |
+| `Env.*` | Gerado por `envied` com segredos do `.env` local |
+| `registryInjectors()` | Orquestra módulos específicos do serviço |
+
+### Adicionando um novo servidor ao sistema
+
+1. Crie `servers/<nome>/server_v1/` seguindo a estrutura de EMS ou SMS
+2. Adicione `server_base: ^1.0.0` nas dependências do `pubspec.yaml`
+3. Adicione o servidor ao workspace root (`pubspec.yaml`) e ao Dockerfile correspondente
+4. Em `lib/config/injector.dart`, chame `registryBaseInfrastructure` + `registryCommonModules` + módulos específicos
+5. Em `bin/server.dart`, siga o template acima
+
+---
+
 ## Documentação Completa
 
 - [ENVIRONMENT_STRATEGY.md](ENVIRONMENT_STRATEGY.md) - Estratégia de ambientes

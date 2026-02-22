@@ -50,7 +50,7 @@ Future<DependencyInjector> registryInjectors() async {
   di.registerLazySingleton<FileRoutes>(
     () => FileRoutes(
       di.get<StorageService>(),
-      di.get<AuthMiddleware>(),
+      di.get<AuthMiddleware>().verifyJwt,
       backendBaseApi: Env.backendPathApi,
     ),
   );

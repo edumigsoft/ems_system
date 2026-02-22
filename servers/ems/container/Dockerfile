@@ -1,5 +1,5 @@
 # Estágio de Build
-FROM dart:stable AS build
+FROM dart:3.10.7 AS build
 
 # Build ARGs (disponíveis no estágio de build)
 ARG VERSION=unknown
@@ -16,6 +16,7 @@ RUN echo 'name: ems_system_build' > /app/pubspec.yaml && \
     echo '  sdk: ^3.10.7' >> /app/pubspec.yaml && \
     echo '' >> /app/pubspec.yaml && \
     echo 'workspace:' >> /app/pubspec.yaml && \
+    echo '  - servers/shared/server_base' >> /app/pubspec.yaml && \
     echo '  - servers/ems/server_v1' >> /app/pubspec.yaml && \
     echo '  - packages/core/core_server' >> /app/pubspec.yaml && \
     echo '  - packages/core/core_shared' >> /app/pubspec.yaml && \
@@ -57,6 +58,9 @@ COPY packages/tag/tag_server/pubspec.yaml /app/packages/tag/tag_server/pubspec.y
 COPY packages/notebook/notebook_shared/pubspec.yaml /app/packages/notebook/notebook_shared/pubspec.yaml
 COPY packages/notebook/notebook_server/pubspec.yaml /app/packages/notebook/notebook_server/pubspec.yaml
 
+# Server Base (shared)
+COPY servers/shared/server_base/pubspec.yaml /app/servers/shared/server_base/pubspec.yaml
+
 # Server pubspec
 COPY servers/ems/server_v1/pubspec.yaml /app/servers/ems/server_v1/pubspec.yaml
 
@@ -88,6 +92,7 @@ COPY packages/notebook/notebook_shared /app/packages/notebook/notebook_shared
 COPY packages/notebook/notebook_server /app/packages/notebook/notebook_server
 
 # --- 5. COPIAR CÓDIGO FONTE DO SERVIDOR ---
+COPY servers/shared/server_base /app/servers/shared/server_base
 COPY servers/ems/server_v1 /app/servers/ems/server_v1
 
 # --- 6. COMPILAÇÃO ---

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:auth_server/auth_server.dart' show AuthMiddleware;
 import '../../core_server.dart' show Routes;
 import 'package:core_shared/core_shared.dart' show StorageService;
 import 'package:shelf/shelf.dart';
@@ -11,12 +10,12 @@ import 'package:shelf_router/shelf_router.dart';
 /// verificando autenticação antes de permitir o download.
 class FileRoutes extends Routes {
   final StorageService _storageService;
-  final AuthMiddleware _authMiddleware;
+  final Middleware _authGuard;
   final String _backendBaseApi;
 
   FileRoutes(
     this._storageService,
-    this._authMiddleware, {
+    this._authGuard, {
     required String backendBaseApi,
   }) : _backendBaseApi = backendBaseApi,
        super(security: true);
@@ -32,7 +31,7 @@ class FileRoutes extends Routes {
     router.get(
       '/<year>/<month>/<filename>',
       Pipeline()
-          .addMiddleware(_authMiddleware.verifyJwt)
+          .addMiddleware(_authGuard)
           .addHandler(_downloadFile),
     );
 
