@@ -1,0 +1,21 @@
+name: server_base
+description: Shared server infrastructure for EMS System services
+publish_to: none
+version: 1.0.0
+resolution: workspace
+
+environment:
+  sdk: ^3.10.7
+
+dependencies:
+  shelf: ^1.4.2
+  dart_jsonwebtoken: ^3.3.1
+  core_shared: ^1.1.0
+  core_server: ^1.1.0
+  open_api_server: ^1.1.0
+  auth_server: ^1.1.0
+  user_server: ^1.1.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.26.0

@@ -11,10 +11,12 @@ import 'package:shelf/shelf.dart' hide Server;
 import 'server.reflectable.dart';
 
 // -------------Somente para gerar Swagger---------------
+const version = String.fromEnvironment('APP_VERSION', defaultValue: 'unknown');
+
 @api
 @ApiInfo(
   title: 'SMS System API',
-  version: '1.0.0',
+  version: version,
   description: 'API para o SMS System',
 )
 class Document {}
