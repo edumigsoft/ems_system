@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:core_shared/core_shared.dart' show LogService, LogLevel;
 import 'package:ems_server_v1/config/env/env.dart';
 import 'package:ems_server_v1/config/injector.dart';
@@ -24,9 +26,12 @@ void main() async {
 
   final di = await registryInjectors();
 
+  final apiKey = Platform.environment['API_KEY'] ??
+      (throw StateError('API_KEY is required but not set in environment'));
+
   await runServer(
     di: di,
-    apiKey: Env.apiKey,
+    apiKey: apiKey,
     backendPathApi: Env.backendPathApi,
     port: Env.serverPort,
     urlDoc: Env.enableDocs,

@@ -24,25 +24,19 @@ final class EnvDatabase {
   static const String dbName = _EnvDatabase.dbName;
 }
 
-@Envied(path: '.env', name: 'Env', useConstantCase: true)
+// Apenas defaults não-sensíveis, agnósticos de ambiente.
+// Secrets (JWT_KEY, API_KEY, etc.) são injetados via Platform.environment em runtime.
+// Ver: ENV_SEPARATION_ANALYSIS.md
+@Envied(path: '.env.defaults', name: 'Env', useConstantCase: true)
 final class Env {
   @EnviedField()
-  static const String serverAddress = _Env.serverAddress;
-
-  @EnviedField()
   static const int serverPort = _Env.serverPort;
-
-  @EnviedField()
-  static const String jwtKey = _Env.jwtKey;
 
   @EnviedField()
   static const bool enableDocs = _Env.enableDocs;
 
   @EnviedField()
   static const String backendPathApi = _Env.backendPathApi;
-
-  @EnviedField()
-  static const String apiKey = _Env.apiKey;
 
   @EnviedField()
   static const int accessTokenExpiresMinutes = _Env.accessTokenExpiresMinutes;
@@ -61,17 +55,4 @@ final class Env {
 
   @EnviedField()
   static const int ipBlockMinutes = _Env.ipBlockMinutes;
-
-  @EnviedField()
-  static const String verificationLinkBaseUrl = _Env.verificationLinkBaseUrl;
-
-  // Email Service
-  @EnviedField()
-  static const String emailServiceHost = _Env.emailServiceHost;
-
-  @EnviedField()
-  static const int emailServicePort = _Env.emailServicePort;
-
-  @EnviedField()
-  static const String emailServiceApiKey = _Env.emailServiceApiKey;
 }

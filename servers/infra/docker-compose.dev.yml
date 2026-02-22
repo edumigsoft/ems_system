@@ -1,0 +1,51 @@
+services:
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik_dev
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.filename=/certs/tls.yml"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/certs:ro
+    networks:
+      - ems_system_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik_dash_dev.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik_dash_dev.entrypoints=websecure"
+      - "traefik.http.routers.traefik_dash_dev.tls=true"
+      - "traefik.http.routers.traefik_dash_dev.service=api@internal"
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer_dev
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - portainer_data_dev:/data
+    networks:
+      - ems_system_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer_dev.rule=Host(`portainer.local`)"
+      - "traefik.http.routers.portainer_dev.entrypoints=websecure"
+      - "traefik.http.routers.portainer_dev.tls=true"
+      - "traefik.http.services.portainer_dev.loadbalancer.server.port=9000"
+
+networks:
+  ems_system_net:
+    external: true
+
+volumes:
+  portainer_data_dev:

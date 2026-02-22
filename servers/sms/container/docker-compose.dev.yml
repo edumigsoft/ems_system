@@ -8,18 +8,26 @@ services:
       args:
         VERSION: ${VERSION:-dev}
         ENVIRONMENT: ${ENVIRONMENT:-development}
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+    expose:
+      - "${SERVER_PORT}"
     environment:
       - ENV=${ENVIRONMENT:-development}
     env_file:
       - .env
+    volumes:
+      - ${UPLOADS_HOST_PATH:-../../.dev-data/uploads/sms}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
+      - ${LOGS_HOST_PATH:-../../.dev-data/logs/sms}:${LOGS_CONTAINER_PATH:-/app/logs}
     restart: unless-stopped
     networks:
       - ems_system_net
     labels:
-      com.ems.service: "sms-server"
-      com.ems.environment: "development"
+      - "traefik.enable=true"
+      - "traefik.http.routers.sms-api-dev.rule=Host(`api.sms.local`)"
+      - "traefik.http.routers.sms-api-dev.entrypoints=websecure"
+      - "traefik.http.routers.sms-api-dev.tls=true"
+      - "traefik.http.services.sms-api-dev.loadbalancer.server.port=${SERVER_PORT}"
+      - "com.ems.service=sms-server"
+      - "com.ems.environment=development"
 
 networks:
   ems_system_net:

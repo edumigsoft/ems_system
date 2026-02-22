@@ -15,6 +15,13 @@
 volumes/
 data/
 
+# Dados persistentes de dev local
+.dev-data/
+
+# Certificados TLS locais (mkcert)
+infra/certs/*.pem
+infra/certs/*-key.pem
+
 # Build artifacts
 build/
 dist/

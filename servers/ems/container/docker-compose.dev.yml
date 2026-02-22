@@ -8,21 +8,26 @@ services:
       args:
         VERSION: ${VERSION:-dev}
         ENVIRONMENT: ${ENVIRONMENT:-development}
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+    expose:
+      - "${SERVER_PORT}"
     environment:
       - ENV=${ENVIRONMENT:-development}
     env_file:
       - .env
     volumes:
-      - ${UPLOADS_HOST_PATH:-../../../uploads}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
-      - ${LOGS_HOST_PATH:-./logs}:${LOGS_CONTAINER_PATH:-/app/logs}
+      - ${UPLOADS_HOST_PATH:-../../.dev-data/uploads/ems}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
+      - ${LOGS_HOST_PATH:-../../.dev-data/logs/ems}:${LOGS_CONTAINER_PATH:-/app/logs}
     restart: unless-stopped
     networks:
       - ems_system_net
     labels:
-      com.ems.service: "ems-server"
-      com.ems.environment: "development"
+      - "traefik.enable=true"
+      - "traefik.http.routers.ems-api-dev.rule=Host(`api.ems.local`)"
+      - "traefik.http.routers.ems-api-dev.entrypoints=websecure"
+      - "traefik.http.routers.ems-api-dev.tls=true"
+      - "traefik.http.services.ems-api-dev.loadbalancer.server.port=${SERVER_PORT}"
+      - "com.ems.service=ems-server"
+      - "com.ems.environment=development"
 
 networks:
   ems_system_net:

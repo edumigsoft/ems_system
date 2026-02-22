@@ -7,8 +7,17 @@ import 'package:server_base/server_base.dart';
 import 'env/env.dart';
 
 Future<DependencyInjector> registryInjectors() async {
+  final jwtKey = Platform.environment['JWT_KEY'] ??
+      (throw StateError('JWT_KEY is required but not set in environment'));
+
+  final verificationLinkBaseUrl =
+      Platform.environment['VERIFICATION_LINK_BASE_URL'] ??
+      (throw StateError(
+        'VERIFICATION_LINK_BASE_URL is required but not set in environment',
+      ));
+
   final config = ServerBaseConfig(
-    dbHost: Platform.environment['DB_HOST'] ?? 'localhost',
+    dbHost: Platform.environment['DB_HOST'] ?? EnvDatabase.dbHost,
     dbPort:
         int.tryParse(Platform.environment['DB_PORT'] ?? EnvDatabase.dbPort) ??
         5432,
@@ -16,11 +25,11 @@ Future<DependencyInjector> registryInjectors() async {
     dbPass: Platform.environment['DB_PASS'] ?? EnvDatabase.dbPass,
     dbName: Platform.environment['DB_NAME'] ?? EnvDatabase.dbName,
     dbUseSsl: false,
-    jwtKey: Env.jwtKey,
+    jwtKey: jwtKey,
     backendPathApi: Env.backendPathApi,
     accessTokenExpiresMinutes: Env.accessTokenExpiresMinutes,
     refreshTokenExpiresDays: Env.refreshTokenExpiresDays,
-    verificationLinkBaseUrl: Env.verificationLinkBaseUrl,
+    verificationLinkBaseUrl: verificationLinkBaseUrl,
     appVersion: Platform.environment['APP_VERSION'],
     environment:
         Platform.environment['ENV'] ?? Platform.environment['ENVIRONMENT'],
