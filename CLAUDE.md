@@ -64,7 +64,7 @@ flutter run
 
 # Iniciar banco de dados PostgreSQL compartilhado
 cd servers/containers/postgres
-docker-compose up -d
+docker compose -f docker-compose.prod.yml up -d
 
 # Executar servidor EMS
 cd servers/ems/server_v1

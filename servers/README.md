@@ -236,7 +236,7 @@ cd servers
 
 **Desenvolvimento (`dev.sh`):**
 - Build: `docker-compose build --build-arg ENVIRONMENT=development`
-- Runtime: `ENV=development` (via docker-compose.yml)
+- Runtime: `ENV=development` (via docker-compose.prod.yml)
 - Health: `"env": "development"`
 
 **Produção (`publish.sh` + VPS):**

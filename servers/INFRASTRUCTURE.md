@@ -1,76 +1,243 @@
 # Arquitetura de Infraestrutura (Docker, Local e VPS)
 
-Este documento centraliza as definições de infraestrutura do sistema EMS/SMS, abordando desde o ambiente de desenvolvimento local até o deploy em produção (VPS).
-
-> **Status:** 🟢 **A maior parte da infraestrutura descrita já está implementada e ativa no código.**
-> A exceção é a **Estrutura de Pastas na VPS (Seção 2)**, que possui um plano de migração listado como pendente para as instâncias de produção.
+Centraliza as definições de infraestrutura do EMS System para desenvolvimento local e produção (VPS).
 
 ---
 
-## 1. 💻 [ATIVO] Ambiente de Desenvolvimento Local com Paridade de Produção
+## 1. 💻 Ambiente de Desenvolvimento Local
 
-O ambiente local é um espelho fiel da produção (utilizando a mesma stack Traefik + Docker + PostgreSQL), alterando apenas os domínios para `.local` e o certificado TLS via `mkcert`.
-A infraestrutura base do Traefik localmente já se encontra em `servers/infra/docker-compose.dev.yml`. 
+O ambiente local espelha a produção com a mesma stack (Traefik + Docker + PostgreSQL), diferindo apenas nos domínios `.local` e TLS via `mkcert`.
 
-### Como a Infra Local Funciona no Código
+### Estrutura local relevante
 
-**Arquivos de Setup:**
-- `servers/infra/docker-compose.dev.yml` configura o Traefik de Dev (sem ACME Let's Encrypt, com File Provider do `mkcert`) lendo de `servers/infra/certs/tls.yml`.
-- `servers/ems/container/docker-compose.dev.yml` e a variante do `sms` expõem os labels corretos do Traefik para roteamento em `api.ems.local` e gerenciam os volumes `UPLOADS_HOST_PATH` referenciando aos mock locations de desenvolvimento `../../.dev-data/...`.
+```
+~/Projects/Working/ems_system/              ← raiz do repositório
+│
+├── .dev-data/                              ← volumes locais (.gitignore'd)
+│   ├── uploads/
+│   │   ├── ems/
+│   │   └── sms/
+│   └── logs/
+│       ├── ems/
+│       └── sms/
+│
+└── servers/
+    ├── dev.sh                              ← build local da imagem
+    ├── publish.sh                          ← publica imagem no GHCR
+    ├── update.sh                           ← deploy na VPS (pull + restart)
+    ├── rollback.sh                         ← rollback de versão na VPS
+    │
+    ├── infra/
+    │   ├── docker-compose.dev.yml          ← Traefik dev (mkcert, sem ACME)
+    │   ├── docker-compose.prod.yml         ← Traefik prod (Let's Encrypt ACME)
+    │   └── certs/
+    │       ├── tls.yml                     ← configuração TLS para mkcert
+    │       ├── local.pem                   ← cert local (.gitignore'd)
+    │       └── local-key.pem              ← chave local (.gitignore'd)
+    │
+    ├── containers/
+    │   └── postgres/
+    │       ├── docker-compose.prod.yml     ← PostgreSQL (dev e prod usam o mesmo)
+    │       ├── .env_example               ← template de credenciais
+    │       └── .env                       ← credenciais (.gitignore'd)
+    │
+    ├── ems/
+    │   ├── server_v1/                     ← código-fonte do servidor EMS
+    │   └── container/
+    │       ├── Dockerfile
+    │       ├── docker-compose.dev.yml      ← EMS dev → api.ems.local
+    │       ├── docker-compose.prod.yml     ← EMS prod → api.ems.edumigsoft.com.br
+    │       ├── .env_example               ← template (anotações dev/VPS)
+    │       └── .env                       ← valores locais (.gitignore'd)
+    │
+    └── sms/
+        ├── server_v1/                     ← código-fonte do servidor SMS
+        └── container/
+            ├── Dockerfile
+            ├── docker-compose.dev.yml      ← SMS dev → api.sms.local
+            ├── docker-compose.prod.yml     ← SMS prod → api.sms.edumigsoft.com.br
+            ├── .env_example               ← template (anotações dev/VPS)
+            └── .env                       ← valores locais (.gitignore'd)
+```
 
 ---
 
-## 2. ☁️ [PENDENTE] Nova Estrutura de Pastas na VPS (Traefik com Let's Encrypt)
+## 2. ☁️ Produção (VPS) — Estrutura de Diretórios
 
-Na VPS de produção, o proxy Traefik utiliza exclusivamente o **Let's Encrypt (ACME)** para gerenciar e rotacionar os certificados HTTPS automaticamente. O `mkcert` é usado apenas para o ambiente de desenvolvimento local (`.local`).
+A VPS utiliza **caminhos absolutos** para isolar dados persistentes do repositório,
+evitando fragilidades com movimentação de arquivos ou re-clones.
 
-Em setups anteriores, a VPS clonou e armazenou o repositório por inteiro, e isso acaba misturando configurações versionadas com dados estáticos persistentes (Uploads, TLS, Logs).
+### Estrutura definitiva em `/root/`
 
-### O Entendimento de Caminhos Relativos Atuais
-Atualmente o arquivo `servers/ems/container/docker-compose.prod.yml` referencia arquivos utilizando caminhos relativos na criação de volumes docker. Por exemplo:
-- `../../../uploads` (Ele volta 3 pastas a partir de `servers/ems/container` para chegar na raiz onde supostamente a pasta `uploads` ficaria ao lado de `apps` e `servers`).
-- No Traefik, os certificados TLS são injetados do `./letsencrypt` (A mesma pasta do arquivo `docker-compose.yml` da infraestrutura). 
+```
+/root/
+│
+├── infra/                                  ← infraestrutura compartilhada (todos os sistemas)
+│   └── letsencrypt/                       ← certificados ACME Let's Encrypt (persistente)
+│
+├── ems_system/                            ← EMS System
+│   ├── .secrets/
+│   │   └── github                        ← GHCR token (chmod 600) — ver Seção 4
+│   │
+│   ├── data/                             ← volumes persistentes (fora do repo)
+│   │   ├── uploads/
+│   │   │   ├── ems/
+│   │   │   └── sms/
+│   │   ├── logs/
+│   │   │   ├── ems/
+│   │   │   └── sms/
+│   │   └── backups/                      ← dumps pg_dump (cron)
+│   │
+│   └── repo/                             ← repositório git clonado
+│       └── servers/                      ← única pasta usada na VPS
+│           ├── update.sh                 ← deploy: pull imagem + restart
+│           ├── rollback.sh               ← rollback de versão
+│           │
+│           ├── infra/
+│           │   └── docker-compose.prod.yml  ← Traefik (ACME → /root/infra/letsencrypt)
+│           │
+│           ├── containers/
+│           │   └── postgres/
+│           │       ├── docker-compose.prod.yml
+│           │       ├── .env_example
+│           │       └── .env              ← criar manualmente na VPS
+│           │
+│           ├── ems/container/
+│           │   ├── docker-compose.prod.yml
+│           │   ├── .env_example
+│           │   └── .env                  ← criar manualmente na VPS
+│           │
+│           └── sms/container/
+│               ├── docker-compose.prod.yml
+│               ├── .env_example
+│               └── .env                  ← criar manualmente na VPS
+│
+└── ppr_system/                           ← outros sistemas futuros (mesmo padrão)
+    ├── .secrets/github
+    ├── data/...
+    └── repo/...
+```
 
-Isso é frágil caso o repositório seja transferido, escalado ou ocorra qualquer erro de movimentação. O objetivo futuro é segmentar a VPS estabelecendo um isolamento estrito por caminho absoluto (`/opt/ems_system/...`):
+### Equivalência local ↔ VPS
 
-### 🚨 Como Implementar o Plano de Migração na VPS
+| Elemento | Local | VPS |
+|---|---|---|
+| Repositório | `~/Projects/Working/ems_system/` | `/root/ems_system/repo/` |
+| Traefik config | `servers/infra/docker-compose.dev.yml` | `servers/infra/docker-compose.prod.yml` |
+| TLS | `servers/infra/certs/` (mkcert) | `/root/infra/letsencrypt/` (Let's Encrypt ACME) |
+| PostgreSQL | `servers/containers/postgres/docker-compose.prod.yml` | idem |
+| EMS compose | `servers/ems/container/docker-compose.dev.yml` | `servers/ems/container/docker-compose.prod.yml` |
+| SMS compose | `servers/sms/container/docker-compose.dev.yml` | `servers/sms/container/docker-compose.prod.yml` |
+| Uploads EMS | `.dev-data/uploads/ems/` | `/root/ems_system/data/uploads/ems/` |
+| Uploads SMS | `.dev-data/uploads/sms/` | `/root/ems_system/data/uploads/sms/` |
+| Logs EMS | `.dev-data/logs/ems/` | `/root/ems_system/data/logs/ems/` |
+| Logs SMS | `.dev-data/logs/sms/` | `/root/ems_system/data/logs/sms/` |
+| GHCR token | `$GITHUB_TOKEN` local | `/root/ems_system/.secrets/github` |
 
-Esta migração causará um breve período de inatividade no serviço (aprox. 10-15 min) e exigirá validação assíncrona:
+### Mapeamento de volumes nos composes de produção
 
-**Passo 1:** **Criar Nova Hierarquia Definitiva (Apenas na VPS)**
-- [ ] Estabelecer a base rigorosa em `/opt/ems_system/` com diretórios de vida longa apartados: `/data` (Uploads, Certificados do Traefik Let's Encrypt), `/logs` e a nova pasta base exclusiva para containers (`/servers`).
-
-**Passo 2:** **Migração via Terminal (Downtime)**
-- [ ] Realizar backup crítico pré-migração da pasta `letsencrypt` conectada ao Traefik de Produção e da pasta raiz local de `uploads` na VPS.
-- [ ] Excluir preventivamente as stacks antigas do Traefik, EMS e SMS na VPS (`docker compose down`). O PostgreSQL em volume *Named* pode continuar intacto. 
-- [ ] Mover em definitivo o estado e os relatórios originais para a nova área segura (`/opt/ems_system/data/...`).
-
-**Passo 3:** **Alterações de Arquivos no Código Fonte Local**
-- [ ] Editar `servers/infra/docker-compose.yml` (repositório) para modificar o volume associado ao container traefik acme (`./letsencrypt`) para um path incondicional: (`/opt/ems_system/data/letsencrypt`).
-- [ ] Retificar o `UPLOADS_HOST_PATH` e `LOGS_HOST_PATH` em `servers/ems/container/.env_example` e variantes `.env` de runtime na VPS.
-
-**Passo 4:** **Validação e Limpeza Final**
-- [ ] Transferir apenas os dockers restritivos da VPS utilizando SSH/Rsync (isento de Dart) e re-acordá-los (`update.sh`). Validar emissão do ACME Traefik. Por fim, limpe a estrutura originária se sucesso certificado.
+| Serviço | Volume Host (default no compose) | Override via `.env` |
+|---|---|---|
+| Traefik ACME | `/root/infra/letsencrypt` | — (hardcoded) |
+| EMS uploads | `/root/ems_system/data/uploads/ems` | `UPLOADS_HOST_PATH` |
+| EMS logs | `/root/ems_system/data/logs/ems` | `LOGS_HOST_PATH` |
+| SMS uploads | `/root/ems_system/data/uploads/sms` | `UPLOADS_HOST_PATH` |
+| SMS logs | `/root/ems_system/data/logs/sms` | `LOGS_HOST_PATH` |
 
 ---
 
-## 3. 🔐 [ATIVO] Setup de GITHUB_TOKEN na VPS
+## 3. 🚨 Plano de Migração na VPS (execução manual)
 
-Para baixar as imagens do contêiner armazenadas no GitHub Container Registry (GHCR), os utilitários de servidor validam automaticamente o acesso de pull. Isso já é funcional e mantido nativamente via `update.sh`.
+> Causa ~10-15 min de downtime. Executar fora do horário de pico.
+> PostgreSQL em **named volume** permanece intacto durante toda a migração.
 
-Em vez de replicar o secret global `GITHUB_TOKEN` comumente no `docker-compose.yml`, sua armazenagem opera no padrão protegido da chave global exclusiva do ambiente host Linux VPS:
+### Passo 1 — Criar hierarquia definitiva
 
 ```bash
-/root/apps/.secrets/github
+mkdir -p /root/infra/letsencrypt
+mkdir -p /root/ems_system/.secrets
+mkdir -p /root/ems_system/data/uploads/{ems,sms}
+mkdir -p /root/ems_system/data/logs/{ems,sms}
+mkdir -p /root/ems_system/data/backups
+chmod 700 /root/ems_system/.secrets
+
+# Mover o repositório para a nova localização
+mv /caminho/antigo/ems_system /root/ems_system/repo
 ```
-Esse formato, com configuração local restritiva (`chmod 600`), garante que a integridade se mantenha exclusivamente nos parâmetros do container registry (`read:packages`).
 
-### Substituição e Rotação
+### Passo 2 — Backup e derrubada das stacks antigas
 
-A VPS não pedirá credencial desde que o token mantido em `.secrets` não atinja seu prazo de validade (*Expiration*).
+```bash
+# Backup crítico antes de qualquer operação
+cp -r <caminho_antigo>/letsencrypt /root/infra/letsencrypt
+cp -r <caminho_antigo>/uploads/ems  /root/ems_system/data/uploads/ems
+cp -r <caminho_antigo>/uploads/sms  /root/ems_system/data/uploads/sms
 
-Se o token expirar ou necessitar de rotação rotineira de segurança:
-1. Revogue e reemita um novo com limite respectivo (no GitHub, vá em Settings > Developer Settings > Classic Tokens).
-2. Acesse a VPS como usuário root (ou super-admin ssh) e utilize qualquer editor de terminal para sobscrever exatamente apenas este valor, regravando como:
-   `export GITHUB_TOKEN=ghp_ABC123...`
-3. Execute o script nativo `# source /root/apps/.secrets/github && echo $GITHUB_TOKEN | docker login ghcr.io -u edumigsoft --password-stdin` para reassegurar.
+# Derrubar stacks antigas
+cd /root/ems_system/repo/servers
+docker compose -f infra/docker-compose.prod.yml down
+docker compose -f ems/container/docker-compose.prod.yml down
+docker compose -f sms/container/docker-compose.prod.yml down
+```
+
+### Passo 3 — Alterações de código ✅ (já implementado)
+
+- `servers/infra/docker-compose.prod.yml` → volume letsencrypt usa `/root/infra/letsencrypt`
+- `servers/ems/container/docker-compose.prod.yml` → defaults absolutos para uploads/logs
+- `servers/sms/container/docker-compose.prod.yml` → volumes adicionados com defaults absolutos
+- `servers/update.sh` → secrets path atualizado para `/root/ems_system/.secrets/github`
+- `.env_example` de cada container → anotações `# Dev: ... | VPS: ...` para cada path
+- Todos os `docker-compose.yml` renomeados para `docker-compose.prod.yml`
+
+### Passo 4 — Criar `.env` de produção e subir stacks
+
+```bash
+cd /root/ems_system/repo/servers
+
+# Criar .env de produção (baseado nos _example)
+cp containers/postgres/.env_example containers/postgres/.env
+cp ems/container/.env_example ems/container/.env
+cp sms/container/.env_example sms/container/.env
+
+# Editar cada .env:
+#   - ENVIRONMENT=production
+#   - DB_* com credenciais reais
+#   - JWT_KEY, API_KEY com valores seguros
+#   - UPLOADS_HOST_PATH e LOGS_HOST_PATH já têm defaults absolutos corretos
+nano containers/postgres/.env
+nano ems/container/.env
+nano sms/container/.env
+
+# Subir infraestrutura
+docker compose -f infra/docker-compose.prod.yml up -d
+docker compose -f containers/postgres/docker-compose.prod.yml up -d
+docker compose -f ems/container/docker-compose.prod.yml up -d
+docker compose -f sms/container/docker-compose.prod.yml up -d
+
+# Validar emissão do certificado ACME (~2 min)
+docker logs traefik --tail 50 | grep -i acme
+```
+
+---
+
+## 4. 🔐 GITHUB_TOKEN na VPS (GHCR Pull)
+
+Cada sistema mantém sua própria credencial de leitura do GitHub Container Registry.
+
+**Localização:** `/root/ems_system/.secrets/github`
+**Permissão:** `chmod 600`
+**Formato:**
+```bash
+export GITHUB_TOKEN=ghp_ABC123...
+```
+
+O `update.sh` carrega automaticamente esse arquivo via `source` antes de `docker login`.
+
+### Rotação do token
+
+1. Revogue e reemita em **GitHub → Settings → Developer Settings → Classic Tokens** (escopo: `read:packages`)
+2. Na VPS, sobrescreva o arquivo: `/root/ems_system/.secrets/github`
+3. Valide:
+```bash
+source /root/ems_system/.secrets/github && echo $GITHUB_TOKEN | docker login ghcr.io -u edumigsoft --password-stdin
+```

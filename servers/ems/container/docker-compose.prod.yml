@@ -7,8 +7,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ${UPLOADS_HOST_PATH:-../../../uploads}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
-      - ${LOGS_HOST_PATH:-./logs}:${LOGS_CONTAINER_PATH:-/app/logs}
+      - ${UPLOADS_HOST_PATH:-/root/ems_system/data/uploads/ems}:${UPLOADS_CONTAINER_PATH:-/app/uploads}
+      - ${LOGS_HOST_PATH:-/root/ems_system/data/logs/ems}:${LOGS_CONTAINER_PATH:-/app/logs}
     networks:
       - ems_system_net
     restart: unless-stopped

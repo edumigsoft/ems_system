@@ -22,7 +22,7 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./letsencrypt:/letsencrypt
+      - /root/infra/letsencrypt:/letsencrypt
     networks:
       - ems_system_net
     labels:

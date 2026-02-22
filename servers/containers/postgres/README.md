@@ -1,11 +1,11 @@
 # PostgreSQL Container - EMS System
 
-Container PostgreSQL 17 Alpine compartilhado para EMS e SMS, configurado para rodar em VPS com rede Docker compartilhada (nginx proxy reverso).
+Container PostgreSQL 17 Alpine compartilhado para EMS e SMS, configurado para rodar em VPS com rede Docker compartilhada (Traefik proxy reverso).
 
 ## Arquitetura
 
 - **Container**: Uma instância PostgreSQL compartilhada
-- **Rede**: `ems_system_net` (externa, compartilhada com nginx e outros serviços)
+- **Rede**: `ems_system_net` (externa, compartilhada com Traefik e outros serviços)
 - **Acesso**: Apenas via rede interna Docker (sem exposição de portas públicas)
 - **Persistência**: Um volume Docker único (`postgres_ems_system_data`)
 - **Databases**: Múltiplas databases isoladas (EMS, SMS, etc.) no mesmo PostgreSQL
@@ -26,21 +26,22 @@ Container PostgreSQL 17 Alpine compartilhado para EMS e SMS, configurado para ro
 docker network create ems_system_net
 ```
 
-### 2. Copiar arquivos para o VPS
+### 2. Localização na VPS
 
-```bash
-# No VPS
-mkdir -p /opt/ems_system/postgres
-cd /opt/ems_system/postgres
+O arquivo `docker-compose.prod.yml` já estará disponível dentro do repositório clonado em:
 
-# Copiar apenas:
-# - docker-compose.yml
-# - .env (criar com credenciais de produção)
+```
+/root/ems_system/repo/servers/containers/postgres/
+├── docker-compose.prod.yml
+├── .env_example
+└── .env          ← criar manualmente com credenciais de produção
 ```
 
 ### 3. Configurar variáveis de ambiente
 
 ```bash
+cd /root/ems_system/repo/servers/containers/postgres
+cp .env_example .env
 nano .env
 ```
 
@@ -57,14 +58,14 @@ POSTGRES_DB=postgres
 ### 4. Subir o container
 
 ```bash
-docker-compose up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### 5. Verificar status
 
 ```bash
-docker-compose ps
-docker-compose logs -f
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs -f
 docker exec postgres_ems_system pg_isready -U postgres
 ```
 
@@ -109,26 +110,14 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO sms_user;
 
 ## Acesso pelos servidores EMS/SMS
 
-Configuração de conexão para servidores Dart/Shelf:
+Configuração de conexão via variáveis de ambiente no `.env` de cada container:
 
-```dart
-// Servidor EMS
-final connection = PostgreSQLConnection(
-  'postgres_ems_system',  // Nome do container na rede Docker
-  5432,                   // Porta interna
-  'ems_production',       // Database
-  username: 'ems_user',
-  password: env['EMS_DB_PASSWORD'],
-);
-
-// Servidor SMS
-final connection = PostgreSQLConnection(
-  'postgres_ems_system',  // Mesmo container
-  5432,
-  'sms_production',       // Database diferente
-  username: 'sms_user',
-  password: env['SMS_DB_PASSWORD'],
-);
+```
+DB_HOST=postgres_ems_system   # Nome do container na rede Docker
+DB_PORT=5432
+DB_NAME=ems_production        # ou sms_production
+DB_USER=ems_user              # ou sms_user
+DB_PASS=<senha>
 ```
 
 ## Backup e Restore (por database)
@@ -175,7 +164,7 @@ cat backup_ems.sql | docker exec -i postgres_ems_system \
 
 ```bash
 # Parar o container
-docker-compose stop
+docker compose -f docker-compose.prod.yml stop
 
 # Backup do volume
 docker run --rm \
@@ -184,16 +173,16 @@ docker run --rm \
   alpine tar czf /backup/postgres_full_backup_$(date +%Y%m%d).tar.gz /data
 
 # Reiniciar
-docker-compose up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
 
 ### Script de backup automático (cron)
 
-Crie `/opt/ems_system/postgres/backup.sh`:
+Crie `/root/ems_system/data/backups/backup.sh`:
 
 ```bash
 #!/bin/bash
-BACKUP_DIR="/opt/ems_system/backups"
+BACKUP_DIR="/root/ems_system/data/backups"
 RETENTION_DAYS=7
 
 mkdir -p $BACKUP_DIR
@@ -213,25 +202,25 @@ find $BACKUP_DIR -name "*.sql.gz" -mtime +$RETENTION_DAYS -delete
 Adicione ao cron:
 
 ```bash
-chmod +x /opt/ems_system/postgres/backup.sh
+chmod +x /root/ems_system/data/backups/backup.sh
 
 # Backup diário às 2h da manhã
 crontab -e
-0 2 * * * /opt/ems_system/postgres/backup.sh
+0 2 * * * /root/ems_system/data/backups/backup.sh
 ```
 
 ## Manutenção
 
 ```bash
 # Ver logs
-docker-compose logs -f
+docker compose -f docker-compose.prod.yml logs -f
 
 # Restart
-docker-compose restart
+docker compose -f docker-compose.prod.yml restart
 
 # Stop/Start
-docker-compose stop
-docker-compose up -d
+docker compose -f docker-compose.prod.yml stop
+docker compose -f docker-compose.prod.yml up -d
 
 # Verificar saúde
 docker inspect postgres_ems_system | grep -A 10 Health
@@ -264,7 +253,7 @@ docker exec postgres_ems_system tail -f /var/lib/postgresql/data/log/postgresql-
 ✅ **Isolamento de databases**: Cada serviço (EMS/SMS) tem sua própria database e usuário
 ✅ **Sem exposição pública**: Acesso apenas via rede Docker interna
 ✅ **Firewall VPS**: Proteção adicional no host
-✅ **Nginx proxy**: Apps acessam via proxy reverso
+✅ **Traefik proxy**: Apps acessam via proxy reverso
 ✅ **Healthcheck**: Detecta problemas automaticamente
 
 ⚠️ **Checklist de produção:**
@@ -297,29 +286,13 @@ docker exec postgres_ems_system psql -U postgres -d ems_production \
 
 ```bash
 # Ver logs de erro
-docker-compose logs
+docker compose -f docker-compose.prod.yml logs
 
 # Verificar volume
 docker volume inspect postgres_ems_system_data
 
 # Último recurso: recriar volume (PERDE DADOS!)
-docker-compose down
+docker compose -f docker-compose.prod.yml down
 docker volume rm postgres_ems_system_data
-docker-compose up -d
+docker compose -f docker-compose.prod.yml up -d
 ```
-
-## Resposta: Volumes separados são viáveis?
-
-**Curto**: Não é prático nem recomendado.
-
-**Explicação**:
-- PostgreSQL armazena TODAS as databases em `/var/lib/postgresql/data`
-- Volumes separados só funcionam com **tablespaces** (adiciona complexidade)
-- A solução atual (1 volume, múltiplas databases) é:
-  ✅ **Eficiente**: Economiza recursos vs múltiplos containers
-  ✅ **Flexível**: `pg_dump`/`pg_restore` por database individual
-  ✅ **Confiável**: Fácil restaurar database com problema sem afetar outras
-  ✅ **Simples**: Menos complexidade operacional
-
-**Para restaurar database com problema:**
-Simplesmente faça `pg_dump` da database problemática, recrie-a e restaure do backup. As outras databases não são afetadas.
