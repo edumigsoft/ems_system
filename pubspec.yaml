@@ -6,6 +6,7 @@ environment:
 
 workspace:
   # Servers
+  - servers/shared/server_base
   - servers/ems/server_v1
   - servers/sms/server_v1
 
