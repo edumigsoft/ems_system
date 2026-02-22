@@ -22,13 +22,21 @@ Future<DependencyInjector> registryInjectors() async {
       ));
 
   final config = ServerBaseConfig(
-    dbHost: Platform.environment['DB_HOST'] ?? EnvDatabase.dbHost,
-    dbPort:
-        int.tryParse(Platform.environment['DB_PORT'] ?? EnvDatabase.dbPort) ??
-        5432,
-    dbUser: Platform.environment['DB_USER'] ?? EnvDatabase.dbUser,
-    dbPass: Platform.environment['DB_PASS'] ?? EnvDatabase.dbPass,
-    dbName: Platform.environment['DB_NAME'] ?? EnvDatabase.dbName,
+    dbHost: Platform.environment['DB_HOST'] ??
+        (throw StateError('DB_HOST is required but not set in environment')),
+    dbPort: int.tryParse(
+          Platform.environment['DB_PORT'] ??
+              (throw StateError(
+                'DB_PORT is required but not set in environment',
+              )),
+        ) ??
+        (throw StateError('DB_PORT must be a valid integer')),
+    dbUser: Platform.environment['DB_USER'] ??
+        (throw StateError('DB_USER is required but not set in environment')),
+    dbPass: Platform.environment['DB_PASS'] ??
+        (throw StateError('DB_PASS is required but not set in environment')),
+    dbName: Platform.environment['DB_NAME'] ??
+        (throw StateError('DB_NAME is required but not set in environment')),
     dbUseSsl: false,
     jwtKey: jwtKey,
     backendPathApi: Env.backendPathApi,

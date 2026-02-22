@@ -2,31 +2,9 @@ import 'package:envied/envied.dart';
 
 part 'env.g.dart';
 
-@Envied(
-  path: '../container/.env',
-  name: 'EnvDatabase',
-  useConstantCase: true,
-)
-final class EnvDatabase {
-  @EnviedField()
-  static const String dbUser = _EnvDatabase.dbUser;
-
-  @EnviedField()
-  static const String dbPass = _EnvDatabase.dbPass;
-
-  @EnviedField()
-  static const String dbHost = _EnvDatabase.dbHost;
-
-  @EnviedField()
-  static const String dbPort = _EnvDatabase.dbPort;
-
-  @EnviedField()
-  static const String dbName = _EnvDatabase.dbName;
-}
-
-// Apenas defaults não-sensíveis, agnósticos de ambiente.
-// Secrets (JWT_KEY, API_KEY, etc.) são injetados via Platform.environment em runtime.
-// Ver: ENV_SEPARATION_ANALYSIS.md
+// Apenas defaults não-sensíveis e agnósticos de ambiente.
+// Todos os secrets (JWT_KEY, DB_*, API_KEY, etc.) são obrigatoriamente
+// injetados via Platform.environment em runtime — sem fallback em build-time.
 @Envied(path: '.env.defaults', name: 'Env', useConstantCase: true)
 final class Env {
   @EnviedField()
